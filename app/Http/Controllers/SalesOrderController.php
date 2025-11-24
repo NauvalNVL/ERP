@@ -766,14 +766,28 @@ class SalesOrderController extends Controller
             ob_end_clean();
         }
 
-        // Get sales order from SO table
-        $so = DB::table('so')->where('SO_Num', $soNumber)->first();
+        // Get all sales orders with the same base SO number (including main and fits)
+        // Extract base SO number by removing any suffix
+        $baseSoNumber = preg_replace('/-(fit\d+)$/i', '', $soNumber);
+        
+        // Get all related SO records (main + fit1-9)
+        $allSoRecords = DB::table('so')
+            ->where('SO_Num', 'like', $baseSoNumber . '%')
+            ->orderBy('SO_Num')
+            ->get();
 
-        if (!$so) {
+        if ($allSoRecords->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Sales Order not found'
             ], 404);
+        }
+
+        // Find the main record
+        $mainSo = $allSoRecords->firstWhere('COMP_Num', 'Main');
+        if (!$mainSo) {
+            // If no Main found, use the first record as main
+            $mainSo = $allSoRecords->first();
         }
 
         // Extract delivery schedules from D_DATE_1..10, D_QTY_1..10, etc.
@@ -784,10 +798,10 @@ class SalesOrderController extends Controller
             $dueCol  = $i === 10 ? 'D_DUE10'  : 'D_DUE_' . $i;
             $qtyCol  = $i === 10 ? 'D_QTY_10' : 'D_QTY_' . $i;
 
-            $date = $so->$dateCol ?? '';
-            $time = $so->$timeCol ?? '';
-            $due = $so->$dueCol ?? '';
-            $qty = $so->$qtyCol ?? 0;
+            $date = $mainSo->$dateCol ?? '';
+            $time = $mainSo->$timeCol ?? '';
+            $due = $mainSo->$dueCol ?? '';
+            $qty = $mainSo->$qtyCol ?? 0;
 
             if ($date || $qty > 0) {
                 $schedules[] = [
@@ -801,7 +815,7 @@ class SalesOrderController extends Controller
         }
 
         // Get customer address
-        $customer = DB::table('CUSTOMER')->where('CODE', $so->AC_Num)->first();
+        $customer = DB::table('CUSTOMER')->where('CODE', $mainSo->AC_Num)->first();
         $customerAddress = '';
         if ($customer) {
             $addressParts = array_filter([
@@ -814,62 +828,99 @@ class SalesOrderController extends Controller
 
         // Get delivery address
         $deliveryAddress = '';
-        if ($so->DELIVERY_TO) {
+        if ($mainSo->DELIVERY_TO) {
             $addressParts = array_filter([
-                $so->DELIVERY_ADD_1 ?? '',
-                $so->DELIVERY_ADD_2 ?? '',
-                $so->DELIVERY_ADD_3 ?? ''
+                $mainSo->DELIVERY_ADD_1 ?? '',
+                $mainSo->DELIVERY_ADD_2 ?? '',
+                $mainSo->DELIVERY_ADD_3 ?? ''
             ]);
             $deliveryAddress = implode(', ', $addressParts);
+        }
+
+        // Build details array with main and all fit components
+        $details = [];
+        
+        // Add main component first
+        $details[] = [
+            'item_code' => $mainSo->PRODUCT,
+            'item_description' => $mainSo->MODEL . ' - ' . $mainSo->P_DESIGN,
+            'order_quantity' => (float) $mainSo->SO_QTY,
+            'unit_price' => (float) $mainSo->UNIT_PRICE,
+            'uom' => $mainSo->UNIT,
+            'flute' => $mainSo->FLUTE,
+            'paper_quality_1' => $mainSo->PQ1,
+            'paper_quality_2' => $mainSo->PQ2,
+            'paper_quality_3' => $mainSo->PQ3,
+            'dimensions' => [
+                'int_l' => (float) $mainSo->INT_L,
+                'int_w' => (float) $mainSo->INT_W,
+                'int_h' => (float) $mainSo->INT_H,
+                'ext_l' => (float) $mainSo->EXT_L,
+                'ext_w' => (float) $mainSo->EXT_W,
+                'ext_h' => (float) $mainSo->EXT_H,
+            ],
+            'gross_kg' => (float) ($mainSo->MC_GROSS_KG_PER_PCS ?? 0),
+            'price_per_m2' => (float) ($mainSo->MC_NET_M2_PER_PCS ?? 0),
+            'comp_num' => $mainSo->COMP_Num,
+            'p_design' => $mainSo->P_DESIGN,
+            'roll_size' => ''
+        ];
+
+        // Add fit components (fit1-9)
+        foreach ($allSoRecords as $soRecord) {
+            if ($soRecord->COMP_Num !== 'Main' && 
+                (preg_match('/^fit\d+$/i', $soRecord->COMP_Num) || str_starts_with($soRecord->COMP_Num, 'Fit'))) {
+                
+                $details[] = [
+                    'item_code' => $soRecord->PRODUCT,
+                    'item_description' => $soRecord->MODEL . ' - ' . $soRecord->P_DESIGN . ' (' . $soRecord->COMP_Num . ')',
+                    'order_quantity' => (float) $soRecord->SO_QTY,
+                    'unit_price' => (float) $soRecord->UNIT_PRICE,
+                    'uom' => $soRecord->UNIT,
+                    'flute' => $soRecord->FLUTE,
+                    'paper_quality_1' => $soRecord->PQ1,
+                    'paper_quality_2' => $soRecord->PQ2,
+                    'paper_quality_3' => $soRecord->PQ3,
+                    'dimensions' => [
+                        'int_l' => (float) $soRecord->INT_L,
+                        'int_w' => (float) $soRecord->INT_W,
+                        'int_h' => (float) $soRecord->INT_H,
+                        'ext_l' => (float) $soRecord->EXT_L,
+                        'ext_w' => (float) $soRecord->EXT_W,
+                        'ext_h' => (float) $soRecord->EXT_H,
+                    ],
+                    'gross_kg' => (float) ($soRecord->MC_GROSS_KG_PER_PCS ?? 0),
+                    'price_per_m2' => (float) ($soRecord->MC_NET_M2_PER_PCS ?? 0),
+                    'comp_num' => $soRecord->COMP_Num,
+                    'p_design' => $soRecord->P_DESIGN,
+                    'roll_size' => ''
+                ];
+            }
         }
 
         return response()->json([
             'success' => true,
             'data' => [
                 'sales_order' => [
-                    'so_number' => $so->SO_Num,
-                    'customer_code' => $so->AC_Num,
-                    'customer_name' => $so->AC_NAME,
+                    'so_number' => $mainSo->SO_Num,
+                    'customer_code' => $mainSo->AC_Num,
+                    'customer_name' => $mainSo->AC_NAME,
                     'customer_address' => $customerAddress,
-                    'customer_po_number' => $so->PO_Num,
-                    'po_date' => $so->PO_DATE,
-                    'master_card_seq' => $so->MCS_Num,
-                    'master_card_model' => $so->MODEL,
-                    'part_number' => $so->PART_NUMBER,
-                    'p_design' => $so->P_DESIGN,
-                    'currency' => $so->CURR,
+                    'customer_po_number' => $mainSo->PO_Num,
+                    'po_date' => $mainSo->PO_DATE,
+                    'master_card_seq' => $mainSo->MCS_Num,
+                    'master_card_model' => $mainSo->MODEL,
+                    'part_number' => $mainSo->PART_NUMBER,
+                    'p_design' => $mainSo->P_DESIGN,
+                    'currency' => $mainSo->CURR,
                     'credit_terms' => '',
-                    'remark' => $so->SO_REMARK,
-                    'instruction1' => $so->SO_INSTRUCTION_1,
-                    'instruction2' => $so->SO_INSTRUCTION_2,
-                    'status' => $so->STS,
-                    'delivery_location' => $so->DELIVERY_TO,
+                    'remark' => $mainSo->SO_REMARK,
+                    'instruction1' => $mainSo->SO_INSTRUCTION_1,
+                    'instruction2' => $mainSo->SO_INSTRUCTION_2,
+                    'status' => $mainSo->STS,
+                    'delivery_location' => $mainSo->DELIVERY_TO,
                     'delivery_address' => $deliveryAddress,
-                    'details' => [[
-                        'item_code' => $so->PRODUCT,
-                        'item_description' => $so->MODEL . ' - ' . $so->P_DESIGN,
-                        'order_quantity' => (float) $so->SO_QTY,
-                        'unit_price' => (float) $so->UNIT_PRICE,
-                        'uom' => $so->UNIT,
-                        'flute' => $so->FLUTE,
-                        'paper_quality_1' => $so->PQ1,
-                        'paper_quality_2' => $so->PQ2,
-                        'paper_quality_3' => $so->PQ3,
-                        'dimensions' => [
-                            'int_l' => (float) $so->INT_L,
-                            'int_w' => (float) $so->INT_W,
-                            'int_h' => (float) $so->INT_H,
-                            'ext_l' => (float) $so->EXT_L,
-                            'ext_w' => (float) $so->EXT_W,
-                            'ext_h' => (float) $so->EXT_H,
-                        ],
-                        'measurement' => $so->P_DESIGN,
-                        'roll_size' => '',
-                        'gross_kg' => (float) $so->MC_GROSS_KG_PER_PCS,
-                        'price_per_m2' => 0,
-                        'ppn_percentage' => 0,
-                        'line_total' => (float) $so->AMOUNT
-                    ]]
+                    'details' => $details
                 ],
                 'delivery_schedules' => $schedules
             ]
@@ -1182,13 +1233,18 @@ class SalesOrderController extends Controller
 
                 Log::info('Filtering SO range:', ['from_so' => $fromSO, 'to_so' => $toSO]);
 
-                $query->where(function($q) use ($fromSO, $toSO) {
-                    // New format: MM-YYYY-XXXXX
-                    $q->whereBetween('SO_Num', [$fromSO, $toSO]);
-
-                    // Old format: SO-YYYYMMDD-XXXX (always include for backward compatibility)
-                    $q->orWhere('SO_Num', 'like', 'SO-%');
-                });
+                // Check if we're dealing with new format (MM-YYYY-XXXXX) or old format
+                if (preg_match('/^\d{2}-\d{4}-\d{5}$/', $fromSO) && preg_match('/^\d{2}-\d{4}-\d{5}$/', $toSO)) {
+                    // New format: MM-YYYY-XXXXX - use whereBetween for exact range
+                    $query->whereBetween('SO_Num', [$fromSO, $toSO]);
+                    Log::info('Using new format SO range filter');
+                } else {
+                    // Old format: SO-YYYYMMDD-XXXX - extract and compare by date and sequence
+                    $query->where(function($q) use ($fromSO, $toSO) {
+                        $q->whereBetween('SO_Num', [$fromSO, $toSO]);
+                    });
+                    Log::info('Using old format SO range filter');
+                }
             }
 
             // Filter by status
@@ -1197,11 +1253,11 @@ class SalesOrderController extends Controller
                 Log::info('Filtering by status:', ['status' => $statuses]);
                 if (is_array($statuses) && !empty($statuses)) {
                     $statusMap = [
-                        'outstanding' => 'OPEN',
-                        'partial' => 'PARTIAL',
-                        'completed' => 'COMPLETED',
-                        'closed' => 'CLOSED',
-                        'cancelled' => 'CANCELLED'
+                        'outstanding' => 'Outstanding',
+                        'partial' => 'Partial',
+                        'completed' => 'Completed',
+                        'closed' => 'Closed',
+                        'cancelled' => 'Cancelled'
                     ];
                     $dbStatuses = [];
                     foreach ($statuses as $status) {
@@ -1215,6 +1271,10 @@ class SalesOrderController extends Controller
                     }
                 }
             }
+
+            // Filter to only show main component (exclude fit1-9)
+            $query->where('COMP_Num', 'Main');
+            Log::info('Filtering by COMP_Num: Main only');
 
             // Get SQL query for debugging
             $sql = $query->toSql();

@@ -942,18 +942,21 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   doc.setLineWidth(0.5)
   doc.line(leftMargin, yPos, rightMargin, yPos)
   yPos += 9
-  
+
   // Detail rows
   doc.setFont('courier', 'normal')
   doc.setFontSize(7)
-  details.forEach((detail) => {
+  details.forEach((detail, index) => {
+    if (index > 0) yPos += 5 // Add spacing between components
+
     const qty = detail.order_quantity || 0
     const price = detail.unit_price || 0
     const amount = qty * price
-    
-    // Main line
-    doc.text('Main', leftMargin, yPos)
-    
+
+    // Use COMP_Num for TYPE field
+    const compType = detail.comp_num || 'Main'
+    doc.text(compType, leftMargin, yPos)
+
     // Part number and design info - Moved closer to TYPE column
     const partNo = so.part_number || ''
     const pDesign = detail.item_code || ''
@@ -1027,14 +1030,68 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   doc.setFont('courier', 'normal')
   doc.setFontSize(7)
-  schedules.forEach((schedule) => {
+  
+  // Process schedules - keep each schedule separate (don't group by date)
+  const scheduleList = []
+  
+  // Process main component schedules
+  schedules.forEach((schedule, index) => {
     const dateStr = formatDate(schedule.schedule_date)
-    const qty = schedule.delivery_quantity || 0
-    const qtyText = qty.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    scheduleList.push({
+      date: dateStr,
+      main: schedule.delivery_quantity || 0,
+      fit1: 0,
+      fit2: 0,
+      fit3: 0,
+      fit4: 0,
+      fit5: 0,
+      fit6: 0,
+      fit7: 0,
+      fit8: 0,
+      fit9: 0,
+      remark: schedule.remark || '',
+      index: index // Keep track of original schedule order
+    })
+  })
+  
+  // Process fit components schedules
+  details.forEach((detail) => {
+    const compNum = detail.comp_num || ''
+    const fitMatch = compNum.match(/fit(\d+)/i)
+    if (fitMatch) {
+      const fitNum = parseInt(fitMatch[1])
+      if (fitNum >= 1 && fitNum <= 9) {
+        // Distribute fit quantities across all schedules proportionally
+        schedules.forEach((schedule, index) => {
+          const fitQty = detail.order_quantity || 0
+          const mainQty = details[0]?.order_quantity || 1
+          const scheduleQty = schedule.delivery_quantity || 0
+          const proportionalQty = (fitQty / mainQty) * scheduleQty
+          
+          const fitKey = `fit${fitNum}`
+          scheduleList[index][fitKey] += Math.round(proportionalQty)
+        })
+      }
+    }
+  })
+  
+  // Render delivery schedule table
+  scheduleList.forEach((scheduleData) => {
+    doc.text(scheduleData.date, leftMargin, yPos)
     
-    doc.text(dateStr, leftMargin, yPos)
-    doc.text(qtyText, leftMargin + 110, yPos, { align: 'right' })
-    doc.text(schedule.remark || '', leftMargin + 345, yPos)
+    // Main column
+    const mainQty = scheduleData.main.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    doc.text(mainQty, leftMargin + 110, yPos, { align: 'right' })
+    
+    // Fit columns F1-F9
+    for (let i = 1; i <= 9; i++) {
+      const fitQty = scheduleData[`fit${i}`]
+      const qtyText = fitQty > 0 ? fitQty.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : ''
+      const xPos = leftMargin + 120 + ((i - 1) * 25)
+      doc.text(qtyText, xPos + 15, yPos, { align: 'right' })
+    }
+    
+    doc.text(scheduleData.remark, leftMargin + 345, yPos)
     yPos += 8
   })
   
@@ -1255,7 +1312,9 @@ function renderSoReport(so, details, schedules) {
     const price = detail.unit_price || 0
     const amount = qty * price
     
-    lines.push(pad('Main', 15) + pad(`PART NO      : ${so.part_number || ''}`, 35) + padL(num(qty, 0), 12) + pad(detail.uom || 'PCS', 8) + padL(num(price, 4), 14) + padL(num(amount, 2), 15))
+    // Use COMP_Num for TYPE field
+    const compType = detail.comp_num || 'Main'
+    lines.push(pad(compType, 15) + pad(`PART NO      : ${so.part_number || ''}`, 35) + padL(num(qty, 0), 12) + pad(detail.uom || 'PCS', 8) + padL(num(price, 4), 14) + padL(num(amount, 2), 15))
     lines.push(pad('', 15) + `P/DESIGN     : ${detail.item_code || ''} ( PCS/SET )`)
     
     const flute = detail.flute || ''
@@ -1277,13 +1336,68 @@ function renderSoReport(so, details, schedules) {
   lines.push('')
   
   // Delivery schedule
+  lines.push('')
   lines.push('DELIVERY SCHEDULE :')
   lines.push(pad('DATE', 14) + pad('MAIN', 10) + pad('F1', 6) + pad('F2', 6) + pad('F3', 6) + pad('F4', 6) + pad('F5', 6) + pad('F6', 6) + pad('F7', 6) + pad('F8', 6) + pad('F9', 6) + 'REMARKS')
   
-  schedules.forEach((s) => {
-    const dateStr = formatDate(s.schedule_date)
-    const qtyText = padL(num(s.delivery_quantity || 0, 0), 8)
-    lines.push(pad(dateStr, 14) + pad(qtyText, 10) + (s.remark || ''))
+  // Process schedules - keep each schedule separate (don't group by date)
+  const scheduleListPreview = []
+  
+  // Process main component schedules
+  schedules.forEach((schedule, index) => {
+    const dateStr = formatDate(schedule.schedule_date)
+    scheduleListPreview.push({
+      date: dateStr,
+      main: schedule.delivery_quantity || 0,
+      fit1: 0,
+      fit2: 0,
+      fit3: 0,
+      fit4: 0,
+      fit5: 0,
+      fit6: 0,
+      fit7: 0,
+      fit8: 0,
+      fit9: 0,
+      remark: schedule.remark || '',
+      index: index
+    })
+  })
+  
+  // Process fit components schedules
+  details.forEach((detail) => {
+    const compNum = detail.comp_num || ''
+    const fitMatch = compNum.match(/fit(\d+)/i)
+    if (fitMatch) {
+      const fitNum = parseInt(fitMatch[1])
+      if (fitNum >= 1 && fitNum <= 9) {
+        schedules.forEach((schedule, index) => {
+          const fitQty = detail.order_quantity || 0
+          const mainQty = details[0]?.order_quantity || 1
+          const scheduleQty = schedule.delivery_quantity || 0
+          const proportionalQty = (fitQty / mainQty) * scheduleQty
+          
+          const fitKey = `fit${fitNum}`
+          scheduleListPreview[index][fitKey] += Math.round(proportionalQty)
+        })
+      }
+    }
+  })
+  
+  // Render delivery schedule rows
+  scheduleListPreview.forEach((scheduleData) => {
+    const mainQty = padL(num(scheduleData.main, 0), 8)
+    const fitQtys = []
+    for (let i = 1; i <= 9; i++) {
+      const qty = scheduleData[`fit${i}`]
+      fitQtys.push(qty > 0 ? padL(num(qty, 0), 4) : pad('', 4))
+    }
+    
+    lines.push(
+      pad(scheduleData.date, 14) + 
+      pad(mainQty, 10) + 
+      fitQtys.join('') + 
+      (scheduleData.remark || '')
+    )
   })
   
   lines.push('')

@@ -16,7 +16,7 @@ class ProductDesignController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Contracts\View\View
      */
     public function index(Request $request)
     {
@@ -49,7 +49,7 @@ class ProductDesignController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function create()
     {
@@ -60,7 +60,7 @@ class ProductDesignController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -120,8 +120,8 @@ class ProductDesignController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function show($id)
     {
@@ -131,8 +131,8 @@ class ProductDesignController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit($id)
     {
@@ -149,8 +149,8 @@ class ProductDesignController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $id)
     {
@@ -209,8 +209,8 @@ class ProductDesignController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
     {
@@ -230,7 +230,7 @@ class ProductDesignController extends Controller
     }
 
     /**
-     * Display a listing of the resource for printing.
+     * View and print product designs.
      *
      * @return \Illuminate\View\View
      */
@@ -243,7 +243,7 @@ class ProductDesignController extends Controller
     /**
      * Display a listing of the resource for printing in Vue.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueViewAndPrint()
     {
@@ -258,7 +258,7 @@ class ProductDesignController extends Controller
     /**
      * Display product designs page using Vue.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueIndex()
     {
@@ -284,7 +284,6 @@ class ProductDesignController extends Controller
                 'id',
                 'pd_code',
                 'pd_name',
-                'pd_alt_name',
                 'pd_design_type',
                 'idc',
                 'product',
@@ -463,6 +462,9 @@ class ProductDesignController extends Controller
 
     /**
      * Get a product design by its code
+     * 
+     * @param string $code
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getByCode($code)
     {
