@@ -613,23 +613,6 @@ Route::prefix('delivery-orders')->group(function () {
     Route::post('/{doNumber}/cancel', [DeliveryOrderController::class, 'cancel']);
 });
 
-// FG Stock-In by WO API routes
-Route::prefix('fg-stock-in-wo')->group(function () {
-Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
-Route::get('/work-orders/{woNumber}/details', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrderDetails']);
-Route::post('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'store']);
-Route::get('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'index']);
-});
-
-
-// Vendor API Routes
-Route::prefix('vendors')->group(function () {
-Route::get('/', [App\Http\Controllers\VendorController::class, 'index']);
-Route::get('/search', [App\Http\Controllers\VendorController::class, 'search']);
-Route::get('/suggestions', [App\Http\Controllers\VendorController::class, 'suggestions']);
-Route::get('/{apAcNumber}', [App\Http\Controllers\VendorController::class, 'show']);
-});
-
 // Location API Routes
 Route::prefix('locations')->group(function () {
 Route::get('/', function () {
