@@ -49,7 +49,9 @@
                       <input 
                         v-model="item.quantity" 
                         type="number"
-                        class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        :readonly="props.readOnlyQuantity"
+                        :disabled="props.readOnlyQuantity"
+                        class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 disabled:text-gray-500"
                         @input="calculateAmount(item)"
                       >
                     </td>
@@ -92,14 +94,17 @@
                   <span class="text-sm font-medium text-gray-700">Total:</span>
                   <button 
                     @click="setQuantity"
-                    class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                    :disabled="props.readOnlyQuantity"
+                    class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
                   >
                     Set
                   </button>
                   <input 
                     v-model="totalQuantity" 
                     type="number"
-                    class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    :readonly="props.readOnlyQuantity"
+                    :disabled="props.readOnlyQuantity"
+                    class="w-20 px-2 py-1 border border-gray-300 rounded text-sm disabled:bg-gray-100 disabled:text-gray-500"
                     @input="updateMainQuantity"
                   >
                   <input 
@@ -186,6 +191,12 @@ const props = defineProps({
   mcComponents: {
     type: Array,
     default: () => []
+  },
+  // When true, quantities are driven by Set Quantity in Order Details
+  // and all quantity inputs in this modal should be read-only
+  readOnlyQuantity: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -492,15 +503,36 @@ const formatCurrency = (amount) => {
   }).format(amount || 0)
 }
 
+// Helper: apply a quantity to Main only (used when user clicks Set in this modal)
 const setQuantity = () => {
-  console.log('setQuantity called with totalQuantity:', totalQuantity.value)
-  // Apply quantity to Main and only Fit rows that have actual component data
+  console.log('setQuantity called with totalQuantity (Main only):', totalQuantity.value)
+  const quantity = parseFloat(totalQuantity.value)
+  if (isNaN(quantity) || quantity <= 0) {
+    return
+  }
+
+  // Only update Main row when user interacts inside Product Design screen
+  items[0].quantity = quantity
+  calculateAmount(items[0])
+  console.log(`Main item updated via setQuantity: quantity=${items[0].quantity}, unitPrice=${items[0].unitPrice}, amount=${items[0].amount}`)
+}
+
+// Helper: apply a quantity to Main and all Fit components that have MC data
+// Used only when quantity is pushed from parent (Order Details setQuantity / initialQuantity)
+const applyQuantityToAllComponents = (qty) => {
+  const numericQty = Number(qty)
+  if (!numericQty || numericQty <= 0) {
+    return
+  }
+
+  console.log('applyQuantityToAllComponents called with:', numericQty)
+
   items.forEach((item, index) => {
     // Always apply to Main (index 0)
     if (index === 0) {
-      item.quantity = totalQuantity.value
+      item.quantity = numericQty
       calculateAmount(item)
-      console.log(`Item ${index} (${item.name}): quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
+      console.log(`Main item set from external quantity: quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
       return
     }
 
@@ -511,9 +543,9 @@ const setQuantity = () => {
       return
     }
 
-    item.quantity = totalQuantity.value
+    item.quantity = numericQty
     calculateAmount(item)
-    console.log(`Item ${index} (${item.name}): quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
+    console.log(`Fit item ${index} (${item.name}) set from external quantity: quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
   })
 }
 
@@ -541,8 +573,8 @@ const applyExternalQuantity = (qty) => {
   if (qty && Number(qty) > 0) {
     const numericQty = Number(qty)
     totalQuantity.value = numericQty
-    setQuantity()
-    console.log('Quantity applied:', numericQty, 'to items:', items.map(i => ({ name: i.name, quantity: i.quantity })))
+    applyQuantityToAllComponents(numericQty)
+    console.log('External quantity applied to all components:', numericQty, 'items:', items.map(i => ({ name: i.name, quantity: i.quantity })))
   } else {
     // If no quantity or zero, clear the values
     totalQuantity.value = null
@@ -599,7 +631,7 @@ onMounted(() => {
   if (props.initialQuantity && Number(props.initialQuantity) > 0) {
     console.log('Setting initial quantity from props:', props.initialQuantity)
     totalQuantity.value = Number(props.initialQuantity)
-    setQuantity()
+    applyQuantityToAllComponents(totalQuantity.value)
   } else {
     // If no initial quantity provided, set main item quantity to null
     console.log('No initial quantity provided, clearing values')
@@ -621,7 +653,7 @@ watch(() => props.initialQuantity, (newVal) => {
     const numericQty = Number(newVal)
     console.log('Setting quantity from watch:', numericQty)
     totalQuantity.value = numericQty
-    setQuantity()
+    applyQuantityToAllComponents(numericQty)
   } else {
     // If no quantity or zero, clear the values
     console.log('Clearing quantity from watch')
@@ -637,7 +669,7 @@ watch(() => props.show, (newVal) => {
     console.log('Modal opened, applying initial quantity:', props.initialQuantity)
     const numericQty = Number(props.initialQuantity)
     totalQuantity.value = numericQty
-    setQuantity()
+    applyQuantityToAllComponents(numericQty)
   }
 })
 </script>

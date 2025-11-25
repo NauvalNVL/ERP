@@ -16,7 +16,7 @@ class MachineController extends Controller
      * Display a listing of the machines.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
@@ -83,7 +83,7 @@ class MachineController extends Controller
      * Store a newly created machine in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -235,7 +235,7 @@ class MachineController extends Controller
      * Remove the specified machine from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
     {

@@ -595,6 +595,7 @@
           :customer="selectedCustomer"
           :initial-quantity="normalizedSetQuantity"
           :mc-components="mcComponentsForDesign"
+          :read-only-quantity="normalizedSetQuantity > 0"
           ref="productDesignModalRef"
     />
 
@@ -703,9 +704,13 @@ const orderDetails = reactive({
   lotNumber: '',
   remark: '',
   instruction1: '',
-  instruction2: ''
-  ,
-  so_number: ''
+  instruction2: '',
+  so_number: '',
+  productDesignQuantities: {},
+  isProductDesignQuantity: false,
+  mainQuantity: 0,
+  unitPrice: 0,
+  uom: ''
 })
 
 // Modal visibility
@@ -1035,6 +1040,7 @@ const refreshPage = () => {
     seq: '',
     model: '',
     status: '',
+    approval: '',
     partNo: '',
     compNo: '',
     pDesign: ''
@@ -1062,7 +1068,12 @@ const refreshPage = () => {
     remark: '',
     instruction1: '',
     instruction2: '',
-    so_number: ''
+    so_number: '',
+    productDesignQuantities: {},
+    isProductDesignQuantity: false,
+    mainQuantity: 0,
+    unitPrice: 0,
+    uom: ''
   })
 
   // Update UI after reset
@@ -1542,7 +1553,6 @@ const saveProductDesign = async (designData) => {
 
       // Persist key values from design to order details for SO creation
       try {
-        const hadInitialSetQty = Number(orderDetails.setQuantity) > 0
         const mainItem = Array.isArray(designData.items) ? designData.items[0] : null
         if (mainItem) {
           if (mainItem.unitPrice != null) {
@@ -1571,7 +1581,10 @@ const saveProductDesign = async (designData) => {
         const totalDesignQty = Array.isArray(designData.items)
           ? designData.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
           : 0
-        if (!hadInitialSetQty && totalDesignQty > 0) {
+
+        // Once Product Design is used, treat quantities as product-design-driven
+        // regardless of whether setQuantity was filled earlier
+        if (totalDesignQty > 0) {
           orderDetails.mainQuantity = totalDesignQty
           orderDetails.isProductDesignQuantity = true
         }
@@ -1747,24 +1760,11 @@ const saveDeliveryLocation = async (locationData) => {
   showDeliveryLocationModal.value = false
   success('Delivery location saved successfully')
 
-  // Create Sales Order first, then proceed to Delivery Schedule
-  try {
-    const soResponse = await createSalesOrder()
-    if (soResponse?.success) {
-      orderDetails.so_number = soResponse.so_number
-      success(`Sales Order ${soResponse.so_number} created successfully!`)
-
-      // After creating SO, proceed to Delivery Schedule
-      setTimeout(() => {
-        showDeliveryScheduleModal.value = true
-      }, 300)
-    } else {
-      error('Failed to create Sales Order: ' + (soResponse?.message || 'Unknown error'))
-    }
-  } catch (err) {
-    console.error('Error creating Sales Order:', err)
-    error('Error creating Sales Order: ' + (err.message || 'Network error'))
-  }
+  // DO NOT create Sales Order here - wait for Delivery Schedule save
+  // Just proceed to Delivery Schedule modal
+  setTimeout(() => {
+    showDeliveryScheduleModal.value = true
+  }, 300)
   } catch (err) {
     console.error('Error saving delivery location:', err)
     error('Error saving delivery location: ' + (err.message || 'Network error'))
@@ -1803,10 +1803,13 @@ const saveDeliverySchedule = async (scheduleData) => {
     }
 
     // Now save the delivery schedule (entries already validated by modal)
+    // Use entries as emitted by DeliveryScheduleModal (supports both legacy and per-component formats)
     const requestData = {
       so_number: soNumber,
       entries: scheduleData.entries
     }
+    
+    console.log('Transformed delivery schedule data:', requestData)
 
     // Debug CSRF token for delivery schedule
     const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
@@ -1836,6 +1839,12 @@ const saveDeliverySchedule = async (scheduleData) => {
     if (data.success) {
       console.log('Delivery schedule saved:', scheduleData)
       showDeliveryScheduleModal.value = false
+      showDeliveryLocationModal.value = false
+      showProductDesignModal.value = false
+      showCustomerModal.value = false
+      showSalesOrderTableModal.value = false
+      // Reset main PrepareMCSO form after successful schedule save
+      refreshPage()
       success('Delivery schedule saved successfully')
 
       // Optionally, you can proceed with final sales order creation here
@@ -1849,7 +1858,8 @@ const saveDeliverySchedule = async (scheduleData) => {
 }
 
 // Create Sales Order function
-const createSalesOrder = async () => {
+const createSalesOrder = async (options = {}) => {
+  const resetOnSuccess = options.resetOnSuccess === true
   try {
     // Comprehensive validation
     if (!selectedCustomer.code) {
@@ -1888,6 +1898,8 @@ const createSalesOrder = async () => {
       set_quantity: (orderDetails.setQuantity !== undefined && orderDetails.setQuantity !== null)
         ? String(orderDetails.setQuantity)
         : '',
+      // Include product design quantities for each component (Main, Fit1-9)
+      product_design_quantities: orderDetails.productDesignQuantities || {},
       // ===================================================================
       // DELIVERY LOCATION DATA - Dual Mode System
       // ===================================================================
@@ -1908,6 +1920,18 @@ const createSalesOrder = async () => {
         }
       ]
     }
+
+    // Debug log for potential conversion issues
+    console.log('Sales Order Request Data Debug:', {
+      setQuantity: orderDetails.setQuantity,
+      setQuantityType: typeof orderDetails.setQuantity,
+      parsedSetQuantity: parseFloat(orderDetails.setQuantity),
+      unitPrice: orderDetails.unitPrice,
+      unitPriceType: typeof orderDetails.unitPrice,
+      parsedUnitPrice: parseFloat(orderDetails.unitPrice),
+      productDesignQuantities: orderDetails.productDesignQuantities,
+      productDesignQuantitiesType: typeof orderDetails.productDesignQuantities
+    })
 
     // Log delivery location data for debugging
     console.log('Sales Order - Delivery Location Data:', {
@@ -1939,6 +1963,19 @@ const createSalesOrder = async () => {
       // Note: Removed duplicate save to legacy SO table to prevent data duplication
       // The main API endpoint '/api/sales-order' should handle all necessary data storage
       console.log('Sales Order created successfully:', data.data.so_number)
+
+      if (resetOnSuccess) {
+        orderDetails.so_number = data.data.so_number
+        showCustomerModal.value = false
+        showProductDesignModal.value = false
+        showDeliveryLocationModal.value = false
+        showDeliveryScheduleModal.value = false
+        showSalesOrderTableModal.value = false
+        if (typeof showMcsTableModal !== 'undefined') {
+          showMcsTableModal.value = false
+        }
+        refreshPage()
+      }
 
       return {
         success: true,
@@ -2086,7 +2123,7 @@ const handleKeyDown = (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === 's') {
     event.preventDefault()
     if (canProceed.value) {
-      createSalesOrder()
+      createSalesOrder({ resetOnSuccess: true })
     } else {
       error('Please complete required fields first')
     }

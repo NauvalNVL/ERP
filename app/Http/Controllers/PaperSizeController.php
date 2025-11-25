@@ -164,7 +164,7 @@ class PaperSizeController extends Controller
     /**
      * Display a listing of the resource using Vue.
      *
-     * @return \\Inertia\\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueIndex()
     {
@@ -194,7 +194,7 @@ class PaperSizeController extends Controller
     /**
      * Display a listing of the resource for printing in Vue.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueViewAndPrint()
     {

@@ -622,11 +622,26 @@ const orderComponentQuantities = computed(() => {
       }
     }
   } else {
-    // Fallback: use initial set quantity for Main only
+    // When quantity is set initially (not through product design modal)
+    // Distribute the setQuantity to all active components (Main + Fits)
     const val = props.orderDetails?.setQuantity
     const setQty = typeof val === 'string' ? parseFloat(val) : Number(val)
     if (!isNaN(setQty) && setQty > 0) {
-      result.Main = setQty
+      if (active && active.size > 0) {
+        // Distribute quantity to all active components
+        if (active.has('Main')) {
+          result.Main = setQty
+        }
+        for (let i = 1; i <= 9; i++) {
+          const label = `Fit${i}`
+          if (active.has(label)) {
+            result[label] = setQty
+          }
+        }
+      } else {
+        // Fallback: assign to Main only if no active components data
+        result.Main = setQty
+      }
     }
   }
 
@@ -635,6 +650,29 @@ const orderComponentQuantities = computed(() => {
 
 const orderComponentsTotal = computed(() => {
   const q = orderComponentQuantities.value
+  const activeLabels = activeComponentLabels.value
+  
+  // If we have active component labels (fit data exists), calculate total from all components
+  if (activeLabels && activeLabels.size > 0) {
+    let total = 0
+    
+    // Add Main component if exists
+    if (activeLabels.has('Main')) {
+      total += (Number(q.Main) || 0)
+    }
+    
+    // Add Fit components if they exist
+    for (let i = 1; i <= 9; i++) {
+      const fitLabel = `Fit${i}`
+      if (activeLabels.has(fitLabel)) {
+        total += (Number(q[fitLabel]) || 0)
+      }
+    }
+    
+    return total
+  }
+  
+  // Fallback: if no active components defined, sum all available quantities
   return (
     (Number(q.Main) || 0) +
     (Number(q.Fit1) || 0) +
@@ -652,14 +690,9 @@ const orderComponentsTotal = computed(() => {
 // Computed properties for totals
 const entryTotal = computed(() => {
   const totals = scheduleEntries.value.reduce((acc, entry) => {
+    // Use individual entry quantities (not sum of main + fits)
     acc.set += parseInt(entry.set) || 0
-
-    // Main total = Main + all Fit quantities (if any)
-    let mainAndFits = parseInt(entry.main) || 0
-    for (let i = 1; i <= 9; i++) {
-      mainAndFits += parseInt(entry[`fit${i}`]) || 0
-    }
-    acc.main += mainAndFits
+    acc.main += parseInt(entry.set) || parseInt(entry.main) || 0
 
     return acc
   }, { set: 0, main: 0 })
@@ -850,15 +883,70 @@ const refreshScreen = () => {
 
 
 const saveSchedule = async () => {
-  if (scheduleEntries.value.length === 0) {
-    error('Please add at least one schedule entry')
-    return
-  }
+  try {
+    console.log('saveSchedule function called')
+    
+    // Early validation with safe access
+    if (!scheduleEntries.value || scheduleEntries.value.length === 0) {
+      error('Please add at least one schedule entry')
+      return
+    }
 
-  // Validate totals (use Main + all Fit quantities as scheduled qty)
-  const totalMain = Number(entryTotal.value.main) || 0
-  const requiredMain = Number(orderComponentsTotal.value || orderTotal.value.main || 0)
-  if (totalMain !== requiredMain) {
+    // Validate totals based on whether using Product Design quantities or not
+    let totalScheduled = 0
+    let totalRequired = 0
+    
+    console.log('Starting validation. isProductDesignQuantity:', isProductDesignQuantity.value)
+  
+    // Safely access reactive values to prevent async errors
+    const isProductDesignMode = isProductDesignQuantity.value
+    const activeLabels = activeComponentLabels.value || new Set()
+    const editableLabels = editableComponentLabels.value || new Set()
+    const componentQuantities = orderComponentQuantities.value || {}
+    
+  if (isProductDesignMode) {
+    // When using Product Design quantities, validate against individual component quantities
+    
+    // Calculate total scheduled for all active components
+    const entries = scheduleEntries.value || []
+    entries.forEach(entry => {
+      const safeEntry = entry || {}
+      if (activeLabels.has('Main') && editableLabels.has('Main')) {
+        totalScheduled += parseFloat(safeEntry.main) || 0
+      }
+      for (let i = 1; i <= 9; i++) {
+        const fitLabel = `Fit${i}`
+        const fitKey = `fit${i}`
+        if (activeLabels.has(fitLabel) && editableLabels.has(fitLabel)) {
+          totalScheduled += parseFloat(safeEntry[fitKey]) || 0
+        }
+      }
+    })
+    
+    // Calculate total required for all active components
+    if (activeLabels.has('Main') && editableLabels.has('Main')) {
+      totalRequired += componentQuantities.Main || 0
+    }
+    for (let i = 1; i <= 9; i++) {
+      const fitLabel = `Fit${i}`
+      if (activeLabels.has(fitLabel) && editableLabels.has(fitLabel)) {
+        totalRequired += componentQuantities[fitLabel] || 0
+      }
+    }
+  } else {
+    // When quantity set initially, validate against setQuantity
+    const entryTotalValue = entryTotal.value || { main: 0 }
+    const orderTotalValue = orderTotal.value || { main: 0 }
+    
+    totalScheduled = Number(entryTotalValue.main) || 0
+    const setQuantity = Number(props.orderDetails?.setQuantity) || 0
+    totalRequired = setQuantity > 0 ? setQuantity : (Number(orderTotalValue.main) || 0)
+    console.log('Non-PD mode: totalScheduled=', totalScheduled, 'totalRequired=', totalRequired)
+  }
+  
+  console.log('Final validation values: totalScheduled=', totalScheduled, 'totalRequired=', totalRequired)
+  
+  if (totalScheduled !== totalRequired) {
     // Show popup with code 200105
     errorInfo.code = '200105'
     errorInfo.type = 'Unmatched Order Qty with Delivery Schedule Qty'
@@ -868,68 +956,131 @@ const saveSchedule = async () => {
 
   // Validate that no per-entry or cumulative scheduled qty exceeds order qty
   let runningTotal = 0
+  console.log('Starting per-entry validation, totalRequired=', totalRequired)
+  
   for (let i = 0; i < scheduleEntries.value.length; i++) {
-    const e = scheduleEntries.value[i]
-    // Per-entry scheduled qty = Main + all Fit quantities; fallback to Set if they are all zero
-    let qtyMainAndFits = Number(e.main) || 0
-    for (let j = 1; j <= 9; j++) {
-      qtyMainAndFits += Number(e[`fit${j}`]) || 0
-    }
-    const qty = qtyMainAndFits > 0 ? qtyMainAndFits : (Number(e.set) || 0)
+    const e = scheduleEntries.value[i] || {}
+    // Per-entry scheduled qty = individual entry quantity (Set or Main)
+    const qty = Number(e.set) || Number(e.main) || 0
+    console.log(`Entry ${i + 1}: qty=${qty}, runningTotal=${runningTotal}`)
+    
     if (!qty || qty <= 0) {
       error(`Entry ${e.no || i + 1}: Delivery quantity must be greater than 0`)
       return
     }
-    if (qty > requiredMain) {
-      error(`Entry ${e.no || i + 1}: Scheduled quantity exceeds order quantity`)
+    if (qty > totalRequired) {
+      error(`Entry ${e.no || i + 1}: Scheduled quantity exceeds order quantity (${totalRequired})`)
       return
     }
     runningTotal += qty
-    if (runningTotal > requiredMain) {
-      error(`Entry ${e.no || i + 1}: Scheduled quantity for line 1 exceeds order quantity`)
+    if (runningTotal > totalRequired) {
+      error(`Entry ${e.no || i + 1}: Total scheduled quantity (${runningTotal}) exceeds order quantity (${totalRequired})`)
       return
     }
   }
+  
+  console.log('Per-entry validation completed successfully')
 
-  try {
     // Validate entries before sending
-    const validatedEntries = scheduleEntries.value.map(entry => {
-      let qtyMainAndFits = Number(entry.main) || 0
-      for (let j = 1; j <= 9; j++) {
-        qtyMainAndFits += Number(entry[`fit${j}`]) || 0
-      }
-      const deliveryQuantity = qtyMainAndFits > 0
-        ? qtyMainAndFits
-        : (parseFloat(entry.set) || 0)
+    const validatedEntries = []
+    
+    // Create entries for each active component (Main + Fits) when using Product Design quantities
+    if (isProductDesignMode) {
+      // Use already cached values to prevent reactive access errors
       
-      // Validate required fields
-      if (!entry.date) {
-        throw new Error(`Entry ${entry.no}: Date is required`)
-      }
+      const safeEntries = scheduleEntries.value || []
+      safeEntries.forEach((entry, entryIndex) => {
+        const safeEntry = entry || {}
+        const lineNumber = Number(safeEntry.no) || (entryIndex + 1)
+        // Validate required fields first
+        if (!safeEntry.date) {
+          throw new Error(`Entry ${safeEntry.no}: Date is required`)
+        }
+        
+        if (!safeEntry.due || !['ETD', 'ETA', 'TBA'].includes(safeEntry.due)) {
+          throw new Error(`Entry ${safeEntry.no}: Due status must be ETD, ETA, or TBA`)
+        }
+        
+        // Create separate entries for each active component
+        if (activeLabels.has('Main') && editableLabels.has('Main')) {
+          const mainQty = parseFloat(safeEntry.main) || 0
+          if (mainQty > 0) {
+            validatedEntries.push({
+              line_number: lineNumber,
+              component: 'Main',
+              schedule_date: safeEntry.date,
+              schedule_time: safeEntry.time || '00:00',
+              delivery_quantity: mainQty,
+              due_status: safeEntry.due,
+              remark: safeEntry.remark || '',
+              delivery_code: safeEntry.delivery_code || '',
+              delivery_location: safeEntry.delivery_location || ''
+            })
+          }
+        }
+        
+        // Add Fit components
+        for (let i = 1; i <= 9; i++) {
+          const fitLabel = `Fit${i}`
+          const fitKey = `fit${i}`
+          
+          if (activeLabels.has(fitLabel) && editableLabels.has(fitLabel)) {
+            const fitQty = parseFloat(safeEntry[fitKey]) || 0
+            if (fitQty > 0) {
+              validatedEntries.push({
+                line_number: lineNumber,
+                component: fitLabel,
+                schedule_date: safeEntry.date,
+                schedule_time: safeEntry.time || '00:00',
+                delivery_quantity: fitQty,
+                due_status: safeEntry.due,
+                remark: safeEntry.remark || '',
+                delivery_code: safeEntry.delivery_code || '',
+                delivery_location: safeEntry.delivery_location || ''
+              })
+            }
+          }
+        }
+      })
+    } else {
+      // Original logic for when quantity is set initially (not through product design modal)
+      const safeEntriesNonPD = scheduleEntries.value || []
+      safeEntriesNonPD.forEach((entry, entryIndex) => {
+        const safeEntry = entry || {}
+        const lineNumber = Number(safeEntry.no) || (entryIndex + 1)
+        // Use individual entry quantity (Set or Main), not sum of components
+        const deliveryQuantity = parseFloat(safeEntry.set) || parseFloat(safeEntry.main) || 0
+        
+        // Validate required fields
+        if (!safeEntry.date) {
+          throw new Error(`Entry ${safeEntry.no}: Date is required`)
+        }
 
-      if (deliveryQuantity <= 0) {
-        throw new Error(`Entry ${entry.no}: Delivery quantity must be greater than 0`)
-      }
+        if (deliveryQuantity <= 0) {
+          throw new Error(`Entry ${safeEntry.no}: Delivery quantity must be greater than 0`)
+        }
 
-      if (!entry.due || !['ETD', 'ETA', 'TBA'].includes(entry.due)) {
-        throw new Error(`Entry ${entry.no}: Due status must be ETD, ETA, or TBA`)
-      }
+        if (!safeEntry.due || !['ETD', 'ETA', 'TBA'].includes(safeEntry.due)) {
+          throw new Error(`Entry ${safeEntry.no}: Due status must be ETD, ETA, or TBA`)
+        }
 
-      return {
-        line_number: entry.line_number || 1,
-        schedule_date: entry.date,
-        schedule_time: entry.time || '00:00',
-        delivery_quantity: deliveryQuantity,
-        due_status: entry.due,
-        remark: entry.remark || '',
-        delivery_code: entry.delivery_code || '',
-        delivery_location: entry.delivery_location || ''
-      }
-    })
+        validatedEntries.push({
+          line_number: lineNumber,
+          schedule_date: safeEntry.date,
+          schedule_time: safeEntry.time || '00:00',
+          delivery_quantity: deliveryQuantity,
+          due_status: safeEntry.due,
+          remark: safeEntry.remark || '',
+          delivery_code: safeEntry.delivery_code || '',
+          delivery_location: safeEntry.delivery_location || ''
+        })
+      })
+    }
     // Hand over to parent for actual saving
-    emit('save', { entries: validatedEntries })
+    await Promise.resolve(emit('save', { entries: validatedEntries }))
+    
   } catch (err) {
-    console.error('Error saving delivery schedule:', err)
+    console.error('Error in saveSchedule function:', err)
 
     // Handle validation errors more specifically
     if (err.response && err.response.status === 422) {
@@ -943,7 +1094,7 @@ const saveSchedule = async () => {
     } else if (err.message) {
       error(err.message)
     } else {
-      error('Failed to save delivery schedule')
+      error('Failed to save delivery schedule: ' + err.toString())
     }
   }
 }
