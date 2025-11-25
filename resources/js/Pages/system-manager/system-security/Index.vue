@@ -2,7 +2,7 @@
     <AppLayout header="User List">
         <Head title="User Management" />
         <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
-            <div class="max-w-7xl mx-auto relative z-10">
+            <div class="max-w-7xl mx-auto relative z-0">
                 <!-- Header Card -->
                 <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
                     <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 sm:p-6">
@@ -55,13 +55,28 @@
                 <!-- Users Table -->
                 <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden">
                     <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
-                        <h2 class="text-lg md:text-xl font-semibold text-white flex items-center">
-                            <div class="bg-white/20 rounded-full p-1.5 md:p-2 mr-2 md:mr-3">
-                                <UserIcon class="h-6 w-6 text-white" />
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                            <div>
+                                <h2 class="text-lg md:text-xl font-semibold text-white flex items-center">
+                                    <div class="bg-white/20 rounded-full p-1.5 md:p-2 mr-2 md:mr-3">
+                                        <UserIcon class="h-6 w-6 text-white" />
+                                    </div>
+                                    User Directory
+                                </h2>
+                                <p class="text-blue-100 text-xs md:text-sm mt-1">Complete list of system users</p>
                             </div>
-                            User Directory
-                        </h2>
-                        <p class="text-blue-100 text-xs md:text-sm mt-1">Complete list of system users</p>
+                            <div class="relative w-full md:w-64">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <MagnifyingGlassIcon class="h-5 w-5 text-white/60" />
+                                </div>
+                                <input
+                                    v-model="searchQuery"
+                                    type="text"
+                                    placeholder="Search users..."
+                                    class="block w-full pl-10 pr-3 py-2 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-fixed divide-y divide-gray-200">
@@ -110,7 +125,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white/50 md:divide-y divide-transparent md:divide-gray-200">
-                                <tr v-for="user in users.data" :key="user.id" class="block md:table-row bg-white rounded-xl border border-gray-200 shadow-none mb-3 md:bg-transparent md:border-0 md:rounded-none md:shadow-none hover:bg-white/50 transition-colors duration-150">
+                                <tr v-for="user in filteredUsers" :key="user.id" class="block md:table-row bg-white rounded-xl border border-gray-200 shadow-none mb-3 md:bg-transparent md:border-0 md:rounded-none md:shadow-none hover:bg-white/50 transition-colors duration-150">
                                     <td class="px-4 py-3 md:px-8 md:py-6 whitespace-normal md:whitespace-nowrap block md:table-cell">
                                         <div class="flex items-center justify-between md:justify-start">
                                             <div class="md:hidden text-xs font-medium text-gray-500 mr-3">User ID</div>
@@ -236,7 +251,7 @@ import {
     CheckBadgeIcon as BadgeCheckIcon,
     CheckCircleIcon,
     ExclamationCircleIcon,
-    
+    MagnifyingGlassIcon
 } from '@heroicons/vue/24/outline';
 import Swal from 'sweetalert2';
 
@@ -257,10 +272,31 @@ export default {
         BriefcaseIcon,
         BadgeCheckIcon,
         CheckCircleIcon,
-        ExclamationCircleIcon
+        ExclamationCircleIcon,
+        MagnifyingGlassIcon
     },
     props: {
         users: Object
+    },
+    data() {
+        return {
+            searchQuery: ''
+        }
+    },
+    computed: {
+        filteredUsers() {
+            if (!this.searchQuery || !this.searchQuery.trim()) {
+                return this.users.data;
+            }
+            const query = this.searchQuery.toLowerCase().trim();
+            return this.users.data.filter(user => {
+                return (
+                    user.user_id.toLowerCase().includes(query) ||
+                    user.username.toLowerCase().includes(query) ||
+                    (user.official_name && user.official_name.toLowerCase().includes(query))
+                );
+            });
+        }
     },
     methods: {
         confirmDelete(userId) {
