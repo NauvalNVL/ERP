@@ -557,14 +557,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">System Gross Area:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">System Gross Area:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
                                         >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
@@ -572,44 +572,50 @@
                             </div>
                         </div>
 
-                        <!-- Column Headers -->
-                        <div class="flex items-center mb-1">
-                            <div class="flex items-center p-2 flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-16"></div> <!-- Spacer for label column -->
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">DB</div>
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">B</div>
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">!L</div>
-                                    <div class="w-16 text-xs text-center font-medium text-gray-600">A/C/E</div>
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">2L</div>
-                                </div>
-                            </div>
-                            <!-- Right side column spacer -->
-                            <div class="w-64"></div>
-                        </div>
-
                         <!-- Row 2: B/Quality (Yellow background) -->
                         <div class="flex items-center mb-2">
                             <div class="flex items-center bg-yellow-200 p-2 rounded flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <label class="text-xs font-bold w-16">B/Quality:</label>
-                                    <input type="text" value="DB" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="B" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="1L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="A/C/E" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="2L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center space-x-1">
+                                        <label class="text-xs font-bold w-16">B/Quality:</label>
+                                        <!-- Header for SO/WO 1 (DB) -->
+                                        <input type="text" value="DB" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 2 (B) -->
+                                        <input type="text" value="B" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 3 (1L) -->
+                                        <input type="text" value="1L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 4 (A/C/E) -->
+                                        <input type="text" value="A/C/E" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 5 (2L) -->
+                                        <input type="text" value="2L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">System Gross Weight:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">System Gross Weight:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
                                         >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
@@ -650,14 +656,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Gross Area:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Gross Area:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
@@ -696,14 +702,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Gross Weight:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Gross Weight:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
@@ -742,14 +748,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Net Area:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Net Area:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayNetM2PerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
@@ -784,14 +790,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Net Weight:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Net Weight:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayNetKgPerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
