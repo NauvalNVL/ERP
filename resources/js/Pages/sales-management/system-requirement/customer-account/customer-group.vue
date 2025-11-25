@@ -94,15 +94,15 @@
                 </div>
                 <hr class="my-2 border-blue-100">
                 <div class="text-gray-700 mb-4">
-                  Gunakan form ini untuk memperbarui data group customer. Pastikan semua informasi yang dimasukkan sudah benar dan lengkap.
+                  Use this form to update customer group data. Make sure all information entered is correct and complete.
                 </div>
                 <div class="bg-blue-50 rounded-lg p-4">
-                  <div class="font-bold text-blue-700 mb-2">Petunjuk:</div>
+                  <div class="font-bold text-blue-700 mb-2">Instructions:</div>
                   <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
-                    <li>Masukkan kode group untuk mencari data</li>
-                    <li>Klik tombol tabel untuk melihat daftar group</li>
-                    <li>Isi semua field yang diperlukan</li>
-                    <li>Klik Save untuk menyimpan perubahan</li>
+                    <li>Enter the group code to search for data</li>
+                    <li>Click the table button to view the list of groups</li>
+                    <li>Fill in all required fields</li>
+                    <li>Click Save to store your changes</li>
                   </ul>
                 </div>
               </div>
@@ -201,7 +201,7 @@
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
       <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-5 right-5 z-50 shadow-xl rounded-lg transition-all duration-300 transform"
          :class="{
@@ -284,7 +284,7 @@ onMounted(() => {
 
 watch(searchQuery, (newQuery) => {
   if (newQuery && customerGroups.value.length > 0) {
-    const foundGroup = customerGroups.value.find(group => 
+    const foundGroup = customerGroups.value.find(group =>
       group.group_code.toLowerCase().includes(newQuery.toLowerCase()) ||
       group.description.toLowerCase().includes(newQuery.toLowerCase())
     );
@@ -298,10 +298,10 @@ const onCustomerGroupSelected = (group) => {
   selectedRow.value = group;
   searchQuery.value = group.group_code;
   showModal.value = false;
-  
+
   isCreating.value = false;
-  editForm.value = { 
-    group_code: group.group_code, 
+  editForm.value = {
+    group_code: group.group_code,
     description: group.description || ''
   };
   showEditModal.value = true;
@@ -335,7 +335,7 @@ const saveCustomerGroupChanges = async () => {
     } else {
       response = await axios.put(`/api/customer-groups/${editForm.value.group_code}`, payload);
     }
-    
+
     const result = response.data;
     if (result.success) {
       showNotification(isCreating.value ? 'Customer group created successfully!' : 'Customer group updated successfully!', 'success');
@@ -357,7 +357,7 @@ const deleteCustomerGroup = async (groupCode) => {
   if (!confirm(`Are you sure you want to delete customer group "${groupCode}"? This action cannot be undone.`)) {
     return;
   }
-  
+
   saving.value = true;
   try {
     const response = await axios.delete(`/api/customer-groups/${groupCode}`);
@@ -389,7 +389,7 @@ const showNotification = (message, type = 'success') => {
     message,
     type
   };
-  
+
   setTimeout(() => {
     notification.value.show = false;
   }, 3000);
@@ -450,7 +450,7 @@ const showNotification = (message, type = 'success') => {
     animation: pulse-slow 5s infinite;
 }
 
-.animation-delay-500 { 
-    animation-delay: 0.5s; 
+.animation-delay-500 {
+    animation-delay: 0.5s;
 }
 </style>
