@@ -510,12 +510,6 @@
                     <span class="truncate">Setup MC, PD</span>
                 </h3>
                 <div class="flex space-x-2">
-                    <button type="button" class="text-white hover:text-red-300 focus:outline-none">
-                        <i class="fas fa-power-off text-lg"></i>
-                    </button>
-                    <button type="button" class="text-white hover:text-green-300 focus:outline-none">
-                        <i class="fas fa-file text-lg"></i>
-                    </button>
                     <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                         <i class="fas fa-times text-lg sm:text-xl"></i>
                     </button>

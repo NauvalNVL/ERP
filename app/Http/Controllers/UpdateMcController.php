@@ -113,8 +113,6 @@ class UpdateMcController extends Controller
         $paginated = $mcQuery->paginate($perPage);
 
         $transformed = collect($paginated->items())->map(function ($item) {
-            // Treat MC with STS = 'Active' as approved for SO preparation
-            $isApproved = strtoupper((string) $item->STS) === 'ACTIVE';
             return [
                 'seq' => $item->MCS_Num,
                 'model' => $item->MODEL,
@@ -122,7 +120,6 @@ class UpdateMcController extends Controller
                 'part' => $item->PART_NO,
                 'comp' => $item->COMP,
                 'status' => $item->STS,
-                'mc_approval' => $isApproved ? 'Yes' : 'No',
                 'p_design' => $item->P_DESIGN,
                 'customer_code' => $item->AC_NUM,
                 'customer_name' => $item->AC_NAME ?? $item->AC_NUM,
@@ -457,7 +454,6 @@ class UpdateMcController extends Controller
             $row = $q->first();
 
             if ($row) {
-                $isApproved = strtoupper((string) $row->STS) === 'ACTIVE';
                 return response()->json([
                     'exists' => true,
                     'data' => [
@@ -466,7 +462,6 @@ class UpdateMcController extends Controller
                         'mc_model' => $row->MODEL,
                         'mc_short_model' => '',
                         'status' => $row->STS,
-                        'mc_approval' => $isApproved ? 'Yes' : 'No',
                         'part_no' => $row->PART_NO,
                         'comp_no' => $row->COMP,
                         'p_design' => $row->P_DESIGN,
@@ -529,7 +524,6 @@ class UpdateMcController extends Controller
             'mc_model' => 'nullable|string',
             'mc_short_model' => 'nullable|string',
             'status' => 'nullable|string|in:Active,Obsolete',
-            'mc_approval' => 'nullable|string|in:Yes,No',
             'part_no' => 'nullable|string',
             'comp_no' => 'nullable|string',
             'p_design' => 'nullable|string',
@@ -613,7 +607,7 @@ class UpdateMcController extends Controller
             // Return detailed error response
             $receivedFields = array_keys($request->all());
             $validationRules = [
-                'mc_seq', 'customer_code', 'customer_name', 'mc_model', 'mc_short_model', 'status', 'mc_approval',
+                'mc_seq', 'customer_code', 'customer_name', 'mc_model', 'mc_short_model', 'status',
                 'part_no', 'comp_no', 'p_design', 'ext_dim_1', 'ext_dim_2', 'ext_dim_3',
                 'int_dim_1', 'int_dim_2', 'int_dim_3', 'detailed_master_card', 'pd_setup',
                 'selectedProductDesign', 'selectedPaperFlute', 'selectedChemicalCoat',
