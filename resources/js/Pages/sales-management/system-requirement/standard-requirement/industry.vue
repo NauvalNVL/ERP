@@ -519,7 +519,7 @@ const saveIndustryChanges = async () => {
         }
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/api/industry' : `/api/industry/${selectedIndustry.value ? selectedIndustry.value.id : ''}`;
+        let url = isCreating.value ? '/api/industry' : `/api/industry/${editForm.value.code}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         console.log('Making API request to:', url, 'with method:', method);
@@ -603,7 +603,7 @@ const deleteIndustry = async () => {
         const formData = new FormData();
         formData.append('_method', 'DELETE');
         
-        const response = await fetch(`/api/industry/${selectedIndustry.value.id}`, {
+        const response = await fetch(`/api/industry/${selectedIndustry.value.code}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,

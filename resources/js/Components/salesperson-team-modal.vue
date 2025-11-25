@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-6xl min-w-4xl mx-4">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
           <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
             <i class="fas fa-users"></i>
@@ -21,7 +21,7 @@
               <i class="fas fa-search"></i>
             </span>
             <input type="text" v-model="searchQuery" placeholder="Search salesperson teams..."
-              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
@@ -38,14 +38,14 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
               <tr v-for="team in filteredTeams" :key="team.id || team.s_person_code"
-                :class="['hover:bg-blue-50 cursor-pointer', selectedTeam && selectedTeam.s_person_code === team.s_person_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                :class="['hover:bg-emerald-50 cursor-pointer', selectedTeam && selectedTeam.s_person_code === team.s_person_code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(team)"
                 @dblclick="selectAndClose(team)">
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ getSalespersonCode(team.s_person_code) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ getSalespersonName(team.s_person_code) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div v-if="isEditing(team.id || team.s_person_code, 'st_code')" class="flex items-center space-x-1 w-full">
-                    <select v-model="editingValue" class="flex-1 text-xs border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500 min-w-0">
+                    <select v-model="editingValue" class="flex-1 text-xs border border-gray-300 rounded px-2 py-1 focus:ring-emerald-500 focus:border-emerald-500 min-w-0">
                       <option value="">Select Team</option>
                       <option v-for="salesTeam in salesTeams" :key="salesTeam.id" :value="salesTeam.code">
                         {{ salesTeam.code }} - {{ salesTeam.name }}
@@ -59,8 +59,8 @@
                     </button>
                   </div>
                   <div v-else class="flex items-center justify-between group">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ team.st_code }}</span>
-                    <button @click="startEdit(team.id || team.s_person_code, 'st_code', team.st_code)" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-600 ml-2">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">{{ team.st_code }}</span>
+                    <button @click="startEdit(team.id || team.s_person_code, 'st_code', team.st_code)" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-emerald-600 ml-2">
                       <i class="fas fa-edit text-xs"></i>
                     </button>
                   </div>
@@ -68,7 +68,7 @@
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ team.sales_team_name }}</td>
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div v-if="isEditing(team.id || team.s_person_code, 'sales_team_position')" class="flex items-center space-x-1 w-full">
-                    <select v-model="editingValue" class="flex-1 text-xs border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500 min-w-0">
+                    <select v-model="editingValue" class="flex-1 text-xs border border-gray-300 rounded px-2 py-1 focus:ring-emerald-500 focus:border-emerald-500 min-w-0">
                       <option value="">Select Position</option>
                       <option v-for="position in positionOptions" :key="position.value" :value="position.value">
                         {{ position.label }}
@@ -83,14 +83,14 @@
                   </div>
                   <div v-else class="flex items-center justify-between group">
                     <span class="text-gray-700">{{ getPositionLabel(team.sales_team_position) }}</span>
-                    <button @click="startEdit(team.id || team.s_person_code, 'sales_team_position', team.sales_team_position)" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-600 ml-2">
+                    <button @click="startEdit(team.id || team.s_person_code, 'sales_team_position', team.sales_team_position)" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-emerald-600 ml-2">
                       <i class="fas fa-edit text-xs"></i>
                     </button>
                   </div>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div v-if="isEditing(team.id || team.s_person_code, 'status')" class="flex items-center space-x-1 w-full">
-                    <select v-model="editingValue" class="flex-1 text-xs border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500 min-w-0">
+                    <select v-model="editingValue" class="flex-1 text-xs border border-gray-300 rounded px-2 py-1 focus:ring-emerald-500 focus:border-emerald-500 min-w-0">
                       <option value="">Select Status</option>
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
@@ -111,7 +111,7 @@
                       team.status === 'Suspended' ? 'bg-red-100 text-red-800' : 
                       'bg-gray-100 text-gray-800'
                     ]">{{ team.status || 'Active' }}</span>
-                    <button @click="startEdit(team.id || team.s_person_code, 'status', team.status || 'Active')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-600 ml-2">
+                    <button @click="startEdit(team.id || team.s_person_code, 'status', team.status || 'Active')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-emerald-600 ml-2">
                       <i class="fas fa-edit text-xs"></i>
                     </button>
                   </div>
@@ -136,7 +136,7 @@
           <button type="button" @click="sortTable('sales_team_name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Team
           </button>
-          <button type="button" @click="selectAndClose(selectedTeam)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="selectAndClose(selectedTeam)" class="py-2 px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-edit mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">

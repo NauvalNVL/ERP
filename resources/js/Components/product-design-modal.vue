@@ -4,7 +4,7 @@
       <!-- List View -->
       <div v-if="view === 'list'">
         <!-- Modal Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
           <div class="flex items-center">
             <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
               <i class="fas fa-drafting-compass"></i>
@@ -23,7 +23,7 @@
                 <i class="fas fa-search"></i>
               </span>
               <input type="text" v-model="searchQuery" placeholder="Search product designs..."
-                class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
             </div>
           </div>
           <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
@@ -73,7 +73,7 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200 text-xs">
                 <tr v-for="design in filteredDesigns" :key="design.pd_code"
-                  :class="['hover:bg-blue-50 cursor-pointer', selectedDesign && selectedDesign.pd_code === design.pd_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                  :class="['hover:bg-emerald-50 cursor-pointer', selectedDesign && selectedDesign.pd_code === design.pd_code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                   @click="selectRow(design)"
                   @dblclick="handleDoubleClick(design)">
                   <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ design.pd_code }}</td>
@@ -81,7 +81,7 @@
                   <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.pd_design_type }}</td>
                   <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.idc }}</td>
                   <td class="px-6 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ design.product }}</span>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">{{ design.product }}</span>
                   </td>
                   <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.joint }}</td>
                   <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.joint_to_print }}</td>
@@ -95,7 +95,7 @@
                 <tr v-if="loading">
                   <td colspan="13" class="px-6 py-4 text-center">
                     <div class="flex items-center justify-center">
-                      <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                      <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
                       <span class="ml-2 text-gray-500">Loading data...</span>
                     </div>
                   </td>
@@ -122,7 +122,7 @@
             <button 
               type="button" 
               @click="props.doubleClickAction === 'select' ? selectAndClose(selectedDesign) : selectAndEdit(selectedDesign)"
-              class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px" 
+              class="py-2 px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg transform active:translate-y-px" 
               :disabled="!selectedDesign" 
               :class="{'opacity-50 cursor-not-allowed': !selectedDesign}">
               <i :class="props.doubleClickAction === 'select' ? 'fas fa-check mr-1' : 'fas fa-edit mr-1'"></i>
@@ -136,7 +136,7 @@
       </div>
       <!-- Form View -->
       <div v-else>
-        <div class="flex items-center justify-between p-3 bg-blue-600 text-white rounded-t-lg">
+        <div class="flex items-center justify-between p-3 bg-green-600 text-white rounded-t-lg">
             <div class="flex items-center">
                 <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
                     <i class="fas fa-drafting-compass text-white"></i>
@@ -402,7 +402,7 @@
                     <button type="button" @click="view = 'list'" class="px-5 py-2 bg-gray-100 text-gray-800 rounded border border-gray-300 hover:bg-gray-200 flex items-center font-medium">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </button>
-                    <button type="submit" :disabled="saving" class="px-5 py-2 bg-blue-500 text-white rounded border border-blue-600 hover:bg-blue-600 flex items-center font-medium" :class="{'opacity-50 cursor-not-allowed': saving}">
+                    <button type="submit" :disabled="saving" class="px-5 py-2 bg-emerald-500 text-white rounded border border-emerald-600 hover:bg-emerald-600 flex items-center font-medium" :class="{'opacity-50 cursor-not-allowed': saving}">
                         <i class="fas fa-save mr-2"></i>{{ saving ? 'Saving...' : 'Save' }}
                     </button>
                     <button v-if="!isCreating" :disabled="saving" type="button" @click="deleteDesign(editForm.pd_code)" class="px-5 py-2 bg-red-500 text-white rounded border border-red-600 hover:bg-red-600 flex items-center font-medium" :class="{'opacity-50 cursor-not-allowed': saving}">
