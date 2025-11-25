@@ -795,6 +795,7 @@
             @selectComponent="selectComponent"
             @setupPD="setupPD"
             @setupOthers="setupOthers"
+            @saveSpecialInstructions="saveSpecialInstructions"
             @handleZoomChange="handleZoomChange"
             @fetchMcsData="fetchMcsData"
             @selectMcsItem="selectedMcs = $event"
@@ -1242,7 +1243,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         // Use form.comp_no directly as it's already updated by selectComponent
         const componentName = form.value.comp_no || 'Main';
         const selectedComponent = mcComponents.value.find(c => c.c_num === componentName);
-        
+
         console.log('🔍 Save Master Card - Component Info:', {
             selectedComponent: selectedComponent,
             componentName: componentName,
@@ -1257,7 +1258,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         } else if (form.value.mc_status === 'Act') {
             validStatus = 'Active';
         }
-        
+
         // Ensure mc_approval is valid (Yes or No)
         let validApproval = 'No';
         if (form.value.mc_approval === 'Yes' || form.value.mc_approval === 'No') {
@@ -1304,10 +1305,10 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
 
         // Get CSRF token from meta tag or cookie
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        
+
         const res = await axios.post('/api/update-mc/master-cards', payload, {
-            headers: { 
-                'Content-Type': 'application/json', 
+            headers: {
+                'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest'
@@ -1316,8 +1317,11 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
 
         if (res.data) {
             toast.success(`Master Card saved successfully for component: ${componentName}`);
+            // After successful save from Setup MC, PD, close PD modal only
+            // so the user returns to the Setup MC, Component modal instead of the main page.
+            showSetupPdModal.value = false;
         }
-        
+
         // Refresh full MC so subsequent openings have the latest pd_setup
         try {
             if (form.value.mcs && form.value.ac) {
@@ -1333,19 +1337,17 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         } catch (e) {
             console.error('Failed to refresh full MC after save:', e);
         }
-        // After successful save, reset page to initial state (user must reselect AC and MCS)
-        resetUpdateMcPage();
     } catch (e) {
         console.error('=== SAVE MASTERCARD ERROR ===');
         console.error('Full Error:', e);
         console.error('Error Response:', e.response?.data);
-        
+
         // Handle CSRF token mismatch specifically
         if (e.response?.status === 419) {
             toast.error('Session expired. Please refresh the page and try again.');
             return;
         }
-        
+
         // Display detailed error information
         if (e.response?.data?.errors) {
             console.error('=== VALIDATION ERRORS ===');
@@ -1354,14 +1356,14 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
                 console.error(`Field "${field}":`, e.response.data.errors[field]);
             });
         }
-        
+
         if (e.response?.data?.debug) {
             console.error('=== DEBUG INFO ===');
             console.error('Received Fields Count:', e.response.data.debug.received_fields?.length);
             console.error('Received Fields:', e.response.data.debug.received_fields);
             console.error('Missing Validations Count:', e.response.data.debug.missing_validations?.length);
             console.error('Missing Validations:', e.response.data.debug.missing_validations);
-            
+
             // Show which fields are missing validation
             if (Array.isArray(e.response.data.debug.missing_validations) && e.response.data.debug.missing_validations.length > 0) {
                 console.error('⚠️ FIELDS WITHOUT VALIDATION RULES:');
@@ -1370,8 +1372,76 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
                 });
             }
         }
-        
+
         const errorMsg = e.response?.data?.message || e.message || 'Failed to save Master Card';
+        toast.error(errorMsg);
+    }
+};
+
+const saveSpecialInstructions = async (rows) => {
+    try {
+        if (!form.value.ac || !form.value.mcs) {
+            toast.error('Please select AC and MCS before saving Special Instructions.');
+            return;
+        }
+
+        const componentName = form.value.comp_no || 'Main';
+        const specialInstructions = Array.isArray(rows)
+            ? rows.slice(0, 4).map((v) => (v ?? '') + '')
+            : ['', '', '', ''];
+
+        if (!window.confirm('Save Special Instructions for this Master Card?')) {
+            return;
+        }
+
+        const payload = {
+            mc_seq: form.value.mcs,
+            customer_code: form.value.ac,
+            comp_no: componentName,
+            specialInstructions,
+        };
+
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content');
+
+        console.log('📤 Saving Special Instructions only:', payload);
+
+        const res = await axios.post('/api/update-mc/master-cards', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+
+        if (res.data) {
+            toast.success('Special Instructions saved successfully.');
+        }
+
+        try {
+            if (form.value.mcs && form.value.ac) {
+                const mcsSeqEnc = encodeURIComponent(form.value.mcs);
+                const custEnc = encodeURIComponent(form.value.ac);
+                const refRes = await axios.get(
+                    `/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`,
+                    {
+                        headers: { Accept: 'application/json' },
+                    }
+                );
+                if (refRes.data) {
+                    selectedMcsFull.value = refRes.data;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to refresh full MC after saving Special Instructions:', e);
+        }
+    } catch (e) {
+        console.error('Save Special Instructions error:', e);
+        console.error('Error Response:', e.response?.data);
+        const errorMsg =
+            e.response?.data?.message || e.message || 'Failed to save Special Instructions';
         toast.error(errorMsg);
     }
 };
@@ -1521,16 +1591,16 @@ const selectCustomer = async (customer) => {
 
     // Set the form fields with customer information
     isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
-    
+
     // Use nextTick to ensure DOM updates
     await nextTick();
     form.value.ac = customer.customer_code;
     form.value.customer_name = customer.customer_name;
-    
+
     // Force reactivity update
     await nextTick();
     isProgrammaticUpdate.value = false; // Re-enable input handlers
-    
+
     console.log('Customer selected:', {
         ac: form.value.ac,
         customer_name: form.value.customer_name,
@@ -1708,7 +1778,7 @@ const loadChemicalCoats = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (response.ok) {
             const data = await response.json();
             chemicalCoats.value = data;
@@ -2255,12 +2325,12 @@ const handleMcsInput = () => {
     if (form.value.mcs && !selectedMcs.value) {
         recordMode.value = "new";
         form.value.mc_approval = "No";
-        
+
         // Reset SO, WO, and MSP data for new MC
         soValues.value = ["", "", "", "", ""];
         woValues.value = ["", "", "", "", ""];
         selectedMcsFull.value = null;
-        
+
         // Require AC selection before showing detailed form for a new MC
         if (!form.value.ac) {
             showDetailedMcInfo.value = false;
@@ -2274,7 +2344,7 @@ const handleMcsInput = () => {
         // Hide detailed MC info when MCS input is cleared
         showDetailedMcInfo.value = false;
         recordMode.value = "new";
-        
+
         // Reset SO, WO, and MSP data when MCS is cleared
         soValues.value = ["", "", "", "", ""];
         woValues.value = ["", "", "", "", ""];
@@ -2327,11 +2397,11 @@ const addNewRecord = () => {
     form.value.mc_approval = "No";
     recordSelected.value = true;
     showDetailedMcInfo.value = true; // Show detailed MC info for new record
-    
+
     // Reset SO, WO, and MSP data for new MC
     soValues.value = ["", "", "", "", ""];
     woValues.value = ["", "", "", "", ""];
-    
+
     // Clear selectedMcsFull to ensure fresh data
     selectedMcsFull.value = null;
 };
@@ -2390,11 +2460,11 @@ const saveRecord = async () => {
 
     try {
         const loadingToast = toast.loading("Saving master card...");
-        
+
         // Get selected component name (Main, Fit1, Fit2, etc.)
         // Use form.comp_no directly as it's already updated by selectComponent
         const componentName = form.value.comp_no || 'Main';
-        
+
         const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
@@ -2431,7 +2501,7 @@ const saveRecord = async () => {
         });
 
         toast.dismiss(loadingToast);
-        
+
         if (response.data) {
             toast.success(`Master Card saved successfully for component: ${componentName}`);
             console.log('Master Card saved:', response.data);
@@ -2511,7 +2581,7 @@ const selectMcs = async (mcs) => {
 
     // Populate form fields (UI values)
     isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
-    
+
     // Use nextTick to ensure DOM updates
     await nextTick();
     form.value.mcs = mcsSeq;
@@ -2519,11 +2589,11 @@ const selectMcs = async (mcs) => {
     form.value.mc_short_model = mcShortModel;
     form.value.mc_status = mcStatus;
     form.value.mc_approval = mcApproval;
-    
+
     // Force reactivity update
     await nextTick();
     isProgrammaticUpdate.value = false; // Re-enable input handlers
-    
+
     console.log('Master Card selected:', {
         mcs: form.value.mcs,
         mc_model: form.value.mc_model,
@@ -2558,7 +2628,7 @@ const selectMcs = async (mcs) => {
             const full = await res.json();
             // Keep a local copy to pass into child modals
             selectedMcsFull.value = full;
-            
+
             console.log('✅ Loaded full MC data:', {
                 mcs: mcsSeq,
                 has_pd_setup: !!full.pd_setup,
@@ -2567,7 +2637,7 @@ const selectMcs = async (mcs) => {
                 components_at_root: full.components?.length || 0,
                 component_list: full.components?.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })) || []
             });
-            
+
             // Hydrate SO/WO for currently selected component and prefill PD code
             try {
                 hydrateSoWoFromFull(selectedMcsFull.value);
@@ -2967,12 +3037,12 @@ const selectComponent = (component, index) => {
         index: index,
         component_c_num: component?.c_num
     });
-    
+
     // Reset all selections
     mcComponents.value.forEach((comp) => (comp.selected = false));
     // Select the clicked component
     component.selected = true;
-    
+
     // Update form comp_no with selected component name
     if (form.value) {
         form.value.comp_no = component.c_num; // Main, Fit1, Fit2, etc.

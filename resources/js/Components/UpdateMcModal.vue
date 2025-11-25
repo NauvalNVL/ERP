@@ -111,7 +111,7 @@
                         </button>
                         <button
                             type="button"
-                            @click="$emit('setupOthers')"
+                            @click="openSpecialInstructionsModal()"
                             class="py-1.5 sm:py-2 px-3 sm:px-4 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
                         >
                             Setup Others
@@ -1144,6 +1144,14 @@
         @close="showMspModal = false"
         @save="onMspSave"
     />
+
+    <MCSpecialInstruction
+        :show="showSpecialInstructionsModal"
+        :value="specialInstructions"
+        @update:value="(v) => { specialInstructions.value = Array.isArray(v) ? v.slice(0, 4) : []; }"
+        @save="onSpecialInstructionsSave"
+        @close="showSpecialInstructionsModal = false"
+    />
 </template>
 
 <script setup>
@@ -1157,6 +1165,35 @@ const normalizeDisplay = (vals) => {
     };
     const arr = Array.isArray(vals) ? vals : [];
     return [0,1,2,3,4].map(i => toStringVal(arr[i]));
+};
+
+const openSpecialInstructionsModal = () => {
+    let base = Array.isArray(specialInstructions.value) ? [...specialInstructions.value] : [];
+    const hasValue = base.some((v) => v && String(v).trim() !== '');
+    if (!hasValue) {
+        const loaded = props.mcLoaded || {};
+        const pd = loaded.pd_setup || {};
+        if (Array.isArray(pd.specialInstructions) && pd.specialInstructions.length) {
+            base = pd.specialInstructions;
+        } else {
+            base = [
+                loaded.MC_SPECIAL_INST1,
+                loaded.MC_SPECIAL_INST2,
+                loaded.MC_SPECIAL_INST3,
+                loaded.MC_SPECIAL_INST4,
+            ];
+        }
+    }
+    specialInstructions.value = Array.from({ length: 4 }, (_, i) => (base[i] ?? '') + '');
+    showSpecialInstructionsModal.value = true;
+};
+
+const onSpecialInstructionsSave = (rows) => {
+    const normalized = Array.isArray(rows)
+        ? rows.slice(0, 4).map((v) => (v ?? '') + '')
+        : ['', '', '', ''];
+    specialInstructions.value = normalized;
+    emit('saveSpecialInstructions', normalized);
 };
 
 // Helper: normalize any array-like into fixed 5-length string array
@@ -1223,6 +1260,7 @@ import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
 import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
 import MachineSelectingProcedureModal from '@/Components/MachineSelectingProcedureModal.vue';
+import MCSpecialInstruction from '@/Components/MCSpecialInstruction.vue';
 
 // Product Design Modal
 const showProductDesignModal = ref(false);
@@ -1671,6 +1709,8 @@ const onWrappingSelected = (item) => {
 // More Description Modal
 const showMoreDescriptionModal = ref(false);
 let moreDescriptions = ref([]);
+const showSpecialInstructionsModal = ref(false);
+const specialInstructions = ref(['', '', '', '']);
 
 // Additional PD state bindings
 const partNo = ref('');
@@ -1964,6 +2004,7 @@ const emit = defineEmits([
     'selectComponent',
     'setupPD',
     'setupOthers',
+    'saveSpecialInstructions',
     'handleZoomChange',
     'fetchMcsData',
     'selectMcsItem',
