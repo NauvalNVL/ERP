@@ -102,7 +102,7 @@
                                     <span>Master Card</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">SD</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">SO</span>
                                     <span>Sales Order</span>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                             <h4 class="text-sm font-semibold text-yellow-800 uppercase tracking-wider mb-2">Important Note</h4>
                             <p class="text-xs text-gray-600">
                                 <i class="fas fa-exclamation-triangle text-yellow-600 mr-1"></i>
-                                AM, CM, CL & UN of Analysis Group 2 are only applied to Analysis Group = 'SD'
+                                AM, CM, CL & UN of Analysis Group 2 are only applied to Analysis Group = 'SO'
                             </p>
                         </div>
                     </div>
@@ -217,7 +217,7 @@
                                 <select v-model="editForm.analysis_group" @change="onAnalysisGroupChange" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                                     <option value="">Select Analysis Group</option>
                                     <option value="MC">MC-Master Card</option>
-                                    <option value="SD">SD-Sales Order</option>
+                                    <option value="SO">SO-Sales Order</option>
                                 </select>
                             </div>
                         </div>
@@ -233,7 +233,7 @@
                                         <option value="CS">CS-Corrugator Run Size</option>
                                         <option value="RS">RS-Sheet Board Run Size</option>
                                     </optgroup>
-                                    <optgroup label="Sales Order Options" v-if="editForm.analysis_group === 'SD'">
+                                    <optgroup label="Sales Order Options" v-if="editForm.analysis_group === 'SO'">
                                         <option value="AM">AM-Amend Sales Order</option>
                                         <option value="CM">CM-Close Sales Order</option>
                                         <option value="CL">CL-Cancel Sales Order</option>
@@ -241,7 +241,7 @@
                                     </optgroup>
                                 </select>
                             </div>
-                            <p v-if="editForm.analysis_group === 'SD'" class="mt-1 text-xs text-yellow-600">
+                            <p v-if="editForm.analysis_group === 'SO'" class="mt-1 text-xs text-yellow-600">
                                 <i class="fas fa-info-circle mr-1"></i>AM, CM, CL & UN are only for Sales Order
                             </p>
                         </div>
