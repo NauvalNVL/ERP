@@ -2,13 +2,13 @@
   <AppLayout header="Amend SO">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b border-blue-700 text-white">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <i class="fas fa-edit text-2xl text-orange-600"></i>
             <div>
-              <h1 class="text-xl font-semibold text-gray-800">Amend SO</h1>
-              <p class="text-xs text-gray-500">Modify existing sales orders</p>
+              <h1 class="text-xl font-semibold text-white">Amend SO</h1>
+              <p class="text-xs text-blue-100">Modify existing sales orders</p>
             </div>
           </div>
           <div class="flex items-center space-x-2">
@@ -590,38 +590,7 @@ export default {
             selectedRowIndex: -1,
             showAnalysisCodeModal: false,
             selectedAnalysisCodeIndex: -1,
-            analysisCodeList: [
-                {
-                    code: 'AMND',
-                    name: 'EDIT HARGA SO MISS TRIM',
-                    group: 'SH',
-                    group2: 'AM'
-                },
-                {
-                    code: 'AM03',
-                    name: 'EDIT HARGA',
-                    group: 'SO',
-                    group2: 'AM'
-                },
-                {
-                    code: 'DLVY',
-                    name: 'DELIVERY DATE CHANGE',
-                    group: 'SO',
-                    group2: 'DL'
-                },
-                {
-                    code: 'PRIO',
-                    name: 'PRIORITY CHANGE',
-                    group: 'SO',
-                    group2: 'PR'
-                },
-                {
-                    code: 'SPEC',
-                    name: 'SPECIFICATION CHANGE',
-                    group: 'SO',
-                    group2: 'SP'
-                }
-            ]
+            analysisCodeList: []
         }
     },
     methods: {
@@ -826,9 +795,40 @@ export default {
             }
         },
 
-        openAnalysisCodeModal() {
-            this.showAnalysisCodeModal = true;
+        async openAnalysisCodeModal() {
             this.selectedAnalysisCodeIndex = -1;
+
+            try {
+                const response = await fetch('/api/analysis-codes', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const allCodes = Array.isArray(data)
+                        ? data
+                        : (Array.isArray(data.data) ? data.data : []);
+
+                    this.analysisCodeList = allCodes
+                        .filter(code => code.analysis_group === 'SO' && code.analysis_group2 === 'AM')
+                        .map(code => ({
+                            code: code.analysis_code,
+                            name: code.analysis_name,
+                            group: code.analysis_group,
+                            group2: code.analysis_group2,
+                        }));
+                } else {
+                    console.error('Failed to fetch analysis codes for Amend SO');
+                }
+            } catch (error) {
+                console.error('Error fetching analysis codes for Amend SO:', error);
+            }
+
+            this.showAnalysisCodeModal = true;
         },
 
         closeAnalysisCodeModal() {

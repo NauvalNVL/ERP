@@ -111,7 +111,7 @@
                         </button>
                         <button
                             type="button"
-                            @click="$emit('setupOthers')"
+                            @click="openSpecialInstructionsModal()"
                             class="py-1.5 sm:py-2 px-3 sm:px-4 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
                         >
                             Setup Others
@@ -510,12 +510,6 @@
                     <span class="truncate">Setup MC, PD</span>
                 </h3>
                 <div class="flex space-x-2">
-                    <button type="button" class="text-white hover:text-red-300 focus:outline-none">
-                        <i class="fas fa-power-off text-lg"></i>
-                    </button>
-                    <button type="button" class="text-white hover:text-green-300 focus:outline-none">
-                        <i class="fas fa-file text-lg"></i>
-                    </button>
                     <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                         <i class="fas fa-times text-lg sm:text-xl"></i>
                     </button>
@@ -557,14 +551,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">System Gross Area:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">System Gross Area:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
                                         >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
@@ -572,44 +566,50 @@
                             </div>
                         </div>
 
-                        <!-- Column Headers -->
-                        <div class="flex items-center mb-1">
-                            <div class="flex items-center p-2 flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-16"></div> <!-- Spacer for label column -->
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">DB</div>
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">B</div>
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">!L</div>
-                                    <div class="w-16 text-xs text-center font-medium text-gray-600">A/C/E</div>
-                                    <div class="w-12 text-xs text-center font-medium text-gray-600">2L</div>
-                                </div>
-                            </div>
-                            <!-- Right side column spacer -->
-                            <div class="w-64"></div>
-                        </div>
-
                         <!-- Row 2: B/Quality (Yellow background) -->
                         <div class="flex items-center mb-2">
                             <div class="flex items-center bg-yellow-200 p-2 rounded flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <label class="text-xs font-bold w-16">B/Quality:</label>
-                                    <input type="text" value="DB" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="B" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="1L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="A/C/E" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                    <input type="text" value="2L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center space-x-1">
+                                        <label class="text-xs font-bold w-16">B/Quality:</label>
+                                        <!-- Header for SO/WO 1 (DB) -->
+                                        <input type="text" value="DB" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 2 (B) -->
+                                        <input type="text" value="B" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 3 (1L) -->
+                                        <input type="text" value="1L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 4 (A/C/E) -->
+                                        <input type="text" value="A/C/E" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <!-- Header for SO/WO 5 (2L) -->
+                                        <input type="text" value="2L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">System Gross Weight:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">System Gross Weight:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
                                         >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
@@ -650,14 +650,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Gross Area:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Gross Area:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
@@ -696,14 +696,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Gross Weight:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Gross Weight:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
@@ -742,14 +742,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Net Area:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Net Area:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayNetM2PerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
@@ -784,14 +784,14 @@
                             </div>
                             <!-- Right side column for measurements -->
                             <div class="w-64 flex flex-col space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Net Weight:</label>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-32 whitespace-nowrap">Input Net Weight:</label>
                                     <div class="flex items-center">
                                         <input
                                             type="text"
                                             :value="formatTrimZeros((displayNetKgPerPcs || 0).toFixed(6))"
                                             readonly
-                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                            class="w-20 px-2 py-1 border border-gray-400 text-xs text-right"
                                         >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
@@ -1144,6 +1144,14 @@
         @close="showMspModal = false"
         @save="onMspSave"
     />
+
+    <MCSpecialInstruction
+        :show="showSpecialInstructionsModal"
+        :value="specialInstructions"
+        @update:value="(v) => { specialInstructions.value = Array.isArray(v) ? v.slice(0, 4) : []; }"
+        @save="onSpecialInstructionsSave"
+        @close="showSpecialInstructionsModal = false"
+    />
 </template>
 
 <script setup>
@@ -1157,6 +1165,35 @@ const normalizeDisplay = (vals) => {
     };
     const arr = Array.isArray(vals) ? vals : [];
     return [0,1,2,3,4].map(i => toStringVal(arr[i]));
+};
+
+const openSpecialInstructionsModal = () => {
+    let base = Array.isArray(specialInstructions.value) ? [...specialInstructions.value] : [];
+    const hasValue = base.some((v) => v && String(v).trim() !== '');
+    if (!hasValue) {
+        const loaded = props.mcLoaded || {};
+        const pd = loaded.pd_setup || {};
+        if (Array.isArray(pd.specialInstructions) && pd.specialInstructions.length) {
+            base = pd.specialInstructions;
+        } else {
+            base = [
+                loaded.MC_SPECIAL_INST1,
+                loaded.MC_SPECIAL_INST2,
+                loaded.MC_SPECIAL_INST3,
+                loaded.MC_SPECIAL_INST4,
+            ];
+        }
+    }
+    specialInstructions.value = Array.from({ length: 4 }, (_, i) => (base[i] ?? '') + '');
+    showSpecialInstructionsModal.value = true;
+};
+
+const onSpecialInstructionsSave = (rows) => {
+    const normalized = Array.isArray(rows)
+        ? rows.slice(0, 4).map((v) => (v ?? '') + '')
+        : ['', '', '', ''];
+    specialInstructions.value = normalized;
+    emit('saveSpecialInstructions', normalized);
 };
 
 // Helper: normalize any array-like into fixed 5-length string array
@@ -1223,6 +1260,7 @@ import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
 import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
 import MachineSelectingProcedureModal from '@/Components/MachineSelectingProcedureModal.vue';
+import MCSpecialInstruction from '@/Components/MCSpecialInstruction.vue';
 
 // Product Design Modal
 const showProductDesignModal = ref(false);
@@ -1671,6 +1709,8 @@ const onWrappingSelected = (item) => {
 // More Description Modal
 const showMoreDescriptionModal = ref(false);
 let moreDescriptions = ref([]);
+const showSpecialInstructionsModal = ref(false);
+const specialInstructions = ref(['', '', '', '']);
 
 // Additional PD state bindings
 const partNo = ref('');
@@ -1964,6 +2004,7 @@ const emit = defineEmits([
     'selectComponent',
     'setupPD',
     'setupOthers',
+    'saveSpecialInstructions',
     'handleZoomChange',
     'fetchMcsData',
     'selectMcsItem',

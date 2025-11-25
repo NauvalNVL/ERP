@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
           <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
             <i class="fas fa-object-group"></i>
@@ -21,7 +21,7 @@
               <i class="fas fa-search"></i>
             </span>
             <input type="text" v-model="searchQuery" placeholder="Search product groups..."
-              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
@@ -35,7 +35,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
               <tr v-for="group in filteredGroups" :key="group.id"
-                :class="['hover:bg-blue-50 cursor-pointer', selectedGroup && selectedGroup.id === group.id ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                :class="['hover:bg-emerald-50 cursor-pointer', selectedGroup && selectedGroup.id === group.id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(group)"
                 @dblclick="selectAndClose(group)">
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.code }}</td>
@@ -52,7 +52,7 @@
               <tr v-if="loading">
                 <td colspan="3" class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
                     <span class="ml-2 text-gray-500">Loading data...</span>
                   </div>
                 </td>
@@ -73,7 +73,7 @@
           <button type="button" @click="sortTable('name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Group Name
           </button>
-          <button type="button" @click="selectAndClose(selectedGroup)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="selectAndClose(selectedGroup)" class="py-2 px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-edit mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">

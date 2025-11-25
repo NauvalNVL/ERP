@@ -26,10 +26,10 @@
       <!-- Main Form Content -->
       <div class="p-6">
         <!-- Period and Customer Information -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-stretch">
           <!-- Period Information -->
-          <div class="space-y-4">
-            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div class="space-y-4 h-full flex flex-col">
+            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm flex-1">
               <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Period Information</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -105,7 +105,10 @@
             </div>
 
             <!-- Last SO Order ID -->
-            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm">
+            <div
+              v-if="selectedCustomer.code && selectedMasterCard.seq"
+              class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm"
+            >
               <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Order Information</h3>
               <div class="flex items-center space-x-2">
                 <label class="text-xs font-medium text-gray-600">Last S/Order#:</label>
@@ -129,8 +132,8 @@
           </div>
 
           <!-- Customer Information -->
-          <div class="space-y-4">
-            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div class="space-y-4 h-full flex flex-col">
+            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm flex-1">
               <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Customer Information</h3>
               <div class="space-y-3">
                 <div>
@@ -522,17 +525,17 @@
             </ul>
           </div>
 
-          <!-- Master Card Approval Warning -->
+          <!-- Master Card Status Warning -->
           <div v-if="canProceed && !isMasterCardApproved" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <div class="flex items-center">
               <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
               <span class="text-sm text-orange-800 font-medium">
-                Master Card Approval Notice
+                Master Card Status Notice
               </span>
             </div>
             <p class="text-xs text-orange-700 mt-1">
-              The selected master card is not yet approved. You can proceed with creating the sales order,
-              but the master card may need to be approved before production can begin.
+              The selected master card status is not Active. You can proceed with creating the sales order,
+              but please verify the master card status before production begins.
             </p>
           </div>
         </div>
@@ -656,9 +659,9 @@ const backwardPeriod = ref(1)
 
 // Last SO Order Information
 const lastSOOrder = reactive({
-  prefix: '5',
-  year: 2019,
-  number: 640
+  prefix: '',
+  year: '',
+  number: ''
 })
 
 // Customer Information
@@ -675,7 +678,6 @@ const selectedMasterCard = reactive({
   seq: '',
   model: '',
   status: '',
-  approval: '',
   partNo: '',
   compNo: '',
   pDesign: ''
@@ -762,14 +764,14 @@ const canProceed = computed(() => {
 })
 
 // Computed property to check if master card is approved
-// Treat MC with status 'Active' as approved even if mc_approval flag is missing
+// Now we only rely on status: Active/Act treated as approved
 const isMasterCardApproved = computed(() => {
-  const approvalFlag = (selectedMasterCard.approval || '').toString().toLowerCase()
   const statusFlag = (selectedMasterCard.status || '').toString().toLowerCase()
-  return approvalFlag === 'yes' || statusFlag === 'active'
+  return statusFlag === 'active' || statusFlag === 'act'
 })
 
-// Computed property to get approval status message
+// Computed property to get approval/validation status message
+// Now based solely on MC status (Active/Act)
 const approvalStatusMessage = computed(() => {
   if (!selectedMasterCard.seq) return ''
 
@@ -777,11 +779,9 @@ const approvalStatusMessage = computed(() => {
     return ''
   }
 
-  switch (selectedMasterCard.approval) {
-    case 'No':
-      return { type: 'warning', message: 'Master Card is not approved yet. You can proceed but approval may be required later.' }
-    default:
-      return { type: 'info', message: 'Master Card approval status is unknown' }
+  return {
+    type: 'warning',
+    message: 'Master Card status is not Active. You can proceed, but please verify before production.'
   }
 })
 
@@ -909,6 +909,64 @@ const currentOrderTypeConfig = computed(() => {
   const allOrderTypes = [...orderTypesConfig.Sales, ...orderTypesConfig['Non-Sales']]
   return allOrderTypes.find(type => type.code === orderDetails.orderType) || null
 })
+
+// Helper: clear Last SO Order fields
+const clearLastSOOrder = () => {
+  lastSOOrder.prefix = ''
+  lastSOOrder.year = ''
+  lastSOOrder.number = ''
+}
+
+// Helper: fetch last sales order number for current customer + master card
+const fetchLastSOOrderForCurrentSelection = async () => {
+  if (!selectedCustomer.code || !selectedMasterCard.seq) {
+    clearLastSOOrder()
+    return
+  }
+
+  try {
+    const params = new URLSearchParams()
+    params.append('customer_code', selectedCustomer.code)
+
+    const response = await fetch(`/api/sales-orders?${params.toString()}`)
+    const data = await response.json()
+
+    if (!data.success || !Array.isArray(data.data) || data.data.length === 0) {
+      clearLastSOOrder()
+      return
+    }
+
+    const allOrders = data.data
+    const selectedSeq = String(selectedMasterCard.seq || '')
+    const matchingOrders = selectedSeq
+      ? allOrders.filter(order => String(order.master_card_seq || '') === selectedSeq)
+      : []
+
+    const lastOrder = (matchingOrders.length > 0 ? matchingOrders[0] : allOrders[0])
+
+    if (!lastOrder || !lastOrder.so_number) {
+      clearLastSOOrder()
+      return
+    }
+
+    const soNum = String(lastOrder.so_number)
+    const parts = soNum.split('-')
+
+    if (parts.length === 3) {
+      lastSOOrder.prefix = parts[0] || ''
+      lastSOOrder.year = parts[1] || ''
+      lastSOOrder.number = parts[2] || ''
+    } else {
+      // Fallback for legacy formats: show full SO number in last box
+      lastSOOrder.prefix = ''
+      lastSOOrder.year = ''
+      lastSOOrder.number = soNum
+    }
+  } catch (err) {
+    console.error('Error fetching last sales order:', err)
+    clearLastSOOrder()
+  }
+}
 
 // Methods
 // Handle Order Group change
@@ -1045,6 +1103,8 @@ const refreshPage = () => {
     compNo: '',
     pDesign: ''
   })
+
+  clearLastSOOrder()
   Object.assign(orderDetails, {
     orderMode: '0',
     product: {
@@ -1075,6 +1135,8 @@ const refreshPage = () => {
     unitPrice: 0,
     uom: ''
   })
+
+  clearLastSOOrder()
 
   // Update UI after reset
   updateOrderTypeUI()
@@ -1182,6 +1244,8 @@ const validateCustomer = async () => {
         pDesign: ''
       })
 
+      clearLastSOOrder()
+
       // Fetch salesperson name if available
       if (customer.salesperson_code) {
         try {
@@ -1230,7 +1294,6 @@ const selectMcs = (mc) => {
   const seq = mc.seq || mc.mc_seq || mc.mc_sequence || ''
   const model = mc.model || mc.mc_model || ''
   const status = mc.status || mc.sts || ''
-  const approval = mc.mc_approval || mc.approval || 'No'
   const partNo = mc.part || mc.part_no || mc.part_num || ''
   const compNo = mc.comp || mc.comp_no || mc.component || ''
   const pDesign = mc.p_design || mc.pd || ''
@@ -1238,18 +1301,19 @@ const selectMcs = (mc) => {
   selectedMasterCard.seq = String(seq)
   selectedMasterCard.model = String(model)
   selectedMasterCard.status = String(status)
-  selectedMasterCard.approval = String(approval)
   selectedMasterCard.partNo = String(partNo)
   selectedMasterCard.compNo = String(compNo)
   selectedMasterCard.pDesign = String(pDesign)
 
   showMcsTableModal.value = false
 
-  // Show appropriate message based on approval status
+  fetchLastSOOrderForCurrentSelection()
+
+  // Show appropriate message based on master card status
   if (isMasterCardApproved.value) {
-    success('Master card selected successfully - Approved and ready for use')
+    success('Master card selected successfully - Status Active and ready for use')
   } else {
-    success('Master card selected successfully - Not yet approved')
+    success('Master card selected successfully - Status is not Active')
   }
 }
 
@@ -1264,22 +1328,22 @@ const validateMasterCard = async () => {
       const masterCard = data.data
       selectedMasterCard.model = masterCard.mc_model || ''
       selectedMasterCard.status = masterCard.status || 'Active'
-      selectedMasterCard.approval = masterCard.mc_approval || 'No'
       selectedMasterCard.partNo = masterCard.part_no || ''
       selectedMasterCard.compNo = masterCard.comp_no || ''
       selectedMasterCard.pDesign = masterCard.p_design || ''
 
-      // Show appropriate message based on approval status
+      fetchLastSOOrderForCurrentSelection()
+
+      // Show appropriate message based on master card status
       if (isMasterCardApproved.value) {
-        success('Master card validated successfully - Approved and ready for use')
+        success('Master card validated successfully - Status Active and ready for use')
       } else {
-        success('Master card validated successfully - Not yet approved')
+        success('Master card validated successfully - Status is not Active')
       }
     } else {
       error('Master card not found')
       selectedMasterCard.model = ''
       selectedMasterCard.status = ''
-      selectedMasterCard.approval = ''
       selectedMasterCard.partNo = ''
       selectedMasterCard.compNo = ''
       selectedMasterCard.pDesign = ''
@@ -1289,7 +1353,6 @@ const validateMasterCard = async () => {
     error('Error validating master card: ' + (err.message || 'Network error'))
     selectedMasterCard.model = ''
     selectedMasterCard.status = ''
-    selectedMasterCard.approval = ''
     selectedMasterCard.partNo = ''
     selectedMasterCard.compNo = ''
     selectedMasterCard.pDesign = ''
@@ -1312,7 +1375,6 @@ const mapMcsRows = (rows) => {
     int_dim_2: r.int_dim_2 ?? r.id_w ?? '',
     int_dim_3: r.int_dim_3 ?? r.id_h ?? '',
     status: r.status ?? r.sts ?? '',
-    mc_approval: r.mc_approval ?? r.approval ?? 'No',
   }))
 }
 

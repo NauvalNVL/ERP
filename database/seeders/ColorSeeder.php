@@ -16,16 +16,16 @@ class ColorSeeder extends Seeder
     public function run(): void
     {
         // Skip if target table does not exist in this environment
-        if (!Schema::hasTable('colors')) {
+        if (!Schema::hasTable('COLOR')) {
             return;
         }
 
         // Hapus data yang sudah ada untuk menghindari duplikasi
         try {
-            DB::table('colors')->truncate();
+            DB::table('COLOR')->truncate();
         } catch (QueryException $e) {
             // If truncate fails due to constraints, fallback to delete
-            DB::table('colors')->delete();
+            DB::table('COLOR')->delete();
         }
 
         $colors = [
@@ -213,9 +213,14 @@ class ColorSeeder extends Seeder
 
         try {
             foreach ($colors as $color) {
-                DB::table('colors')->insert($color);
+                DB::table('COLOR')->insert([
+                    'Color_Code' => $color['color_id'],
+                    'Color_Name' => $color['color_name'],
+                    'GroupCode'  => $color['color_group_id'],
+                    'Group'      => $color['cg_type'] ?? null,
+                ]);
             }
-            $this->command->info('Data warna berhasil dimasukkan.');
+            $this->command->info('Data warna berhasil dimasukkan ke tabel COLOR.');
         } catch (QueryException $e) {
             $this->command->error('Error: ' . $e->getMessage());
         }

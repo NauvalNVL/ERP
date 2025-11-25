@@ -50,7 +50,7 @@
                   </div>
                     <div class="md:col-span-1 flex flex-col justify-end">
                       <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                      <button type="button" @click="openAddNewCustomerModal" class="primary-button group w-full">
+                      <button type="button" @click="openAddNewCustomerModal" class="primary-button group w-full whitespace-nowrap">
                           <span class="shimmer-effect"></span>
                           <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
                           Add New Customer
@@ -73,16 +73,16 @@
                 <hr class="my-2 border-blue-100">
 
                 <div class="text-gray-700 mb-4">
-                  Gunakan form ini untuk memperbarui data customer account. Pastikan semua informasi yang dimasukkan sudah benar dan lengkap.
+                  Use this form to update customer account data. Make sure all information entered is correct and complete.
                 </div>
                 <div class="bg-blue-50 rounded-lg p-4">
-                  <div class="font-bold text-blue-700 mb-2">Petunjuk:</div>
+                  <div class="font-bold text-blue-700 mb-2">Instructions:</div>
                   <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
-                    <li>Masukkan kode customer untuk mencari data</li>
-                    <li>Klik tombol tabel untuk melihat daftar customer</li>
-                    <li>Pilih customer dari modal untuk edit</li>
-                    <li>Klik "Add New" untuk membuat customer baru</li>
-                    <li>Klik Save untuk menyimpan perubahan</li>
+                    <li>Enter the customer code to search for data</li>
+                    <li>Click the table button to view the customer list</li>
+                    <li>Select a customer from the modal to edit</li>
+                    <li>Click 'Add New' to create a new customer</li>
+                    <li>Click Save to store your changes</li>
                   </ul>
                 </div>
               </div>
@@ -277,7 +277,10 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
-                                    <input type="text" v-model="newCustomerForm.sales_type" class="form-input" placeholder="Enter Customer Type" maxlength="50">
+                                    <select v-model="newCustomerForm.sales_type" class="form-input">
+                                        <option value="PT">PT</option>
+                                        <option value="Perorangan">Perorangan</option>
+                                    </select>
                                     <span class="text-xs text-gray-500">Customer type classification</span>
                                 </div>
 
@@ -459,6 +462,12 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Short Name</label>
+                                    <input type="text" v-model="form.short_name" class="form-input" maxlength="12">
+                                    <span class="text-xs text-gray-500">For Production</span>
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
                                     <input type="text" v-model="form.contact_person" class="form-input">
                                 </div>
@@ -545,7 +554,10 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
-                                    <input type="text" v-model="form.sales_type" class="form-input" placeholder="Enter Customer Type" maxlength="50">
+                                    <select v-model="form.sales_type" class="form-input">
+                                        <option value="PT">PT</option>
+                                        <option value="Perorangan">Perorangan</option>
+                                    </select>
                                     <span class="text-xs text-gray-500">Customer type classification</span>
                                 </div>
 
@@ -661,7 +673,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { Head } from '@inertiajs/vue3'
 import { route } from '@/ziggy'
@@ -698,6 +710,7 @@ const customerGroups = ref([])
 const form = reactive({
     customer_code: '',
     customer_name: '',
+    short_name: '',
     address: '',
     address2: '',
     address3: '',
@@ -708,6 +721,7 @@ const form = reactive({
     credit_limit: 0,
     credit_terms: 0,
     ac_type: 'N-Local', // Default value
+    currency_code: '',
     npwp: '',
     sales_type: '', // Sales Type field
     salesperson_code: '',
@@ -721,6 +735,7 @@ const form = reactive({
 const newCustomerForm = reactive({
     customer_code: '',
     customer_name: '',
+    short_name: '',
     address: '',
     address2: '',
     address3: '',
@@ -731,6 +746,7 @@ const newCustomerForm = reactive({
     credit_limit: 0,
     credit_terms: 0,
     ac_type: 'N-Local',
+    currency_code: '',
     npwp: '',
     sales_type: '', // Sales Type field
     salesperson_code: '',
@@ -739,6 +755,33 @@ const newCustomerForm = reactive({
     grouping_code: '',
     print_ar_aging: 'N-No'
 })
+
+// Helper to derive short name (max 12 chars) from customer name
+const deriveShortName = (name) => {
+    return (name || '').substring(0, 12)
+}
+
+// Auto-generate short_name from customer_name on create (new customer)
+watch(
+    () => newCustomerForm.customer_name,
+    (newVal, oldVal) => {
+        const prevAuto = deriveShortName(oldVal)
+        if (!newCustomerForm.short_name || newCustomerForm.short_name === prevAuto) {
+            newCustomerForm.short_name = deriveShortName(newVal)
+        }
+    }
+)
+
+// Auto-generate short_name from customer_name on edit
+watch(
+    () => form.customer_name,
+    (newVal, oldVal) => {
+        const prevAuto = deriveShortName(oldVal)
+        if (!form.short_name || form.short_name === prevAuto) {
+            form.short_name = deriveShortName(newVal)
+        }
+    }
+)
 
 // Search for customers - Now handled by modal
 const searchCustomers = async () => {
@@ -868,6 +911,7 @@ const selectCustomerAccount = (account) => {
     // Fill the form with customer data, ensuring all required fields have valid values
     form.customer_code = accountData.customer_code
     form.customer_name = accountData.customer_name || ''
+    form.short_name = deriveShortName(accountData.short_name || accountData.customer_name || '')
     form.address = accountData.address || ''
     form.address2 = accountData.address2 || ''
     form.address3 = accountData.address3 || ''
@@ -878,6 +922,13 @@ const selectCustomerAccount = (account) => {
     form.credit_limit = accountData.credit_limit || 0
     form.credit_terms = accountData.credit_terms || 0
     form.ac_type = accountData.ac_type || accountData.account_type || 'N-Local'
+    form.currency_code = accountData.currency_code || accountData.currency || ''
+    // Customer Type may come under different keys depending on API
+    form.sales_type =
+        accountData.sales_type ||
+        accountData.customer_type ||
+        accountData.CUST_TYPE ||
+        ''
 
     // Ensure ac_type has a valid value
     if (!['Y-Foreign', 'N-Local'].includes(form.ac_type)) {
@@ -1152,6 +1203,7 @@ const saveNewCustomerAccount = async () => {
             Object.assign(newCustomerForm, {
                 customer_code: '',
                 customer_name: '',
+                short_name: '',
                 address: '',
                 address2: '',
                 address3: '',
@@ -1162,6 +1214,7 @@ const saveNewCustomerAccount = async () => {
                 credit_limit: 0,
                 credit_terms: 0,
                 ac_type: 'N-Local',
+                currency_code: '',
                 npwp: '',
                 sales_type: '',
                 salesperson_code: '',

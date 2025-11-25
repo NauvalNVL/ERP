@@ -1,7 +1,7 @@
 <template>
   <div v-if="show" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-4/5 lg:w-3/5 max-h-[90vh] max-w-4xl mx-auto overflow-hidden">
-      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
           <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
             <i class="fas fa-tools"></i>
@@ -22,7 +22,7 @@
                 <i class="fas fa-search text-gray-400"></i>
               </div>
               <input type="text" v-model="searchFilter" placeholder="Search by code or name..." 
-                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm">
+                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out sm:text-sm">
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
               </td>
             </tr>
             <tr v-for="tool in filteredScoringTools" :key="tool.id" 
-                :class="['hover:bg-gray-50 cursor-pointer', selectedTool && selectedTool.id === tool.id ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                :class="['hover:bg-gray-50 cursor-pointer', selectedTool && selectedTool.id === tool.id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectedTool = tool"
                 @dblclick="selectTool(tool)">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ tool.code }}</td>
@@ -62,15 +62,15 @@
                 @click="selectTool(selectedTool)" 
                 :disabled="!selectedTool"
                 :class="[
-                  'inline-flex justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px',
+                  'inline-flex justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transform active:translate-y-px',
                   selectedTool 
-                    ? 'text-white bg-blue-600 hover:bg-blue-700 border border-blue-600' 
+                    ? 'text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 border border-emerald-500' 
                     : 'text-gray-400 bg-gray-200 border border-gray-300 cursor-not-allowed'
                 ]">
           <i class="fas fa-check mr-1"></i>
           Select
         </button>
-        <button type="button" @click="$emit('close')" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px">
+        <button type="button" @click="$emit('close')" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transform active:translate-y-px">
           <i class="fas fa-times mr-1"></i>
           Close
         </button>

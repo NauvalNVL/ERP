@@ -113,8 +113,6 @@ class UpdateMcController extends Controller
         $paginated = $mcQuery->paginate($perPage);
 
         $transformed = collect($paginated->items())->map(function ($item) {
-            // Treat MC with STS = 'Active' as approved for SO preparation
-            $isApproved = strtoupper((string) $item->STS) === 'ACTIVE';
             return [
                 'seq' => $item->MCS_Num,
                 'model' => $item->MODEL,
@@ -122,7 +120,6 @@ class UpdateMcController extends Controller
                 'part' => $item->PART_NO,
                 'comp' => $item->COMP,
                 'status' => $item->STS,
-                'mc_approval' => $isApproved ? 'Yes' : 'No',
                 'p_design' => $item->P_DESIGN,
                 'customer_code' => $item->AC_NUM,
                 'customer_name' => $item->AC_NAME ?? $item->AC_NUM,
@@ -160,7 +157,7 @@ class UpdateMcController extends Controller
     public function apiShow($mcSeq, Request $request)
     {
         $customerCode = $request->input('customer_code');
-        
+
         // Get Main component
         $q = DB::table('MC')
             ->where('MCS_Num', $mcSeq)
@@ -169,11 +166,11 @@ class UpdateMcController extends Controller
             $q->where('AC_NUM', $customerCode);
         }
         $main = $q->first();
-        
+
         if (!$main) {
             return response()->json(['message' => 'Not found'], 404);
         }
-        
+
         // Get all Fit components for this MC (all PD fields per component)
         $fitsQuery = DB::table('MC')
             ->where('MCS_Num', $mcSeq)
@@ -183,10 +180,10 @@ class UpdateMcController extends Controller
             $fitsQuery->where('AC_NUM', $customerCode);
         }
         $fits = $fitsQuery->get();
-        
+
         // Convert Main to array
         $result = (array) $main;
-        
+
         // Add components array with all Fit data (full PD fields per component)
         $components = [];
 
@@ -421,20 +418,20 @@ class UpdateMcController extends Controller
                 'fullBlockPrint' => $fit->FB_PRINTING ?? null,
             ];
         }
-        
+
         // Add to both root level and pd_setup for compatibility
         $result['components'] = $components;
         $result['pd_setup'] = [
             'components' => $components
         ];
-        
+
         Log::info('apiShow result', [
             'mcs_num' => $mcSeq,
             'main_comp' => $main->COMP,
             'fits_count' => count($components),
             'fits' => array_map(fn($c) => $c['c_num'], $components)
         ]);
-        
+
         return response()->json($result);
     }
 
@@ -457,7 +454,6 @@ class UpdateMcController extends Controller
             $row = $q->first();
 
             if ($row) {
-                $isApproved = strtoupper((string) $row->STS) === 'ACTIVE';
                 return response()->json([
                     'exists' => true,
                     'data' => [
@@ -466,7 +462,6 @@ class UpdateMcController extends Controller
                         'mc_model' => $row->MODEL,
                         'mc_short_model' => '',
                         'status' => $row->STS,
-                        'mc_approval' => $isApproved ? 'Yes' : 'No',
                         'part_no' => $row->PART_NO,
                         'comp_no' => $row->COMP,
                         'p_design' => $row->P_DESIGN,
@@ -520,7 +515,7 @@ class UpdateMcController extends Controller
             'has_pd_setup' => $request->has('pd_setup'),
             'has_mspData' => $request->has('mspData')
         ]);
-        
+
         try {
             $validated = $request->validate([
             'mc_seq' => 'required|string',
@@ -529,7 +524,6 @@ class UpdateMcController extends Controller
             'mc_model' => 'nullable|string',
             'mc_short_model' => 'nullable|string',
             'status' => 'nullable|string|in:Active,Obsolete',
-            'mc_approval' => 'nullable|string|in:Yes,No',
             'part_no' => 'nullable|string',
             'comp_no' => 'nullable|string',
             'p_design' => 'nullable|string',
@@ -609,11 +603,11 @@ class UpdateMcController extends Controller
                 'message' => $e->getMessage(),
                 'request_keys' => array_keys($request->all())
             ]);
-            
+
             // Return detailed error response
             $receivedFields = array_keys($request->all());
             $validationRules = [
-                'mc_seq', 'customer_code', 'customer_name', 'mc_model', 'mc_short_model', 'status', 'mc_approval',
+                'mc_seq', 'customer_code', 'customer_name', 'mc_model', 'mc_short_model', 'status',
                 'part_no', 'comp_no', 'p_design', 'ext_dim_1', 'ext_dim_2', 'ext_dim_3',
                 'int_dim_1', 'int_dim_2', 'int_dim_3', 'detailed_master_card', 'pd_setup',
                 'selectedProductDesign', 'selectedPaperFlute', 'selectedChemicalCoat',
@@ -633,7 +627,7 @@ class UpdateMcController extends Controller
                 'mspData', 'components', 'subMaterials', 'colorAreaPercents', 'partNo'
             ];
             $missingValidations = array_values(array_diff($receivedFields, $validationRules));
-            
+
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
@@ -665,7 +659,7 @@ class UpdateMcController extends Controller
             // Map and upsert to legacy MC table for reporting/compatibility
             // Get customer data to populate AC_NAME and CURRENCY
             $customer = \App\Models\Customer::where('CODE', $validated['customer_code'])->first();
-            
+
             Log::info('Customer lookup', [
                 'customer_code' => $validated['customer_code'],
                 'customer_found' => $customer ? 'YES' : 'NO',
@@ -675,37 +669,37 @@ class UpdateMcController extends Controller
             // Get UNIT from product_designs -> products table
             $unit = null;
             $pDesignCode = $validated['p_design'] ?? $validated['selectedProductDesign'] ?? null;
-            
+
             Log::info('P_DESIGN lookup start', [
                 'p_design_from_validated' => $validated['p_design'] ?? 'NULL',
                 'selectedProductDesign_from_validated' => $validated['selectedProductDesign'] ?? 'NULL',
                 'final_pDesignCode' => $pDesignCode
             ]);
-            
+
             if ($pDesignCode) {
                 // Get product code from product_designs table
                 $productDesign = DB::table('product_designs')
                     ->where('pd_code', $pDesignCode)
                     ->first();
-                
+
                 Log::info('Product Design lookup', [
                     'pd_code' => $pDesignCode,
                     'product_design_found' => $productDesign ? 'YES' : 'NO',
                     'product_code' => $productDesign ? $productDesign->product : 'NULL'
                 ]);
-                
+
                 if ($productDesign && $productDesign->product) {
                     // Get unit from products table
                     $product = DB::table('products')
                         ->where('product_code', $productDesign->product)
                         ->first();
-                    
+
                     Log::info('Product lookup', [
                         'product_code' => $productDesign->product,
                         'product_found' => $product ? 'YES' : 'NO',
                         'unit' => $product ? ($product->unit ?? 'NULL') : 'NULL'
                     ]);
-                    
+
                     if ($product && $product->unit) {
                         $unit = $product->unit;
                         Log::info('✓ UNIT successfully fetched', [
@@ -730,7 +724,7 @@ class UpdateMcController extends Controller
             }
 
             $currency = $customer ? $customer->CURRENCY : null;
-            
+
             if (!$currency) {
                 Log::warning('✗ CURRENCY not found', [
                     'customer_exists' => $customer ? 'YES' : 'NO',
@@ -742,7 +736,7 @@ class UpdateMcController extends Controller
                     'currency' => $currency
                 ]);
             }
-            
+
             Log::info('MC Save - Initial values', [
                 'customer_code' => $validated['customer_code'],
                 'currency' => $currency,
@@ -761,7 +755,8 @@ class UpdateMcController extends Controller
                 'AC_NUM' => $validated['customer_code'],
                 // Store customer NAME, not code
                 'AC_NAME' => $customer ? $customer->NAME : $validated['customer_code'],
-                'STS' => $validated['status'],
+                // Preserve existing STS on partial updates; allow missing status key
+                'STS' => $validated['status'] ?? ($existing->STS ?? null),
                 'COMP' => $validated['comp_no'] ?? 'Main', // Default to 'Main' if not specified
                 'P_DESIGN' => $pDesignCode,
                 'MCS_Num' => $validated['mc_seq'],
@@ -772,7 +767,7 @@ class UpdateMcController extends Controller
                 // Get UNIT from product_designs -> products table
                 'UNIT' => $unit,
             ];
-            
+
             Log::info('Legacy COMP value set to', [
                 'COMP' => $legacy['COMP']
             ]);
@@ -885,7 +880,7 @@ class UpdateMcController extends Controller
                     }
                     // Calculate TOTAL_COLOR: just the count of selected colors (not multiplied)
                     $legacy['TOTAL_COLOR'] = $colorCount > 0 ? $colorCount : null;
-                    
+
                     Log::info('TOTAL_COLOR calculated', [
                         'color_count' => $colorCount,
                         'total_color' => $legacy['TOTAL_COLOR'],
@@ -954,7 +949,7 @@ class UpdateMcController extends Controller
                 // Core product attributes
                 $newPDesign = $alias($pd, ['pDesign','p_design','productDesign','pdCode','pd','selectedProductDesign']);
                 $legacy['P_DESIGN'] = $keep('P_DESIGN', $newPDesign);
-                
+
                 $legacy['FLUTE'] = $keep('FLUTE', $alias($pd, ['flute','paperFlute','flute_code','paper_flute','selectedPaperFlute']));
                 $legacy['S_TOOL'] = $keep('S_TOOL', $alias($pd, ['scoringTool','scoreTool','sTool','S_TOOL','selectedScoringToolCode']));
                 $legacy['COAT'] = $keep('COAT', $alias($pd, ['chemicalCoat','chemCoat','coat','selectedChemicalCoat']));
@@ -980,7 +975,7 @@ class UpdateMcController extends Controller
                 $legacy['FB_PRINTING'] = $toYesNo($alias($pd, ['fbPrinting','fb_printing','fullBlockPrint'])) ;
                 $legacy['STRING_TYPE'] = $keep('STRING_TYPE', $alias($pd, ['stringType','string_type','selectedBundlingStringCode']));
                 $legacy['ITEM_REMARK'] = $keep('ITEM_REMARK', $alias($pd, ['itemRemark','item_remark']));
-                
+
                 // UNIT: Only override if not already set from product_designs lookup
                 $unitBeforeCheck = $legacy['UNIT'] ?? null;
                 if (!isset($legacy['UNIT']) || $legacy['UNIT'] === null) {
@@ -996,7 +991,7 @@ class UpdateMcController extends Controller
                         'unit' => $legacy['UNIT']
                     ]);
                 }
-                
+
                 // CURRENCY: Should always come from customer table (already set above)
                 // Don't override with PD currency even if customer not found
                 Log::info('CURRENCY check in PD section', [
@@ -1017,7 +1012,7 @@ class UpdateMcController extends Controller
                         $legacy["MSP{$i}_UP"] = null;
                         $legacy["MSP{$i}_SPECIAL_INST"] = null;
                     }
-                    
+
                     // Process MSP data from the new modal format
                     foreach ($mspData['machines'] as $index => $machine) {
                         $mspNum = $index + 1;
@@ -1177,12 +1172,12 @@ class UpdateMcController extends Controller
                     'p_design_length' => strlen($finalPDesign),
                     'p_design_chars' => str_split($finalPDesign)
                 ]);
-                
+
                 // Try exact match first
                 $productDesign = DB::table('product_designs')
                     ->where('pd_code', $finalPDesign)
                     ->first();
-                
+
                 // If not found, try case-insensitive search
                 if (!$productDesign) {
                     Log::info('Exact match not found, trying case-insensitive search');
@@ -1190,27 +1185,27 @@ class UpdateMcController extends Controller
                         ->whereRaw('UPPER(pd_code) = ?', [strtoupper($finalPDesign)])
                         ->first();
                 }
-                
+
                 // If still not found, try common typo corrections (0 vs O, R vs P, etc.)
                 if (!$productDesign) {
                     Log::info('Case-insensitive search failed, trying typo corrections');
-                    
+
                     $typoCorrections = [
                         ['0', 'O'],  // number 0 vs letter O
                         ['R', 'P'],  // R vs P (APR → APP)
                         ['1', 'I'],  // number 1 vs letter I
                     ];
-                    
+
                     foreach ($typoCorrections as $correction) {
                         [$from, $to] = $correction;
                         $correctedCode = str_replace($from, $to, $finalPDesign);
-                        
+
                         if ($correctedCode !== $finalPDesign) {
                             Log::info("Trying correction: {$from} → {$to}", ['corrected_code' => $correctedCode]);
                             $productDesign = DB::table('product_designs')
                                 ->where('pd_code', $correctedCode)
                                 ->first();
-                            
+
                             if ($productDesign) {
                                 Log::info('✓ Found with typo correction!', [
                                     'original' => $finalPDesign,
@@ -1225,7 +1220,7 @@ class UpdateMcController extends Controller
                         }
                     }
                 }
-                
+
                 // If still not found, try to find similar codes
                 if (!$productDesign) {
                     Log::info('Case-insensitive search failed, searching for similar codes');
@@ -1234,7 +1229,7 @@ class UpdateMcController extends Controller
                         ->limit(10)
                         ->pluck('pd_code')
                         ->toArray();
-                    
+
                     // If no similar codes, check if table has any data at all
                     if (empty($similarCodes)) {
                         $totalDesigns = DB::table('product_designs')->count();
@@ -1243,14 +1238,14 @@ class UpdateMcController extends Controller
                             ->limit(10)
                             ->pluck('pd_code')
                             ->toArray();
-                        
+
                         Log::warning('Product Design not found - Database status', [
                             'searched_pd_code' => $finalPDesign,
                             'total_designs_in_db' => $totalDesigns,
                             'sample_codes' => $sampleDesigns,
                             'issue' => $totalDesigns == 0 ? 'product_designs table is EMPTY' : 'P_DESIGN code does not exist',
-                            'suggestion' => $totalDesigns == 0 
-                                ? 'Add product design data to database first' 
+                            'suggestion' => $totalDesigns == 0
+                                ? 'Add product design data to database first'
                                 : 'Use one of the existing codes or add new product design'
                         ]);
                     } else {
@@ -1261,7 +1256,7 @@ class UpdateMcController extends Controller
                         ]);
                     }
                 }
-                
+
                 if ($productDesign) {
                     Log::info('Product Design found', [
                         'searched_pd_code' => $finalPDesign,
@@ -1269,16 +1264,16 @@ class UpdateMcController extends Controller
                         'pd_name' => $productDesign->pd_name ?? 'N/A',
                         'product_code' => $productDesign->product ?? 'NULL'
                     ]);
-                    
+
                     if ($productDesign->product) {
                         $product = DB::table('products')
                             ->where('product_code', $productDesign->product)
                             ->first();
-                        
+
                         if ($product) {
                             $unitValue = $product->unit ?? null;
                             $unitTrimmed = $unitValue ? trim($unitValue) : null;
-                            
+
                             Log::info('Product found', [
                                 'product_code' => $productDesign->product,
                                 'description' => $product->description ?? 'N/A',
@@ -1287,7 +1282,7 @@ class UpdateMcController extends Controller
                                 'unit_trimmed' => $unitTrimmed,
                                 'unit_is_empty' => empty($unitTrimmed)
                             ]);
-                            
+
                             // Check if unit exists and is not empty (after trimming)
                             if (!empty($unitTrimmed)) {
                                 $legacy['UNIT'] = $unitTrimmed;
@@ -1355,7 +1350,7 @@ class UpdateMcController extends Controller
                 'mc_seq' => $validated['mc_seq'],
                 'customer_code' => $validated['customer_code'],
                 'mc_model' => $validated['mc_model'] ?? null,
-                'status' => $validated['status'],
+                'status' => $validated['status'] ?? null,
                 'ext_dim_1' => $validated['ext_dim_1'] ?? null,
                 'ext_dim_2' => $validated['ext_dim_2'] ?? null,
                 'ext_dim_3' => $validated['ext_dim_3'] ?? null,
@@ -1608,25 +1603,25 @@ class UpdateMcController extends Controller
     {
         try {
             $customerCode = $request->input('customer_code');
-            
+
             Log::info('apiShowComponents called', [
                 'mcs_num' => $mcSeq,
                 'customer_code' => $customerCode
             ]);
-            
+
             // Query all components for this MC (Main + all Fit components)
             $query = DB::table('MC')
                 ->where('MCS_Num', $mcSeq);
-            
+
             if ($customerCode) {
                 $query->where('AC_NUM', $customerCode);
             }
-            
+
             // Order by component number: Main first, then Fit1-9
             // SQL Server requires 3 arguments for SUBSTRING: SUBSTRING(string, start, length)
             $components = $query->orderByRaw("CASE WHEN COMP = 'Main' THEN 0 ELSE CAST(SUBSTRING(COMP, 4, 10) AS INT) + 1 END")
                 ->get();
-            
+
             Log::info('Components query result', [
                 'mcs_num' => $mcSeq,
                 'total_found' => $components->count(),
@@ -1637,7 +1632,7 @@ class UpdateMcController extends Controller
                     'PART_NO' => $c->PART_NO
                 ])->toArray()
             ]);
-            
+
             if ($components->isEmpty()) {
                 Log::warning('No components found for MC', [
                     'mcs_num' => $mcSeq,
@@ -1645,7 +1640,7 @@ class UpdateMcController extends Controller
                 ]);
                 return response()->json([], 200); // Return empty array if no components found
             }
-            
+
             // Transform components data (full PD fields per component)
             $result = $components->map(function ($comp) {
                 return [
@@ -1762,23 +1757,23 @@ class UpdateMcController extends Controller
                     'fullBlockPrint' => $comp->FB_PRINTING ?? null,
                 ];
             })->toArray();
-            
+
             Log::info('Components fetched successfully', [
                 'mcs_num' => $mcSeq,
                 'customer_code' => $customerCode,
                 'component_count' => count($result),
                 'components' => array_map(fn($c) => $c['c_num'], $result)
             ]);
-            
+
             return response()->json($result);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching MC components', [
                 'mcs_num' => $mcSeq,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'message' => 'Error fetching components',
                 'error' => $e->getMessage()

@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorGroupController;
+use App\Http\Controllers\ColorController;
 use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
@@ -120,6 +121,9 @@ Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
 Route::post('/products', [ProductController::class, 'apiStore']);
 Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
+
+// Color API routes
+Route::get('/colors', [ColorController::class, 'apiIndex']);
 
 // Color Group API routes
 Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
@@ -570,6 +574,11 @@ Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store
 
 // Industry, Geo, and Salesperson API routes
 Route::get('/industry', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
+Route::post('/industry', [App\Http\Controllers\IndustryController::class, 'store']);
+Route::get('/industry/search/{code}', [App\Http\Controllers\IndustryController::class, 'search']);
+Route::put('/industry/{code}', [App\Http\Controllers\IndustryController::class, 'update']);
+Route::delete('/industry/{code}', [App\Http\Controllers\IndustryController::class, 'destroy']);
+Route::post('/industry/seed', [App\Http\Controllers\IndustryController::class, 'seed']);
 
 // Geo API routes (complete CRUD)
 Route::get('/geo', [App\Http\Controllers\GeoController::class, 'apiIndex']);

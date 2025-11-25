@@ -177,16 +177,16 @@ class AnalysisCodeController extends Controller
 
     /**
      * Validate business rules for Analysis Group 2
-     * 
-     * 'AM', 'CM', 'CL' & 'UN' of Analysis Group 2 are only applied to Analysis Group = 'SD'
+     *
+     * 'AM', 'CM', 'CL' & 'UN' of Analysis Group 2 are only applied to Analysis Group = 'SO'
      */
     private function validateAnalysisGroupRules($group, $group2)
     {
-        $sdOnlyGroups = ['AM', 'CM', 'CL', 'UN'];
+        $soOnlyGroups = ['AM', 'CM', 'CL', 'UN'];
         $mcOnlyGroups = ['CS', 'RS'];
 
-        if (in_array($group2, $sdOnlyGroups) && $group !== 'SD') {
-            throw new \Exception("Analysis Group2 '{$group2}' can only be used with Analysis Group 'SD-Sales Order'");
+        if (in_array($group2, $soOnlyGroups) && $group !== 'SO') {
+            throw new \Exception("Analysis Group2 '{$group2}' can only be used with Analysis Group 'SO-Sales Order'");
         }
 
         if (in_array($group2, $mcOnlyGroups) && $group !== 'MC') {
