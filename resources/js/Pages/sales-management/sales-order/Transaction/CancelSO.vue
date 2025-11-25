@@ -2,13 +2,13 @@
   <AppLayout header="Cancel SO">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b border-blue-700 text-white">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <i class="fas fa-times-circle text-2xl text-red-600"></i>
             <div>
-              <h1 class="text-xl font-semibold text-gray-800">Cancel SO</h1>
-              <p class="text-xs text-gray-500">Cancel existing sales orders</p>
+              <h1 class="text-xl font-semibold text-white">Cancel SO</h1>
+              <p class="text-xs text-blue-100">Cancel existing sales orders</p>
             </div>
           </div>
           <div class="flex items-center space-x-2">
@@ -287,17 +287,6 @@
             <div class="space-y-4">
               <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                 <h4 class="text-sm font-semibold text-red-700 mb-3">Cancellation Information</h4>
-                
-                <!-- Cancel Reason -->
-                <div class="mb-4">
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Cancel Reason:</label>
-                  <textarea 
-                    v-model="cancelReason" 
-                    rows="4"
-                    placeholder="Enter reason for cancellation..."
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  ></textarea>
-                </div>
 
                 <!-- Cancel Date -->
                 <div class="mb-4">
@@ -340,7 +329,7 @@
                   <button 
                     @click="cancelSalesOrder" 
                     class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
-                    :disabled="!cancelReason.trim() || selectedSO.status === 'Cancelled'"
+                    :disabled="selectedSO.status === 'Cancelled'"
                   >
                     <i class="fas fa-ban mr-1"></i>
                     Cancel SO
@@ -448,7 +437,6 @@ export default {
                 soNumber: ''
             },
             selectedSO: null,
-            cancelReason: '',
             cancelDate: new Date().toISOString().split('T')[0],
             cancelledBy: 'SYSTEM', // This should be populated from auth user
             searchPerformed: false,
@@ -456,38 +444,7 @@ export default {
             selectedRowIndex: -1,
             showAnalysisCodeModal: false,
             selectedAnalysisCodeIndex: -1,
-            analysisCodeList: [
-                {
-                    code: 'SLOR',
-                    name: 'SALAM INPUT',
-                    group: 'SH',
-                    group2: 'CL'
-                },
-                {
-                    code: 'CL02',
-                    name: 'PO BATAL (PELUMINTAN CUSTOMER)',
-                    group: 'SO',
-                    group2: 'CL'
-                },
-                {
-                    code: 'CANC',
-                    name: 'CANCELLED ORDER',
-                    group: 'SO',
-                    group2: 'CL'
-                },
-                {
-                    code: 'RTRN',
-                    name: 'RETURN GOODS',
-                    group: 'WH',
-                    group2: 'RT'
-                },
-                {
-                    code: 'DEFECT',
-                    name: 'DEFECTIVE PRODUCTS',
-                    group: 'QC',
-                    group2: 'DF'
-                }
-            ],
+            analysisCodeList: [],
             salesOrderList: [
                 {
                     id: 1,
@@ -738,9 +695,40 @@ export default {
             }
         },
 
-        openAnalysisCodeModal() {
-            this.showAnalysisCodeModal = true;
+        async openAnalysisCodeModal() {
             this.selectedAnalysisCodeIndex = -1;
+
+            try {
+                const response = await fetch('/api/analysis-codes', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const allCodes = Array.isArray(data)
+                        ? data
+                        : (Array.isArray(data.data) ? data.data : []);
+
+                    this.analysisCodeList = allCodes
+                        .filter(code => code.analysis_group === 'SO' && code.analysis_group2 === 'CL')
+                        .map(code => ({
+                            code: code.analysis_code,
+                            name: code.analysis_name,
+                            group: code.analysis_group,
+                            group2: code.analysis_group2,
+                        }));
+                } else {
+                    console.error('Failed to fetch analysis codes for Cancel SO');
+                }
+            } catch (error) {
+                console.error('Error fetching analysis codes for Cancel SO:', error);
+            }
+
+            this.showAnalysisCodeModal = true;
         },
 
         closeAnalysisCodeModal() {
@@ -806,17 +794,12 @@ export default {
         },
 
         async cancelSalesOrder() {
-            if (!this.cancelReason.trim()) {
-                alert('Please enter a reason for cancellation.');
-                return;
-            }
-
             if (!this.selectedSO || !this.selectedSO.soNumber) {
                 alert('No sales order selected.');
                 return;
             }
 
-            if (confirm(`Are you sure you want to cancel Sales Order ${this.selectedSO.soNumber}?\n\nReason: ${this.cancelReason}`)) {
+            if (confirm(`Are you sure you want to cancel Sales Order ${this.selectedSO.soNumber}?`)) {
                 try {
                     const response = await fetch(`/api/sales-order/${this.selectedSO.soNumber}/cancel`, {
                         method: 'PUT',
@@ -825,7 +808,7 @@ export default {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
                         body: JSON.stringify({
-                            cancel_reason: this.cancelReason,
+                            cancel_reason: '',
                             cancel_date: this.cancelDate,
                             cancelled_by: this.cancelledBy,
                             analysis_code: this.selectedSO.analysisCode
@@ -856,7 +839,6 @@ export default {
         clearSelection() {
             this.searchForm.soNumber = '';
             this.selectedSO = null;
-            this.cancelReason = '';
             this.searchPerformed = false;
         },
 

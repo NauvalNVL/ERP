@@ -33,21 +33,6 @@ class ColorController extends Controller
                 ->orderBy('Color_Code', 'asc')
                 ->get();
             
-            // If no data exists, seed sample data
-            if ($colors->isEmpty() && $colorGroups->isEmpty()) {
-                $this->seedData();
-                
-                $colors = Color::whereNotNull('GroupCode')
-                    ->whereRaw('GroupCode != Color_Code')
-                    ->orderBy('Color_Code', 'asc')
-                    ->get();
-                    
-                $colorGroups = Color::whereNull('GroupCode')
-                    ->orWhereRaw('GroupCode = Color_Code')
-                    ->orderBy('Color_Code', 'asc')
-                    ->get();
-            }
-            
             // Transform data to match Vue component expected format
             $colorsTransformed = $colors->map(function($color) {
                 return [
@@ -441,6 +426,58 @@ class ColorController extends Controller
     }
 
     /**
+     * Display a listing of the colors for API consumers (JSON only).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            // Get only colors (not color groups) from COLOR table
+            $colors = Color::whereNotNull('GroupCode')
+                ->whereRaw('GroupCode != Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->get();
+            
+            // Get color groups for dropdown
+            $colorGroups = Color::whereNull('GroupCode')
+                ->orWhereRaw('GroupCode = Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->get();
+
+            // Transform data to match Vue component expected format
+            $colorsTransformed = $colors->map(function($color) {
+                return [
+                    'color_id' => $color->Color_Code,
+                    'color_name' => $color->Color_Name,
+                    'color_group_id' => $color->GroupCode,
+                    'cg_type' => $color->Group,
+                    'origin' => 'ID'
+                ];
+            });
+
+            $colorGroupsTransformed = $colorGroups->map(function($group) {
+                return [
+                    'cg' => $group->Color_Code,
+                    'cg_name' => $group->Color_Name,
+                    'cg_type' => $group->Group
+                ];
+            });
+
+            return response()->json([
+                'colors' => $colorsTransformed,
+                'color_groups' => $colorGroupsTransformed
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@apiIndex: ' . $e->getMessage());
+            return response()->json([
+                'error' => true,
+                'message' => 'Error displaying color data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display a listing of the resource for printing.
      *
      * @return \Illuminate\View\View
@@ -500,45 +537,7 @@ class ColorController extends Controller
      */
     private function seedData()
     {
-        try {
-            // 1. Seed Color Groups first (GroupCode = Color_Code for self-reference)
-            $colorGroups = [
-                ['Color_Code' => 'BK', 'Color_Name' => 'Black', 'GroupCode' => 'BK', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'R', 'Color_Name' => 'Red', 'GroupCode' => 'R', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'B', 'Color_Name' => 'Blue', 'GroupCode' => 'B', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'G', 'Color_Name' => 'Green', 'GroupCode' => 'G', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'Y', 'Color_Name' => 'Yellow', 'GroupCode' => 'Y', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'W', 'Color_Name' => 'White', 'GroupCode' => 'W', 'Group' => 'X-Flexo'],
-            ];
-
-            foreach ($colorGroups as $group) {
-                if (!Color::where('Color_Code', $group['Color_Code'])->exists()) {
-                    Color::create($group);
-                }
-            }
-
-            // 2. Seed individual Colors (GroupCode references parent Color Group)
-            $colors = [
-                ['Color_Code' => 'BK01', 'Color_Name' => 'Black Matte', 'GroupCode' => 'BK', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'BK02', 'Color_Name' => 'Black Glossy', 'GroupCode' => 'BK', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'RD01', 'Color_Name' => 'Red Standard', 'GroupCode' => 'R', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'RD02', 'Color_Name' => 'Red Bright', 'GroupCode' => 'R', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'BL01', 'Color_Name' => 'Blue Navy', 'GroupCode' => 'B', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'BL02', 'Color_Name' => 'Blue Sky', 'GroupCode' => 'B', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'GR01', 'Color_Name' => 'Green Forest', 'GroupCode' => 'G', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'GR02', 'Color_Name' => 'Green Lime', 'GroupCode' => 'G', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'YL01', 'Color_Name' => 'Yellow Standard', 'GroupCode' => 'Y', 'Group' => 'X-Flexo'],
-                ['Color_Code' => 'WT01', 'Color_Name' => 'White Standard', 'GroupCode' => 'W', 'Group' => 'X-Flexo'],
-            ];
-
-            foreach ($colors as $color) {
-                if (!Color::where('Color_Code', $color['Color_Code'])->exists()) {
-                    Color::create($color);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding color data: ' . $e->getMessage());
-        }
+        return;
     }
 
     /**
@@ -548,20 +547,10 @@ class ColorController extends Controller
      */
     public function seed()
     {
-        try {
-            $this->seedData();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Color seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in ColorController@seed: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed colors data: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Color seeding is disabled'
+        ], 410);
     }
 
     // ==================== COLOR GROUP METHODS ====================

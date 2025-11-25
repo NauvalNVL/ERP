@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorGroupController;
+use App\Http\Controllers\ColorController;
 use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
@@ -120,6 +121,9 @@ Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
 Route::post('/products', [ProductController::class, 'apiStore']);
 Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
+
+// Color API routes
+Route::get('/colors', [ColorController::class, 'apiIndex']);
 
 // Color Group API routes
 Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
