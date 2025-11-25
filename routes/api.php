@@ -574,6 +574,11 @@ Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store
 
 // Industry, Geo, and Salesperson API routes
 Route::get('/industry', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
+Route::post('/industry', [App\Http\Controllers\IndustryController::class, 'store']);
+Route::get('/industry/search/{code}', [App\Http\Controllers\IndustryController::class, 'search']);
+Route::put('/industry/{code}', [App\Http\Controllers\IndustryController::class, 'update']);
+Route::delete('/industry/{code}', [App\Http\Controllers\IndustryController::class, 'destroy']);
+Route::post('/industry/seed', [App\Http\Controllers\IndustryController::class, 'seed']);
 
 // Geo API routes (complete CRUD)
 Route::get('/geo', [App\Http\Controllers\GeoController::class, 'apiIndex']);

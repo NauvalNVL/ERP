@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl my-8">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+      <div class="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
           <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-2 md:mr-3">
             <i class="fas fa-layer-group text-sm md:text-base"></i>
@@ -21,7 +21,7 @@
               <i class="fas fa-search"></i>
             </span>
             <input type="text" v-model="searchQuery" placeholder="Search flutes..."
-              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-[60vh]">
@@ -44,7 +44,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-sm">
               <tr v-for="flute in filteredFlutes" :key="flute.Flute"
-                :class="['hover:bg-blue-50 cursor-pointer transition-colors', selectedFlute && selectedFlute.Flute === flute.Flute ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                :class="['hover:bg-emerald-50 cursor-pointer transition-colors', selectedFlute && selectedFlute.Flute === flute.Flute ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(flute)"
                 @dblclick="selectAndClose(flute)">
                 <td class="px-3 md:px-6 py-2 md:py-3 whitespace-nowrap font-medium text-gray-900">{{ flute.Flute }}</td>
@@ -61,7 +61,7 @@
           <p class="md:hidden">Tap to select, double-tap to edit.</p>
         </div>
         <div class="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
-          <button type="button" @click="selectAndClose(selectedFlute)" :disabled="!selectedFlute" class="w-full sm:w-auto py-2 px-4 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-all">
+          <button type="button" @click="selectAndClose(selectedFlute)" :disabled="!selectedFlute" class="w-full sm:w-auto py-2 px-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-all">
             <i class="fas fa-check mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="w-full sm:w-auto py-2 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm rounded-lg transition-colors">

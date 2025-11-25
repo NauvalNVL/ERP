@@ -55,17 +55,15 @@ class IndustryController extends Controller
         return response()->json($industry);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $code)
     {
-        $industry = Industry::findOrFail($id);
+        $industry = Industry::where('code', $code)->firstOrFail();
         
         $request->validate([
-            'code' => 'required|string|max:5|unique:industry,code,' . $id,
             'name' => 'required|string|max:30',
         ]);
 
         $industry->update([
-            'code' => strtoupper($request->code),
             'name' => strtoupper($request->name),
         ]);
 
@@ -80,9 +78,9 @@ class IndustryController extends Controller
         return redirect()->route('vue.industry.index')->with('success', 'Industry updated successfully');
     }
 
-    public function destroy($id)
+    public function destroy($code)
     {
-        $industry = Industry::findOrFail($id);
+        $industry = Industry::where('code', $code)->firstOrFail();
         $industry->delete();
         
         if (request()->wantsJson() || request()->ajax()) {

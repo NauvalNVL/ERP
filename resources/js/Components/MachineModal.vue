@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
           <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
             <i class="fas fa-cogs"></i>
@@ -21,7 +21,7 @@
               <i class="fas fa-search"></i>
             </span>
             <input type="text" v-model="searchTerm" placeholder="Search machines..."
-              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
@@ -38,7 +38,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
               <tr v-for="machine in filteredMachines" :key="machine.machine_code || machine.id"
-                :class="['hover:bg-blue-50 cursor-pointer', selectedMachine && selectedMachine.machine_code === machine.machine_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                :class="['hover:bg-emerald-50 cursor-pointer', selectedMachine && selectedMachine.machine_code === machine.machine_code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectMachine(machine)"
                 @dblclick="selectAndClose(machine)">
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ machine.machine_code }}</td>
@@ -76,7 +76,7 @@
           <button type="button" @click="sortTable('finisher_type')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Finisher
           </button>
-          <button type="button" @click="selectAndClose(selectedMachine)" :disabled="!selectedMachine" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed">
+          <button type="button" @click="selectAndClose(selectedMachine)" :disabled="!selectedMachine" class="py-2 px-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-xs rounded-lg transform active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed">
             <i class="fas fa-edit mr-1"></i>Select
           </button>
           <button type="button" @click="closeModal" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
