@@ -452,6 +452,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');
 
          Route::get('/chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.chemical-coat.index');
+         Route::get('/chemical-coat/status', [ChemicalCoatController::class, 'vueManageStatus'])->name('vue.chemical-coat.status');
          Route::get('/chemical-coat/view-print', [ChemicalCoatController::class, 'vueViewAndPrint'])->name('vue.chemical-coat.view-print');
          // Alias for search menu
          Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');

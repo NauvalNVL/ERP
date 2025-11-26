@@ -17,30 +17,35 @@ class ChemicalCoatSeeder extends Seeder
                 'code' => '001',
                 'name' => 'VERNISH',
                 'dry_end_code' => '1',
+                'status' => 'Act',
                 'is_active' => true
             ],
             [
                 'code' => '002',
                 'name' => 'WATER BASE COATING',
                 'dry_end_code' => '2',
+                'status' => 'Act',
                 'is_active' => true
             ],
             [
                 'code' => '003',
                 'name' => 'GLOSS COAT',
                 'dry_end_code' => '3',
+                'status' => 'Act',
                 'is_active' => true
             ],
             [
                 'code' => '004',
                 'name' => 'MATTE COAT',
                 'dry_end_code' => '4',
+                'status' => 'Act',
                 'is_active' => true
             ],
             [
                 'code' => '005',
                 'name' => 'UV COATING',
                 'dry_end_code' => '5',
+                'status' => 'Act',
                 'is_active' => true
             ],
         ];

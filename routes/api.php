@@ -340,6 +340,7 @@ Route::post('/finishings/seed', [FinishingController::class, 'seed']);
 Route::get('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::class, 'apiIndex']);
 Route::post('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::class, 'store']);
 Route::put('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'update']);
+Route::put('/chemical-coats/{code}/status', [App\Http\Controllers\ChemicalCoatController::class, 'toggleStatus']);
 Route::delete('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'destroy']);
 Route::post('/chemical-coats/seed', [App\Http\Controllers\ChemicalCoatController::class, 'seed']);
 

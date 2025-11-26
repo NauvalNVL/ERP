@@ -28,13 +28,14 @@
 						<thead class="bg-gray-50 sticky top-0">
 							<tr>
 								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('code')">Code</th>
-								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/3 cursor-pointer" @click="sortTable('name')">Name</th>
+								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5 cursor-pointer" @click="sortTable('name')">Name</th>
+								<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Status</th>
 								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('dry_end_code')">Dry-End Code</th>
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200 text-xs">
 							<tr v-if="isLoading">
-								<td colspan="3" class="px-4 py-4 text-center text-gray-500">
+								<td colspan="4" class="px-4 py-4 text-center text-gray-500">
 									<div class="flex items-center justify-center">
 										<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500 mr-3"></div>
 										<span>Loading chemical coat data...</span>
@@ -42,7 +43,7 @@
 								</td>
 							</tr>
 							<tr v-else-if="filteredCoats.length === 0">
-								<td colspan="3" class="px-4 py-4 text-center text-gray-500">No chemical coat data available.</td>
+								<td colspan="4" class="px-4 py-4 text-center text-gray-500">No chemical coat data available.</td>
 							</tr>
 							<tr v-else v-for="coat in filteredCoats" :key="coat.id || coat.code"
 								:class="['hover:bg-emerald-50 cursor-pointer', selectedCoat && (selectedCoat.id || selectedCoat.code) === (coat.id || coat.code) ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
@@ -50,6 +51,18 @@
 								@dblclick="selectAndClose(coat)">
 								<td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ coat.code }}</td>
 								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.name }}</td>
+								<td class="px-4 py-3 whitespace-nowrap text-center">
+									<span
+										:class="[
+											coat.status === 'Obs'
+												? 'bg-red-100 text-red-800'
+												: 'bg-emerald-100 text-emerald-800',
+											'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
+										]"
+									>
+										{{ coat.status === 'Obs' ? 'Obsolete' : 'Active' }}
+									</span>
+								</td>
 								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.dry_end_code || '-' }}</td>
 							</tr>
 						</tbody>

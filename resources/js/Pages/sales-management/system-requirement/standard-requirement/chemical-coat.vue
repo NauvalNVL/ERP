@@ -342,13 +342,14 @@ const fetchChemicalCoats = async () => {
 
         const data = await response.json();
 
+        let list = [];
         if (Array.isArray(data)) {
-            chemicalCoats.value = data;
+            list = data;
         } else if (data.data && Array.isArray(data.data)) {
-            chemicalCoats.value = data.data;
-        } else {
-            chemicalCoats.value = [];
+            list = data.data;
         }
+
+        chemicalCoats.value = (list || []).filter(coat => !coat.status || coat.status === 'Act');
     } catch (error) {
         console.error('Error fetching chemical coats:', error);
         chemicalCoats.value = [];
