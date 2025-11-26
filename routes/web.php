@@ -458,6 +458,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');
 
          Route::get('/reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.reinforcement-tape.index');
+         Route::get('/reinforcement-tape/status', [ReinforcementTapeController::class, 'vueManageStatus'])->name('vue.reinforcement-tape.status');
          Route::get('/reinforcement-tape/view-print', [ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
          // Alias for search menu
          Route::get('/define-reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');

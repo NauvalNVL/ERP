@@ -28,7 +28,8 @@
 						<thead class="bg-gray-50 sticky top-0">
 							<tr>
 								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('code')">Code</th>
-								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/3 cursor-pointer" @click="sortTable('name')">Name</th>
+								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5 cursor-pointer" @click="sortTable('name')">Name</th>
+								<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Status</th>
 								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('dry_end_code')">Dry-End Code</th>
 							</tr>
 						</thead>
@@ -39,10 +40,22 @@
 								@dblclick="selectAndClose(item)">
 								<td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
 								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
-								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ item.dry_end_code }}</td>
+								<td class="px-4 py-3 whitespace-nowrap text-center">
+									<span
+										:class="[
+											item.status === 'Obs'
+												? 'bg-red-100 text-red-800'
+												: 'bg-emerald-100 text-emerald-800',
+											'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
+										]"
+									>
+										{{ item.status === 'Obs' ? 'Obsolete' : 'Active' }}
+									</span>
+								</td>
+								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ item.dry_end_code || '-' }}</td>
 							</tr>
 							<tr v-if="filteredRows.length === 0">
-								<td colspan="3" class="px-4 py-4 text-center text-gray-500">No reinforcement tape data available.</td>
+								<td colspan="4" class="px-4 py-4 text-center text-gray-500">No reinforcement tape data available.</td>
 							</tr>
 						</tbody>
 					</table>

@@ -356,6 +356,7 @@ Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::cl
 Route::get('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeController::class, 'apiIndex']);
 Route::post('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeController::class, 'store']);
 Route::put('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'update']);
+Route::put('/reinforcement-tapes/{code}/status', [App\Http\Controllers\ReinforcementTapeController::class, 'toggleStatus']);
 Route::delete('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'destroy']);
 Route::post('/reinforcement-tapes/seed', [App\Http\Controllers\ReinforcementTapeController::class, 'seed']);
 

@@ -21,12 +21,12 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            
+
             if ($reinforcementTapes->isEmpty()) {
                 $this->seedData();
                 $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
             }
-            
+
             return response()->json($reinforcementTapes);
         } catch (\Exception $e) {
             Log::error('Error in ReinforcementTapeController@apiIndex: ' . $e->getMessage());
@@ -102,7 +102,9 @@ class ReinforcementTapeController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|unique:reinforcement_tapes,code|max:50',
                 'name' => 'required|max:255',
-                'dry_end_code' => 'nullable|max:1'
+                'dry_end_code' => 'nullable|max:1',
+                'is_active' => 'boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -114,12 +116,25 @@ class ReinforcementTapeController extends Controller
                 ], 422);
             }
 
-            $reinforcementTape = ReinforcementTape::create([
+            $data = [
                 'code' => trim($request->code),
                 'name' => trim($request->name),
                 'dry_end_code' => $request->dry_end_code ? trim($request->dry_end_code) : null,
-                'is_active' => true
-            ]);
+            ];
+
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = 'Act';
+            }
+            $data['status'] = $status;
+
+            if ($request->has('is_active')) {
+                $data['is_active'] = (bool) $request->boolean('is_active');
+            } else {
+                $data['is_active'] = $status === 'Act';
+            }
+
+            $reinforcementTape = ReinforcementTape::create($data);
 
             Log::info('Reinforcement tape created successfully:', ['code' => $reinforcementTape->code]);
 
@@ -151,7 +166,9 @@ class ReinforcementTapeController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'dry_end_code' => 'nullable|string|max:1'
+                'dry_end_code' => 'nullable|string|max:1',
+                'is_active' => 'boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -172,9 +189,22 @@ class ReinforcementTapeController extends Controller
                 ], 404);
             }
 
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = $reinforcementTape->status ?? ($reinforcementTape->is_active ? 'Act' : 'Obs');
+            }
+
+            if ($request->has('is_active')) {
+                $isActive = (bool) $request->boolean('is_active');
+            } else {
+                $isActive = $status === 'Act';
+            }
+
             $reinforcementTape->update([
                 'name' => trim($request->name),
-                'dry_end_code' => $request->dry_end_code ? trim($request->dry_end_code) : null
+                'dry_end_code' => $request->dry_end_code ? trim($request->dry_end_code) : null,
+                'status' => $status,
+                'is_active' => $isActive,
             ]);
 
             Log::info('Reinforcement tape updated successfully:', ['id' => $id]);
@@ -208,11 +238,13 @@ class ReinforcementTapeController extends Controller
             $reinforcementTape = ReinforcementTape::find($id);
 
             if ($reinforcementTape) {
-                $reinforcementTape->delete();
+                $reinforcementTape->status = 'Obs';
+                $reinforcementTape->is_active = false;
+                $reinforcementTape->save();
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Reinforcement tape berhasil dihapus'
+                    'message' => 'Reinforcement tape berhasil dihapus (marked as obsolete)'
                 ]);
             } else {
                 return response()->json([
@@ -239,24 +271,47 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            
+
             // If no data exists, seed sample data
             if ($reinforcementTapes->isEmpty()) {
                 $this->seedData();
                 $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
                 'reinforcementTapes' => $reinforcementTapes,
                 'header' => 'Define Reinforcement Tape'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ReinforcementTapeController@vueIndex: ' . $e->getMessage());
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
                 'reinforcementTapes' => [],
                 'header' => 'Define Reinforcement Tape',
                 'error' => 'Error displaying reinforcement tape data'
+            ]);
+        }
+    }
+
+    /**
+     * Display the Obsolete/Unobsolete Reinforcement Tape status management page (Vue)
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteReinforcementTape', [
+                'reinforcementTapes' => $reinforcementTapes,
+                'header' => 'Manage Reinforcement Tape Status',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ReinforcementTapeController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteReinforcementTape', [
+                'reinforcementTapes' => [],
+                'header' => 'Manage Reinforcement Tape Status',
+                'error' => 'Error displaying reinforcement tape data',
             ]);
         }
     }
@@ -290,9 +345,9 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTapes = [
-                ['code' => '001', 'name' => 'LAKBAN SERAT', 'dry_end_code' => '1', 'is_active' => true],
-                ['code' => '002', 'name' => 'REINFORCEMENT TAPE TYPE A', 'dry_end_code' => '2', 'is_active' => true],
-                ['code' => '003', 'name' => 'REINFORCEMENT TAPE TYPE B', 'dry_end_code' => '3', 'is_active' => true],
+                ['code' => '001', 'name' => 'LAKBAN SERAT', 'dry_end_code' => '1', 'status' => 'Act', 'is_active' => true],
+                ['code' => '002', 'name' => 'REINFORCEMENT TAPE TYPE A', 'dry_end_code' => '2', 'status' => 'Act', 'is_active' => true],
+                ['code' => '003', 'name' => 'REINFORCEMENT TAPE TYPE B', 'dry_end_code' => '3', 'status' => 'Act', 'is_active' => true],
             ];
 
             foreach ($reinforcementTapes as $tape) {
@@ -324,6 +379,49 @@ class ReinforcementTapeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to seed reinforcement tape data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle reinforcement tape status (Act/Obs) via API
+     */
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $reinforcementTape = ReinforcementTape::where('code', $code)->first();
+
+            if (!$reinforcementTape) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reinforcement tape tidak ditemukan',
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['Act', 'Obs'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid',
+                ], 422);
+            }
+
+            $reinforcementTape->status = $status;
+            $reinforcementTape->is_active = $status === 'Act';
+            $reinforcementTape->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status reinforcement tape berhasil diperbarui',
+                'data' => $reinforcementTape,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ReinforcementTapeController@toggleStatus: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating reinforcement tape status: ' . $e->getMessage(),
             ], 500);
         }
     }

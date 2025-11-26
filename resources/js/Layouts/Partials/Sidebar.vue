@@ -238,7 +238,8 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_vehicle_class' ||
     menuKey === 'obsolete_unobsolete_analysis_code' ||
     menuKey === 'obsolete_unobsolete_stitch_wire' ||
-    menuKey === 'obsolete_unobsolete_chemical_coat'
+    menuKey === 'obsolete_unobsolete_chemical_coat' ||
+    menuKey === 'obsolete_unobsolete_reinforcement_tape'
   ) {
     return true;
   }
@@ -380,6 +381,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Obsolete/Unobsolete Stitch Wire': 'obsolete_unobsolete_stitch_wire',
     'Define Chemical Coat': 'define_chemical_coat',
     'Obsolete/Unobsolete Chemical Coat': 'obsolete_unobsolete_chemical_coat',
+    'Obsolete/Unobsolete Reinforcement Tape': 'obsolete_unobsolete_reinforcement_tape',
     'Define Reinforcement Tape': 'define_reinforcement_tape',
     'Define Bundling String': 'define_bundling_string',
     'Define Wrapping Material': 'define_wrapping_material',
@@ -618,6 +620,7 @@ const salesManagementItems = [
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
           { title: 'Obsolete/Unobsolete Chemical Coat', icon: 'fas fa-ban', route: '/chemical-coat/status' },
           { title: 'Define Reinforcement Tape', icon: 'fas fa-tape', route: '/reinforcement-tape' },
+          { title: 'Obsolete/Unobsolete Reinforcement Tape', icon: 'fas fa-ban', route: '/reinforcement-tape/status' },
           { title: 'Define Bundling String', icon: 'fas fa-link', route: '/bundling-string' },
           { title: 'Define Wrapping Material', icon: 'fas fa-box-open', route: '/wrapping-material' },
           { title: 'Define Glueing Material', icon: 'fas fa-vial', route: '/glueing-material' },
