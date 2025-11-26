@@ -273,6 +273,41 @@ class ProductDesignController extends Controller
     }
 
     /**
+     * Display the Vue version of product design status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $productDesigns = ProductDesign::orderBy('pd_code', 'asc')->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-product-design', [
+                'productDesigns' => $productDesigns->items(),
+                'pagination' => [
+                    'currentPage' => $productDesigns->currentPage(),
+                    'perPage' => $productDesigns->perPage(),
+                    'total' => $productDesigns->total()
+                ],
+                'header' => 'Manage Product Design Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductDesignController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-product-design', [
+                'productDesigns' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Product Design Status',
+                'error' => 'Error displaying product designs: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Get product designs as JSON
      * 
      * @return \Illuminate\Http\JsonResponse
@@ -392,6 +427,7 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
+            'is_active' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -399,22 +435,62 @@ class ProductDesignController extends Controller
         }
 
         try {
-            $productDesign = ProductDesign::where('pd_code', $id)->firstOrFail();
+            // Try to find by id first, then by pd_code
+            $productDesign = ProductDesign::where('id', $id)->first();
+            if (!$productDesign) {
+                $productDesign = ProductDesign::where('pd_code', $id)->first();
+            }
+            
+            if (!$productDesign) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product design not found'
+                ], 404);
+            }
 
-            $productDesign->update([
-                'pd_name' => $request->pd_name,
-                'pd_design_type' => $request->pd_design_type,
-                'idc' => $request->idc,
-                'product' => $request->product,
-                'joint' => $request->joint,
-                'joint_to_print' => $request->joint_to_print,
-                'pcs_to_joint' => $request->pcs_to_joint,
-                'score' => $request->score,
-                'slot' => $request->slot,
-                'flute_style' => $request->flute_style,
-                'print_flute' => $request->print_flute,
-                'input_weight' => $request->input_weight,
-            ]);
+            $updateData = [];
+            
+            if ($request->has('pd_name')) {
+                $updateData['pd_name'] = $request->pd_name;
+            }
+            if ($request->has('pd_design_type')) {
+                $updateData['pd_design_type'] = $request->pd_design_type;
+            }
+            if ($request->has('idc')) {
+                $updateData['idc'] = $request->idc;
+            }
+            if ($request->has('product')) {
+                $updateData['product'] = $request->product;
+            }
+            if ($request->has('joint')) {
+                $updateData['joint'] = $request->joint;
+            }
+            if ($request->has('joint_to_print')) {
+                $updateData['joint_to_print'] = $request->joint_to_print;
+            }
+            if ($request->has('pcs_to_joint')) {
+                $updateData['pcs_to_joint'] = $request->pcs_to_joint;
+            }
+            if ($request->has('score')) {
+                $updateData['score'] = $request->score;
+            }
+            if ($request->has('slot')) {
+                $updateData['slot'] = $request->slot;
+            }
+            if ($request->has('flute_style')) {
+                $updateData['flute_style'] = $request->flute_style;
+            }
+            if ($request->has('print_flute')) {
+                $updateData['print_flute'] = $request->print_flute;
+            }
+            if ($request->has('input_weight')) {
+                $updateData['input_weight'] = $request->input_weight;
+            }
+            if ($request->has('is_active')) {
+                $updateData['is_active'] = $request->is_active;
+            }
+
+            $productDesign->update($updateData);
             
             // Refresh the model from the database to get the latest state
             $productDesign->refresh();

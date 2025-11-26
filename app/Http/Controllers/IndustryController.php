@@ -60,12 +60,27 @@ class IndustryController extends Controller
         $industry = Industry::where('code', $code)->firstOrFail();
         
         $request->validate([
-            'name' => 'required|string|max:30',
+            'name' => 'nullable|string|max:30',
+            'description' => 'nullable|string|max:100',
+            'is_active' => 'nullable|boolean',
+            'status' => 'nullable|string|max:3',
         ]);
 
-        $industry->update([
-            'name' => strtoupper($request->name),
-        ]);
+        $updateData = [];
+        if ($request->has('name')) {
+            $updateData['name'] = strtoupper($request->name);
+        }
+        if ($request->has('description')) {
+            $updateData['description'] = $request->description;
+        }
+        if ($request->has('is_active')) {
+            $updateData['is_active'] = $request->is_active;
+        }
+        if ($request->has('status')) {
+            $updateData['status'] = $request->status;
+        }
+
+        $industry->update($updateData);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
@@ -144,6 +159,41 @@ class IndustryController extends Controller
     }
 
     /**
+     * Display the Vue version of industry status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $industries = Industry::orderBy('code', 'asc')->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-industry', [
+                'industries' => $industries->items(),
+                'pagination' => [
+                    'currentPage' => $industries->currentPage(),
+                    'perPage' => $industries->perPage(),
+                    'total' => $industries->total()
+                ],
+                'header' => 'Manage Industry Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in IndustryController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-industry', [
+                'industries' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Industry Status',
+                'error' => 'Error displaying industries: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Display the Vue version of the view and print page
      *
      * @return \Inertia\Response|\Illuminate\Http\JsonResponse
@@ -166,9 +216,15 @@ class IndustryController extends Controller
     public function apiIndex()
     {
         try {
-            $industries = Industry::select('code', 'name')
-                ->orderBy('code')
-                ->get();
+            $industries = Industry::orderBy('code')
+                ->get()
+                ->map(function ($industry) {
+                    // Ensure all fields have values
+                    $industry->description = $industry->description ?? $industry->name;
+                    $industry->is_active = $industry->is_active ?? true;
+                    $industry->status = $industry->status ?? 'Act';
+                    return $industry;
+                });
             
             return response()->json($industries, 200, [], JSON_PRETTY_PRINT);
         } catch (\Exception $e) {

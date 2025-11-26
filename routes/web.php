@@ -347,47 +347,56 @@ return Inertia::render('sales-management/customer-service/production-monitoring-
 
 // Standard Requirement Routes
 Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
+Route::get('/sales-team/status', [SalesTeamController::class, 'vueManageStatus'])->name('vue.sales-team.status');
 Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
 // Alias for search menu
 Route::get('/define-sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.define-sales-team');
 
 Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
+Route::get('/sales-person/status', [SalespersonController::class, 'vueManageStatus'])->name('vue.sales-person.status');
 Route::get('/sales-person/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person.view-print');
 // Alias for search menu
 Route::get('/define-salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.define-salesperson');
 Route::get('/view-print-salesperson', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.view-print-salesperson');
 
 Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
+Route::get('/sales-person-team/status', [SalespersonTeamController::class, 'vueManageStatus'])->name('vue.sales-person-team.status');
 Route::get('/sales-person-team/view-print', [SalespersonTeamController::class, 'vueViewAndPrint'])->name('vue.sales-person-team.view-print');
 // Alias for search menu
 Route::get('/define-salesperson-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.define-salesperson-team');
 
 Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
+Route::get('/industry/status', [IndustryController::class, 'vueManageStatus'])->name('vue.industry.status');
 Route::get('/industry/view-print', [IndustryController::class, 'vueViewAndPrint'])->name('vue.industry.view-print');
 // Alias for search menu
 Route::get('/define-industry', [IndustryController::class, 'vueIndex'])->name('vue.define-industry');
 
 Route::get('/geo', [GeoController::class, 'vueIndex'])->name('vue.geo.index');
+Route::get('/geo/status', [GeoController::class, 'vueManageStatus'])->name('vue.geo.status');
 Route::get('/geo/view-print', [GeoController::class, 'vueViewAndPrint'])->name('vue.geo.view-print');
 // Alias for search menu
 Route::get('/define-geo', [GeoController::class, 'vueIndex'])->name('vue.define-geo');
 
 Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
+Route::get('/product-group/status', [ProductGroupController::class, 'vueManageStatus'])->name('vue.product-group.status');
 Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');
 // Alias for search menu
 Route::get('/define-product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.define-product-group');
 
 Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
+Route::get('/product/status', [ProductController::class, 'vueManageStatus'])->name('vue.product.status');
 Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
 // Alias for search menu
 Route::get('/define-product', [ProductController::class, 'vueIndex'])->name('vue.define-product');
 
 Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
+Route::get('/product-design/status', [ProductDesignController::class, 'vueManageStatus'])->name('vue.product-design.status');
 Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
 // Alias for search menu
 Route::get('/define-product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.define-product-design');
 
 Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
+Route::get('/scoring-tool/status', [ScoringToolController::class, 'vueManageStatus'])->name('vue.scoring-tool.status');
 Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
 // Alias for search menu
 Route::get('/define-scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.define-scoring-tool');
@@ -399,26 +408,31 @@ Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueView
 Route::get('/define-paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.define-paper-quality');
 
 Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
+Route::get('/paper-flute/status', [PaperFluteController::class, 'vueManageStatus'])->name('vue.paper-flute.status');
 Route::get('/paper-flute/view-print', [PaperFluteController::class, 'vueViewAndPrint'])->name('vue.paper-flute.view-print');
 // Alias for search menu
 Route::get('/define-paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.define-paper-flute');
 
 Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
+Route::get('/paper-size/status', [PaperSizeController::class, 'vueManageStatus'])->name('vue.paper-size.status');
 Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
 // Alias for search menu
 Route::get('/define-paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.define-paper-size');
 
 Route::get('/color-group', [ColorGroupController::class, 'index'])->name('vue.color-group.index');
+Route::get('/color-group/status', [ColorGroupController::class, 'vueManageStatus'])->name('vue.color-group.status');
 Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
 // Alias for search menu
 Route::get('/define-color-group', [ColorGroupController::class, 'index'])->name('vue.define-color-group');
 
-Route::get('/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
-Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
+Route::get('/color', [ColorController::class, 'vueIndex'])->name('color.index');
+Route::get('/color/status', [ColorController::class, 'vueManageStatus'])->name('color.status');
+Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('color.view-print');
 // Alias for search menu
 Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.define-color');
 
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
+         Route::get('/finishing/status', [FinishingController::class, 'vueManageStatus'])->name('vue.finishing.status');
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
          // Alias for search menu
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');

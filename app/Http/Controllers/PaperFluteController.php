@@ -109,10 +109,21 @@ class PaperFluteController extends Controller
     public function update(Request $request, $flute)
     {
         try {
-            $paperFlute = PaperFlute::where('Flute', $flute)->firstOrFail();
+            // Try to find by No (primary key) first, then by Flute
+            $paperFlute = PaperFlute::where('No', $flute)->first();
+            if (!$paperFlute) {
+                $paperFlute = PaperFlute::where('Flute', $flute)->first();
+            }
+            
+            if (!$paperFlute) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Paper flute not found'
+                ], 404);
+            }
 
             $validator = Validator::make($request->all(), [
-                'Descr' => 'required|string|max:100',
+                'Descr' => 'nullable|string|max:100',
                 'DB' => 'nullable|numeric|min:0',
                 'B' => 'nullable|numeric|min:0',
                 '_1L' => 'nullable|numeric|min:0',
@@ -120,6 +131,7 @@ class PaperFluteController extends Controller
                 '_2L' => 'nullable|numeric|min:0',
                 'Height' => 'nullable|numeric|min:0',
                 'Starch' => 'nullable|numeric|min:0',
+                'is_active' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -133,7 +145,7 @@ class PaperFluteController extends Controller
             $paperFlute->update($request->all());
 
             // Get the updated data
-            $updatedFlute = PaperFlute::where('Flute', $flute)->first();
+            $updatedFlute = PaperFlute::where('No', $paperFlute->No)->first();
 
             return response()->json([
                 'success' => true,
@@ -264,6 +276,41 @@ class PaperFluteController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in PaperFluteController@vueIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load paper flute data'], 500);
+        }
+    }
+
+    /**
+     * Display the Vue version of paper flute status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $paperFlutes = PaperFlute::orderBy('Flute', 'asc')->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-flute', [
+                'paperFlutes' => $paperFlutes->items(),
+                'pagination' => [
+                    'currentPage' => $paperFlutes->currentPage(),
+                    'perPage' => $paperFlutes->perPage(),
+                    'total' => $paperFlutes->total()
+                ],
+                'header' => 'Manage Paper Flute Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperFluteController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-flute', [
+                'paperFlutes' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Paper Flute Status',
+                'error' => 'Error displaying paper flutes: ' . $e->getMessage()
+            ]);
         }
     }
 

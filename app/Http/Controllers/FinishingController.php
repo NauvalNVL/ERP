@@ -94,9 +94,10 @@ class FinishingController extends Controller
             $finishing = Finishing::where('code', $code)->firstOrFail();
             
             $validator = Validator::make($request->all(), [
-                'code' => 'required|string|max:10|unique:finishings,code,' . $finishing->id,
-                'description' => 'required|string|max:255',
-                'is_compute' => 'boolean',
+                'code' => 'sometimes|required|string|max:10|unique:finishings,code,' . $finishing->id,
+                'description' => 'sometimes|required|string|max:255',
+                'is_compute' => 'nullable|boolean',
+                'is_active' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -107,15 +108,10 @@ class FinishingController extends Controller
             }
 
             // Update the finishing
-            $finishing->update([
-                'code' => $request->code,
-                'description' => $request->description,
-                'is_compute' => $request->is_compute ?? $finishing->is_compute,
-                'updated_at' => now()
-            ]);
+            $finishing->update($request->only(['code', 'description', 'is_compute', 'is_active']));
 
             // Get the updated data
-            $updatedFinishing = Finishing::where('code', $request->code)->first();
+            $updatedFinishing = Finishing::where('code', $request->code ?? $finishing->code)->first();
 
             return response()->json([
                 'success' => true,
@@ -128,6 +124,29 @@ class FinishingController extends Controller
                 'success' => false,
                 'message' => 'Error updating finishing: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Display the Vue version of finishing status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $finishings = Finishing::orderBy('code')->get();
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-finishing', [
+                'finishings' => $finishings,
+                'header' => 'Manage Finishing Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in FinishingController@vueManageStatus: ' . $e->getMessage());
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-finishing', [
+                'finishings' => [],
+                'header' => 'Manage Finishing Status'
+            ]);
         }
     }
 

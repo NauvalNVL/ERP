@@ -117,6 +117,9 @@ class ColorGroupController extends Controller
     /**
      * Update a color group
      */
+    /**
+     * Update a color group
+     */
     public function update(Request $request, $code)
     {
         try {
@@ -124,8 +127,9 @@ class ColorGroupController extends Controller
             Log::info('Request data:', $request->all());
 
             $validator = Validator::make($request->all(), [
-                'cg_name' => 'required|max:150',
-                'cg_type' => 'required|max:50'
+                'cg_name' => 'nullable|max:150',
+                'cg_type' => 'nullable|max:50',
+                'is_active' => 'nullable|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -147,10 +151,12 @@ class ColorGroupController extends Controller
             }
 
             // Update color group
-            $colorGroup->update([
-                'CG_Name' => trim($request->cg_name),
-                'CG_Type' => trim($request->cg_type)
-            ]);
+            $updateData = [];
+            if ($request->has('cg_name')) $updateData['CG_Name'] = trim($request->cg_name);
+            if ($request->has('cg_type')) $updateData['CG_Type'] = trim($request->cg_type);
+            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            
+            $colorGroup->update($updateData);
 
             Log::info('Color group updated successfully:', ['CG' => $code]);
             
@@ -158,7 +164,8 @@ class ColorGroupController extends Controller
             $colorGroupResponse = [
                 'cg' => $colorGroup->CG,
                 'cg_name' => $colorGroup->CG_Name,
-                'cg_type' => $colorGroup->CG_Type
+                'cg_type' => $colorGroup->CG_Type,
+                'is_active' => $colorGroup->is_active
             ];
 
             return response()->json([
@@ -236,6 +243,53 @@ class ColorGroupController extends Controller
     }
 
     /**
+     * Display the Vue version of color group status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $colorGroups = ColorGroup::orderBy('CG', 'asc')->paginate(15);
+
+            // Transform data
+            $colorGroupsTransformed = $colorGroups->getCollection()->map(function($group) {
+                return [
+                    'cg' => $group->CG,
+                    'cg_name' => $group->CG_Name,
+                    'cg_type' => $group->CG_Type,
+                    'is_active' => $group->is_active
+                ];
+            });
+            
+            $colorGroups->setCollection($colorGroupsTransformed);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-color-group', [
+                'colorGroups' => $colorGroups->items(),
+                'pagination' => [
+                    'currentPage' => $colorGroups->currentPage(),
+                    'perPage' => $colorGroups->perPage(),
+                    'total' => $colorGroups->total()
+                ],
+                'header' => 'Manage Color Group Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorGroupController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-color-group', [
+                'colorGroups' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Color Group Status',
+                'error' => 'Error displaying color groups: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * API endpoint to get color groups
      */
     public function apiIndex()
@@ -248,7 +302,8 @@ class ColorGroupController extends Controller
                 return [
                     'cg' => $group->CG,
                     'cg_name' => $group->CG_Name,
-                    'cg_type' => $group->CG_Type
+                    'cg_type' => $group->CG_Type,
+                    'is_active' => $group->is_active
                 ];
             });
             

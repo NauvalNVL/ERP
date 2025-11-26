@@ -40,8 +40,9 @@ window.axios.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 419) {
-            console.error('CSRF token mismatch. Session may have expired.');
-            // You can add custom handling here, like showing a modal or redirecting
+            console.warn('CSRF token mismatch. Session may have expired. Redirecting to login...');
+            // Redirect to login page when session expires
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

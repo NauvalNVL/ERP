@@ -165,6 +165,41 @@ class ProductController extends Controller
     }
 
     /**
+     * Display the Vue version of product status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $products = Product::orderBy('product_code', 'asc')->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-product', [
+                'products' => $products->items(),
+                'pagination' => [
+                    'currentPage' => $products->currentPage(),
+                    'perPage' => $products->perPage(),
+                    'total' => $products->total()
+                ],
+                'header' => 'Manage Product Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-product', [
+                'products' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Product Status',
+                'error' => 'Error displaying products: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Get product categories as JSON
      * 
      * @return \Illuminate\Http\JsonResponse
@@ -309,8 +344,11 @@ class ProductController extends Controller
     public function apiUpdate(Request $request, $id)
     {
         try {
-            // Use where('id') instead of find() because primary key is 'product_code', not 'id'
-            $product = Product::where('id', $id)->first();
+            // Try to find by product_code first, then by id
+            $product = Product::where('product_code', $id)->first();
+            if (!$product) {
+                $product = Product::where('id', $id)->first();
+            }
             
             if (!$product) {
                 return response()->json([
@@ -320,8 +358,11 @@ class ProductController extends Controller
             }
             
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255', // Vue sends 'name' but DB uses 'description'
-                'category_id' => 'required|string', // Vue sends 'category_id' but DB uses 'category'
+                'name' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:255',
+                'category_id' => 'nullable|string',
+                'category' => 'nullable|string',
+                'is_active' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -331,12 +372,33 @@ class ProductController extends Controller
                 ], 422);
             }
 
-            $product->update([
-                'description' => $request->name, // Map Vue 'name' to DB 'description'
-                'category' => $request->category_id, // Map Vue 'category_id' to DB 'category'
-                'unit' => $request->unit ?? $product->unit,
-                'product_group_id' => $request->product_group_id ?? $product->product_group_id
-            ]);
+            $updateData = [];
+            
+            if ($request->has('name')) {
+                $updateData['description'] = $request->name;
+            } elseif ($request->has('description')) {
+                $updateData['description'] = $request->description;
+            }
+            
+            if ($request->has('category_id')) {
+                $updateData['category'] = $request->category_id;
+            } elseif ($request->has('category')) {
+                $updateData['category'] = $request->category;
+            }
+            
+            if ($request->has('unit')) {
+                $updateData['unit'] = $request->unit;
+            }
+            
+            if ($request->has('product_group_id')) {
+                $updateData['product_group_id'] = $request->product_group_id;
+            }
+            
+            if ($request->has('is_active')) {
+                $updateData['is_active'] = $request->is_active;
+            }
+
+            $product->update($updateData);
 
             // Transform for response
             $responseData = [
@@ -346,8 +408,10 @@ class ProductController extends Controller
                 'description' => $product->description,
                 'category_id' => $product->category,
                 'category_code' => $product->category,
+                'category' => $product->category,
                 'unit' => $product->unit ?? '',
-                'product_group_id' => $product->product_group_id
+                'product_group_id' => $product->product_group_id,
+                'is_active' => $product->is_active
             ];
 
             return response()->json([

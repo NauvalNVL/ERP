@@ -215,7 +215,21 @@ const hasPermission = (menuKey) => {
     menuKey === 'define_machine' ||
     menuKey === 'view_print_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
-    menuKey === 'reactive_unobsolete_user'
+    menuKey === 'reactive_unobsolete_user' ||
+    menuKey === 'obsolete_unobsolete_sales_team' ||
+    menuKey === 'obsolete_unobsolete_salesperson' ||
+    menuKey === 'obsolete_unobsolete_salesperson_team' ||
+    menuKey === 'obsolete_unobsolete_industry' ||
+    menuKey === 'obsolete_unobsolete_geo' ||
+    menuKey === 'obsolete_unobsolete_product_group' ||
+    menuKey === 'obsolete_unobsolete_product' ||
+    menuKey === 'obsolete_unobsolete_product_design' ||
+    menuKey === 'obsolete_unobsolete_scoring_tool' ||
+    menuKey === 'obsolete_unobsolete_paper_flute' ||
+    menuKey === 'obsolete_unobsolete_paper_size' ||
+    menuKey === 'obsolete_unobsolete_color_group' ||
+    menuKey === 'obsolete_unobsolete_color' ||
+    menuKey === 'obsolete_unobsolete_finishing'
   ) {
     return true;
   }
@@ -322,21 +336,35 @@ const getPermissionKeyFromTitle = (title) => {
 
     // Sales Management - Standard Requirement
     'Define Sales Team': 'define_sales_team',
+    'Obsolete/Unobsolete Sales Team': 'obsolete_unobsolete_sales_team',
+    'Obsolete/Unobsolete Salesperson': 'obsolete_unobsolete_salesperson',
     'Define Salesperson': 'define_salesperson',
     'Define Salesperson Team': 'define_salesperson_team',
+    'Obsolete/Unobsolete Salesperson Team': 'obsolete_unobsolete_salesperson_team',
     'Define Industry': 'define_industry',
+    'Obsolete/Unobsolete Industry': 'obsolete_unobsolete_industry',
     'Define Geo': 'define_geo',
+    'Obsolete/Unobsolete Geo': 'obsolete_unobsolete_geo',
     'Define Product Group': 'define_product_group',
+    'Obsolete/Unobsolete Product Group': 'obsolete_unobsolete_product_group',
     'Define Product': 'define_product',
+    'Obsolete/Unobsolete Product': 'obsolete_unobsolete_product',
     'Define Product Design': 'define_product_design',
+    'Obsolete/Unobsolete Product Design': 'obsolete_unobsolete_product_design',
     'Define Scoring Tool': 'define_scoring_tool',
+    'Obsolete/Unobsolete Scoring Tool': 'obsolete_unobsolete_scoring_tool',
     'Define Paper Quality': 'define_paper_quality',
     'Obsolete/Unobsolete Paper Quality': 'obsolete_unobsolete_paper_quality',
     'Define Paper Flute': 'define_paper_flute',
+    'Obsolete/Unobsolete Paper Flute': 'obsolete_unobsolete_paper_flute',
     'Define Paper Size': 'define_paper_size',
+    'Obsolete/Unobsolete Paper Size': 'obsolete_unobsolete_paper_size',
     'Define Color Group': 'define_color_group',
+    'Obsolete/Unobsolete Color Group': 'obsolete_unobsolete_color_group',
     'Define Color': 'define_color',
+    'Obsolete/Unobsolete Color': 'obsolete_unobsolete_color',
     'Define Finishing': 'define_finishing',
+    'Obsolete/Unobsolete Finishing': 'obsolete_unobsolete_finishing',
     'Define Analysis Code': 'define_analysis_code',
     'Define Stitch Wire': 'define_stitch_wire',
     'Define Chemical Coat': 'define_chemical_coat',
@@ -484,6 +512,16 @@ const logout = () => {
   router.post('/logout', {}, {
     preserveScroll: false,
     preserveState: false,
+    onError: (errors) => {
+      // If CSRF token mismatch (419), just redirect to login
+      console.log('Logout error, redirecting to login...');
+      window.location.href = '/login';
+    },
+    onFinish: () => {
+      // Clear any cached data
+      localStorage.clear();
+      sessionStorage.clear();
+    }
   });
 };
 
@@ -536,21 +574,35 @@ const salesManagementItems = [
         icon: 'fas fa-clipboard-check',
         children: [
           { title: 'Define Sales Team', icon: 'fas fa-users-cog', route: '/sales-team' },
+          { title: 'Obsolete/Unobsolete Sales Team', icon: 'fas fa-ban', route: '/sales-team/status' },
           { title: 'Define Salesperson', icon: 'fas fa-user-tie', route: '/sales-person' },
+          { title: 'Obsolete/Unobsolete Salesperson', icon: 'fas fa-ban', route: '/sales-person/status' },
           { title: 'Define Salesperson Team', icon: 'fas fa-user-friends', route: '/sales-person-team' },
+          { title: 'Obsolete/Unobsolete Salesperson Team', icon: 'fas fa-ban', route: '/sales-person-team/status' },
           { title: 'Define Industry', icon: 'fas fa-industry', route: '/industry' },
+          { title: 'Obsolete/Unobsolete Industry', icon: 'fas fa-ban', route: '/industry/status' },
           { title: 'Define Geo', icon: 'fas fa-globe', route: '/geo' },
+          { title: 'Obsolete/Unobsolete Geo', icon: 'fas fa-ban', route: '/geo/status' },
           { title: 'Define Product Group', icon: 'fas fa-boxes', route: '/product-group' },
+          { title: 'Obsolete/Unobsolete Product Group', icon: 'fas fa-ban', route: '/product-group/status' },
           { title: 'Define Product', icon: 'fas fa-box', route: '/product' },
+          { title: 'Obsolete/Unobsolete Product', icon: 'fas fa-ban', route: '/product/status' },
           { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/product-design' },
+          { title: 'Obsolete/Unobsolete Product Design', icon: 'fas fa-ban', route: '/product-design/status' },
           { title: 'Define Scoring Tool', icon: 'fas fa-cut', route: '/scoring-tool' },
+          { title: 'Obsolete/Unobsolete Scoring Tool', icon: 'fas fa-ban', route: '/scoring-tool/status' },
           { title: 'Define Paper Quality', icon: 'fas fa-scroll', route: '/paper-quality' },
           { title: 'Obsolete/Unobsolete Paper Quality', icon: 'fas fa-ban', route: '/paper-quality/status' },
           { title: 'Define Paper Flute', icon: 'fas fa-layer-group', route: '/paper-flute' },
+          { title: 'Obsolete/Unobsolete Paper Flute', icon: 'fas fa-ban', route: '/paper-flute/status' },
           { title: 'Define Paper Size', icon: 'fas fa-ruler-combined', route: '/paper-size' },
+          { title: 'Obsolete/Unobsolete Paper Size', icon: 'fas fa-ban', route: '/paper-size/status' },
           { title: 'Define Color Group', icon: 'fas fa-palette', route: '/color-group' },
+          { title: 'Obsolete/Unobsolete Color Group', icon: 'fas fa-ban', route: '/color-group/status' },
           { title: 'Define Color', icon: 'fas fa-fill-drip', route: '/color' },
+          { title: 'Obsolete/Unobsolete Color', icon: 'fas fa-ban', route: '/color/status' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
+          { title: 'Obsolete/Unobsolete Finishing', icon: 'fas fa-ban', route: '/finishing/status' },
           { title: 'Define Analysis Code', icon: 'fas fa-code-branch', route: '/analysis-code' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },

@@ -23,6 +23,11 @@ class ProductDesign extends Model
         'flute_style',
         'print_flute',
         'input_weight',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**

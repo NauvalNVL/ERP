@@ -402,4 +402,39 @@ class ProductGroupController extends Controller
             return response()->json(['error' => 'Failed to load product groups data'], 500);
         }
     }
+
+    /**
+     * Display the Vue version of product group status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $productGroups = ProductGroup::orderBy('product_group_id', 'asc')->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-product-group', [
+                'productGroups' => $productGroups->items(),
+                'pagination' => [
+                    'currentPage' => $productGroups->currentPage(),
+                    'perPage' => $productGroups->perPage(),
+                    'total' => $productGroups->total()
+                ],
+                'header' => 'Manage Product Group Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-product-group', [
+                'productGroups' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Product Group Status',
+                'error' => 'Error displaying product groups: ' . $e->getMessage()
+            ]);
+        }
+    }
 } 

@@ -803,6 +803,7 @@ export default {
                 warehouse_management: false
             },
             showAllStandardRequirement: false,
+            isLoadingPermissions: false,
             form: {
                 permissions: {
                     'dashboard': false,
@@ -813,6 +814,7 @@ export default {
                     'copy_paste_user_access_permission': false,
                     'reactive_unobsolete_user': false,
                     'view_print_user': false,
+                    'sales_management': false,
                     // Standard Requirement
                     'define_sales_team': false,
                     'define_salesperson': false,
@@ -862,6 +864,7 @@ export default {
                     'view_print_bundling_string': false,
                     'view_print_wrapping_material': false,
                     'view_print_glueing_material': false,
+                    'view_print_machine': false,
                     'define_customer_group': false,
                     'update_customer_account': false,
                     'obsolete_reactive_customer_ac': false,
@@ -959,6 +962,44 @@ export default {
             return Object.keys(this.form.permissions).length;
         }
     },
+    watch: {
+        'form.permissions.sales_management'(newValue) {
+            if (this.isLoadingPermissions) return;
+            // When Sales Management main access is toggled, toggle all related permissions
+            const salesPermissions = this.getCategoryPermissions('sales_management');
+            salesPermissions.forEach(key => {
+                if (key !== 'sales_management') { // Don't toggle the main checkbox itself
+                    this.form.permissions[key] = newValue;
+                }
+            });
+        },
+        'form.permissions': {
+            handler(newPermissions) {
+                if (this.isLoadingPermissions) return;
+                // Auto-check main access if all submenus are checked
+                const salesPermissions = this.getCategoryPermissions('sales_management');
+                const subMenuPermissions = salesPermissions.filter(key => key !== 'sales_management');
+                
+                // Check if all submenu permissions are checked
+                const allSubMenusChecked = subMenuPermissions.length > 0 && 
+                    subMenuPermissions.every(key => newPermissions[key] === true);
+                
+                // Check if at least one submenu is checked
+                const someSubMenusChecked = subMenuPermissions.some(key => newPermissions[key] === true);
+                
+                // Auto-check main access if all submenus are checked
+                if (allSubMenusChecked && !newPermissions.sales_management) {
+                    this.form.permissions.sales_management = true;
+                }
+                
+                // Auto-uncheck main access if no submenus are checked
+                if (!someSubMenusChecked && newPermissions.sales_management) {
+                    this.form.permissions.sales_management = false;
+                }
+            },
+            deep: true
+        }
+    },
     methods: {
         async searchUser() {
             this.isSearching = true;
@@ -984,9 +1025,17 @@ export default {
                     
                     // Load existing permissions
                     if (data.permissions) {
-                        Object.keys(this.form.permissions).forEach(key => {
-                            this.form.permissions[key] = data.permissions.includes(key);
-                        });
+                        this.isLoadingPermissions = true;
+                        try {
+                            Object.keys(this.form.permissions).forEach(key => {
+                                this.form.permissions[key] = data.permissions.includes(key);
+                            });
+                        } finally {
+                            // Use nextTick to ensure watchers don't fire on the immediate updates
+                            this.$nextTick(() => {
+                                this.isLoadingPermissions = false;
+                            });
+                        }
                     }
                 } else {
                     this.foundUser = null;
@@ -1075,7 +1124,7 @@ export default {
                     key.includes('geo') || key.includes('color') || key.includes('paper') || 
                     key.includes('finishing') || key.includes('scoring') || key.includes('stitch') ||
                     key.includes('chemical') || key.includes('reinforcement') || key.includes('bundling') ||
-                    key.includes('wrapping') || key.includes('glueing')
+                    key.includes('wrapping') || key.includes('glueing') || key.includes('machine')
                 ),
                 warehouse_management: Object.keys(this.form.permissions).filter(key => 
                     key.includes('delivery') || key.includes('warehouse') || key.includes('dorn') || 
