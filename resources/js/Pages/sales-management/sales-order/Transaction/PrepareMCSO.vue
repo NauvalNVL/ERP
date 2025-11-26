@@ -1574,6 +1574,18 @@ const saveProductDesign = async (designData) => {
       return
     }
 
+    // Detect if user already provided Set Quantity before opening Product Design.
+    // When Set Quantity exists, we keep Set-based mode and do not switch to
+    // per-component (product-design-driven) quantity behaviour.
+    let hadInitialSetQuantity = false
+    const existingSetRaw = orderDetails.setQuantity
+    if (existingSetRaw !== undefined && existingSetRaw !== null && existingSetRaw !== '') {
+      const existingSetNum = typeof existingSetRaw === 'string'
+        ? parseFloat(existingSetRaw)
+        : Number(existingSetRaw)
+      hadInitialSetQuantity = !isNaN(existingSetNum) && existingSetNum > 0
+    }
+
     const requestData = {
       master_card_seq: selectedMasterCard.seq,
       items: designData.items || [],
@@ -1603,7 +1615,9 @@ const saveProductDesign = async (designData) => {
           if (mainItem.unitPrice != null) {
             orderDetails.unitPrice = Number(mainItem.unitPrice) || 0
           }
-          if (mainItem.quantity != null) {
+          // Only let Product Design overwrite header Set Quantity when user did not
+          // provide Set Quantity beforehand. If user already filled Set, keep it as master.
+          if (!hadInitialSetQuantity && mainItem.quantity != null) {
             orderDetails.setQuantity = Number(mainItem.quantity) || 0
           }
           if (mainItem.unit) {
@@ -1630,8 +1644,18 @@ const saveProductDesign = async (designData) => {
         // Once Product Design is used, treat quantities as product-design-driven
         // regardless of whether setQuantity was filled earlier
         if (totalDesignQty > 0) {
-          orderDetails.mainQuantity = totalDesignQty
-          orderDetails.isProductDesignQuantity = true
+          if (hadInitialSetQuantity) {
+            // Keep Set-based scheduling: mainQuantity left empty so summaries
+            // fall back to Set Quantity, and DeliverySchedule stays in Set mode.
+            orderDetails.mainQuantity = ''
+            orderDetails.isProductDesignQuantity = false
+          } else {
+            // No prior Set Quantity: quantities are driven from Product Design
+            // (per-component Main/Fit) and DeliverySchedule should use
+            // product-design mode.
+            orderDetails.mainQuantity = totalDesignQty
+            orderDetails.isProductDesignQuantity = true
+          }
         }
       } catch (e) {
         console.warn('Failed to map product design values to order details:', e)
@@ -1853,7 +1877,7 @@ const saveDeliverySchedule = async (scheduleData) => {
       so_number: soNumber,
       entries: scheduleData.entries
     }
-    
+
     console.log('Transformed delivery schedule data:', requestData)
 
     // Debug CSRF token for delivery schedule
