@@ -209,7 +209,7 @@ class ScoringToolController extends Controller
     /**
      * Display a listing of the resource for printing in Vue.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueViewAndPrint()
     {
@@ -301,7 +301,7 @@ class ScoringToolController extends Controller
     /**
      * Display the Vue component for scoring tool management.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueIndex()
     {
@@ -334,7 +334,7 @@ class ScoringToolController extends Controller
     /**
      * Run the scoring tool seeder.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
     private function seedData()
     {
@@ -407,6 +407,23 @@ class ScoringToolController extends Controller
                 'success' => false,
                 'message' => 'Error seeding scoring tools: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Update the seeder file with new scoring tool data
+     *
+     * @param  \App\Models\ScoringTool  $scoringTool
+     * @return void
+     */
+    private function updateSeederFile($scoringTool)
+    {
+        try {
+            // This method would update the seeder file with the new tool
+            // For now, we'll just log the action
+            Log::info('Seeder file update needed for tool: ' . $scoringTool->code);
+        } catch (\Exception $e) {
+            Log::error('Error updating seeder file: ' . $e->getMessage());
         }
     }
 

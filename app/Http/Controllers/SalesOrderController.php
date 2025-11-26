@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Customer;
 use App\Models\Salesperson;
 
@@ -119,32 +120,44 @@ class SalesOrderController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'customer_code' => 'required|string',
-            'master_card_seq' => 'required|string',
-            'order_mode' => 'nullable|string',
-            'product_code' => 'nullable|string',
-            'salesperson_code' => 'nullable|string',
-            'currency' => 'nullable|string',
-            'exchange_rate' => 'nullable|numeric',
-            'customer_po_number' => 'nullable|string',
-            'po_date' => 'required|string',
-            'order_group' => 'nullable|string',
-            'order_type' => 'nullable|string',
-            // Accept any type for sales_tax; we'll normalize below
-            'sales_tax' => 'nullable',
-            'lot_number' => 'nullable|string',
-            'remark' => 'nullable|string',
-            'instruction1' => 'nullable|string',
-            'instruction2' => 'nullable|string',
-            'set_quantity' => 'nullable|string',
+        $validator = Validator::make($request->all(), [
+            'customer_code' => 'required|string|max:50',
+            'master_card_seq' => 'required|string|max:50',
+            'order_mode' => 'required|string|max:50',
+            'product_code' => 'required|string|max:50',
+            'salesperson_code' => 'nullable|string|max:50',
+            'currency' => 'required|string|max:10',
+            'exchange_rate' => 'required|numeric|min:0',
+            'customer_po_number' => 'nullable|string|max:50',
+            'po_date' => 'required|date',
+            'order_group' => 'required|string|max:50',
+            'order_type' => 'required|string|max:50',
+            'sales_tax' => 'boolean',
+            'lot_number' => 'nullable|string|max:50',
+            'remark' => 'nullable|string|max:250',
+            'instruction1' => 'nullable|string|max:250',
+            'instruction2' => 'nullable|string|max:250',
+            'set_quantity' => 'nullable|numeric|min:0',
+            'product_design_quantities' => 'nullable|array',
+            'product_design_quantities.*' => 'numeric|min:0',
+            'delivery_location.delivery_code' => 'nullable|string|max:50',
+            'delivery_location.customer_name' => 'nullable|string|max:250',
+            'delivery_location.address' => 'nullable|string|max:250',
             'details' => 'required|array|min:1',
-            'details.*.line_number' => 'required|integer',
-            'details.*.item_code' => 'required|string',
-            'details.*.order_quantity' => 'required|numeric',
-            'details.*.unit_price' => 'required|numeric',
-            'details.*.uom' => 'required|string',
+            'details.*.line_number' => 'required|integer|min:1',
+            'details.*.item_code' => 'required|string|max:50',
+            'details.*.item_description' => 'nullable|string|max:250',
+            'details.*.order_quantity' => 'required|numeric|min:0',
+            'details.*.unit_price' => 'required|numeric|min:0',
+            'details.*.uom' => 'nullable|string|max:10',
+            'details.*.remark' => 'nullable|string|max:250',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->messages()], 422);
+        }
+
+        $validated = $request->all();
 
         // Normalize sales_tax to 'Y' or 'N'
         $rawSalesTax = $request->input('sales_tax');
@@ -163,11 +176,12 @@ class SalesOrderController extends Controller
         $year = date('Y');
 
         // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
-        // SQL Server compatible: Use CHARINDEX and REVERSE for extracting last part
+        // Use TRY_CAST to safely handle non-numeric suffixes like "-Fit1" in SO_Num
         $lastSO = DB::table('so')
             ->where('MM', $month)
             ->where('YYYY', $year)
-            ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
+            ->whereRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) IS NOT NULL')
+            ->orderByRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) DESC')
             ->first();
 
         $sequence = 1;
@@ -245,25 +259,71 @@ class SalesOrderController extends Controller
         // Prepare minimal legacy SO row so schedule updates can find it
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
-        $amount = $qty * $price;
+        $mainQty = $productDesignQuantities['Main'] ?? $qty;
+        $amount = $mainQty * $price;
         $exRate = isset($validated['exchange_rate']) ? (float) $validated['exchange_rate'] : 1.0;
         if ($exRate <= 0) {
             $exRate = 1.0;
         }
 
+        // Extract product design quantities for each component (Main, Fit1-9)
+        $productDesignQuantities = $validated['product_design_quantities'] ?? [];
+        
+        // Ensure product design quantities is an associative array of numeric values
+        if (!is_array($productDesignQuantities)) {
+            $productDesignQuantities = [];
+        }
+
+        // Normalize component keys from Product Design to match MC.COMP values
+        // Handle variations like "Fit 1" vs "Fit1", case differences, and extra spaces
+        $normalizedProductDesignQuantities = [];
+        foreach ($productDesignQuantities as $component => $quantity) {
+            $qtyFloat = (float) $quantity;
+            if ($qtyFloat <= 0) {
+                continue;
+            }
+
+            $rawKey = (string) $component;
+            $noSpaces = preg_replace('/\s+/', '', $rawKey);
+            $lower = strtolower($noSpaces);
+
+            if ($lower === 'main') {
+                $normalizedKey = 'Main';
+            } elseif (preg_match('/^fit(\d+)$/', $lower, $m)) {
+                // Map any variation like "fit1", "Fit 1" to canonical "Fit1"
+                $normalizedKey = 'Fit' . $m[1];
+            } else {
+                // Fallback: keep original key
+                $normalizedKey = $rawKey;
+            }
+
+            if (!isset($normalizedProductDesignQuantities[$normalizedKey])) {
+                $normalizedProductDesignQuantities[$normalizedKey] = 0.0;
+            }
+            $normalizedProductDesignQuantities[$normalizedKey] += $qtyFloat;
+        }
+
+        $productDesignQuantities = $normalizedProductDesignQuantities;
+        
+        Log::info('Product Design Quantities processed:', [
+            'original' => $validated['product_design_quantities'] ?? 'not_set',
+            'processed' => $productDesignQuantities,
+            'fallback_qty' => $qty
+        ]);
+
         // Use master card part number, fallback to request data
         $partNumber = $mcPartNumber ?: (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
 
-        // Calculate totals based on MC data and SO quantity
-        $totalGrossM2 = $mcGrossM2 * $qty;
-        $totalNetM2 = $mcNetM2 * $qty;
-        $totalGrossKg = $mcGrossKg * $qty;
-        $totalNetKg = $mcNetKg * $qty;
+        // Calculate totals based on MC data and Main component quantity
+        $totalGrossM2 = $mcGrossM2 * $mainQty;
+        $totalNetM2 = $mcNetM2 * $mainQty;
+        $totalGrossKg = $mcGrossKg * $mainQty;
+        $totalNetKg = $mcNetKg * $mainQty;
 
         // Calculate TOTAL_LM (Linear Meter) = (SHEET_LENGTH × Quantity) / 1,000 (convert mm to meter)
         $totalLM = 0;
-        if ($sheetLength > 0 && $qty > 0) {
-            $totalLM = ($sheetLength * $qty) / 1000;
+        if ($sheetLength > 0 && $mainQty > 0) {
+            $totalLM = ($sheetLength * $mainQty) / 1000;
         }
 
         // Calculate total M3 (volume) = (L × W × H × Quantity) / 1,000,000,000 (convert mm³ to m³)
@@ -274,7 +334,7 @@ class SalesOrderController extends Controller
         Log::info('TOTAL_M3 Calculation Debug', [
             'customer_code' => $validated['customer_code'],
             'master_card_seq' => $validated['master_card_seq'],
-            'so_qty' => $qty,
+            'main_qty' => $mainQty,
             'int_l' => $intL,
             'int_w' => $intW,
             'int_h' => $intH,
@@ -284,17 +344,17 @@ class SalesOrderController extends Controller
         ]);
 
         // Try EXT dimensions first, fallback to INT dimensions
-        if ($extL > 0 && $extW > 0 && $extH > 0 && $qty > 0) {
-            $totalM3 = ($extL * $extW * $extH * $qty) / 1000000000;
+        if ($extL > 0 && $extW > 0 && $extH > 0 && $mainQty > 0) {
+            $totalM3 = ($extL * $extW * $extH * $mainQty) / 1000000000;
             Log::info('TOTAL_M3 calculated from EXT dimensions', ['totalM3' => $totalM3]);
-        } elseif ($intL > 0 && $intW > 0 && $intH > 0 && $qty > 0) {
-            $totalM3 = ($intL * $intW * $intH * $qty) / 1000000000;
+        } elseif ($intL > 0 && $intW > 0 && $intH > 0 && $mainQty > 0) {
+            $totalM3 = ($intL * $intW * $intH * $mainQty) / 1000000000;
             Log::info('TOTAL_M3 calculated from INT dimensions', ['totalM3' => $totalM3]);
         } else {
             Log::warning('TOTAL_M3 calculation failed - no valid dimensions', [
                 'ext_dimensions' => [$extL, $extW, $extH],
                 'int_dimensions' => [$intL, $intW, $intH],
-                'qty' => $qty
+                'main_qty' => $mainQty
             ]);
         }
 
@@ -397,6 +457,27 @@ class SalesOrderController extends Controller
 
         // Extract delivery schedules (up to 10 schedules)
         $deliverySchedules = $request->input('delivery_schedules', []);
+        
+        // Ensure delivery schedules is a properly indexed array
+        if (!is_array($deliverySchedules)) {
+            $deliverySchedules = [];
+        }
+        
+        // Create empty schedule entries if not provided
+        for ($i = count($deliverySchedules); $i < 10; $i++) {
+            $deliverySchedules[$i] = [
+                'date' => '',
+                'time' => '',
+                'due' => '',
+                'quantity' => 0
+            ];
+        }
+        
+        Log::info('Delivery schedules processed:', [
+            'original_schedules' => $request->input('delivery_schedules', []),
+            'processed_schedules' => $deliverySchedules,
+            'schedule_count' => count($deliverySchedules)
+        ]);
 
         // Get current time in WIB timezone (UTC+7)
         $nowWib = $this->getNowWib();
@@ -450,7 +531,7 @@ class SalesOrderController extends Controller
             'PQ3' => $pq3,
             'PQ4' => $pq4,
             'PQ5' => $pq5,
-            'SO_QTY' => $qty,
+            'SO_QTY' => (float) ($productDesignQuantities['Main'] ?? $qty),
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
             'EX_RATE' => $exRate,
@@ -539,8 +620,14 @@ class SalesOrderController extends Controller
         // Build SO rows for Main + Fit components for this master card
         $rowsToInsert = [];
 
-        // Always include the base row (typically Main component)
-        $rowsToInsert[] = $base;
+        // Only include the base row (Main component) if it has quantity in product design
+        if (isset($productDesignQuantities['Main']) && $productDesignQuantities['Main'] > 0) {
+            $rowsToInsert[] = $base;
+        } else {
+            Log::info('Skipping Main component - no quantity in product design', [
+                'product_design_quantities' => $productDesignQuantities
+            ]);
+        }
 
         // Fetch all MC components (Main + Fit1-9) for this MC & customer
         $mcComponents = DB::table('MC')
@@ -552,6 +639,31 @@ class SalesOrderController extends Controller
         foreach ($mcComponents as $componentRow) {
             // Skip if this is the same component as used for the base row to avoid duplicate Main
             if ($masterCardData && $componentRow->COMP === ($masterCardData->COMP ?? null)) {
+                continue;
+            }
+            
+            // Only create SO records for components that have quantities in product design
+            // For Fit components, use Main quantity if not specified (backward compatibility)
+            $componentName = (string) ($componentRow->COMP ?? '');
+            $componentQty = $productDesignQuantities[$componentName] ?? null;
+            
+            // If this is a Fit component and no quantity specified, use Main component quantity
+            if (($componentQty === null || $componentQty <= 0) && 
+                (preg_match('/^fit\d+$/i', $componentName) || str_starts_with($componentName, 'Fit'))) {
+                $componentQty = $productDesignQuantities['Main'] ?? $qty;
+                Log::info('Fit component using Main quantity', [
+                    'component' => $componentName,
+                    'using_quantity' => $componentQty,
+                    'main_quantity' => $productDesignQuantities['Main'] ?? $qty
+                ]);
+            }
+            
+            // Skip if still no quantity after fallback
+            if (!$componentQty || $componentQty <= 0) {
+                Log::info('Skipping component - no quantity available', [
+                    'component' => $componentName,
+                    'available_quantities' => $productDesignQuantities
+                ]);
                 continue;
             }
 
@@ -579,26 +691,29 @@ class SalesOrderController extends Controller
             $compMcGrossKg = (float)($componentRow->MC_GROSS_KG_PER_SET ?? 0);
             $compMcNetKg = (float)($componentRow->MC_NET_KG_PER_PCS ?? 0);
 
-            $compTotalGrossM2 = $compMcGrossM2 * $qty;
-            $compTotalNetM2 = $compMcNetM2 * $qty;
-            $compTotalGrossKg = $compMcGrossKg * $qty;
-            $compTotalNetKg = $compMcNetKg * $qty;
+            $compTotalGrossM2 = $compMcGrossM2 * $componentQty;
+            $compTotalNetM2 = $compMcNetM2 * $componentQty;
+            $compTotalGrossKg = $compMcGrossKg * $componentQty;
+            $compTotalNetKg = $compMcNetKg * $componentQty;
 
             // Calculate component-level TOTAL_M3 using same logic as base row
             $compTotalM3 = 0;
-            if ($compExtL > 0 && $compExtW > 0 && $compExtH > 0 && $qty > 0) {
-                $compTotalM3 = ($compExtL * $compExtW * $compExtH * $qty) / 1000000000;
-            } elseif ($compIntL > 0 && $compIntW > 0 && $compIntH > 0 && $qty > 0) {
-                $compTotalM3 = ($compIntL * $compIntW * $compIntH * $qty) / 1000000000;
+            if ($compExtL > 0 && $compExtW > 0 && $compExtH > 0 && $componentQty > 0) {
+                $compTotalM3 = ($compExtL * $compExtW * $compExtH * $componentQty) / 1000000000;
+            } elseif ($compIntL > 0 && $compIntW > 0 && $compIntH > 0 && $componentQty > 0) {
+                $compTotalM3 = ($compIntL * $compIntW * $compIntH * $componentQty) / 1000000000;
             }
 
             // Clone base row and override MC-related fields for this component
             $row = $base;
+
             $row['MODEL'] = $compModel;
             $row['PRODUCT'] = (string) ($validated['details'][0]['item_code'] ?? '');
             $row['COMP_Num'] = (string) ($componentRow->COMP ?? '');
             $row['P_DESIGN'] = $compPDesign;
             $row['PART_NUMBER'] = $compPartNumber;
+
+            $row['SO_QTY'] = (float) $componentQty; // Use component-specific quantity
 
             $row['INT_L'] = $compIntL;
             $row['INT_W'] = $compIntW;
@@ -616,26 +731,98 @@ class SalesOrderController extends Controller
 
             $row['MC_GROSS_M2_PER_PCS'] = $compMcGrossM2;
             $row['MC_NET_M2_PER_PCS'] = $compMcNetM2;
-            $row['TOTAL_SO_GROSS_M2'] = $compTotalGrossM2;
-            $row['TOTAL_SO_NET_M2'] = $compTotalNetM2;
+            $row['TOTAL_SO_GROSS_M2'] = $compMcGrossM2 * $componentQty;
+            $row['TOTAL_SO_NET_M2'] = $compMcNetM2 * $componentQty;
             $row['TOTAL_M3'] = (int) round($compTotalM3);
             $row['MC_GROSS_KG_PER_PCS'] = $compMcGrossKg;
             $row['MC_NET_KG_PER_PCS'] = $compMcNetKg;
-            $row['TOTAL_SO_GROSS_KG'] = $compTotalGrossKg;
-            $row['TOTAL_SO_NET_KG'] = $compTotalNetKg;
+            $row['TOTAL_SO_GROSS_KG'] = $compMcGrossKg * $componentQty;
+            $row['TOTAL_SO_NET_KG'] = $compMcNetKg * $componentQty;
 
             $rowsToInsert[] = $row;
+            
+            Log::info('Component SO row created', [
+                'component' => $componentName,
+                'so_number' => $row['SO_Num'],
+                'quantity' => $componentQty,
+                'comp_num' => $row['COMP_Num']
+            ]);
         }
 
         // Always INSERT new records, NEVER update existing
         // This ensures each sales order is unique even for same customer and master card
-        DB::table('so')->insert($rowsToInsert);
+        
+        // Debug: Log the data before insertion
+        Log::info('About to insert SO records:', [
+            'rows_count' => count($rowsToInsert),
+            'sample_row' => !empty($rowsToInsert) ? $rowsToInsert[0] : null,
+            'all_rows_data_types' => array_map(function($row) {
+                return array_map(function($value) {
+                    return [
+                        'value' => $value,
+                        'type' => gettype($value)
+                    ];
+                }, $row);
+            }, $rowsToInsert)
+        ]);
+        
+        // Validate and sanitize all data before insertion
+        $sanitizedRows = [];
+        foreach ($rowsToInsert as $row) {
+            $sanitizedRow = [];
+            foreach ($row as $key => $value) {
+                // Handle different field types appropriately
+                if (in_array($key, [
+                    'YYYY', 'MM', 'SO_DMY', 'SO_Num', 'STS', 'TYPE', 'AC_Num', 'AC_NAME', 
+                    'SLM', 'IND', 'AREA', 'GROUP_', 'PO_Num', 'PO_DATE', 'MODEL', 'PRODUCT',
+                    'COMP_Num', 'P_DESIGN', 'PART_NUMBER', 'UNIT', 'CURR', 'SO_REMARK',
+                    'SO_INSTRUCTION_1', 'SO_INSTRUCTION_2', 'D_LOC_Num', 'DELIVERY_TO',
+                    'DELIVERY_ADD_1', 'DELIVERY_ADD_2', 'DELIVERY_ADD_3', 'TOTAL_LM',
+                    'FLUTE', 'PQ1', 'PQ2', 'PQ3', 'PQ4', 'PQ5', 'INT_L', 'INT_W', 'INT_H',
+                    'EXT_L', 'EXT_W', 'EXT_H'
+                ])) {
+                    // String fields - ensure string type
+                    $sanitizedRow[$key] = (string) $value;
+                } elseif (in_array($key, [
+                    'SO_QTY', 'UNIT_PRICE', 'EX_RATE', 'AMOUNT', 'BASE_AMOUNT',
+                    'MC_GROSS_M2_PER_PCS', 'MC_NET_M2_PER_PCS', 'TOTAL_SO_GROSS_M2',
+                    'TOTAL_SO_NET_M2', 'TOTAL_M3', 'MC_GROSS_KG_PER_PCS', 'MC_NET_KG_PER_PCS',
+                    'TOTAL_SO_GROSS_KG', 'TOTAL_SO_NET_KG', 'D_QTY_1', 'D_QTY_2', 'D_QTY_3',
+                    'D_QTY_4', 'D_QTY_5', 'D_QTY_6', 'D_QTY_7', 'D_QTY_8', 'D_QTY_9', 'D_QTY_10'
+                ])) {
+                    // Numeric fields - ensure numeric type
+                    $sanitizedRow[$key] = is_numeric($value) ? (float) $value : 0.0;
+                } elseif (in_array($key, [
+                    'D_DATE_1', 'D_TIME_1', 'D_DUE_1', 'D_DATE_2', 'D_TIME_2', 'D_DUE_2',
+                    'D_DATE_3', 'D_TIME_3', 'D_DUE_3', 'D_DATE_4', 'D_TIME_4', 'D_DUE_4',
+                    'D_DATE_5', 'D_TIME_5', 'D_DUE_5', 'D_DATE_6', 'D_TIME_6', 'D_DUE_6',
+                    'D_DATE_7', 'D_TIME_7', 'D_DUE_7', 'D_DATE_8', 'D_TIME_8', 'D_DUE_8',
+                    'D_DATE_9', 'D_TIME_9', 'D_DUE_9', 'D_DATE_10', 'D_TIME_10', 'D_DUE_10'
+                ])) {
+                    // Date/Time fields - ensure string type
+                    $sanitizedRow[$key] = (string) $value;
+                } else {
+                    // Unknown field - try to preserve original type
+                    $sanitizedRow[$key] = $value;
+                }
+            }
+            $sanitizedRows[] = $sanitizedRow;
+        }
+        
+        Log::info('Sanitized SO records ready for insertion:', [
+            'original_count' => count($rowsToInsert),
+            'sanitized_count' => count($sanitizedRows),
+            'sample_sanitized_row' => !empty($sanitizedRows) ? $sanitizedRows[0] : null
+        ]);
+        
+        DB::table('so')->insert($sanitizedRows);
 
         Log::info('New sales order created', [
             'so_number' => $soNumber,
             'customer_code' => $validated['customer_code'],
             'master_card_seq' => $validated['master_card_seq'],
             'component_row_count' => count($rowsToInsert),
+            'product_design_quantities' => $productDesignQuantities
         ]);
 
         return response()->json([
@@ -645,6 +832,45 @@ class SalesOrderController extends Controller
                 'so_number' => $soNumber,
                 'sales_tax' => $salesTax
             ]
+        ]);
+    }
+
+    /**
+     * Get the last sales order number for a given customer (based on SO_Num order, Main component only).
+     * Returns the full SO number and its parts: mm, yyyy, and sequence.
+     */
+    public function getLastSalesOrderForCustomer(string $customerCode): JsonResponse
+    {
+        // Find the latest SO record for this customer, Main component only
+        $lastSo = DB::table('so')
+            ->where('AC_Num', $customerCode)
+            ->where('COMP_Num', 'Main')
+            ->orderBy('SO_Num', 'desc')
+            ->first();
+
+        if (!$lastSo || empty($lastSo->SO_Num)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No sales order found for this customer',
+            ], 404);
+        }
+
+        $soNumber = (string) $lastSo->SO_Num;
+
+        // Expect format MM-YYYY-XXXXX; fall back safely if format is different
+        $parts = explode('-', $soNumber);
+        $mm = $parts[0] ?? '';
+        $yyyy = $parts[1] ?? '';
+        $sequence = isset($parts[2]) ? $parts[2] : substr($soNumber, -5);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'so_number' => $soNumber,
+                'mm' => $mm,
+                'yyyy' => $yyyy,
+                'sequence' => $sequence,
+            ],
         ]);
     }
 
@@ -709,7 +935,12 @@ class SalesOrderController extends Controller
             'entries.*.line_number' => 'nullable|integer',
             'entries.*.schedule_date' => 'required|string',
             'entries.*.schedule_time' => 'nullable|string',
-            'entries.*.delivery_quantity' => 'required|numeric|min:0.0000001',
+            'entries.*.delivery_quantities' => 'nullable|array', // Make optional for backward compatibility
+            'entries.*.delivery_quantities.*.component' => 'required_with:entries.*.delivery_quantities|string',
+            'entries.*.delivery_quantities.*.quantity' => 'required_with:entries.*.delivery_quantities|numeric|min:0.0000001',
+            // Component field for legacy Product Design mode entries (Main, Fit1-9)
+            'entries.*.component' => 'nullable|string',
+            'entries.*.delivery_quantity' => 'nullable|numeric|min:0.0000001', // Keep for backward compatibility
             'entries.*.due_status' => 'required|string|in:ETD,ETA,TBA',
             'entries.*.remark' => 'nullable|string',
             'entries.*.delivery_code' => 'nullable|string',
@@ -720,29 +951,260 @@ class SalesOrderController extends Controller
         $soNumber = $validated['so_number'];
         $entries = $validated['entries'];
 
-        $updates = [];
-        $max = min(10, count($entries));
-        for ($i = 0; $i < $max; $i++) {
-            $index = $i + 1;
-            $entry = $entries[$i];
-            $dateCol = $index === 10 ? 'D_DATE10' : 'D_DATE_' . $index;
-            $timeCol = $index === 10 ? 'D_TIME10' : 'D_TIME_' . $index;
-            $dueCol  = $index === 10 ? 'D_DUE10'  : 'D_DUE_' . $index;
-            $qtyCol  = $index === 10 ? 'D_QTY_10' : 'D_QTY_' . $index;
-            $updates[$dateCol] = (string) ($entry['schedule_date'] ?? '');
-            $updates[$timeCol] = (string) ($entry['schedule_time'] ?? '');
-            $updates[$dueCol]  = (string) ($entry['due_status'] ?? '');
-            $updates[$qtyCol]  = (float) ($entry['delivery_quantity'] ?? 0);
+        // Get product design quantities from SO records to ensure consistency
+        $soRecords = DB::table('so')
+            ->where('SO_Num', 'like', preg_replace('/-(fit\d+)$/i', '', $soNumber) . '%')
+            ->orderBy('SO_Num')
+            ->get();
+
+        $componentQuantities = [];
+        foreach ($soRecords as $record) {
+            $componentQuantities[$record->COMP_Num] = (float) $record->SO_QTY;
         }
 
-        // D_LOC_Num is NOT updated here
-        // It was already set during SO creation with geographical delivery code
-        // (same logic as Del_Code in DO table)
-        // Sources: customer_alternate_addresses.delivery_code OR update_customer_accounts.geographical OR CUSTOMER.AREA
+        Log::info('Delivery Schedule - Component quantities from SO:', [
+            'so_number' => $soNumber,
+            'component_quantities' => $componentQuantities,
+            'entries' => $entries
+        ]);
 
-        $affected = DB::table('so')->where('SO_Num', $soNumber)->update($updates);
+        // Validate that delivery quantities don't exceed available quantities
+        $totalDeliveryQuantities = [];
+        foreach ($entries as $entry) {
+            // Handle new format (delivery_quantities array) or old formats
+            if (isset($entry['delivery_quantities']) && is_array($entry['delivery_quantities'])) {
+                // New format: component-wise quantities per entry
+                foreach ($entry['delivery_quantities'] as $dq) {
+                    $component = $dq['component'] ?? 'Main';
+                    $quantity = (float) ($dq['quantity'] ?? 0);
 
-        if ($affected === 0) {
+                    if ($quantity <= 0) {
+                        continue;
+                    }
+
+                    if (!isset($totalDeliveryQuantities[$component])) {
+                        $totalDeliveryQuantities[$component] = 0;
+                    }
+                    $totalDeliveryQuantities[$component] += $quantity;
+                }
+            } elseif (isset($entry['component']) && isset($entry['delivery_quantity'])) {
+                // Legacy Product Design mode: each entry already represents a single component
+                $component = (string) $entry['component'];
+                $quantity = (float) $entry['delivery_quantity'];
+
+                if ($quantity <= 0) {
+                    continue;
+                }
+
+                if (!isset($totalDeliveryQuantities[$component])) {
+                    $totalDeliveryQuantities[$component] = 0;
+                }
+                $totalDeliveryQuantities[$component] += $quantity;
+            } elseif (isset($entry['delivery_quantity'])) {
+                // Old format: single quantity without component info (assume Main component)
+                $quantity = (float) $entry['delivery_quantity'];
+
+                if ($quantity <= 0) {
+                    continue;
+                }
+
+                if (!isset($totalDeliveryQuantities['Main'])) {
+                    $totalDeliveryQuantities['Main'] = 0;
+                }
+                $totalDeliveryQuantities['Main'] += $quantity;
+            }
+        }
+
+        // Check if any component exceeds available quantity
+        $exceededComponents = [];
+        foreach ($totalDeliveryQuantities as $component => $totalDelivered) {
+            $available = $componentQuantities[$component] ?? 0;
+            if ($totalDelivered > $available) {
+                $exceededComponents[] = [
+                    'component' => $component,
+                    'delivered' => $totalDelivered,
+                    'available' => $available
+                ];
+            }
+        }
+
+        if (!empty($exceededComponents)) {
+            Log::info('Delivery Schedule - Validation failed: quantities exceed available', [
+                'so_number' => $soNumber,
+                'component_quantities' => $componentQuantities,
+                'total_delivery_quantities' => $totalDeliveryQuantities,
+                'exceeded_components' => $exceededComponents,
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Delivery quantities exceed available quantities',
+                'errors' => $exceededComponents
+            ], 422);
+        }
+
+        // Build schedule slots grouped by line_number (1..10)
+        // All components belonging to the same visual row (line_number)
+        // share the same schedule index (D_DATE_i/D_QTY_i).
+        $scheduleSlots = [];
+
+        foreach ($entries as $idx => $entry) {
+            $lineNumber = isset($entry['line_number']) ? (int) $entry['line_number'] : ($idx + 1);
+            if ($lineNumber < 1 || $lineNumber > 10) {
+                continue;
+            }
+
+            $slotIndex = $lineNumber - 1; // 0-based index for internal array
+
+            $date = (string) ($entry['schedule_date'] ?? '');
+            $time = (string) ($entry['schedule_time'] ?? '');
+            $due  = (string) ($entry['due_status'] ?? '');
+
+            // Skip completely empty rows
+            if ($date === '' && $time === '' && $due === '') {
+                continue;
+            }
+
+            if (!isset($scheduleSlots[$slotIndex])) {
+                $scheduleSlots[$slotIndex] = [
+                    'date' => $date,
+                    'time' => $time,
+                    'due'  => $due,
+                    'components' => [] // component => qty for this line
+                ];
+            } else {
+                // Keep existing date/time/due if already set, only override if empty
+                if ($scheduleSlots[$slotIndex]['date'] === '' && $date !== '') {
+                    $scheduleSlots[$slotIndex]['date'] = $date;
+                }
+                if ($scheduleSlots[$slotIndex]['time'] === '' && $time !== '') {
+                    $scheduleSlots[$slotIndex]['time'] = $time;
+                }
+                if ($scheduleSlots[$slotIndex]['due'] === '' && $due !== '') {
+                    $scheduleSlots[$slotIndex]['due'] = $due;
+                }
+            }
+
+            // Per-component quantities for this entry
+            if (isset($entry['delivery_quantities']) && is_array($entry['delivery_quantities'])) {
+                // New format: array of { component, quantity }
+                foreach ($entry['delivery_quantities'] as $dq) {
+                    $component = (string) ($dq['component'] ?? 'Main');
+                    $quantity  = (float) ($dq['quantity'] ?? 0);
+
+                    if ($quantity <= 0) {
+                        continue;
+                    }
+
+                    if (!isset($scheduleSlots[$slotIndex]['components'][$component])) {
+                        $scheduleSlots[$slotIndex]['components'][$component] = 0.0;
+                    }
+                    $scheduleSlots[$slotIndex]['components'][$component] += $quantity;
+                }
+            } elseif (isset($entry['component']) && isset($entry['delivery_quantity'])) {
+                // Legacy Product Design mode: one component per entry
+                $component = (string) $entry['component'];
+                $quantity  = (float) $entry['delivery_quantity'];
+
+                if ($quantity <= 0) {
+                    continue;
+                }
+
+                if (!isset($scheduleSlots[$slotIndex]['components'][$component])) {
+                    $scheduleSlots[$slotIndex]['components'][$component] = 0.0;
+                }
+                $scheduleSlots[$slotIndex]['components'][$component] += $quantity;
+            } elseif (isset($entry['delivery_quantity'])) {
+                // Old single-quantity format: treat as Main
+                $quantity = (float) $entry['delivery_quantity'];
+
+                if ($quantity <= 0) {
+                    continue;
+                }
+
+                if (!isset($scheduleSlots[$slotIndex]['components']['Main'])) {
+                    $scheduleSlots[$slotIndex]['components']['Main'] = 0.0;
+                }
+                $scheduleSlots[$slotIndex]['components']['Main'] += $quantity;
+            }
+        }
+
+        Log::info('Delivery Schedule - Line-number grouped schedule slots for SO update', [
+            'so_number' => $soNumber,
+            'slots' => $scheduleSlots,
+        ]);
+
+        // Apply schedule slots to ALL related SO rows (Main + Fit components)
+        // Each schedule index (1..n) is shared across components; D_QTY_i per row
+        // stores only that component's quantity for that schedule.
+        $affectedTotal = 0;
+
+        foreach ($soRecords as $record) {
+            $componentName = (string) ($record->COMP_Num ?? 'Main');
+            $rowUpdates = [];
+
+            // Reset all 10 schedule columns to avoid stale data from previous saves
+            for ($i = 1; $i <= 10; $i++) {
+                $dateCol = $i === 10 ? 'D_DATE10' : 'D_DATE_' . $i;
+                $timeCol = $i === 10 ? 'D_TIME10' : 'D_TIME_' . $i;
+                $dueCol  = $i === 10 ? 'D_DUE10'  : 'D_DUE_' . $i;
+                $qtyCol  = $i === 10 ? 'D_QTY_10' : 'D_QTY_' . $i;
+
+                $rowUpdates[$dateCol] = '';
+                $rowUpdates[$timeCol] = '';
+                $rowUpdates[$dueCol]  = '';
+                $rowUpdates[$qtyCol]  = 0.0;
+            }
+
+            // Apply up to 10 possible schedule slots mapped by line_number
+            for ($i = 0; $i < 10; $i++) {
+                $index = $i + 1;
+
+                if (!isset($scheduleSlots[$i])) {
+                    continue; // leave defaults (cleared above)
+                }
+
+                $slot = $scheduleSlots[$i];
+
+                $dateCol = $index === 10 ? 'D_DATE10' : 'D_DATE_' . $index;
+                $timeCol = $index === 10 ? 'D_TIME10' : 'D_TIME_' . $index;
+                $dueCol  = $index === 10 ? 'D_DUE10'  : 'D_DUE_' . $index;
+                $qtyCol  = $index === 10 ? 'D_QTY_10' : 'D_QTY_' . $index;
+
+                $rowUpdates[$dateCol] = $slot['date'];
+                $rowUpdates[$timeCol] = $slot['time'];
+                $rowUpdates[$dueCol]  = $slot['due'];
+
+                // Quantity for this component in this schedule slot
+                $qty = 0.0;
+                if (isset($slot['components'][$componentName])) {
+                    $qty = (float) $slot['components'][$componentName];
+                } elseif ($componentName === 'Main' && isset($slot['components']['Main'])) {
+                    $qty = (float) $slot['components']['Main'];
+                }
+
+                $rowUpdates[$qtyCol] = $qty;
+
+                Log::info('Delivery entry calculated per component', [
+                    'so_record' => $record->SO_Num,
+                    'component' => $componentName,
+                    'entry_index' => $index,
+                    'slot' => $slot,
+                    'component_quantity' => $qty,
+                ]);
+            }
+
+            // D_LOC_Num is NOT updated here; it was already set during SO creation
+            // Use both SO_Num and COMP_Num so each component row (Main, Fit1-9)
+            // receives its own D_QTY_i values even when SO_Num is shared.
+            $affected = DB::table('so')
+                ->where('SO_Num', $record->SO_Num)
+                ->where('COMP_Num', $record->COMP_Num)
+                ->update($rowUpdates);
+
+            $affectedTotal += $affected;
+        }
+
+        if ($affectedTotal === 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Sales Order not found for updating schedule'
@@ -754,7 +1216,9 @@ class SalesOrderController extends Controller
             'message' => 'Delivery schedule saved successfully',
             'data' => [
                 'so_number' => $soNumber,
-                'entries' => $entries
+                'entries' => $entries,
+                'component_quantities_used' => $componentQuantities,
+                'total_delivery_quantities' => $totalDeliveryQuantities
             ]
         ]);
     }
@@ -1008,11 +1472,12 @@ class SalesOrderController extends Controller
             $year = date('Y');
 
             // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
-            // SQL Server compatible: Use RIGHT() function
+            // Use TRY_CAST to safely handle non-numeric suffixes like "-Fit1" in SO_Num
             $lastSO = DB::table('so')
                 ->where('MM', $month)
                 ->where('YYYY', $year)
-                ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
+                ->whereRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) IS NOT NULL')
+                ->orderByRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) DESC')
                 ->first();
 
             $sequence = 1;
@@ -1117,7 +1582,7 @@ class SalesOrderController extends Controller
             'PQ3' => $pq3,
             'PQ4' => $pq4,
             'PQ5' => $pq5,
-            'SO_QTY' => $qty,
+            'SO_QTY' => (float) ($productDesignQuantities['Main'] ?? $qty),
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
             'EX_RATE' => $exRate,
