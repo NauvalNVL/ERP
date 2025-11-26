@@ -446,6 +446,7 @@ Route::get('/analysis-code/view-print', function () {
 Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.define-analysis-code');
 
          Route::get('/stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.stitch-wire.index');
+         Route::get('/stitch-wire/status', [StitchWireController::class, 'vueManageStatus'])->name('vue.stitch-wire.status');
          Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');
          // Alias for search menu
          Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');

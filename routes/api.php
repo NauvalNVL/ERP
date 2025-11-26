@@ -347,6 +347,7 @@ Route::post('/chemical-coats/seed', [App\Http\Controllers\ChemicalCoatController
 Route::get('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'apiIndex']);
 Route::post('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'store']);
 Route::put('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'update']);
+Route::put('/stitch-wires/{code}/status', [App\Http\Controllers\StitchWireController::class, 'toggleStatus']);
 Route::delete('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'destroy']);
 Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::class, 'seed']);
 

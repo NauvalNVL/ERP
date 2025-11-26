@@ -18,6 +18,26 @@ class StitchWireController extends Controller
     }
 
     /**
+     * Display the Vue page to manage Stitch Wire status (obsolete/unobsolete).
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $stitchWires = StitchWire::orderBy('code')->get();
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteStitchWire', [
+                'stitchWires' => $stitchWires,
+                'header' => 'Manage Stitch Wire Status',
+            ]);
+        } catch (\Exception $e) {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteStitchWire', [
+                'stitchWires' => [],
+                'header' => 'Manage Stitch Wire Status',
+            ]);
+        }
+    }
+
+    /**
      * Display the Vue view and print page.
      */
     public function vueViewAndPrint()
@@ -49,7 +69,8 @@ class StitchWireController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|max:50|unique:stitch_wires,code',
             'name' => 'required|string|max:255',
-            'is_active' => 'boolean'
+            'status' => 'nullable|string|max:3',
+            'is_active' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -60,10 +81,20 @@ class StitchWireController extends Controller
         }
 
         try {
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = 'Act';
+            }
+
+            $isActive = $request->has('is_active')
+                ? (bool) $request->is_active
+                : ($status === 'Act');
+
             $stitchWire = StitchWire::create([
                 'code' => $request->code,
                 'name' => $request->name,
-                'is_active' => $request->is_active ?? true
+                'status' => $status,
+                'is_active' => $isActive,
             ]);
 
             return response()->json([
@@ -93,7 +124,8 @@ class StitchWireController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'is_active' => 'boolean'
+            'status' => 'nullable|string|max:3',
+            'is_active' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -104,9 +136,19 @@ class StitchWireController extends Controller
         }
 
         try {
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = $stitchWire->status ?? ($stitchWire->is_active ? 'Act' : 'Obs');
+            }
+
+            $isActive = $request->has('is_active')
+                ? (bool) $request->is_active
+                : ($status === 'Act');
+
             $stitchWire->update([
                 'name' => $request->name,
-                'is_active' => $request->is_active ?? $stitchWire->is_active
+                'status' => $status,
+                'is_active' => $isActive,
             ]);
 
             return response()->json([
@@ -135,15 +177,59 @@ class StitchWireController extends Controller
                 ], 404);
             }
 
-            $stitchWire->delete();
+            // Soft delete: mark as obsolete instead of hard delete
+            $stitchWire->status = 'Obs';
+            $stitchWire->is_active = false;
+            $stitchWire->save();
 
             return response()->json([
-                'message' => 'Stitch wire deleted successfully'
+                'message' => 'Stitch wire marked as obsolete successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to delete stitch wire',
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle stitch wire status (Act/Obs) via API.
+     */
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $stitchWire = StitchWire::where('code', $code)->first();
+
+            if (!$stitchWire) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stitch wire not found',
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['Act', 'Obs'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid status value',
+                ], 422);
+            }
+
+            $stitchWire->status = $status;
+            $stitchWire->is_active = $status === 'Act';
+            $stitchWire->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stitch wire status updated successfully',
+                'data' => $stitchWire,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update stitch wire status',
             ], 500);
         }
     }
@@ -155,9 +241,9 @@ class StitchWireController extends Controller
     {
         try {
             $stitchWires = [
-                ['code' => '001', 'name' => 'TIPE 1+1+1+1+1', 'is_active' => true],
-                ['code' => '002', 'name' => 'TIPE 2+1+1+1+2', 'is_active' => true],
-                ['code' => '003', 'name' => 'TIPE 2+2+2+2+2', 'is_active' => true],
+                ['code' => '001', 'name' => 'TIPE 1+1+1+1+1', 'status' => 'Act', 'is_active' => true],
+                ['code' => '002', 'name' => 'TIPE 2+1+1+1+2', 'status' => 'Act', 'is_active' => true],
+                ['code' => '003', 'name' => 'TIPE 2+2+2+2+2', 'status' => 'Act', 'is_active' => true],
             ];
 
             foreach ($stitchWires as $data) {
