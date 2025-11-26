@@ -446,23 +446,6 @@
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">
-                    Sales Tax:
-                    <span class="text-xs text-gray-400 font-normal">Tick for Y-Yes</span>
-                  </label>
-                  <div class="flex items-center space-x-2">
-                    <input
-                      v-model="orderDetails.salesTax"
-                      type="checkbox"
-                      class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      title="Tick for Y-Yes"
-                    >
-                    <span class="text-sm text-gray-700">
-                      {{ orderDetails.salesTax ? 'Y-Yes' : 'N-No' }}
-                    </span>
-                  </div>
-                </div>
-                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Lot Number:</label>
                   <input
                     v-model="orderDetails.lotNumber"
@@ -711,7 +694,6 @@ const orderDetails = reactive({
   setQuantity: '',
   orderGroup: 'Sales',
   orderType: 'S1-Sales',
-  salesTax: false,
   lotNumber: '',
   remark: '',
   instruction1: '',
@@ -828,8 +810,7 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: true,
-      requiresInvoice: true,
-      salesTax: true
+      requiresInvoice: true
     },
     {
       code: 'S2-Sales',
@@ -840,8 +821,7 @@ const orderTypesConfig = {
       requiresProduction: false,
       requiresDelivery: true,
       requiresInvoice: true,
-      isKanban: true,
-      salesTax: true
+      isKanban: true
     },
     {
       code: 'S3-Sales',
@@ -852,8 +832,7 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: true,
       requiresInvoice: true,
-      skipCorrugator: true,
-      salesTax: true
+      skipCorrugator: true
     }
   ],
   'Non-Sales': [
@@ -865,8 +844,7 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: true,
-      requiresInvoice: false,
-      salesTax: false
+      requiresInvoice: false
     },
     {
       code: 'N2-NonSales',
@@ -876,8 +854,7 @@ const orderTypesConfig = {
       requiresInventory: false,
       requiresProduction: false,
       requiresDelivery: true,
-      requiresInvoice: false,
-      salesTax: false
+      requiresInvoice: false
     },
     {
       code: 'N3-NonSales',
@@ -887,8 +864,7 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: false,
-      requiresInvoice: false,
-      salesTax: false
+      requiresInvoice: false
     },
     {
       code: 'N4-NonSales',
@@ -899,8 +875,7 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: false,
       requiresInvoice: false,
-      corrugatorOnly: true,
-      salesTax: false
+      corrugatorOnly: true
     }
   ]
 }
@@ -967,9 +942,6 @@ const updateOrderTypeUI = () => {
     delivery: typeConfig.requiresDelivery,
     invoice: typeConfig.requiresInvoice
   })
-
-  // Update sales tax based on order type configuration
-  orderDetails.salesTax = typeConfig.salesTax || false
 
   // Special handling for Kanban/JIT orders
   if (typeConfig.isKanban) {
@@ -1093,7 +1065,6 @@ const refreshPage = () => {
     setQuantity: '',
     orderGroup: 'Sales',
     orderType: 'S1-Sales',
-    salesTax: false,
     lotNumber: '',
     remark: '',
     instruction1: '',
@@ -1965,7 +1936,6 @@ const createSalesOrder = async () => {
       po_date: orderDetails.pOrderDate,
       order_group: orderDetails.orderGroup,
       order_type: orderDetails.orderType,
-      sales_tax: orderDetails.salesTax,
       lot_number: orderDetails.lotNumber,
       remark: orderDetails.remark,
       instruction1: orderDetails.instruction1,
