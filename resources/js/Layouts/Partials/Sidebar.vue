@@ -241,7 +241,8 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_chemical_coat' ||
     menuKey === 'obsolete_unobsolete_reinforcement_tape' ||
     menuKey === 'obsolete_unobsolete_bundling_string' ||
-    menuKey === 'obsolete_unobsolete_wrapping_material'
+    menuKey === 'obsolete_unobsolete_wrapping_material' ||
+    menuKey === 'obsolete_unobsolete_glueing_material'
   ) {
     return true;
   }
@@ -390,6 +391,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Wrapping Material': 'define_wrapping_material',
     'Obsolete/Unobsolete Wrapping Material': 'obsolete_unobsolete_wrapping_material',
     'Define Glueing Material': 'define_glueing_material',
+    'Obsolete/Unobsolete Glueing Material': 'obsolete_unobsolete_glueing_material',
     'Define Machine': 'define_machine',
     'View & Print Sales Team': 'view_print_sales_team',
     'View & Print Salesperson': 'view_print_salesperson',
@@ -630,6 +632,7 @@ const salesManagementItems = [
           { title: 'Define Wrapping Material', icon: 'fas fa-box-open', route: '/wrapping-material' },
           { title: 'Obsolete/Unobsolete Wrapping Material', icon: 'fas fa-ban', route: '/wrapping-material/status' },
           { title: 'Define Glueing Material', icon: 'fas fa-vial', route: '/glueing-material' },
+          { title: 'Obsolete/Unobsolete Glueing Material', icon: 'fas fa-ban', route: '/glueing-material/status' },
           { title: 'Define Machine', icon: 'fas fa-cogs', route: '/machine' },
           // View & Print Section
           { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },

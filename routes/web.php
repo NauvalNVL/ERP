@@ -476,6 +476,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/define-wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');
 
          Route::get('/glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.glueing-material.index');
+         Route::get('/glueing-material/status', [GlueingMaterialController::class, 'vueManageStatus'])->name('vue.glueing-material.status');
          Route::get('/glueing-material/view-print', [GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
          // Alias for search menu
          Route::get('/define-glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');

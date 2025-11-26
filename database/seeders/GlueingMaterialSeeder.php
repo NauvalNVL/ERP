@@ -18,24 +18,28 @@ class GlueingMaterialSeeder extends Seeder
                 'code' => '001',
                 'name' => 'PVAC',
                 'description' => 'Polyvinyl Acetate Glue',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '002',
                 'name' => 'STARCH',
                 'description' => 'Starch Based Glue',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '003',
                 'name' => 'HOT MELT',
                 'description' => 'Hot Melt Adhesive',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '004',
                 'name' => 'SILICATE',
                 'description' => 'Sodium Silicate Glue',
+                'status' => 'Act',
                 'is_active' => true,
             ],
         ];
@@ -43,7 +47,12 @@ class GlueingMaterialSeeder extends Seeder
         foreach ($glueingMaterials as $material) {
             GlueingMaterial::updateOrCreate(
                 ['code' => $material['code']],
-                $material
+                [
+                    'name' => $material['name'],
+                    'description' => $material['description'],
+                    'status' => 'Act',
+                    'is_active' => true,
+                ]
             );
         }
     }

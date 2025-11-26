@@ -383,6 +383,7 @@ Route::post('/wrapping-materials/seed', [App\Http\Controllers\WrappingMaterialCo
 Route::get('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'apiIndex']);
 Route::post('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'store']);
 Route::put('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'update']);
+Route::put('/glueing-materials/{code}/status', [App\Http\Controllers\GlueingMaterialController::class, 'toggleStatus']);
 Route::delete('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'destroy']);
 Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialController::class, 'seed']);
 
