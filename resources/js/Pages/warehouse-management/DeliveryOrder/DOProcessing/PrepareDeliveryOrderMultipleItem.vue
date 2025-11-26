@@ -615,15 +615,17 @@ const saveDeliveryOrder = async () => {
             // Baris dummy (Fit2-Fit9 yang tidak ada di MC) -> selalu 0
             rawToDeliver = '0'
           } else if (row && row.toDeliver !== undefined && row.toDeliver !== null && row.toDeliver !== '') {
-            // Prioritas 1: nilai To Deliver per baris di detail SO
+            // Prioritas 1: nilai To Deliver per baris di detail SO (sudah dikalikan dengan pcs masing-masing)
+            // Ini adalah nilai yang diinput user baik dari "To Delivery Set" maupun manual per komponen
             rawToDeliver = row.toDeliver
           } else if (pack && pack.toDel !== undefined && pack.toDel !== null && pack.toDel !== '') {
             // Prioritas 2: nilai To Del dari Packing per komponen
             rawToDeliver = pack.toDel
           } else {
-            // Fallback: gunakan qty utama (mainToDel / To Delivery Set)
+            // Fallback: gunakan baseToDeliver * pcs komponen
             // untuk semua komponen yang benar-benar ada di MC (Main + Fit)
-            rawToDeliver = baseToDeliver
+            const pcsValue = parseFloat(row.pcs) || 1
+            rawToDeliver = baseToDeliver * pcsValue
           }
 
           return {
