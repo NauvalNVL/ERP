@@ -279,7 +279,7 @@
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right bg-yellow-50"
                       :class="{ 'border border-red-500': isToDeliverySetRequired }"
-                      @input="handleToDeliverChange"
+                      @input="handleToDeliverManualChange(item)"
                       placeholder=""
                     >
                   </td>
@@ -467,9 +467,10 @@ const handlePrint = () => {
   info('Print functionality will be implemented')
 }
 
-const handleToDeliverChange = () => {
-  // Trigger reactivity untuk watchEffect
-  // Vue akan otomatis mendeteksi perubahan melalui v-model
+const handleToDeliverManualChange = (item) => {
+  // Ketika user mengubah To Deliver secara manual, hitung ulang To Delivery Set
+  // berdasarkan Main component
+  // Trigger reactivity untuk watchEffect - Vue akan otomatis mendeteksi perubahan
 }
 
 const handleDeliverySetChange = () => {
@@ -575,51 +576,54 @@ const isToDeliverySetExceed = computed(() => {
 })
 
 // Watch untuk sinkronisasi dari "To Delivery Set" ke "To Deliver" items
+// Logika: Ketika user mengisi "To Delivery Set", setiap komponen akan mendapat nilai = toDeliverySet * pcs komponen tersebut
 watch(() => orderDetail.toDeliverySet, (newValue, oldValue) => {
   // Skip jika perubahan berasal dari watchEffect
   if (isUpdatingFromDeliverySet.value) return
   
   const deliverySetValue = parseFloat(newValue) || 0
-  const currentTotal = itemRows.value.reduce((sum, item) => {
-    return sum + (parseFloat(item.toDeliver) || 0)
-  }, 0)
   
-  // Hanya update jika ada perubahan signifikan dari user input
-  if (Math.abs(deliverySetValue - currentTotal) > 0.01) {
-    isUpdatingFromDeliverySet.value = true
-    
-    // Distribusikan nilai ke item pertama yang memiliki data (biasanya Main)
-    const mainItem = itemRows.value.find(item => item.name === 'Main')
-    if (mainItem) {
-      mainItem.toDeliver = deliverySetValue.toString()
-      
-      // Reset item lainnya
-      itemRows.value.forEach(item => {
-        if (item.name !== 'Main') {
-          item.toDeliver = ''
-        }
-      })
+  // Flag untuk mencegah infinite loop
+  isUpdatingFromDeliverySet.value = true
+  
+  // Update setiap komponen berdasarkan pcs-nya
+  itemRows.value.forEach(item => {
+    // Hanya update komponen yang memiliki pDesign (komponen aktif)
+    if (item.pDesign && item.pDesign.trim() !== '') {
+      const pcsValue = parseFloat(item.pcs) || 1 // Default ke 1 jika pcs kosong
+      const calculatedToDeliver = deliverySetValue * pcsValue
+      item.toDeliver = calculatedToDeliver > 0 ? calculatedToDeliver.toString() : ''
+    } else {
+      // Komponen tidak aktif, set ke kosong
+      item.toDeliver = ''
     }
-    
-    // Reset flag setelah update selesai
-    setTimeout(() => {
-      isUpdatingFromDeliverySet.value = false
-    }, 0)
-  }
+  })
+  
+  // Reset flag setelah update selesai
+  setTimeout(() => {
+    isUpdatingFromDeliverySet.value = false
+  }, 0)
 })
 
-// Watch effect untuk monitoring semua perubahan item secara otomatis
+// Watch effect untuk monitoring perubahan manual pada To Deliver items
+// Jika user mengubah To Deliver manual, jangan auto-update To Delivery Set
 watchEffect(() => {
   if (!isUpdatingFromDeliverySet.value) {
-    // Hitung total dari semua item "To Deliver"
-    const total = itemRows.value.reduce((sum, item) => {
-      const value = parseFloat(item.toDeliver) || 0
-      return sum + value
-    }, 0)
-    
-    // Update "To Delivery Set" jika berbeda
-    if (Math.abs(total - parseFloat(orderDetail.toDeliverySet || 0)) > 0.01) {
-      orderDetail.toDeliverySet = total.toString()
+    // Hitung total dari Main component saja untuk To Delivery Set
+    // Karena To Delivery Set adalah dalam satuan "set" bukan total pieces
+    const mainItem = itemRows.value.find(item => item.name === 'Main')
+    if (mainItem) {
+      const mainToDeliver = parseFloat(mainItem.toDeliver) || 0
+      const mainPcs = parseFloat(mainItem.pcs) || 1
+      
+      // To Delivery Set = Main To Deliver / Main Pcs
+      const calculatedDeliverySet = mainPcs > 0 ? mainToDeliver / mainPcs : 0
+      
+      // Update To Delivery Set jika berbeda (dengan toleransi untuk floating point)
+      const currentDeliverySet = parseFloat(orderDetail.toDeliverySet) || 0
+      if (Math.abs(calculatedDeliverySet - currentDeliverySet) > 0.01) {
+        orderDetail.toDeliverySet = calculatedDeliverySet > 0 ? calculatedDeliverySet.toString() : '0'
+      }
     }
   }
 })
