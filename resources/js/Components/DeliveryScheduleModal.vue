@@ -825,6 +825,17 @@ const resetForm = () => {
   timeMinutes.value = '00'
 }
 
+const resetScheduleState = () => {
+  scheduleEntries.value = []
+  selectedEntry.value = null
+  selectedIndex.value = -1
+  isEditing.value = false
+  showErrorPopup.value = false
+  errorInfo.code = ''
+  errorInfo.type = ''
+  resetForm()
+}
+
 const calculateTotals = () => {
   // This method is called when quantities change
   // The computed properties will automatically update
@@ -1173,6 +1184,8 @@ watch(() => props.orderDetails, (newDetails) => {
     console.log('Order details updated:', newDetails)
   }
 }, { deep: true })
+
+defineExpose({ resetScheduleState })
 
 // Initialize component
 onMounted(() => {

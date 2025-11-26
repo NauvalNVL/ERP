@@ -624,6 +624,7 @@
       @save="saveDeliverySchedule"
       :order-details="orderDetails"
       :mc-components="mcComponentsForDesign"
+      ref="deliveryScheduleModalRef"
     />
 
     <!-- Sales Order Table Modal -->
@@ -731,6 +732,8 @@ const showDeliveryScheduleModal = ref(false)
 const showSalesOrderTableModal = ref(false)
 // Ref to Product Design modal for live quantity sync
 const productDesignModalRef = ref(null)
+// Ref to Delivery Schedule modal to allow hard reset from parent
+const deliveryScheduleModalRef = ref(null)
 
 // Normalize setQuantity to number
 const normalizedSetQuantity = computed(() => {
@@ -1037,6 +1040,14 @@ const refreshPage = () => {
   showDeliveryScheduleModal.value = false
   showSalesOrderTableModal.value = false
   showMcsTableModal.value = false
+
+  // Hard reset child modal internal states (if already mounted)
+  if (productDesignModalRef.value && typeof productDesignModalRef.value.resetModalState === 'function') {
+    productDesignModalRef.value.resetModalState()
+  }
+  if (deliveryScheduleModalRef.value && typeof deliveryScheduleModalRef.value.resetScheduleState === 'function') {
+    deliveryScheduleModalRef.value.resetScheduleState()
+  }
 
   // Reset all form data
   Object.assign(currentPeriod, {
