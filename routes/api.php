@@ -364,6 +364,7 @@ Route::post('/reinforcement-tapes/seed', [App\Http\Controllers\ReinforcementTape
 Route::get('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'apiIndex']);
 Route::post('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'store']);
 Route::put('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'update']);
+Route::put('/bundling-strings/{code}/status', [App\Http\Controllers\BundlingStringController::class, 'toggleStatus']);
 Route::delete('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'destroy']);
 
 // Machine API routes

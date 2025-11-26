@@ -337,13 +337,14 @@ const fetchBundlingStrings = async () => {
 
         const data = await response.json();
 
+        let list = [];
         if (Array.isArray(data)) {
-            bundlingStrings.value = data;
+            list = data;
         } else if (data.data && Array.isArray(data.data)) {
-            bundlingStrings.value = data.data;
-        } else {
-            bundlingStrings.value = [];
+            list = data.data;
         }
+
+        bundlingStrings.value = (list || []).filter(item => !item.status || item.status === 'Act');
     } catch (error) {
         console.error('Error fetching bundling strings:', error);
         bundlingStrings.value = [];

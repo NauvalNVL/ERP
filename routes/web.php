@@ -464,6 +464,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/define-reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');
 
          Route::get('/bundling-string', [BundlingStringController::class, 'index'])->name('vue.bundling-string.index');
+         Route::get('/bundling-string/status', [BundlingStringController::class, 'vueManageStatus'])->name('vue.bundling-string.status');
          Route::get('/bundling-string/view-print', [BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
          // Alias for search menu
          Route::get('/define-bundling-string', [BundlingStringController::class, 'index'])->name('vue.define-bundling-string');

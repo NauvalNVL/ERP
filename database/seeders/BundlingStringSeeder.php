@@ -17,21 +17,25 @@ class BundlingStringSeeder extends Seeder
             [
                 'code' => '001',
                 'name' => '5 MM',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '002',
                 'name' => '7 MM',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '003',
                 'name' => '10 MM',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '004',
                 'name' => '12 MM',
+                'status' => 'Act',
                 'is_active' => true,
             ],
         ];
