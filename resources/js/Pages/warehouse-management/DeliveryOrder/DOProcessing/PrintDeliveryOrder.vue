@@ -52,22 +52,22 @@
                     <div class="flex items-center gap-3">
                       <div class="flex-1">
                         <label class="modern-label">Month</label>
-                        <input 
-                          v-model.number="currentPeriod.month" 
-                          type="number" 
-                          min="1" 
-                          max="12" 
+                        <input
+                          v-model.number="currentPeriod.month"
+                          type="number"
+                          min="1"
+                          max="12"
                           class="modern-input text-center"
                           placeholder="MM"
                         />
                       </div>
                       <div class="flex-1">
                         <label class="modern-label">Year</label>
-                        <input 
-                          v-model.number="currentPeriod.year" 
-                          type="number" 
-                          min="2000" 
-                          max="2099" 
+                        <input
+                          v-model.number="currentPeriod.year"
+                          type="number"
+                          min="2000"
+                          max="2099"
                           class="modern-input text-center"
                           placeholder="YYYY"
                         />
@@ -93,8 +93,8 @@
                           <input v-model.number="doRange.fromYear" type="number" min="2000" max="2099" class="modern-input w-20 text-center" placeholder="YYYY" />
                           <span class="text-gray-400">/</span>
                           <input v-model="doRange.fromNumber" type="text" class="modern-input w-24" placeholder="Seq" />
-                          <button 
-                            class="modern-icon-btn" 
+                          <button
+                            class="modern-icon-btn"
                             title="Lookup"
                             @click="openDOModal"
                           >
@@ -102,7 +102,7 @@
                           </button>
                         </div>
                       </div>
-                      
+
                       <!-- To Range -->
                       <div>
                         <label class="modern-label">To D/Order#</label>
@@ -112,8 +112,8 @@
                           <input v-model.number="doRange.toYear" type="number" min="2000" max="2099" class="modern-input w-20 text-center" placeholder="YYYY" />
                           <span class="text-gray-400">/</span>
                           <input v-model="doRange.toNumber" type="text" class="modern-input w-24" placeholder="Seq" />
-                          <button 
-                            class="modern-icon-btn" 
+                          <button
+                            class="modern-icon-btn"
                             title="Lookup"
                             @click="openToDOModal"
                           >
@@ -133,10 +133,10 @@
                   </div>
                   <div class="modern-section-content">
                     <div class="flex gap-2">
-                      <input 
-                        v-model="quickDO" 
-                        class="modern-input flex-1" 
-                        placeholder="Enter DO Number (e.g. DO20250001)" 
+                      <input
+                        v-model="quickDO"
+                        class="modern-input flex-1"
+                        placeholder="Enter DO Number (e.g. DO20250001)"
                       />
                       <button class="modern-btn-primary" @click="quickPrint">
                         <i class="fa-solid fa-bolt mr-2"></i>Quick Print
@@ -159,13 +159,13 @@
                       <div>
                         <label class="modern-label">Customer Code</label>
                         <div class="flex gap-2">
-                          <input 
-                            v-model="customer.code" 
-                            class="modern-input flex-1" 
+                          <input
+                            v-model="customer.code"
+                            class="modern-input flex-1"
                             placeholder="Enter customer code"
                           />
-                          <button 
-                            class="modern-icon-btn" 
+                          <button
+                            class="modern-icon-btn"
                             title="Customer Lookup"
                             @click="openCustomerModal"
                           >
@@ -240,7 +240,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Preview Section -->
         <div v-if="preview" class="mt-6 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-white/20">
           <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-4">
@@ -354,15 +354,15 @@ const refreshForm = () => {
     toYear: '',
     toNumber: ''
   })
-  
+
   Object.assign(customer, {
     code: '',
     name: ''
   })
-  
+
   newEntryMode.value = 'print_only'
   message.value = 'Form refreshed successfully'
-  
+
   setTimeout(() => {
     message.value = ''
   }, 3000)
@@ -432,45 +432,70 @@ const proceedToPrint = async () => {
 
 function formatPreviewText(rows) {
   const lines = []
-  
-  if (rows.length === 0) {
+
+  if (!rows || rows.length === 0) {
     lines.push('No delivery orders found for selected range')
     return lines.join('\n')
   }
 
-  rows.forEach((r, idx) => {
-    const doNum = r.DO_Num || r.do_num || ''
-    const doDate = r.DO_DMY || r.DODateSK || ''
-    const cust = r.AC_Name || r.AC_NAME || r.customer_name || ''
-    const custAddress1 = r.ADDRESS1 || ''
-    const custAddress2 = r.ADDRESS2 || ''
-    const custAddress3 = r.ADDRESS3 || ''
-    const custTel = r.TEL_NO || ''
-    const custFax = r.FAX_NO || ''
-    const vhc = r.DO_VHC_Num || r.vehicle_no || ''
-    const soNum = r.SO_Num || ''
-    const poNum = r.PO_Num || ''
-    const model = r.Model || r.SO_Model || ''
-    const mainName = r.ProductGroupName || ''
-    const doQty = parseFloat(r.DO_Qty || 0)
-    const unit = r.Unit || r.SO_Unit || ''
-    const unitLower = (unit || '').toLowerCase()
-    const intL = r.INT_L || 0
-    const intW = r.INT_W || 0
-    const intH = r.INT_H || 0
-    const pcsPerBld = parseFloat(r.PCS_PER_BLD || 1)
+  // Group rows by DO number so Main/Fit components stay in one Surat Jalan
+  const groups = new Map()
+  rows.forEach(r => {
+    const key = r.DO_Num || r.do_num || ''
+    const groupKey = key || 'NO_DO'
+    if (!groups.has(groupKey)) groups.set(groupKey, [])
+    groups.get(groupKey).push(r)
+  })
 
-    // Calculate bundle quantities
+  const totalGroups = groups.size
+  let groupIndex = 0
+
+  for (const [, groupRows] of groups) {
+    groupIndex++
+
+    // Sort components by line number then COMP (Main, Fit1, Fit2...)
+    groupRows.sort((a, b) => {
+      const aNo = Number(a.No ?? a.no ?? 0)
+      const bNo = Number(b.No ?? b.no ?? 0)
+      if (aNo !== bNo) return aNo - bNo
+      const aComp = String(a.COMP || '')
+      const bComp = String(b.COMP || '')
+      return aComp.localeCompare(bComp)
+    })
+
+    const header = groupRows[0]
+    const base = groupRows.find(r => String(r.COMP || '').toLowerCase() === 'main') || header
+
+    const doNum = header.DO_Num || header.do_num || ''
+    const doDate = header.DO_DMY || header.DODateSK || ''
+    const cust = header.AC_Name || header.AC_NAME || header.customer_name || ''
+    const custAddress1 = header.ADDRESS1 || ''
+    const custAddress2 = header.ADDRESS2 || ''
+    const custAddress3 = header.ADDRESS3 || ''
+    const custTel = header.TEL_NO || ''
+    const custFax = header.FAX_NO || ''
+    const vhc = header.DO_VHC_Num || header.vehicle_no || ''
+    const soNum = base.SO_Num || ''
+    const poNum = base.PO_Num || ''
+    const model = base.Model || base.SO_Model || ''
+
+    const doQty = parseFloat(base.DO_Qty || 0)
+    const unit = base.Unit || base.SO_Unit || ''
+    const unitLower = (unit || '').toLowerCase()
+    const pcsPerBld = parseFloat(base.PCS_PER_BLD || 1)
+
+    // Calculate bundle quantities based on Main line
     let bundles = 0
     let remainingPcs = 0
-    
+
     if (pcsPerBld > 0 && doQty > 0) {
       bundles = Math.floor(doQty / pcsPerBld)
-      remainingPcs = doQty - (bundles * pcsPerBld)
+      remainingPcs = doQty - bundles * pcsPerBld
     } else {
       remainingPcs = doQty
     }
 
+    // Header text (same untuk semua komponen di DO ini)
     lines.push('PT. MULTIBOX INDAH'.padEnd(50) + `No. SJ    : ${doNum}`)
     lines.push('Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo'.padEnd(50) + `Tanggal   : ${doDate}`)
     lines.push('Kec. Jawilan, Serang - Banten 42180'.padEnd(50) + 'Halaman   : 1')
@@ -481,7 +506,7 @@ function formatPreviewText(rows) {
     lines.push('')
     lines.push(`Kirim ke :`.padEnd(50) + `Nomor Truk : ${vhc || '-'}`)
     lines.push(`${cust || '-'}`.padEnd(50) + `Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`)
-    
+
     // Customer address from database
     if (custAddress1) {
       lines.push(custAddress1.padEnd(50) + 'Dibuat Oleh : whs12')
@@ -492,9 +517,9 @@ function formatPreviewText(rows) {
     if (custAddress3) {
       lines.push(custAddress3)
     }
-    
+
     lines.push('')
-    
+
     // Customer phone and fax from database
     if (custTel) {
       lines.push(`Tel   : ${custTel}`)
@@ -502,7 +527,7 @@ function formatPreviewText(rows) {
     if (custFax) {
       lines.push(`Fax   : ${custFax}`)
     }
-    
+
     lines.push('')
     lines.push('No. Nama Barang'.padEnd(60) + 'Jumlah'.padStart(12) + ' '.repeat(4) + 'Satuan')
     lines.push(''.padEnd(110, '-'))
@@ -510,7 +535,33 @@ function formatPreviewText(rows) {
     const unitStrPrev = `${bundles}BDL x ${pcsPerBld}Pcs + ${remainingPcs}Pcs`
     lines.push(`1 SO# : ${soNum}/PO# / ${poNum}`.padEnd(60) + qtyStrPrev.padStart(12) + '    ' + unitStrPrev)
     lines.push(`  Model : ${model}`)
-    lines.push(`  Main : ${mainName}`.padEnd(40) + `${intL} x ${intW} x ${intH}`)
+
+    // Tampilkan semua komponen (Main, Fit1..Fit9) dalam satu DO
+    // Dedup berdasarkan COMP agar data duplikat dari join tidak tercetak ganda
+    const seenComps = new Set()
+    groupRows.forEach(r => {
+      const compLabel = r.COMP || 'Main'
+      const compKey = String(compLabel).trim().toLowerCase()
+      if (seenComps.has(compKey)) return
+      seenComps.add(compKey)
+
+      const mainName = r.ProductGroupName || ''
+      const design = r.PD || r.MC_P_DESIGN || mainName || ''
+      const intL = r.INT_L || 0
+      const intW = r.INT_W || 0
+      const intH = r.INT_H || 0
+      const extL = r.EXT_L || 0
+      const extW = r.EXT_W || 0
+      const extH = r.EXT_H || 0
+      const dimL = extL || intL
+      const dimW = extW || intW
+      const dimH = extH || intH
+
+      const cleanLabel = compLabel ? String(compLabel).trim() : 'Main'
+      const compText = `${cleanLabel} : ${design}`
+      lines.push(compText.padEnd(40) + `${dimL} x ${dimW} x ${dimH}`)
+    })
+
     lines.push('')
     lines.push('')
     lines.push('Keterangan :')
@@ -520,14 +571,14 @@ function formatPreviewText(rows) {
     lines.push('(Nama Jelas dan Cap Perusahaan)  SUHERMAN                     Gudang    1773.98')
     lines.push('Akhir dari halaman                Sopir')
     lines.push(''.padEnd(110, '-'))
-    
-    if (idx < rows.length - 1) {
+
+    if (groupIndex < totalGroups) {
       lines.push('')
       lines.push(''.padEnd(110, '='))
       lines.push('')
     }
-  })
-  
+  }
+
   return lines.join('\n')
 }
 
@@ -562,10 +613,19 @@ async function downloadPdf() {
     const json = await res.json()
     const rows = (json && json.success && Array.isArray(json.data)) ? json.data : []
 
+    // Group rows by DO number so each Surat Jalan page contains Main + Fit components
+    const groups = new Map()
+    rows.forEach(r => {
+      const key = r.DO_Num || r.do_num || ''
+      const groupKey = key || 'NO_DO'
+      if (!groups.has(groupKey)) groups.set(groupKey, [])
+      groups.get(groupKey).push(r)
+    })
+
     let page = 0
-    for (const r of rows) {
+    for (const [, groupRows] of groups) {
       if (page > 0) doc.addPage()
-      renderSuratJalan(doc, r)
+      renderSuratJalan(doc, groupRows)
       page++
     }
 
@@ -582,40 +642,49 @@ async function downloadPdf() {
   }
 }
 
-function renderSuratJalan(doc, row) {
+function renderSuratJalan(doc, groupRows) {
   const left = 50
   const right = 545
   const center = (left + right) / 2
   let y = 50
 
-  // Extract data from row
-  const doNum = row.DO_Num || ''
-  const doDate = row.DO_DMY || ''
-  const custName = row.AC_Name || ''
-  const custAddress1 = row.ADDRESS1 || ''
-  const custAddress2 = row.ADDRESS2 || ''
-  const custAddress3 = row.ADDRESS3 || ''
-  const custTel = row.TEL_NO || ''
-  const custFax = row.FAX_NO || ''
-  const truck = row.DO_VHC_Num || ''
-  const status = row.Status || ''
-  const soNum = row.SO_Num || ''
-  const poNum = row.PO_Num || ''
-  const model = row.Model || row.SO_Model || ''
-  const mainName = row.ProductGroupName || ''
-  const doQty = parseFloat(row.DO_Qty || 0)
-  const unit = row.Unit || row.SO_Unit || ''
+  // Normalize to array and sort components (Main, Fit1..Fit9)
+  const rows = Array.isArray(groupRows) ? [...groupRows] : [groupRows]
+  rows.sort((a, b) => {
+    const aNo = Number(a.No ?? a.no ?? 0)
+    const bNo = Number(b.No ?? b.no ?? 0)
+    if (aNo !== bNo) return aNo - bNo
+    const aComp = String(a.COMP || '')
+    const bComp = String(b.COMP || '')
+    return aComp.localeCompare(bComp)
+  })
+
+  const header = rows[0]
+  const base = rows.find(r => String(r.COMP || '').toLowerCase() === 'main') || header
+
+  // Extract header / base data
+  const doNum = header.DO_Num || ''
+  const doDate = header.DO_DMY || ''
+  const custName = header.AC_Name || ''
+  const custAddress1 = header.ADDRESS1 || ''
+  const custAddress2 = header.ADDRESS2 || ''
+  const custAddress3 = header.ADDRESS3 || ''
+  const custTel = header.TEL_NO || ''
+  const custFax = header.FAX_NO || ''
+  const truck = header.DO_VHC_Num || ''
+  const soNum = base.SO_Num || ''
+  const poNum = base.PO_Num || ''
+  const model = base.Model || base.SO_Model || ''
+  const doQty = parseFloat(base.DO_Qty || 0)
+  const unit = base.Unit || base.SO_Unit || ''
   const unitLower = (unit || '').toLowerCase()
-  const intL = row.INT_L || 0
-  const intW = row.INT_W || 0
-  const intH = row.INT_H || 0
-  const pcsPerBld = parseFloat(row.PCS_PER_BLD || 1)
+  const pcsPerBld = parseFloat(base.PCS_PER_BLD || 1)
 
   // Calculate bundle quantities
   let bundles = 0
   let pcsInBundles = 0
   let remainingPcs = 0
-  
+
   if (pcsPerBld > 0 && doQty > 0) {
     bundles = Math.floor(doQty / pcsPerBld)
     pcsInBundles = bundles * pcsPerBld
@@ -718,12 +787,41 @@ function renderSuratJalan(doc, row) {
   doc.text(`  Model : ${model}`, left, y)
   y += 12
 
-  doc.text(`  Main : ${mainName}`, left, y)
-  doc.text(`${intL} x ${intW} x ${intH}`, left + 150, y)
-  y += 12
+  // Render all components (Main, Fit1..Fit9) for this DO
+  // Deduplicate by COMP so duplicate backend rows do not print twice
+  const seenComps = new Set()
+  rows.forEach(r => {
+    const compLabel = r.COMP || 'Main'
+    const compKey = String(compLabel).toLowerCase()
+    if (seenComps.has(compKey)) return
+    seenComps.add(compKey)
 
-  // Add more space before footer
-  y = 650
+    const mainName = r.ProductGroupName || ''
+    const design = r.PD || r.MC_P_DESIGN || mainName || ''
+    const intL = r.INT_L || 0
+    const intW = r.INT_W || 0
+    const intH = r.INT_H || 0
+    const extL = r.EXT_L || 0
+    const extW = r.EXT_W || 0
+    const extH = r.EXT_H || 0
+    const dimL = extL || intL
+    const dimW = extW || intW
+    const dimH = extH || intH
+
+    const compText = `${compLabel} : ${design}`
+    doc.text(compText, left, y)
+    doc.text(`${dimL} x ${dimW} x ${dimH}`, left + 150, y)
+    y += 12
+  })
+
+  // Posisikan footer di area bawah halaman mirip CPS.
+  // Jika konten masih tinggi di atas, lompat ke sekitar 650;
+  // jika sudah mendekati bawah, cukup tambahkan jarak sedikit.
+  if (y < 650) {
+    y = 650
+  } else {
+    y += 40
+  }
 
   // Footer section
   doc.text('Keterangan :', left, y)
@@ -771,7 +869,7 @@ const handleCustomerSelect = (selectedCustomer) => {
     customer.code = selectedCustomer.customer_code
     customer.name = selectedCustomer.customer_name
     message.value = `Customer selected: ${selectedCustomer.customer_code} - ${selectedCustomer.customer_name}`
-    
+
     setTimeout(() => {
       message.value = ''
     }, 3000)
@@ -790,16 +888,16 @@ const closeDOModal = () => {
 
 const handleDOSelect = (selectedDO) => {
   console.log('📥 Received DO selection:', selectedDO)
-  
+
   if (selectedDO) {
     // Parse DO number format: MM-YYYY-NNNNN
     const doNumber = selectedDO.do_number || selectedDO.doNumber
     console.log('🔍 Parsing DO number:', doNumber)
-    
+
     if (doNumber) {
       const parts = doNumber.split('-')
       console.log('📊 DO parts:', parts)
-      
+
       if (parts.length === 3) {
         // Actual format: MM-YYYY-SSSSS
         doRange.fromMonth = parseInt(parts[0])
@@ -812,15 +910,15 @@ const handleDOSelect = (selectedDO) => {
           doRange.toMonth = doRange.fromMonth
           doRange.toNumber = doRange.fromNumber
         }
-        
+
         console.log('✅ From DO populated:', {
           month: doRange.fromMonth,
           year: doRange.fromYear,
           number: doRange.fromNumber
         })
-        
+
         message.value = `From DO selected: ${doNumber}`
-        
+
         setTimeout(() => {
           message.value = ''
         }, 3000)
@@ -836,7 +934,7 @@ const handleDOSelect = (selectedDO) => {
     console.error('❌ No DO selected')
     message.value = 'No delivery order selected'
   }
-  
+
   closeDOModal()
 }
 
@@ -851,30 +949,30 @@ const closeToDOModal = () => {
 
 const handleToDOSelect = (selectedDO) => {
   console.log('📥 Received To DO selection:', selectedDO)
-  
+
   if (selectedDO) {
     // Parse DO number format: MM-YYYY-NNNNN
     const doNumber = selectedDO.do_number || selectedDO.doNumber
     console.log('🔍 Parsing To DO number:', doNumber)
-    
+
     if (doNumber) {
       const parts = doNumber.split('-')
       console.log('📊 To DO parts:', parts)
-      
+
       if (parts.length === 3) {
         // Actual format: MM-YYYY-SSSSS
         doRange.toMonth = parseInt(parts[0])
         doRange.toYear = parseInt(parts[1])
         doRange.toNumber = parts[2]
-        
+
         console.log('✅ To DO populated:', {
           month: doRange.toMonth,
           year: doRange.toYear,
           number: doRange.toNumber
         })
-        
+
         message.value = `To DO selected: ${doNumber}`
-        
+
         setTimeout(() => {
           message.value = ''
         }, 3000)
@@ -890,7 +988,7 @@ const handleToDOSelect = (selectedDO) => {
     console.error('❌ No To DO selected')
     message.value = 'No To delivery order selected'
   }
-  
+
   closeToDOModal()
 }
 
@@ -898,13 +996,13 @@ const handleToDOSelect = (selectedDO) => {
 const quickPrint = () => {
   if (quickDO.value) {
     message.value = `Quick print initiated for: ${quickDO.value}`
-    
+
     setTimeout(() => {
       message.value = ''
     }, 3000)
   } else {
     message.value = 'Please enter a DO number for quick print'
-    
+
     setTimeout(() => {
       message.value = ''
     }, 3000)
@@ -915,14 +1013,14 @@ const quickPrint = () => {
 <style scoped>
 /* Modern Input Styles */
 .modern-input {
-  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200 
-         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
          hover:border-gray-300 bg-white/80 backdrop-blur-sm;
 }
 
 .modern-select {
-  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200 
-         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
          hover:border-gray-300 bg-white/80 backdrop-blur-sm cursor-pointer;
 }
 
@@ -949,32 +1047,32 @@ const quickPrint = () => {
 
 /* Modern Button Styles */
 .modern-btn-primary {
-  @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white 
-         font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 
+  @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white
+         font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105
          transition-all duration-200 hover:from-blue-600 hover:to-blue-700;
 }
 
 .modern-btn-secondary {
-  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white 
-         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white
+         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
          transition-all duration-200 hover:from-gray-600 hover:to-gray-700;
 }
 
 .modern-btn-confirm {
-  @apply inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
-         font-bold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 
+  @apply inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white
+         font-bold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105
          transition-all duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
 }
 
 .modern-icon-btn {
-  @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 
-         text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200
+         text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600
          transition-all duration-200 shadow-sm hover:shadow-md;
 }
 
 /* Modern Checkbox Styles */
 .modern-checkbox {
-  @apply flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 
+  @apply flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50
          cursor-pointer transition-all duration-200 hover:shadow-sm;
 }
 
@@ -983,7 +1081,7 @@ const quickPrint = () => {
 }
 
 .checkmark {
-  @apply w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center 
+  @apply w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center
          transition-all duration-200;
 }
 
