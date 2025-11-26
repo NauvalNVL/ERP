@@ -24,4 +24,28 @@ export default defineConfig({
             },
         },
     },
+    build: {
+        chunkSizeWarningLimit: 2000,
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('@inertiajs')) {
+                            return 'inertia';
+                        }
+                        if (id.includes('vue')) {
+                            return 'vue';
+                        }
+                        if (id.includes('axios')) {
+                            return 'axios';
+                        }
+                        if (id.includes('ziggy-js')) {
+                            return 'ziggy';
+                        }
+                        return 'vendor';
+                    }
+                },
+            },
+        },
+    },
 });

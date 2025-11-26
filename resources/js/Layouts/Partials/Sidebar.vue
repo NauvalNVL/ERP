@@ -534,13 +534,6 @@ const salesManagementItems = [
     icon: 'fas fa-clipboard-list',
     children: [
       {
-        title: 'Sales Configuration',
-        icon: 'fas fa-cog',
-        children: [
-          { title: 'Define Sales Configuration', icon: 'fas fa-sliders-h', route: '/sales-configuration' }
-        ]
-      },
-      {
         title: 'Standard Requirement',
         icon: 'fas fa-clipboard-check',
         children: [

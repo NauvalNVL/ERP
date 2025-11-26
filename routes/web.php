@@ -40,7 +40,6 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 // use App\Http\Controllers\SOConfigController; // TODO: Controller tidak ditemukan
 use App\Http\Controllers\ScoringFormulaController;
-use App\Http\Controllers\ObsolateReactiveMcController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\SalesOrderController;
@@ -535,13 +534,13 @@ return Inertia::render('sales-management/system-requirement/master-card/approve-
 Route::get('/sales-management/system-requirement/master-card/realese-approve-mc', [RealeseApproveMcController::class, 'index'])->name('vue.master-card.realese-approve-mc');
 
 // Add route for obsolate-reactive-mc
-Route::get('/sales-management/system-requirement/master-card/obsolete-reactive-mc', [ObsolateReactiveMcController::class, 'index'])->name('vue.master-card.obsolete-reactive-mc');
+Route::get('/sales-management/system-requirement/master-card/obsolete-reactive-mc', [UpdateMcController::class, 'obsoleteReactiveIndex'])->name('vue.master-card.obsolete-reactive-mc');
 
 // Add route for view-and-print-MC
-Route::get('/sales-management/system-requirement/master-card/view-and-print-MC', [ObsolateReactiveMcController::class, 'viewAndPrint'])->name('vue.master-card.view-and-print-mc');
+Route::get('/sales-management/system-requirement/master-card/view-and-print-MC', [UpdateMcController::class, 'viewAndPrint'])->name('vue.master-card.view-and-print-mc');
 
 // Add route for view-and-print-mc-maintenance-log
-Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log', [ObsolateReactiveMcController::class, 'viewAndPrintMcMaintenanceLog'])->name('vue.master-card.view-and-print-mc-maintenance-log');
+Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log', [UpdateMcController::class, 'viewAndPrintMcMaintenanceLog'])->name('vue.master-card.view-and-print-mc-maintenance-log');
 
 // Add route for view-and-print-mc-approval-log
 Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-approval-log', function() {

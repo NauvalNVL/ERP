@@ -638,15 +638,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick, defineAsyncComponent } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import UpdateMcModal from '@/Components/UpdateMcModal.vue'
-import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue'
-import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue'
-import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
-import SalesOrderTableModal from '@/Components/SalesOrderTableModal.vue'
 import { useToast } from '@/Composables/useToast'
+
+const CustomerAccountModal = defineAsyncComponent(() => import('@/Components/customer-account-modal.vue'))
+const UpdateMcModal = defineAsyncComponent(() => import('@/Components/UpdateMcModal.vue'))
+const ProductDesignScreenModal = defineAsyncComponent(() => import('@/Components/ProductDesignScreenModal.vue'))
+const DeliveryScheduleModal = defineAsyncComponent(() => import('@/Components/DeliveryScheduleModal.vue'))
+const DeliveryLocationModal = defineAsyncComponent(() => import('@/Components/DeliveryLocationModal.vue'))
+const SalesOrderTableModal = defineAsyncComponent(() => import('@/Components/SalesOrderTableModal.vue'))
 
 const { success, error, info } = useToast()
 

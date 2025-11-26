@@ -127,11 +127,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineAsyncComponent } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import CustomerServiceModals from '@/Components/CustomerServiceModals.vue';
 import axios from 'axios';
+
+const CustomerServiceModals = defineAsyncComponent(() => import('@/Components/CustomerServiceModals.vue'));
 
 const dashboardData = ref(null);
 const loading = ref(true);

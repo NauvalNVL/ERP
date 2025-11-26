@@ -282,13 +282,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, defineAsyncComponent } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import VehicleLookupModal from '@/Components/VehicleTableModal.vue'
-import SalesOrderScreenModal from '@/Components/SalesOrderScreenModal.vue'
 import { useToast } from '@/Composables/useToast'
 import axios from 'axios'
+
+const CustomerAccountModal = defineAsyncComponent(() => import('@/Components/customer-account-modal.vue'))
+const VehicleLookupModal = defineAsyncComponent(() => import('@/Components/VehicleTableModal.vue'))
+const SalesOrderScreenModal = defineAsyncComponent(() => import('@/Components/SalesOrderScreenModal.vue'))
 
 const { success, error, info } = useToast()
 
