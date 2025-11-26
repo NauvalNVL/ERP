@@ -27,15 +27,6 @@
                         <button @click="modalsRef.openMasterCardSearchDirectlyModal()" class="dashboard-button">
                             Search by Master Card
                         </button>
-                        <button @click="modalsRef.openPurchaseOrderRefSearchDirectlyModal()" class="dashboard-button">
-                            Search by Purchase Order
-                        </button>
-                        <button @click="modalsRef.openBoardPurchaseSearchModal()" class="dashboard-button">
-                            Search by Board Purchase
-                        </button>
-                        <button @click="modalsRef.openInitialWorkOrderModal()" class="dashboard-button">
-                            Search by Work Order
-                        </button>
                         <button @click="modalsRef.openInitialDeliveryOrderModal()" class="dashboard-button">
                             Search by Delivery Order
                         </button>
@@ -52,9 +43,56 @@
                         <i class="fas fa-exclamation-triangle text-xl"></i>
                         <span>Error loading data: {{ error }}</span>
                     </div>
-                    <div v-if="!loading && !error && dashboardData" class="mt-8 bg-green-100 p-4 rounded-lg text-green-800 flex items-center space-x-3">
-                        <i class="fas fa-check-circle text-xl"></i>
-                        <span>Dashboard data loaded successfully! Example data: {{ dashboardData.message }}</span>
+                    <div v-if="!loading && !error && dashboardData" class="mt-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm flex items-center">
+                                <div class="p-2 bg-green-500 rounded-full mr-3">
+                                    <i class="fas fa-users text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-green-700 uppercase tracking-wide">Total Customers</p>
+                                    <p class="text-xl font-bold text-green-900">
+                                        {{ dashboardData.total_customers ?? 0 }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+                                <p class="text-xs font-semibold text-blue-700 uppercase tracking-wide">Sales Orders</p>
+                                <p class="text-sm text-blue-900">
+                                    <span class="font-bold text-2xl mr-1">{{ dashboardData.total_sales_orders ?? 0 }}</span>
+                                    <span class="text-xs text-blue-600">total</span>
+                                </p>
+                                <p class="text-xs text-blue-700 mt-1">
+                                    Outstanding / Open:
+                                    <span class="font-semibold">{{ dashboardData.outstanding_sales_orders ?? 0 }}</span>
+                                </p>
+                            </div>
+
+                            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-lg shadow-sm">
+                                <p class="text-xs font-semibold text-indigo-700 uppercase tracking-wide">Delivery Orders</p>
+                                <p class="text-sm text-indigo-900">
+                                    <span class="font-bold text-2xl mr-1">{{ dashboardData.total_delivery_orders ?? 0 }}</span>
+                                    <span class="text-xs text-indigo-600">total</span>
+                                </p>
+                                <p class="text-xs text-indigo-700 mt-1">
+                                    Open / Active:
+                                    <span class="font-semibold">{{ dashboardData.open_delivery_orders ?? 0 }}</span>
+                                </p>
+                            </div>
+
+                            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg shadow-sm">
+                                <p class="text-xs font-semibold text-amber-700 uppercase tracking-wide">Invoices</p>
+                                <p class="text-sm text-amber-900">
+                                    <span class="font-bold text-2xl mr-1">{{ dashboardData.total_invoices ?? 0 }}</span>
+                                    <span class="text-xs text-amber-600">total</span>
+                                </p>
+                                <p class="text-xs text-amber-700 mt-1">
+                                    Unposted:
+                                    <span class="font-semibold">{{ dashboardData.unposted_invoices ?? 0 }}</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,4 +184,4 @@ const showNotification = (message, type) => {
     margin-right: 0.75rem; /* Equivalent to mr-3 */
     font-size: 1.25rem; /* Equivalent to text-xl */
 }
-</style> 
+</style>
