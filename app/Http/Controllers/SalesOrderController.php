@@ -706,18 +706,7 @@ class SalesOrderController extends Controller
 
             // Clone base row and override MC-related fields for this component
             $row = $base;
-            
-            // Generate unique SO number for Fit components
-            if (preg_match('/^fit\d+$/i', $componentName) || str_starts_with($componentName, 'Fit')) {
-                // Use the same SO number for Main and Fit components; differentiation is via COMP_Num
-                $row['SO_Num'] = $soNumber;
-                Log::info('Generated SO number for Fit component', [
-                    'component' => $componentName,
-                    'base_so_number' => $soNumber,
-                    'fit_so_number' => $row['SO_Num']
-                ]);
-            }
-            
+
             $row['MODEL'] = $compModel;
             $row['PRODUCT'] = (string) ($validated['details'][0]['item_code'] ?? '');
             $row['COMP_Num'] = (string) ($componentRow->COMP ?? '');
@@ -843,6 +832,45 @@ class SalesOrderController extends Controller
                 'so_number' => $soNumber,
                 'sales_tax' => $salesTax
             ]
+        ]);
+    }
+
+    /**
+     * Get the last sales order number for a given customer (based on SO_Num order, Main component only).
+     * Returns the full SO number and its parts: mm, yyyy, and sequence.
+     */
+    public function getLastSalesOrderForCustomer(string $customerCode): JsonResponse
+    {
+        // Find the latest SO record for this customer, Main component only
+        $lastSo = DB::table('so')
+            ->where('AC_Num', $customerCode)
+            ->where('COMP_Num', 'Main')
+            ->orderBy('SO_Num', 'desc')
+            ->first();
+
+        if (!$lastSo || empty($lastSo->SO_Num)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No sales order found for this customer',
+            ], 404);
+        }
+
+        $soNumber = (string) $lastSo->SO_Num;
+
+        // Expect format MM-YYYY-XXXXX; fall back safely if format is different
+        $parts = explode('-', $soNumber);
+        $mm = $parts[0] ?? '';
+        $yyyy = $parts[1] ?? '';
+        $sequence = isset($parts[2]) ? $parts[2] : substr($soNumber, -5);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'so_number' => $soNumber,
+                'mm' => $mm,
+                'yyyy' => $yyyy,
+                'sequence' => $sequence,
+            ],
         ]);
     }
 
@@ -1166,8 +1194,11 @@ class SalesOrderController extends Controller
             }
 
             // D_LOC_Num is NOT updated here; it was already set during SO creation
+            // Use both SO_Num and COMP_Num so each component row (Main, Fit1-9)
+            // receives its own D_QTY_i values even when SO_Num is shared.
             $affected = DB::table('so')
                 ->where('SO_Num', $record->SO_Num)
+                ->where('COMP_Num', $record->COMP_Num)
                 ->update($rowUpdates);
 
             $affectedTotal += $affected;

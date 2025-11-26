@@ -432,6 +432,8 @@ Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\Sa
 // Route moved to web.php for CSRF protection
 // Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('api.csrf');
 Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']);
+// Get last sales order for a given customer (for PrepareMCSO Order Information)
+Route::get('/sales-order/last/{customerCode}', [App\Http\Controllers\SalesOrderController::class, 'getLastSalesOrderForCustomer']);
 // Save to legacy-style SO table (CPS compatibility)
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
 // Get sales orders for Print SO and Sales Order Table Modal
