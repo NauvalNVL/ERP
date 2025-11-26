@@ -42,8 +42,8 @@
                                             </div>
                                             User ID <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.user_id" 
+                                        <input type="text"
+                                               v-model="form.user_id"
                                                class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
                                                placeholder="Example: USER001"
                                                required>
@@ -57,8 +57,8 @@
                                             </div>
                                             Username <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.username" 
+                                        <input type="text"
+                                               v-model="form.username"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Login username"
                                                required>
@@ -72,8 +72,8 @@
                                             </div>
                                             Official Name <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.official_name" 
+                                        <input type="text"
+                                               v-model="form.official_name"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Full name"
                                                required>
@@ -87,8 +87,8 @@
                                             </div>
                                             Official Title
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.official_title" 
+                                        <input type="text"
+                                               v-model="form.official_title"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Job position">
                                     </div>
@@ -115,8 +115,8 @@
                                             </div>
                                             Password Expiry Date
                                         </label>
-                                        <input type="number" 
-                                               v-model="form.password_expiry_date" 
+                                        <input type="number"
+                                               v-model="form.password_expiry_date"
                                                class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
                                                placeholder="0 Days [Zero for None]"
                                                value="0"
@@ -151,8 +151,8 @@
                                             </div>
                                             User Printer
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.user_printer" 
+                                        <input type="text"
+                                               v-model="form.user_printer"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Default printer">
                                     </div>
@@ -221,8 +221,8 @@
                                             </div>
                                             Mobile Number
                                         </label>
-                                        <input type="tel" 
-                                               v-model="form.mobile_number" 
+                                        <input type="tel"
+                                               v-model="form.mobile_number"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="08xxxxxxxxxx">
                                     </div>
@@ -235,8 +235,8 @@
                                             </div>
                                             <span class="text-gray-900">Official Telephone</span>
                                         </label>
-                                        <input type="tel" 
-                                               v-model="form.official_tel" 
+                                        <input type="tel"
+                                               v-model="form.official_tel"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="021xxxxxxx">
                                     </div>
@@ -349,12 +349,12 @@
                                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <UserIcon class="h-5 w-5 text-gray-400" />
                                                 </div>
-                                                <input type="text" 
-                                                       v-model="form.salesperson_code" 
+                                                <input type="text"
+                                                       v-model="form.salesperson_code"
                                                        class="block w-full pl-10 pr-3 py-2 border border-r-0 border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                                        placeholder="Salesperson Code">
                                             </div>
-                                                                            <button type="button" 
+                                                                            <button type="button"
                                                     @click="openSalespersonModal"
                                                     class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                 <MagnifyingGlassIcon class="h-4 w-4 mr-1 text-white" />
@@ -430,12 +430,12 @@
                     <!-- Action Buttons -->
                     <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
                         <div class="flex flex-col sm:flex-row gap-4 justify-end">
-                            <Link href="/user" 
+                            <Link href="/user"
                                 class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                                 <XIcon class="h-6 w-6 mr-3" />
                                 Cancel
                             </Link>
-                            <button type="submit" 
+                            <button type="submit"
                                 class="flex-1 inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
                                 <SaveIcon class="h-6 w-6 mr-3" />
                                 Create User
@@ -445,7 +445,7 @@
                 </form>
 
                 <!-- Salesperson Selection Modal -->
-                <SalespersonModal 
+                <SalespersonModal
                     :show="showSalespersonModal"
                     :salespersons="salespersons"
                     @close="showSalespersonModal = false"
@@ -458,20 +458,20 @@
 
 <script>
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, defineAsyncComponent } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Import icons from Heroicons v2
-import { 
+import {
     UserPlusIcon as UserAddIcon,
-    UserCircleIcon, 
-    AtSymbolIcon, 
-    UserIcon, 
-    BriefcaseIcon, 
-    PhoneIcon, 
+    UserCircleIcon,
+    AtSymbolIcon,
+    UserIcon,
+    BriefcaseIcon,
+    PhoneIcon,
     EnvelopeIcon as MailIcon,
-    LockClosedIcon, 
+    LockClosedIcon,
     CheckCircleIcon,
     XMarkIcon as XIcon,
     SignalIcon as StatusOnlineIcon,
@@ -496,17 +496,17 @@ import {
 } from '@heroicons/vue/24/outline';
 
 // Import Headless UI components
-import { 
-    RadioGroup, 
-    RadioGroupLabel, 
-    RadioGroupOption, 
-    Switch, 
-    SwitchGroup, 
-    SwitchLabel 
+import {
+    RadioGroup,
+    RadioGroupLabel,
+    RadioGroupOption,
+    Switch,
+    SwitchGroup,
+    SwitchLabel
 } from '@headlessui/vue';
 
-// Import the salesperson modal component
-import SalespersonModal from '@/Components/salesperson-modal.vue';
+// Import the salesperson modal component as async to reduce initial bundle size
+const SalespersonModal = defineAsyncComponent(() => import('@/Components/salesperson-modal.vue'));
 
 export default {
     components: {
@@ -515,24 +515,24 @@ export default {
         Link,
         AppLayout,
         SalespersonModal,
-        
+
         // Headless UI components
-        RadioGroup, 
-        RadioGroupLabel, 
+        RadioGroup,
+        RadioGroupLabel,
         RadioGroupOption,
         Switch,
         SwitchGroup,
         SwitchLabel,
-        
+
         // Icons
-        UserAddIcon, 
-        UserCircleIcon, 
-        AtSymbolIcon, 
-        UserIcon, 
-        BriefcaseIcon, 
-        PhoneIcon, 
-        MailIcon, 
-        LockClosedIcon, 
+        UserAddIcon,
+        UserCircleIcon,
+        AtSymbolIcon,
+        UserIcon,
+        BriefcaseIcon,
+        PhoneIcon,
+        MailIcon,
+        LockClosedIcon,
         CheckCircleIcon,
         XIcon,
         StatusOnlineIcon,
@@ -643,7 +643,7 @@ export default {
                 password_confirmation: this.form.password_confirmation,
                 _token: this.$page.props.csrf
             };
-            
+
             this.$inertia.post('/user', formData, {
                 preserveState: false,
                 preserveScroll: true,
@@ -676,24 +676,24 @@ export default {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(-20px) scale(0.95); 
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
 @keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(-30px); 
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateX(0); 
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
@@ -764,28 +764,28 @@ button, a, input, select, textarea, .transition-all, .transition {
         margin: 0;
         padding: 0 1rem;
     }
-    
+
     .rounded-2xl {
         border-radius: 1rem;
     }
-    
+
     .p-8 {
         padding: 1.5rem;
     }
-    
+
     .text-3xl {
         font-size: 1.875rem;
     }
-    
+
     .grid-cols-1.lg\:grid-cols-2 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
     }
-    
+
     .backdrop-blur-sm {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
     }
-    
+
     .shadow-xl, .shadow-2xl, .shadow-lg {
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
@@ -796,11 +796,11 @@ button, a, input, select, textarea, .transition-all, .transition {
     .bg-white\/80 {
         background-color: rgba(31, 41, 55, 0.8);
     }
-    
+
     .text-gray-800 {
         color: #f9fafb;
     }
-    
+
     .border-gray-200 {
         border-color: #374151;
     }

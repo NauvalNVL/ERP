@@ -57,12 +57,12 @@ class UserController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             $user = UserCps::createUser($validated);
 
             // User created without any permissions
             // Permissions will be set separately via Define User Access Permission menu
-            
+
             DB::commit();
 
             return redirect()->route('vue.system-security.index')
@@ -90,8 +90,16 @@ class UserController extends Controller
     public function update(Request $request, UserCps $user)
     {
         $rules = [
-            'user_id' => ['required','max:20',Rule::unique('usercps', 'userID')->ignore($user->id)],
-            'username' => ['required','max:30',Rule::unique('usercps', 'userName')->ignore($user->id)],
+            'user_id' => [
+                'required',
+                'max:20',
+                Rule::unique('usercps', 'userID')->ignore($user->userID, 'userID'),
+            ],
+            'username' => [
+                'required',
+                'max:30',
+                Rule::unique('usercps', 'userName')->ignore($user->userID, 'userID'),
+            ],
             'official_name' => 'required|max:100',
             'official_title' => 'nullable|max:50',
             'mobile_number' => 'nullable|digits_between:10,15',
@@ -108,21 +116,37 @@ class UserController extends Controller
         $validated = $request->validate($rules);
 
         try {
+            // Map validated fields to actual usercps table columns
             $updateData = [
-                'user_id' => $validated['user_id'],
-                'username' => $validated['username'],
-                'official_name' => $validated['official_name'],
-                'official_title' => $validated['official_title'],
-                'mobile_number' => $validated['mobile_number'],
-                'official_tel' => $validated['official_tel'],
-                'status' => $validated['status'],
-                'password_expiry_date' => $validated['password_expiry_date'],
-                'amend_expired_password' => $validated['amend_expired_password'],
-                'updated_at' => now()
+                'userID' => $validated['user_id'],
+                'userName' => $validated['username'],
+                'OFFICIAL_NAME' => $validated['official_name'],
+                'OFFICIAL_TITLE' => $validated['official_title'],
+                'MOBILE' => $validated['mobile_number'],
+                'TEL_' => $validated['official_tel'],
+                // Convert A/O status back to original STS values
+                'STS' => $validated['status'] === 'A' ? 'Active' : 'Inactive',
+                // Recalculate absolute expiry date based on number of days
+                'EXPIRY_DATE' => now()->addDays($validated['password_expiry_date'])->format('Y-m-d'),
+                'EXPIRED' => $validated['amend_expired_password'],
+                // Optional printer & menu settings
+                'PRINTER' => $request->input('user_printer', $user->PRINTER),
+                'ROUTE' => $request->input('print_route', $user->ROUTE),
+                'TYPE' => $request->input('menu_type', $user->TYPE),
+                // Special access flags & salesperson lock
+                'U_PRICE' => $request->input('access_unit_price', $user->U_PRICE),
+                'AC' => $request->input('access_customer_acct', $user->AC),
+                'MC' => $request->input('amend_mc', $user->MC),
+                'MC_PRICE' => $request->input('amend_mc_price', $user->MC_PRICE),
+                'SM' => $request->input('salesperson_code', $user->SM),
+                // Price & cost visibility flags
+                'PRICE' => $request->input('rc_rt_price', $user->PRICE),
+                'COST' => $request->input('board_rc_cost', $user->COST),
+                'updated_at' => now(),
             ];
 
             if ($request->filled('password')) {
-                $updateData['password'] = Hash::make($validated['password']);
+                $updateData['PASS'] = Hash::make($validated['password']);
             }
 
             $user->update($updateData);
@@ -139,34 +163,25 @@ class UserController extends Controller
 
     public function destroy(UserCps $user)
     {
-        try {
-            if ($user->userID === Auth::user()->userID) {
-                return back()->with('error', 'Tidak dapat menghapus akun sendiri');
-            }
-
-            $user->delete();
-            return redirect()->route('vue.system-security.index')
-                ->with('success', 'User berhasil dihapus');
-        } catch (\Exception $e) {
-            Log::error('Error deleting user: '.$e->getMessage());
-            return back()->with('error', 'Gagal menghapus user. Silakan coba lagi.');
-        }
+        // Delete user is no longer allowed. Status should be managed via Reactive/Unobsolete User menu.
+        return redirect()->route('vue.system-security.index')
+            ->with('error', 'Fungsi delete user sudah tidak digunakan. Silakan gunakan menu Reactive/Unobsolete User.');
     }
 
     public function showAmendForm(Request $request)
     {
         $user = null;
-        
+
         if($request->has('search_user_id')) {
             $user = UserCps::where('userID', $request->search_user_id)->first();
-            
+
             if(!$user) {
                 return redirect()->route('users.amend-password')
                     ->withInput()
                     ->with('error', 'User ID tidak ditemukan');
             }
         }
-        
+
         return view('system-security/amend', compact('user'));
     }
 
@@ -179,7 +194,7 @@ class UserController extends Controller
 
         try {
             $user = UserCps::where('userID', $request->user_id)->firstOrFail();
-            
+
             // Update password menggunakan method dari model
             $user->updatePassword($request->new_password, 90);
 
@@ -221,11 +236,11 @@ class UserController extends Controller
     public function vueAmendPassword()
     {
         $user = null;
-        
+
         if(request()->has('search_user_id')) {
             $user = UserCps::where('userID', request()->search_user_id)->first();
         }
-        
+
         return Inertia::render('system-manager/system-security/AmendPassword', [
             'user' => $user,
             'header' => 'Amend Password'
@@ -306,7 +321,7 @@ class UserController extends Controller
                 ->where('can_access', true)
                 ->get(['menu_key', 'menu_name', 'menu_route', 'menu_category', 'menu_parent', 'can_access'])
                 ->toArray();
-            
+
             return response()->json($permissions);
         } catch (\Exception $e) {
             Log::error('Error getting user permissions: ' . $e->getMessage());
@@ -320,13 +335,13 @@ class UserController extends Controller
         $validated = $request->validate([
             'permissions' => 'nullable|array'
         ]);
-        
+
         try {
             DB::beginTransaction();
-            
+
             // Delete existing permissions for this user
             UserPermission::where('user_id', $user->userID)->delete();
-            
+
             // Create new permissions based on the copied permissions
             foreach (($validated['permissions'] ?? []) as $permission) {
                 UserPermission::create([
@@ -339,9 +354,9 @@ class UserController extends Controller
                     'can_access' => true
                 ]);
             }
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Permissions berhasil disalin untuk user: ' . $user->userID
@@ -365,7 +380,7 @@ class UserController extends Controller
     {
         try {
             $user = UserCps::where('userID', $userId)->first();
-            
+
             if (!$user) {
                 return response()->json(['user' => null, 'permissions' => []], 404);
             }
@@ -401,21 +416,21 @@ class UserController extends Controller
 
             // Create new permissions
             $menuItems = UserPermission::getAllMenuItems();
-            
+
             // Remove duplicates based on menu_key
             $uniqueMenuItems = [];
             $seenKeys = [];
-            
+
             foreach ($menuItems as $item) {
                 if (!in_array($item['key'], $seenKeys)) {
                     $uniqueMenuItems[] = $item;
                     $seenKeys[] = $item['key'];
                 }
             }
-            
+
             foreach ($uniqueMenuItems as $item) {
                 $hasPermission = isset($validated['permissions'][$item['key']]) && $validated['permissions'][$item['key']];
-                
+
                 UserPermission::create([
                     'user_id' => $userId,
                     'menu_key' => $item['key'],

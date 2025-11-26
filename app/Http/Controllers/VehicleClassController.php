@@ -15,7 +15,7 @@ class VehicleClassController extends Controller
     public function index()
     {
         $vehicleClasses = VehicleClass::orderBy('VEHICLE_CLASS_CODE')->get();
-        
+
         return Inertia::render('warehouse-management/DeliveryOrder/Setup/VehicleClass', [
             'vehicleClasses' => $vehicleClasses
         ]);
@@ -51,7 +51,8 @@ class VehicleClassController extends Controller
             $vehicleClass = VehicleClass::create([
                 'NO_' => VehicleClass::count() + 1,
                 'VEHICLE_CLASS_CODE' => $request->VEHICLE_CLASS_CODE,
-                'DESCRIPTION' => $request->DESCRIPTION
+                'DESCRIPTION' => $request->DESCRIPTION,
+                'STATUS' => 'A',
             ]);
 
             return response()->json([
@@ -144,12 +145,53 @@ class VehicleClassController extends Controller
             $query->search($request->search);
         }
 
+        if ($request->has('status')) {
+            $status = trim((string) $request->status);
+            if ($status !== '' && strcasecmp($status, 'all') !== 0 && strcasecmp($status, 'all status') !== 0) {
+                $query->where('STATUS', strtoupper($status));
+            }
+        }
+
         $vehicleClasses = $query->orderBy('VEHICLE_CLASS_CODE')->get();
 
         return response()->json([
             'success' => true,
             'data' => $vehicleClasses
         ]);
+    }
+
+    public function apiUpdateStatus(Request $request, VehicleClass $vehicleClass)
+    {
+        $validator = Validator::make($request->all(), [
+            'STATUS' => 'required|string|in:A,O',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $status = $validator->validated()['STATUS'];
+
+            $vehicleClass->update([
+                'STATUS' => $status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicle class status updated successfully',
+                'data' => $vehicleClass->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating vehicle class status: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -182,7 +224,7 @@ class VehicleClassController extends Controller
     public function viewPrint()
     {
         $vehicleClasses = VehicleClass::orderBy('VEHICLE_CLASS_CODE')->get();
-        
+
         return Inertia::render('warehouse-management/DeliveryOrder/Setup/ViewPrintVehicleClass', [
             'vehicleClasses' => $vehicleClasses
         ]);

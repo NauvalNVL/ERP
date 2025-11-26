@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('NO_', 50);
             $table->string('VEHICLE_CLASS_CODE', 50);
             $table->string('DESCRIPTION', 50);
+            $table->string('STATUS', 50)->default('A');
             $table->timestamps();
         });
     }
@@ -27,4 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('vehicleclass');
     }
-}; 
+};

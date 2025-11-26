@@ -40,7 +40,6 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 // use App\Http\Controllers\SOConfigController; // TODO: Controller tidak ditemukan
 use App\Http\Controllers\ScoringFormulaController;
-use App\Http\Controllers\ObsolateReactiveMcController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\SalesOrderController;
@@ -132,11 +131,12 @@ return response()->json([
 // Guest Routes
 Route::middleware('guest')->group(function () {
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 });
 
 // Logout Route (accessible to authenticated users)
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
@@ -548,13 +548,13 @@ return Inertia::render('sales-management/system-requirement/master-card/approve-
 Route::get('/sales-management/system-requirement/master-card/realese-approve-mc', [RealeseApproveMcController::class, 'index'])->name('vue.master-card.realese-approve-mc');
 
 // Add route for obsolate-reactive-mc
-Route::get('/sales-management/system-requirement/master-card/obsolete-reactive-mc', [ObsolateReactiveMcController::class, 'index'])->name('vue.master-card.obsolete-reactive-mc');
+Route::get('/sales-management/system-requirement/master-card/obsolete-reactive-mc', [UpdateMcController::class, 'obsoleteReactiveIndex'])->name('vue.master-card.obsolete-reactive-mc');
 
 // Add route for view-and-print-MC
-Route::get('/sales-management/system-requirement/master-card/view-and-print-MC', [ObsolateReactiveMcController::class, 'viewAndPrint'])->name('vue.master-card.view-and-print-mc');
+Route::get('/sales-management/system-requirement/master-card/view-and-print-MC', [UpdateMcController::class, 'viewAndPrint'])->name('vue.master-card.view-and-print-mc');
 
 // Add route for view-and-print-mc-maintenance-log
-Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log', [ObsolateReactiveMcController::class, 'viewAndPrintMcMaintenanceLog'])->name('vue.master-card.view-and-print-mc-maintenance-log');
+Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log', [UpdateMcController::class, 'viewAndPrintMcMaintenanceLog'])->name('vue.master-card.view-and-print-mc-maintenance-log');
 
 // Add route for view-and-print-mc-approval-log
 Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-approval-log', function() {
@@ -595,9 +595,6 @@ return Inertia::render('sales-management/system-requirement/master-card/view-and
 Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-by-machine', function() {
 return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-by-machine');
 })->name('vue.master-card.view-and-print-mc-by-machine');
-
-// Auth Routes
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Warehouse Management Routes
 Route::get('/warehouse-management/finished-goods', function () {
@@ -709,12 +706,19 @@ Route::get('/warehouse-management/delivery-order/setup/vehicle', [VehicleControl
 ->name('vue.warehouse-management.delivery-order.setup.vehicle');
 Route::get('/warehouse-management/delivery-order/setup/vehicle/view-print', [VehicleController::class, 'viewPrint'])
 ->name('vue.warehouse-management.delivery-order.setup.vehicle.view-print');
+Route::get('/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle', function () {
+return Inertia::render('warehouse-management/DeliveryOrder/Setup/ObsoleteUnobsoleteVehicle');
+})->name('vue.warehouse-management.delivery-order.setup.obsolete-unobsolete-vehicle');
 
 // Warehouse Management - Delivery Order - Setup - Vehicle Class
 Route::get('/warehouse-management/delivery-order/setup/vehicle-class', [VehicleClassController::class, 'index'])
 ->name('vue.warehouse-management.delivery-order.setup.vehicle-class');
 Route::get('/warehouse-management/delivery-order/setup/vehicle-class/view-print', [VehicleClassController::class, 'viewPrint'])
 ->name('vue.warehouse-management.delivery-order.setup.vehicle-class.view-print');
+
+Route::get('/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle-class', function () {
+return Inertia::render('warehouse-management/DeliveryOrder/Setup/ObsoleteUnobsoleteVehicleClass');
+})->name('vue.warehouse-management.delivery-order.setup.obsolete-unobsolete-vehicle-class');
 
 // Warehouse Management - Delivery Order - DO Processing
 Route::get('/warehouse-management/delivery-order/do-processing/prepare-multiple', function () {

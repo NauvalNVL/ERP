@@ -869,18 +869,22 @@ class DeliveryOrderController extends Controller
                 ->leftJoin('so', 'DO.SO_Num', '=', 'so.SO_Num')
                 ->leftJoin('MC', function($join) {
                     $join->on('DO.MCS_Num', '=', 'MC.MCS_Num')
-                         ->on('DO.AC_Num', '=', 'MC.AC_NUM');
+                         ->on('DO.AC_Num', '=', 'MC.AC_NUM')
+                         // Important: also match component so each DO line joins only to its own MC row
+                         ->on('DO.COMP', '=', 'MC.COMP');
                 })
                 // Join products to fetch its product group
-                // Some datasets store product code in DO.Product, others in DO.PD
+                // Important: join ONLY on DO.Product to avoid duplicate rows when
+                // DO.Product and DO.PD are different valid product codes.
                 ->leftJoin('products as p', function($join) {
-                    $join->on('p.product_code', '=', 'DO.Product')
-                         ->orOn('p.product_code', '=', 'DO.PD');
+                    $join->on('p.product_code', '=', 'DO.Product');
                 })
                 ->leftJoin('product_groups as pg', 'p.product_group_id', '=', 'pg.product_group_id')
                 ->select(
                     'DO.DO_Num',
                     'DO.DO_DMY',
+                    'DO.No',
+                    'DO.COMP',
                     'DO.AC_Num',
                     'CUSTOMER.NAME as AC_Name',
                     'CUSTOMER.ADDRESS1',
@@ -893,14 +897,19 @@ class DeliveryOrderController extends Controller
                     'DO.SO_Num',
                     'DO.PO_Num',
                     'DO.Model',
+                    'DO.PD',
                     'DO.Product',
                     'DO.DO_Qty',
                     'DO.Unit',
                     'DO.INT_L',
                     'DO.INT_W',
                     'DO.INT_H',
+                    'DO.EXT_L',
+                    'DO.EXT_W',
+                    'DO.EXT_H',
                     'DO.PCS_PER_SET',
                     'MC.PCS_PER_BLD',
+                    'MC.P_DESIGN as MC_P_DESIGN',
                     'so.MODEL as SO_Model',
                     'so.PRODUCT as SO_Product',
                     'so.SO_QTY',
@@ -1030,7 +1039,11 @@ class DeliveryOrderController extends Controller
                 // Add logic for new entries only if needed
             }
 
-            $deliveryOrders = $query->orderBy('DO.DO_Num', 'asc')->get();
+            $deliveryOrders = $query
+                ->orderBy('DO.DO_Num', 'asc')
+                ->orderBy('DO.No', 'asc')
+                ->orderBy('DO.COMP', 'asc')
+                ->get();
 
             Log::info('PrintDO - Query result', [
                 'count' => $deliveryOrders->count(),

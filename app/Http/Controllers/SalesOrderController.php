@@ -132,7 +132,6 @@ class SalesOrderController extends Controller
             'po_date' => 'required|date',
             'order_group' => 'required|string|max:50',
             'order_type' => 'required|string|max:50',
-            'sales_tax' => 'boolean',
             'lot_number' => 'nullable|string|max:50',
             'remark' => 'nullable|string|max:250',
             'instruction1' => 'nullable|string|max:250',
@@ -158,19 +157,6 @@ class SalesOrderController extends Controller
         }
 
         $validated = $request->all();
-
-        // Normalize sales_tax to 'Y' or 'N'
-        $rawSalesTax = $request->input('sales_tax');
-        $salesTax = 'N';
-        if (is_bool($rawSalesTax)) {
-            $salesTax = $rawSalesTax ? 'Y' : 'N';
-        } elseif (is_numeric($rawSalesTax)) {
-            $salesTax = ((int) $rawSalesTax) === 1 ? 'Y' : 'N';
-        } elseif (is_string($rawSalesTax)) {
-            $upper = strtoupper(trim($rawSalesTax));
-            $salesTax = in_array($upper, ['Y', 'YES', 'Y-YES', 'TRUE'], true) ? 'Y' : 'N';
-        }
-
         // Generate SO number in format: MM-YYYY-XXXXX (matching the filter format)
         $month = date('m');
         $year = date('Y');
@@ -268,7 +254,7 @@ class SalesOrderController extends Controller
 
         // Extract product design quantities for each component (Main, Fit1-9)
         $productDesignQuantities = $validated['product_design_quantities'] ?? [];
-        
+
         // Ensure product design quantities is an associative array of numeric values
         if (!is_array($productDesignQuantities)) {
             $productDesignQuantities = [];
@@ -304,7 +290,7 @@ class SalesOrderController extends Controller
         }
 
         $productDesignQuantities = $normalizedProductDesignQuantities;
-        
+
         Log::info('Product Design Quantities processed:', [
             'original' => $validated['product_design_quantities'] ?? 'not_set',
             'processed' => $productDesignQuantities,
@@ -457,12 +443,12 @@ class SalesOrderController extends Controller
 
         // Extract delivery schedules (up to 10 schedules)
         $deliverySchedules = $request->input('delivery_schedules', []);
-        
+
         // Ensure delivery schedules is a properly indexed array
         if (!is_array($deliverySchedules)) {
             $deliverySchedules = [];
         }
-        
+
         // Create empty schedule entries if not provided
         for ($i = count($deliverySchedules); $i < 10; $i++) {
             $deliverySchedules[$i] = [
@@ -472,7 +458,7 @@ class SalesOrderController extends Controller
                 'quantity' => 0
             ];
         }
-        
+
         Log::info('Delivery schedules processed:', [
             'original_schedules' => $request->input('delivery_schedules', []),
             'processed_schedules' => $deliverySchedules,
@@ -641,14 +627,14 @@ class SalesOrderController extends Controller
             if ($masterCardData && $componentRow->COMP === ($masterCardData->COMP ?? null)) {
                 continue;
             }
-            
+
             // Only create SO records for components that have quantities in product design
             // For Fit components, use Main quantity if not specified (backward compatibility)
             $componentName = (string) ($componentRow->COMP ?? '');
             $componentQty = $productDesignQuantities[$componentName] ?? null;
-            
+
             // If this is a Fit component and no quantity specified, use Main component quantity
-            if (($componentQty === null || $componentQty <= 0) && 
+            if (($componentQty === null || $componentQty <= 0) &&
                 (preg_match('/^fit\d+$/i', $componentName) || str_starts_with($componentName, 'Fit'))) {
                 $componentQty = $productDesignQuantities['Main'] ?? $qty;
                 Log::info('Fit component using Main quantity', [
@@ -657,7 +643,7 @@ class SalesOrderController extends Controller
                     'main_quantity' => $productDesignQuantities['Main'] ?? $qty
                 ]);
             }
-            
+
             // Skip if still no quantity after fallback
             if (!$componentQty || $componentQty <= 0) {
                 Log::info('Skipping component - no quantity available', [
@@ -740,7 +726,7 @@ class SalesOrderController extends Controller
             $row['TOTAL_SO_NET_KG'] = $compMcNetKg * $componentQty;
 
             $rowsToInsert[] = $row;
-            
+
             Log::info('Component SO row created', [
                 'component' => $componentName,
                 'so_number' => $row['SO_Num'],
@@ -751,7 +737,7 @@ class SalesOrderController extends Controller
 
         // Always INSERT new records, NEVER update existing
         // This ensures each sales order is unique even for same customer and master card
-        
+
         // Debug: Log the data before insertion
         Log::info('About to insert SO records:', [
             'rows_count' => count($rowsToInsert),
@@ -765,7 +751,7 @@ class SalesOrderController extends Controller
                 }, $row);
             }, $rowsToInsert)
         ]);
-        
+
         // Validate and sanitize all data before insertion
         $sanitizedRows = [];
         foreach ($rowsToInsert as $row) {
@@ -773,7 +759,7 @@ class SalesOrderController extends Controller
             foreach ($row as $key => $value) {
                 // Handle different field types appropriately
                 if (in_array($key, [
-                    'YYYY', 'MM', 'SO_DMY', 'SO_Num', 'STS', 'TYPE', 'AC_Num', 'AC_NAME', 
+                    'YYYY', 'MM', 'SO_DMY', 'SO_Num', 'STS', 'TYPE', 'AC_Num', 'AC_NAME',
                     'SLM', 'IND', 'AREA', 'GROUP_', 'PO_Num', 'PO_DATE', 'MODEL', 'PRODUCT',
                     'COMP_Num', 'P_DESIGN', 'PART_NUMBER', 'UNIT', 'CURR', 'SO_REMARK',
                     'SO_INSTRUCTION_1', 'SO_INSTRUCTION_2', 'D_LOC_Num', 'DELIVERY_TO',
@@ -808,13 +794,13 @@ class SalesOrderController extends Controller
             }
             $sanitizedRows[] = $sanitizedRow;
         }
-        
+
         Log::info('Sanitized SO records ready for insertion:', [
             'original_count' => count($rowsToInsert),
             'sanitized_count' => count($sanitizedRows),
             'sample_sanitized_row' => !empty($sanitizedRows) ? $sanitizedRows[0] : null
         ]);
-        
+
         DB::table('so')->insert($sanitizedRows);
 
         Log::info('New sales order created', [
@@ -829,8 +815,7 @@ class SalesOrderController extends Controller
             'success' => true,
             'message' => 'Sales order created successfully',
             'data' => [
-                'so_number' => $soNumber,
-                'sales_tax' => $salesTax
+                'so_number' => $soNumber
             ]
         ]);
     }
@@ -1233,7 +1218,7 @@ class SalesOrderController extends Controller
         // Get all sales orders with the same base SO number (including main and fits)
         // Extract base SO number by removing any suffix
         $baseSoNumber = preg_replace('/-(fit\d+)$/i', '', $soNumber);
-        
+
         // Get all related SO records (main + fit1-9)
         $allSoRecords = DB::table('so')
             ->where('SO_Num', 'like', $baseSoNumber . '%')
@@ -1307,7 +1292,7 @@ class SalesOrderController extends Controller
 
         // Build details array with main and all fit components
         $details = [];
-        
+
         // Add main component first
         $details[] = [
             'item_code' => $mainSo->PRODUCT,
@@ -1337,9 +1322,9 @@ class SalesOrderController extends Controller
 
         // Add fit components (fit1-9)
         foreach ($allSoRecords as $soRecord) {
-            if ($soRecord->COMP_Num !== 'Main' && 
+            if ($soRecord->COMP_Num !== 'Main' &&
                 (preg_match('/^fit\d+$/i', $soRecord->COMP_Num) || str_starts_with($soRecord->COMP_Num, 'Fit'))) {
-                
+
                 $details[] = [
                     'item_code' => $soRecord->PRODUCT,
                     'item_description' => $soRecord->MODEL . ' - ' . $soRecord->P_DESIGN . ' (' . $soRecord->COMP_Num . ')',
@@ -2149,30 +2134,38 @@ class SalesOrderController extends Controller
                 'balance' => $salesOrder->SO_QTY ?? '0',
             ];
 
-            // Calculate net delivery from DO table (sum of DO_Qty) for this SO
+            // Calculate net delivery from DO table (sum of DO_Qty) for Main component only
             $netDelivery = 0;
             $hasDoRows = false;
             try {
-                $hasDoRows = DB::table('DO')->where('SO_Num', $soNumber)->exists();
+                // Check if DO rows exist for Main component
+                $hasDoRows = DB::table('DO')
+                    ->where('SO_Num', $soNumber)
+                    ->where('COMP', 'Main')
+                    ->exists();
+
                 if ($hasDoRows) {
+                    // Sum DO_Qty for Main component only
                     $netDelivery = (float) DB::table('DO')
                         ->where('SO_Num', $soNumber)
+                        ->where('COMP', 'Main')
                         ->sum('DO_Qty');
                 }
             } catch (\Exception $e) {
-                Log::warning('Error computing DO net delivery; falling back to SO schedule fields', [
+                Log::warning('Error computing DO net delivery for Main component; falling back to SO schedule fields', [
                     'so_number' => $soNumber,
                     'error' => $e->getMessage()
                 ]);
                 $hasDoRows = false;
             }
 
-            // If no DO rows, show net_delivery as empty string and balance equals order
+            // If no DO rows for Main, show net_delivery as empty string and balance equals order
             if (!$hasDoRows) {
                 $itemDetails['net_delivery'] = '';
                 $itemDetails['balance'] = $salesOrder->SO_QTY ?? '0';
             } else {
                 $itemDetails['net_delivery'] = $netDelivery;
+                // Calculate balance per component: Main.Order - Main.Delivery
                 $itemDetails['balance'] = (float)($salesOrder->SO_QTY ?? 0) - $netDelivery;
             }
             // Include pcs per bundle from MC if available
@@ -2200,13 +2193,52 @@ class SalesOrderController extends Controller
                             continue;
                         }
 
+                        // Get order_qty from SO table for this component
+                        $componentSO = DB::table('so')
+                            ->where('SO_Num', $soNumber)
+                            ->where('COMP_Num', $compName)
+                            ->first();
+
+                        $componentOrderQty = $componentSO ? ($componentSO->SO_QTY ?? 0) : 0;
+
+                        // Calculate net delivery from DO table for this component
+                        $componentNetDelivery = 0;
+                        $hasComponentDoRows = false;
+                        try {
+                            $hasComponentDoRows = DB::table('DO')
+                                ->where('SO_Num', $soNumber)
+                                ->where('COMP', $compName)
+                                ->exists();
+
+                            if ($hasComponentDoRows) {
+                                $componentNetDelivery = (float) DB::table('DO')
+                                    ->where('SO_Num', $soNumber)
+                                    ->where('COMP', $compName)
+                                    ->sum('DO_Qty');
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning('Error computing DO net delivery for component', [
+                                'so_number' => $soNumber,
+                                'component' => $compName,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+
+                        // Calculate balance per component: ORDER - DELIVERY
+                        $componentBalance = $componentOrderQty - $componentNetDelivery;
+
                         $fittings[] = [
                             // Optional name for debugging/other UIs; frontend consumers use index-based mapping
                             'name' => $compName,
-                            // Use P_DESIGN, PCS_SET and UNIT from each MC component row
+                            // Use P_DESIGN, PCS_SET, UNIT and PART_NO from each MC component row
                             'design' => $componentRow->P_DESIGN ?? '',
                             'pcs' => $componentRow->PCS_SET ?? '',
                             'unit' => $componentRow->UNIT ?? '',
+                            'part_number' => $componentRow->PART_NO ?? '',
+                            // Add order, delivery, and balance per component
+                            'order_qty' => $componentOrderQty,
+                            'net_delivery' => $hasComponentDoRows ? $componentNetDelivery : '',
+                            'balance' => $componentBalance,
                         ];
 
                         // Limit to first 9 components (Fit1..Fit9)
@@ -2292,7 +2324,6 @@ class SalesOrderController extends Controller
                 'order_group' => 'nullable|string',
                 'order_type' => 'nullable|string',
                 'lot_number' => 'nullable|string',
-                'sales_tax' => 'nullable|string',
                 'remark' => 'nullable|string',
                 'instruction1' => 'nullable|string',
                 'instruction2' => 'nullable|string',

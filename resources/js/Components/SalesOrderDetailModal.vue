@@ -682,6 +682,19 @@ async function hydrateFromSalesOrderData() {
                 row.pDesign = fitting.design || ''
                 row.pcs = fitting.pcs || ''
                 row.unit = fitting.unit || ''
+                row.order = fitting.order_qty ?? ''
+                row.delivery = fitting.net_delivery ?? ''
+                // Calculate balance per component: ORDER - DELIVERY
+                const orderQty = Number((row.order || '0').toString().replace(/,/g, '')) || 0
+                const netDel = Number((row.delivery || '0').toString().replace(/,/g, '')) || 0
+                const bal = orderQty - netDel
+                row.balance = fitting.balance !== undefined && fitting.balance !== null && fitting.balance !== '' 
+                  ? fitting.balance 
+                  : (Number.isFinite(bal) ? bal.toString() : row.order)
+                // Keep these empty for now
+                row.reject = ''
+                row.available = ''
+                row.maxDO = ''
               }
             }
           })

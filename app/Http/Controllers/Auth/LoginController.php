@@ -22,7 +22,7 @@ class LoginController extends Controller
             'user_id' => 'required|string|max:20',
             'password' => 'required|string|min:8'
         ]);
-        
+
         $credentials = [
             'userID' => $request->user_id,
             'password' => $request->password
@@ -30,17 +30,26 @@ class LoginController extends Controller
 
         try {
             if (Auth::attempt($credentials, $request->remember)) {
-                // Regenerate session and CSRF token for security
-                $request->session()->regenerate();
-                $request->session()->regenerateToken();
-                
-                // Update login info di tabel usercps
                 $user = Auth::user();
-                if ($user) {
+
+                // Cegah login jika status user tidak aktif/obsolete
+                if ($user && $user->status !== 'A') {
+                    Auth::logout();
+
+                    return back()->withErrors([
+                        'user_id' => 'User tidak aktif/obsolete dan tidak dapat login. Silakan hubungi administrator.',
+                    ]);
+                }
+
+                // Regenerate session ID for security (CSRF token tetap agar meta csrf di SPA tetap sinkron)
+                $request->session()->regenerate();
+
+                // Update login info di tabel usercps (hanya untuk UserCps)
+                if ($user instanceof UserCps) {
                     $user->updateLoginInfo();
                     Log::info('Login info updated for user: ' . $user->userID);
                 }
-                
+
                 return redirect('/dashboard');
             }
         } catch (\Exception $e) {
@@ -57,13 +66,13 @@ class LoginController extends Controller
     {
         return 'userID';
     }
-    
+
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect('/login');
     }
 }

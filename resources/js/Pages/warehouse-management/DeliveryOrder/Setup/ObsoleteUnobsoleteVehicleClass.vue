@@ -1,0 +1,347 @@
+<template>
+  <AppLayout :header="'Obsolete / Unobsolete Vehicle Class'">
+    <Head title="Obsolete / Unobsolete Vehicle Class" />
+
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg mb-6">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-layer-group mr-3"></i> Manage Vehicle Class Status (Obsolete/Unobsolete)
+      </h2>
+      <p class="text-emerald-100">Toggle the active status of vehicle classes.</p>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-lg p-6">
+      <!-- Notification -->
+      <div
+        v-if="notification.show"
+        :class="{
+          'bg-green-100 border border-green-400 text-green-700': notification.type === 'success',
+          'bg-red-100 border border-red-400 text-red-700': notification.type === 'error',
+          'px-4 py-3 rounded relative mb-4': true
+        }"
+      >
+        <span class="block sm:inline">{{ notification.message }}</span>
+      </div>
+
+      <!-- Search and Filters -->
+      <div class="mb-6 flex flex-wrap items-center gap-4">
+        <div class="flex-1 min-w-[300px]">
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              <i class="fas fa-search"></i>
+            </span>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search vehicle classes..."
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50"
+            >
+          </div>
+        </div>
+        <div>
+          <select
+            v-model="statusFilter"
+            class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active Only</option>
+            <option value="obsolete">Obsolete Only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div v-if="loading" class="my-8 flex justify-center">
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+
+      <!-- Vehicle Class Table -->
+      <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 bg-white">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class Code</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr
+              v-for="cls in paginatedClasses"
+              :key="cls.id"
+              class="hover:bg-gray-50"
+            >
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ cls.VEHICLE_CLASS_CODE }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ cls.DESCRIPTION }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+                  v-if="cls.STATUS === 'A'"
+                  class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >
+                  <i class="fas fa-check-circle mr-1"></i> Active
+                </span>
+                <span
+                  v-else
+                  class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                >
+                  <i class="fas fa-times-circle mr-1"></i> Obsolete
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                <button
+                  @click="toggleClassStatus(cls)"
+                  :disabled="isToggling"
+                  :class="[
+                    cls.STATUS === 'A'
+                      ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
+                      : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
+                    'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
+                  ]"
+                  :style="{ minWidth: '120px' }"
+                >
+                  <i
+                    :class="[cls.STATUS === 'A' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"
+                  ></i>
+                  {{ cls.STATUS === 'A' ? 'Mark Obsolete' : 'Mark Active' }}
+                </button>
+              </td>
+            </tr>
+            <tr v-if="paginatedClasses.length === 0">
+              <td colspan="4" class="px-6 py-4 text-center text-gray-500">No vehicle classes found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div
+        v-if="filteredClasses.length > pagination.perPage"
+        class="flex items-center justify-between mt-6"
+      >
+        <div class="flex-1 flex justify-between items-center">
+          <button
+            @click="changePage(pagination.currentPage - 1)"
+            :disabled="pagination.currentPage === 1"
+            :class="[
+              pagination.currentPage === 1
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700',
+              'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
+            ]"
+          >
+            Previous
+          </button>
+
+          <span class="text-sm text-gray-700">
+            Page {{ pagination.currentPage }} of
+            {{ Math.ceil(filteredClasses.length / pagination.perPage) || 1 }}
+          </span>
+
+          <button
+            @click="changePage(pagination.currentPage + 1)"
+            :disabled="pagination.currentPage >= Math.ceil(filteredClasses.length / pagination.perPage)"
+            :class="[
+              pagination.currentPage >= Math.ceil(filteredClasses.length / pagination.perPage)
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700',
+              'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
+            ]"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div v-if="isToggling" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <p>Updating status...</p>
+      </div>
+    </div>
+  </AppLayout>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { Head } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
+
+const classes = ref([])
+const loading = ref(false)
+const isToggling = ref(false)
+const searchQuery = ref('')
+const statusFilter = ref('all')
+const notification = ref({
+  show: false,
+  message: '',
+  type: 'success'
+})
+
+const pagination = ref({
+  currentPage: 1,
+  perPage: 15,
+  total: 0
+})
+
+const isDev = typeof window !== 'undefined' && window.location.port === '5173'
+
+const buildApiUrl = (pathWithNoApiPrefix, queryParams = '') => {
+  const basePath = `/api${pathWithNoApiPrefix.startsWith('/') ? pathWithNoApiPrefix : '/' + pathWithNoApiPrefix}`
+  const withQuery = queryParams ? `${basePath}?${queryParams}` : basePath
+  return isDev ? `/api${withQuery}` : withQuery
+}
+
+const fetchVehicleClasses = async () => {
+  loading.value = true
+  try {
+    const response = await fetch(buildApiUrl('/vehicle-classes'), {
+      headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch vehicle classes: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data && data.success) {
+      const list = Array.isArray(data.data)
+        ? data.data
+        : Array.isArray(data.rows)
+          ? data.rows
+          : data.data?.data || []
+
+      classes.value = list
+      pagination.value = {
+        currentPage: 1,
+        perPage: 15,
+        total: list.length
+      }
+    } else {
+      showNotification('Error loading vehicle classes' + (data?.message ? `: ${data.message}` : ''), 'error')
+      classes.value = []
+      pagination.value = {
+        currentPage: 1,
+        perPage: 15,
+        total: 0
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching vehicle classes:', error)
+    showNotification('Error loading vehicle classes: ' + (error?.message || error), 'error')
+    classes.value = []
+    pagination.value = {
+      currentPage: 1,
+      perPage: 15,
+      total: 0
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+const filteredClasses = computed(() => {
+  let filtered = [...classes.value]
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(cls => {
+      const fields = [
+        cls.VEHICLE_CLASS_CODE,
+        cls.DESCRIPTION
+      ]
+      return fields.some(f => f && String(f).toLowerCase().includes(query))
+    })
+  }
+
+  if (statusFilter.value !== 'all') {
+    const active = statusFilter.value === 'active'
+    filtered = filtered.filter(cls => (cls.STATUS === 'A') === active)
+  }
+
+  return filtered
+})
+
+const paginatedClasses = computed(() => {
+  const start = (pagination.value.currentPage - 1) * pagination.value.perPage
+  const end = start + pagination.value.perPage
+  return filteredClasses.value.slice(start, end)
+})
+
+const changePage = page => {
+  const totalPages = Math.ceil((filteredClasses.value.length || 1) / pagination.value.perPage)
+  if (page < 1 || page > totalPages) return
+  pagination.value.currentPage = page
+}
+
+const showNotification = (message, type = 'success') => {
+  notification.value = {
+    show: true,
+    message,
+    type
+  }
+
+  setTimeout(() => {
+    notification.value.show = false
+  }, 3000)
+}
+
+const toggleClassStatus = async cls => {
+  if (isToggling.value) return
+
+  const confirmMessage = `Are you sure you want to change the status for vehicle class "${cls.VEHICLE_CLASS_CODE}"?`
+  if (!confirm(confirmMessage)) return
+
+  isToggling.value = true
+
+  try {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    if (!csrfToken) {
+      throw new Error('CSRF token not found')
+    }
+
+    const newStatus = cls.STATUS === 'A' ? 'O' : 'A'
+
+    const response = await fetch(buildApiUrl(`/vehicle-classes/${cls.id}/status`), {
+      method: 'PUT',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        STATUS: newStatus
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to toggle vehicle class status')
+    }
+
+    const result = await response.json()
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Unknown error from server')
+    }
+
+    cls.STATUS = newStatus
+
+    const statusText = newStatus === 'A' ? 'activated' : 'marked obsolete'
+    showNotification(`Vehicle class "${cls.VEHICLE_CLASS_CODE}" successfully ${statusText}`, 'success')
+  } catch (error) {
+    console.error('Error toggling vehicle class status:', error)
+    showNotification('Error updating status: ' + (error?.message || error), 'error')
+  } finally {
+    isToggling.value = false
+  }
+}
+
+onMounted(() => {
+  fetchVehicleClasses()
+})
+</script>
+

@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-    
+
     <!-- Modal -->
     <div class="relative min-h-screen flex items-center justify-center p-4">
       <div class="relative bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden">
@@ -13,7 +13,7 @@
               <i class="fas fa-cogs mr-2 text-white"></i>
               Product Design Screen
             </h3>
-            <button 
+            <button
               @click="$emit('close')"
               class="text-white hover:text-gray-200 transition-colors"
             >
@@ -46,8 +46,8 @@
                     <td class="px-4 py-3 text-sm text-gray-900">{{ item.design }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ item.pcs }}</td>
                     <td class="px-4 py-3">
-                      <input 
-                        v-model="item.quantity" 
+                      <input
+                        v-model="item.quantity"
                         type="number"
                         :readonly="props.readOnlyQuantity"
                         :disabled="props.readOnlyQuantity"
@@ -56,8 +56,8 @@
                       >
                     </td>
                     <td class="px-4 py-3">
-                      <input 
-                        v-model="item.unitPrice" 
+                      <input
+                        v-model="item.unitPrice"
                         type="number"
                         step="0.01"
                         class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -65,8 +65,8 @@
                       >
                     </td>
                     <td class="px-4 py-3">
-                      <select 
-                        v-model="item.unit" 
+                      <select
+                        v-model="item.unit"
                         class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       >
                         <option value="Pcs">Pcs</option>
@@ -92,23 +92,23 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                   <span class="text-sm font-medium text-gray-700">Total:</span>
-                  <button 
+                  <button
                     @click="setQuantity"
                     :disabled="props.readOnlyQuantity"
                     class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
                   >
                     Set
                   </button>
-                  <input 
-                    v-model="totalQuantity" 
+                  <input
+                    v-model="totalQuantity"
                     type="number"
                     :readonly="props.readOnlyQuantity"
                     :disabled="props.readOnlyQuantity"
                     class="w-20 px-2 py-1 border border-gray-300 rounded text-sm disabled:bg-gray-100 disabled:text-gray-500"
                     @input="updateMainQuantity"
                   >
-                  <input 
-                    v-model="totalUnitPrice" 
+                  <input
+                    v-model="totalUnitPrice"
                     type="number"
                     step="0.01"
                     class="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
@@ -155,13 +155,13 @@
 
         <!-- Footer -->
         <div class="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-end space-x-4">
-          <button 
+          <button
             @click="$emit('close')"
             class="px-4 py-2 text-sm font-medium text-blue-700 border border-blue-500 rounded-md bg-white hover:bg-blue-50 hover:border-blue-600 transition-colors"
           >
             Cancel
           </button>
-          <button 
+          <button
             @click="saveDesign"
             class="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm"
           >
@@ -481,14 +481,14 @@ const calculateAmount = (item) => {
   const quantity = parseFloat(item.quantity) || 0
   const unitPrice = parseFloat(item.unitPrice) || 0
   item.amount = quantity * unitPrice
-  
+
   // Update total text boxes when Main item changes
   if (item.name === 'Main') {
     // Update totalQuantity when Main item quantity changes
     if (quantity > 0) {
       totalQuantity.value = quantity
     }
-    
+
     // Update totalUnitPrice when Main item unit price changes
     if (unitPrice > 0) {
       totalUnitPrice.value = unitPrice
@@ -578,13 +578,23 @@ const applyExternalQuantity = (qty) => {
   } else {
     // If no quantity or zero, clear the values
     totalQuantity.value = null
-    items[0].quantity = null
-    calculateAmount(items[0])
+    items.forEach((item) => {
+      item.quantity = null
+      item.amount = 0
+    })
     console.log('Quantity cleared')
   }
 }
 
-defineExpose({ applyExternalQuantity })
+const resetModalState = () => {
+  totalQuantity.value = null
+  items.forEach((item) => {
+    item.quantity = null
+    item.amount = 0
+  })
+}
+
+defineExpose({ applyExternalQuantity, resetModalState })
 
 const saveDesign = () => {
   // Validate that at least main item has quantity and price
@@ -608,7 +618,7 @@ const saveDesign = () => {
 // Initialize
 onMounted(() => {
   console.log('ProductDesignScreenModal mounted with initialQuantity:', props.initialQuantity)
-  
+
   // Hydrate rows from MC components (Main, Fit1-9) when available
   hydrateFromMcComponents()
 
@@ -623,7 +633,7 @@ onMounted(() => {
     }
     console.log('Master card data loaded:', { design: items[0].design, unitPrice: items[0].unitPrice })
   }
-  
+
   // Calculate initial amounts
   items.forEach(calculateAmount)
 

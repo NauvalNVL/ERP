@@ -1070,7 +1070,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch, defineAsyncComponent } from 'vue';
 
 const selectedMcsFull = ref(null);
 // Reset SO/WO paper quality arrays to empty values
@@ -1365,15 +1365,15 @@ import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import axios from "axios";
 import { useToast } from "@/Composables/useToast";
-import CustomerAccountModal from "@/Components/customer-account-modal.vue";
-import UpdateMcModal from "@/Components/UpdateMcModal.vue";
-import MasterCardMaintenanceLogModal from "@/Components/MasterCardMaintenanceLogModal.vue";
-import MasterCardZoomModal from "@/Components/MasterCardZoomModal.vue";
-import MasterCardCurrentPriceModal from "@/Components/MasterCardCurrentPriceModal.vue";
-import MasterCardStandByPriceModal from "@/Components/MasterCardStandByPriceModal.vue";
-import SecondPasswordAccessModal from "@/Components/SecondPasswordAccessModal.vue";
-import PaperQualityModal from "@/Components/paper-quality-modal.vue";
-import ChemicalCoatModal from "@/Components/chemical-coat-modal.vue";
+const CustomerAccountModal = defineAsyncComponent(() => import("@/Components/customer-account-modal.vue"));
+const UpdateMcModal = defineAsyncComponent(() => import("@/Components/UpdateMcModal.vue"));
+const MasterCardMaintenanceLogModal = defineAsyncComponent(() => import("@/Components/MasterCardMaintenanceLogModal.vue"));
+const MasterCardZoomModal = defineAsyncComponent(() => import("@/Components/MasterCardZoomModal.vue"));
+const MasterCardCurrentPriceModal = defineAsyncComponent(() => import("@/Components/MasterCardCurrentPriceModal.vue"));
+const MasterCardStandByPriceModal = defineAsyncComponent(() => import("@/Components/MasterCardStandByPriceModal.vue"));
+const SecondPasswordAccessModal = defineAsyncComponent(() => import("@/Components/SecondPasswordAccessModal.vue"));
+const PaperQualityModal = defineAsyncComponent(() => import("@/Components/paper-quality-modal.vue"));
+const ChemicalCoatModal = defineAsyncComponent(() => import("@/Components/chemical-coat-modal.vue"));
 
 const toast = useToast();
 

@@ -110,88 +110,17 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Sample Data Rows -->
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00595</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">03-2025-00568</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000117.05</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0069828</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B105</td>
+                            <tr v-for="order in filteredSalesOrders" :key="order.so_number" @dblclick="selectSalesOrder(order)" class="hover:bg-blue-50 cursor-pointer" :class="{'bg-blue-100': selectedSalesOrder && selectedSalesOrder.so_number === order.so_number}">
+                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.so_number }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customer_po_number }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customer_code }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.master_card_seq }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.status }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.delivery_location }}</td>
                             </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00584</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">PO.2025.06.00004</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000576</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">263207</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B102</td>
+                            <tr v-if="filteredSalesOrders.length === 0">
+                                <td colspan="6" class="px-3 py-2 text-center text-sm text-gray-500">No sales orders found.</td>
                             </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00583</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">PO 271-0625 05 JUNI 2025</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000603-01</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2657103</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">J001</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">J001</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00582</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">PO 270-0625 05 JUNI 2025</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000603-01</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">265744</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">J001</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00581</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">PO 269-0625 04 JUNI 2025</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000603-01</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2657106</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">J001</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00580</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">ZAENAL ROHMAN</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000581-02</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2470180</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B103</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00579</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">P005-SMCP2506</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000947</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">297412</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B103</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00578</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">P005-SMCP2506</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000947</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">297426</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B103</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00577</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">4280000972</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000235</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2064353</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">J204</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">J204</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 cursor-pointer">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">06-2025-00576</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">4000054614</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">000176</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">OL-0000267</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Outs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B105</td>
-                            </tr>
-                            <!-- Add more rows as needed -->
                         </tbody>
                     </table>
                 </div>
@@ -200,38 +129,38 @@
                 <div class="mb-6 border p-4 rounded-lg bg-gray-50">
                     <div class="flex items-center space-x-2 mb-4">
                         <label class="block text-sm font-medium text-gray-700">Search:</label>
-                        <input type="text" class="form-input w-16 px-2 py-1 border border-gray-300 rounded-md text-sm">
-                        <input type="text" class="form-input w-16 px-2 py-1 border border-gray-300 rounded-md text-sm">
-                        <input type="text" class="form-input w-16 px-2 py-1 border border-gray-300 rounded-md text-sm">
-                        <button class="px-4 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600">Search</button>
+                        <input type="text" v-model="salesOrderSearch.month" class="form-input w-16 px-2 py-1 border border-gray-300 rounded-md text-sm">
+                        <input type="text" v-model="salesOrderSearch.year" class="form-input w-16 px-2 py-1 border border-gray-300 rounded-md text-sm">
+                        <input type="text" v-model="salesOrderSearch.sequence" class="form-input w-16 px-2 py-1 border border-gray-300 rounded-md text-sm">
+                        <button @click="onSalesOrderSearch" class="px-4 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600">Search</button>
                         <span class="text-sm font-medium text-gray-700">S/Order#</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Customer Name:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" value="KARYA INDAH MULTIGUNA, PT" readonly>
+                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedSalesOrder ? selectedSalesOrder.customer_name : ''" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Model:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" value="PEA.PIAYZ.020_POP ICE UNGU" readonly>
+                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedSalesOrder ? selectedSalesOrder.master_card_model : ''" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Order Mode:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" value="0-Order by Customer + Deliver & Invoice to Customer" readonly>
+                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedSalesOrder ? (selectedSalesOrder.order_group + ' - ' + selectedSalesOrder.order_type) : ''" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Salesperson:</label>
                             <div class="flex items-center">
-                                <input type="text" class="form-input mt-1 block w-20 bg-gray-100" value="S100" readonly>
-                                <input type="text" class="form-input mt-1 ml-2 block w-full bg-gray-100" value="IN HOUSE" readonly>
+                                <input type="text" class="form-input mt-1 block w-20 bg-gray-100" :value="selectedSalesOrder ? selectedSalesOrder.salesperson_code : ''" readonly>
+                                <input type="text" class="form-input mt-1 ml-2 block w-full bg-gray-100" value="" readonly>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Order Group:</label>
                             <div class="flex items-center">
-                                <input type="text" class="form-input mt-1 block w-20 bg-gray-100" value="Sales" readonly>
+                                <input type="text" class="form-input mt-1 block w-20 bg-gray-100" :value="selectedSalesOrder ? selectedSalesOrder.order_group : ''" readonly>
                                 <label class="ml-4 text-sm font-medium text-gray-700">Order Type:</label>
-                                <input type="text" class="form-input mt-1 ml-2 block w-20 bg-gray-100" value="S1" readonly>
+                                <input type="text" class="form-input mt-1 ml-2 block w-20 bg-gray-100" :value="selectedSalesOrder ? selectedSalesOrder.order_type : ''" readonly>
                             </div>
                         </div>
                     </div>
@@ -258,43 +187,43 @@
                             <tr>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">PD</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">B1</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ salesOrderItemDetails.pd }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(0, 'design') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(1, 'design') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(2, 'design') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(3, 'design') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(4, 'design') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(5, 'design') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(6, 'design') }}</td>
                             </tr>
                             <tr>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">PCS</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">1</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ salesOrderItemDetails.pcs }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(0, 'pcs') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(1, 'pcs') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(2, 'pcs') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(3, 'pcs') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(4, 'pcs') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(5, 'pcs') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(6, 'pcs') }}</td>
                             </tr>
                             <tr>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">UNIT</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">Pcs</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ salesOrderItemDetails.unit }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(0, 'unit') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(1, 'unit') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(2, 'unit') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(3, 'unit') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(4, 'unit') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(5, 'unit') }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ getFittingField(6, 'unit') }}</td>
                             </tr>
                             <tr>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">ORDER</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2,000</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ salesOrderItemDetails.order_qty }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
@@ -306,7 +235,7 @@
                             <tr>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">NET DELIVERY</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2,000</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ salesOrderItemDetails.net_delivery }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
@@ -318,7 +247,7 @@
                             <tr>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">BALANCE</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">2,000</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ salesOrderItemDetails.balance }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900"></td>
@@ -370,7 +299,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">M/Card Seq#:</label>
                     <div class="flex items-center">
                         <input type="text" v-model="masterCardSearch" class="form-input w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                        <button class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
+                        <button type="button" @click="openMasterCardListModal" class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
                             <i class="fas fa-table"></i>
                         </button>
                     </div>
@@ -529,97 +458,6 @@
         </div>
     </div>
 
-    <!-- New: Direct P/Order Ref Search Modal (from dashboard) -->
-    <div v-if="showDirectPurchaseOrderSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showDirectPurchaseOrderSearchModal}">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-file-invoice mr-2"></i> Search by Purchase Order
-                </h3>
-                <button type="button" @click="closeAllModals" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code:</label>
-                    <div class="flex items-center">
-                        <input type="text" v-model="customerCodePurchaseOrderRef" class="form-input w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                        <button @click="openCustomerAccountSearchModal('purchaseOrderRef')" class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
-                            <i class="fas fa-table"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">P/Order Ref#:</label>
-                    <div class="flex items-center">
-                        <input type="text" v-model="purchaseOrderRefSearch" class="form-input w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                        <button class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
-                            <i class="fas fa-table"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Start S/O Period:</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="text" v-model="purchaseOrderStartSOPeriod.month" class="form-input w-16 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        <input type="text" v-model="purchaseOrderStartSOPeriod.year" class="form-input w-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        <span class="text-gray-600 text-sm">mm/yyyy [If leave blank for P/Order Ref#]</span>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Sort Option:</label>
-                    <div class="flex items-center space-x-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="directPurchaseOrderSort" value="1-P/O Ref# + S/Order#" v-model="purchaseOrderSortOption" class="form-radio h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">1-P/O Ref# + S/Order#</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="directPurchaseOrderSort" value="2-P/O Ref# + M/C Seq#" v-model="purchaseOrderSortOption" class="form-radio h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">2-P/O Ref# + M/C Seq#</span>
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">S/Order Status:</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="purchaseOrderStatus.outstanding" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Outstanding</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="purchaseOrderStatus.partialCompleted" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Partial Completed</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="purchaseOrderStatus.closedManually" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Closed Manually</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="purchaseOrderStatus.completed" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Completed</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="purchaseOrderStatus.cancelled" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Cancelled</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
-                    OK
-                </button>
-                <button @click="retrySearch" class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow">
-                    Retry
-                </button>
-                <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
-                    Exit
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Customer Account Search Modal -->
     <div v-if="showCustomerAccountSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showCustomerAccountSearchModal}">
@@ -661,242 +499,6 @@
             </div>
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
                 <button @click="confirmCustomerSelection" :disabled="!selectedCustomerAccount" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow disabled:opacity-50 disabled:cursor-not-allowed">
-                    Select
-                </button>
-                <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
-                    Exit
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- New: Search by Board Purchase Modal -->
-    <div v-if="showBoardPurchaseSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showBoardPurchaseSearchModal}">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-pallet mr-2"></i> Search by Board Purchase
-                </h3>
-                <button type="button" @click="closeAllModals" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code:</label>
-                    <div class="flex items-center">
-                        <input type="text" v-model="customerCodeBoardPurchase" class="form-input w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                        <button @click="openCustomerAccountSearchModal('boardPurchase')" class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
-                            <i class="fas fa-table"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">P/Order Ref#:</label>
-                    <div class="flex items-center">
-                        <input type="text" v-model="boardPurchaseRefSearch" class="form-input w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                        <button class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
-                            <i class="fas fa-table"></i>
-                        </button>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Sort Option:</label>
-                    <div class="flex items-center space-x-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="boardPurchaseSort" value="1-M/C Seq# + S/Order#" v-model="boardPurchaseSortOption" class="form-radio h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">1-M/C Seq# + S/Order#</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="boardPurchaseSort" value="2-M/C Seq# + P/Order#" v-model="boardPurchaseSortOption" class="form-radio h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">2-M/C Seq# + P/Order#</span>
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">S/Order Status:</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="boardPurchaseOrderStatus.outstanding" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Outstanding</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="boardPurchaseOrderStatus.partialCompleted" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Partial Completed</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="boardPurchaseOrderStatus.closedManually" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Closed Manually</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="boardPurchaseOrderStatus.completed" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Completed</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" v-model="boardPurchaseOrderStatus.cancelled" class="form-checkbox h-4 w-4 text-blue-600">
-                            <span class="ml-2 text-gray-700">Cancelled</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
-                    OK
-                </button>
-                <button @click="retrySearch" class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow">
-                    Retry
-                </button>
-                <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
-                    Exit
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- New: Search by Work Order Modal (Image 1) -->
-    <div v-if="showInitialWorkOrderModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showInitialWorkOrderModal}">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-clipboard-list mr-2"></i> Search by Work Order
-                </h3>
-                <button type="button" @click="closeAllModals" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Work Order#:</label>
-                <div class="relative flex items-center rounded-md shadow-sm">
-                    <input type="text" v-model="workOrderParts.part1" class="flex-1 block w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                    <span class="inline-flex items-center px-2 py-2 border-t border-b border-gray-300 bg-gray-50 text-gray-500">
-                        -
-                    </span>
-                    <input type="text" v-model="workOrderParts.part2" class="flex-1 block w-full px-3 py-2 border-t border-b border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    <span class="inline-flex items-center px-2 py-2 border-t border-b border-gray-300 bg-gray-50 text-gray-500">
-                        -
-                    </span>
-                    <input type="text" v-model="workOrderParts.part3" class="flex-1 block w-full px-3 py-2 border-t border-b border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    <span class="inline-flex items-center px-2 py-2 border-t border-b border-gray-300 bg-gray-50 text-gray-500">
-                        -
-                    </span>
-                    <input type="text" v-model="workOrderParts.part4" class="flex-1 block w-full px-3 py-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-r-md">
-                    <button type="button" @click="openWorkOrderTableModal" class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fas fa-table"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
-                    OK
-                </button>
-                <button @click="retrySearch" class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow">
-                    Retry
-                </button>
-                <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
-                    Exit
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- New: Work Order Table Modal (Image 2) -->
-    <div v-if="showWorkOrderTableModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showWorkOrderTableModal}">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-table mr-2"></i> Work Order Table
-                </h3>
-                <button type="button" @click="closeAllModals" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
-                <!-- Search and Input Section -->
-                <div class="flex items-center space-x-4 mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Work Order#:</label>
-                    <input type="text" v-model="workOrderSearchQueryParts.part1" class="form-input w-20 px-2 py-1 border border-gray-300 rounded-md text-sm">
-                    <input type="text" v-model="workOrderSearchQueryParts.part2" class="form-input w-20 px-2 py-1 border border-gray-300 rounded-md text-sm">
-                    <input type="text" v-model="workOrderSearchQueryParts.part3" class="form-input w-20 px-2 py-1 border border-gray-300 rounded-md text-sm">
-                    <button @click="filterWorkOrders" class="px-4 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600">Search</button>
-                </div>
-
-                <!-- Work Order Table -->
-                <div class="border border-gray-300 rounded-lg overflow-hidden mb-6">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WORK ORDER#</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SO#</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CUSTOMER NAME</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PLAN QTY</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DUE DATE</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="wo in filteredWorkOrders" :key="wo.work_order_no" @dblclick="selectWorkOrder(wo)" class="hover:bg-blue-50 cursor-pointer" :class="{'bg-blue-100': selectedWorkOrder && selectedWorkOrder.work_order_no === wo.work_order_no}">
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ wo.work_order_no }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ wo.so_no }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ wo.customer_name }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ wo.plan_qty }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ wo.due_date }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ wo.status }}</td>
-                            </tr>
-                            <tr v-if="filteredWorkOrders.length === 0">
-                                <td colspan="6" class="px-3 py-2 text-center text-sm text-gray-500">No work orders found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Work Order Details Section (visible on double-click) -->
-                <div v-if="selectedWorkOrder" class="mb-6 border p-4 rounded-lg bg-gray-50">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Work Order Details</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Master Card#:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.master_card_no" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Model:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.model" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Product:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.product" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">P/Design:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.p_design" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Priority:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.priority" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Release Type:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.release_type" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Release:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.release" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Allowance:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.allowance" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Book Excess:</label>
-                            <input type="text" class="form-input mt-1 block w-full bg-gray-100" :value="selectedWorkOrder.book_excess" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
-                    Zoom
-                </button>
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
                     Select
                 </button>
                 <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
@@ -952,7 +554,6 @@
         </div>
     </div>
 
-    <!-- New: Delivery Order Table Modal (Image 2) -->
     <div v-if="showDeliveryOrderTableModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showDeliveryOrderTableModal}">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
@@ -1268,6 +869,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Master Card List Modal integration -->
+    <MasterCardSearchSelectModal
+        :show="showMasterCardListModal"
+        :customer-code="customerCodeMasterCard"
+        @close="showMasterCardListModal = false"
+        @select-mc="handleMasterCardSelected"
+        @reopen-options="showMasterCardSearchModal = true"
+        @zoom-mc="handleMasterCardSelected"
+    />
 </template>
 
 <script setup>
@@ -1280,6 +891,7 @@ import {
     TransitionRoot,
 } from '@headlessui/vue'
 import axios from 'axios'; // Import axios
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue'
 
 const showInitialSalesOrderModal = ref(false); // For the first "Search by Sales Order" modal
 const showOptionsModal = ref(false);         // For the modal with radio button options
@@ -1287,26 +899,6 @@ const showSalesOrderSearchModal = ref(false); // For the actual Sales Order# inp
 const showMasterCardSearchModal = ref(false); // For the Master Card search modal
 const showPurchaseOrderRefSearchModal = ref(false); // For the P/Order Ref search modal
 const showCustomerAccountSearchModal = ref(false); // New: For customer account search
-const showDirectPurchaseOrderSearchModal = ref(false); // New: For direct Purchase Order search from dashboard
-const showBoardPurchaseSearchModal = ref(false); // New: For direct Board Purchase search from dashboard
-
-// New: For Work Order Search
-const showInitialWorkOrderModal = ref(false);
-const showWorkOrderTableModal = ref(false);
-const workOrderParts = ref({
-    part1: '0',
-    part2: '0',
-    part3: '0',
-    part4: 'mm-yyyy-ccccc',
-});
-const workOrders = ref([]);
-const filteredWorkOrders = ref([]);
-const workOrderSearchQueryParts = ref({
-    part1: '',
-    part2: '',
-    part3: '',
-});
-const selectedWorkOrder = ref(null);
 
 // New: For Delivery Order Search
 const showInitialDeliveryOrderModal = ref(false);
@@ -1352,18 +944,31 @@ const salesOrderParts = ref({
     part4: 'mm-yyyy-ccccc',
 });
 
+const salesOrders = ref([]);
+const filteredSalesOrders = ref([]);
+const selectedSalesOrder = ref(null);
+const salesOrderSearch = ref({
+    month: '',
+    year: '',
+    sequence: '',
+});
+
+const salesOrderItemDetails = ref({
+    pd: '',
+    pcs: '',
+    unit: '',
+    order_qty: '',
+    net_delivery: '',
+    balance: '',
+});
+
+const salesOrderFittings = ref([]);
+
 const masterCardSearch = ref('');
 const purchaseOrderRefSearch = ref('');
 
 const customerCodeMasterCard = ref(''); // New: For customer code in Master Card modal
 const customerCodePurchaseOrderRef = ref(''); // New: For customer code in P/Order Ref modal
-const customerCodeBoardPurchase = ref(''); // New: For customer code in Board Purchase modal
-
-// New: For Start S/O Period in Direct Purchase Order modal
-const purchaseOrderStartSOPeriod = ref({
-    month: '0',
-    year: '0',
-});
 
 const masterCardStatus = ref({
     active: true,
@@ -1371,6 +976,8 @@ const masterCardStatus = ref({
 });
 
 const masterCardSortOption = ref('1-M/C Seq# + S/Order#');
+
+const showMasterCardListModal = ref(false);
 
 const salesOrderStatus = ref({
     outstanding: true,
@@ -1381,17 +988,8 @@ const salesOrderStatus = ref({
 });
 
 const purchaseOrderSortOption = ref('1-P/O Ref# + S/Order#');
-const boardPurchaseSortOption = ref('1-M/C Seq# + S/Order#'); // New: For Board Purchase modal
 
 const purchaseOrderStatus = ref({
-    outstanding: true,
-    partialCompleted: true,
-    closedManually: true,
-    completed: false,
-    cancelled: false,
-});
-
-const boardPurchaseOrderStatus = ref({
     outstanding: true,
     partialCompleted: true,
     closedManually: true,
@@ -1415,10 +1013,6 @@ const closeAllModals = () => {
     showMasterCardSearchModal.value = false;
     showPurchaseOrderRefSearchModal.value = false;
     showCustomerAccountSearchModal.value = false; // Close new modal
-    showDirectPurchaseOrderSearchModal.value = false; // New: Close direct PO modal
-    showBoardPurchaseSearchModal.value = false; // New: Close Board Purchase modal
-    showInitialWorkOrderModal.value = false; // New: Close initial Work Order modal
-    showWorkOrderTableModal.value = false; // New: Close Work Order Table modal
     showInitialDeliveryOrderModal.value = false; // New: Close initial Delivery Order modal
     showDeliveryOrderTableModal.value = false; // New: Close Delivery Order Table modal
     showInitialInvoiceModal.value = false; // New: Close initial Invoice modal
@@ -1426,6 +1020,7 @@ const closeAllModals = () => {
     selectedCustomerAccount.value = null; // Clear selected customer
     customerSearchQuery.value = ''; // Clear search query
     filteredCustomerAccounts.value = []; // Clear filtered results
+    showMasterCardListModal.value = false;
 };
 
 const openInitialSalesOrderModal = () => {
@@ -1448,7 +1043,115 @@ const openOptionsModal = () => {
 const openSalesOrderSearchModal = () => {
     closeAllModals();
     showSalesOrderSearchModal.value = true;
-    // You might want to reset salesOrderParts here too if needed
+    selectedSalesOrder.value = null;
+    salesOrderSearch.value = {
+        month: '',
+        year: '',
+        sequence: '',
+    };
+    fetchSalesOrders();
+};
+
+const fetchSalesOrders = async (extraParams = {}) => {
+    try {
+        const params = {};
+
+        if (salesOrderSearch.value.month) params.month = salesOrderSearch.value.month;
+        if (salesOrderSearch.value.year) params.year = salesOrderSearch.value.year;
+        if (salesOrderSearch.value.sequence) params.sequence = salesOrderSearch.value.sequence;
+
+        Object.assign(params, extraParams);
+
+        const response = await axios.get('/api/sales-orders', { params });
+        const payload = response.data;
+        const data = Array.isArray(payload) ? payload : (payload.data || []);
+
+        salesOrders.value = data;
+        filteredSalesOrders.value = data;
+    } catch (error) {
+        console.error('Error fetching sales orders:', error);
+        salesOrders.value = [];
+        filteredSalesOrders.value = [];
+    }
+};
+
+const onSalesOrderSearch = () => {
+    fetchSalesOrders();
+};
+
+const selectSalesOrder = (order) => {
+    selectedSalesOrder.value = order;
+    if (order && order.so_number) {
+        fetchSalesOrderDetail(order.so_number);
+    }
+};
+
+const fetchSalesOrderDetail = async (soNumber) => {
+    try {
+        const response = await axios.get(`/api/sales-order/${encodeURIComponent(soNumber)}/detail`);
+        const payload = response.data || {};
+
+        if (!payload.success || !payload.data) {
+            salesOrderItemDetails.value = {
+                pd: '',
+                pcs: '',
+                unit: '',
+                order_qty: '',
+                net_delivery: '',
+                balance: '',
+            };
+            salesOrderFittings.value = [];
+            return;
+        }
+
+        const { order_info, item_details, fittings } = payload.data;
+
+        // Update header info if available
+        if (order_info) {
+            selectedSalesOrder.value = {
+                ...(selectedSalesOrder.value || {}),
+                customer_name: order_info.customer_name ?? selectedSalesOrder.value?.customer_name ?? '',
+                master_card_model: order_info.model ?? selectedSalesOrder.value?.master_card_model ?? '',
+                order_group: order_info.order_group ?? selectedSalesOrder.value?.order_group ?? '',
+                order_type: order_info.order_type ?? selectedSalesOrder.value?.order_type ?? '',
+                salesperson_code: order_info.salesperson_code ?? selectedSalesOrder.value?.salesperson_code ?? '',
+            };
+        }
+
+        // Update main item details row
+        salesOrderItemDetails.value = {
+            pd: item_details?.pd ?? '',
+            pcs: item_details?.pcs ?? '',
+            unit: item_details?.unit ?? '',
+            order_qty: item_details?.order_qty ?? '',
+            net_delivery: item_details?.net_delivery ?? '',
+            balance: item_details?.balance ?? '',
+        };
+
+        // Update fittings (Fit1..Fit9)
+        salesOrderFittings.value = Array.isArray(fittings) ? fittings : [];
+    } catch (error) {
+        console.error('Error fetching sales order detail:', error);
+        salesOrderItemDetails.value = {
+            pd: '',
+            pcs: '',
+            unit: '',
+            order_qty: '',
+            net_delivery: '',
+            balance: '',
+        };
+        salesOrderFittings.value = [];
+    }
+};
+
+const getFittingField = (index, field) => {
+    const fit = salesOrderFittings.value?.[index];
+    if (!fit) return '';
+
+    if (field === 'design') return fit.design ?? '';
+    if (field === 'pcs') return fit.pcs ?? '';
+    if (field === 'unit') return fit.unit ?? '';
+    return '';
 };
 
 const openMasterCardSearchModal = () => {
@@ -1490,6 +1193,22 @@ const openMasterCardSearchDirectlyModal = () => {
     };
 };
 
+const openMasterCardListModal = () => {
+    // Require customer code first to match CPS flow
+    if (!customerCodeMasterCard.value) {
+        console.warn('Customer code is required before browsing Master Cards');
+        return;
+    }
+    showMasterCardListModal.value = true;
+};
+
+const handleMasterCardSelected = (mc) => {
+    if (!mc) return;
+    // Fill M/Card Seq# with selected MC sequence
+    masterCardSearch.value = mc.mc_seq || mc.seq || '';
+    showMasterCardListModal.value = false;
+};
+
 const openPurchaseOrderRefSearchModal = () => {
     closeAllModals();
     showPurchaseOrderRefSearchModal.value = true;
@@ -1504,93 +1223,6 @@ const openPurchaseOrderRefSearchModal = () => {
         completed: false,
         cancelled: false,
     };
-};
-
-const openPurchaseOrderRefSearchDirectlyModal = () => {
-    closeAllModals();
-    showDirectPurchaseOrderSearchModal.value = true; // Open the new direct modal
-    purchaseOrderRefSearch.value = '';
-    customerCodePurchaseOrderRef.value = '';
-    purchaseOrderStartSOPeriod.value = { month: '0', year: '0' }; // Reset new field
-    purchaseOrderSortOption.value = '1-P/O Ref# + S/Order#';
-    purchaseOrderStatus.value = {
-        outstanding: true,
-        partialCompleted: true,
-        closedManually: true,
-        completed: false,
-        cancelled: false,
-    };
-};
-
-// New: Function to open Board Purchase Search Modal
-const openBoardPurchaseSearchModal = () => {
-    closeAllModals();
-    showBoardPurchaseSearchModal.value = true;
-    customerCodeBoardPurchase.value = '';
-    boardPurchaseRefSearch.value = '';
-    boardPurchaseSortOption.value = '1-M/C Seq# + S/Order#';
-    boardPurchaseOrderStatus.value = {
-        outstanding: true,
-        partialCompleted: true,
-        closedManually: true,
-        completed: false,
-        cancelled: false,
-    };
-};
-
-// New: Functions for Work Order Search Modals
-const openInitialWorkOrderModal = () => {
-    closeAllModals();
-    showInitialWorkOrderModal.value = true;
-    workOrderParts.value = {
-        part1: '0',
-        part2: '0',
-        part3: '0',
-        part4: 'mm-yyyy-ccccc',
-    };
-};
-
-const openWorkOrderTableModal = () => {
-    closeAllModals();
-    showWorkOrderTableModal.value = true;
-    selectedWorkOrder.value = null; // Clear previous selection
-    workOrderSearchQueryParts.value = { part1: '', part2: '', part3: '' }; // Clear search query
-    fetchWorkOrders();
-};
-
-const fetchWorkOrders = () => {
-    // Dummy data for now. Replace with actual API call later.
-    workOrders.value = [
-        { work_order_no: '06-2025-00438', so_no: '06-2025-00583', customer_name: 'CHEVITA', plan_qty: 2100, due_date: '09/06/2025', status: 'Active', master_card_no: '000603-01', model: 'POLOS 353 X 243 X 168', product: '001', p_design: 'B1', priority: '10 NORMAL', release_type: 'Normal Run', release: '2,100', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00437', so_no: '06-2025-00582', customer_name: 'CHEVITA', plan_qty: 1300, due_date: '09/06/2025', status: 'Active', master_card_no: '000603-01', model: 'POLOS 353 X 243 X 168', product: '001', p_design: 'B1', priority: '10 NORMAL', release_type: 'Normal Run', release: '1,300', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00436', so_no: '06-2025-00579', customer_name: 'SOLID MULTI', plan_qty: 3200, due_date: '13/06/2025', status: 'Active', master_card_no: '000603-01', model: 'POLOS 353 X 243 X 168', product: '001', p_design: 'B1', priority: '10 NORMAL', release_type: 'Normal Run', release: '3,200', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00435', so_no: '06-2025-00579', customer_name: 'SOLID MULTI', plan_qty: 3152, due_date: '13/06/2025', status: 'Active', master_card_no: '000603-01', model: 'POLOS 353 X 243 X 168', product: '001', p_design: 'B1', priority: '10 NORMAL', release_type: 'Normal Run', release: '3,152', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00434', so_no: '06-2025-00578', customer_name: 'SOLID MULTI', plan_qty: 5150, due_date: '13/06/2025', status: 'Active', master_card_no: '000603-01', model: 'POLOS 353 X 243 X 168', product: '001', p_design: 'B1', priority: '10 NORMAL', release_type: 'Normal Run', release: '5,150', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00433', so_no: '06-2025-00580', customer_name: 'M.RIZWAN', plan_qty: 2004, due_date: '16/06/2025', status: 'Active', master_card_no: '000581-02', model: 'KARTON BOX POLOS', product: '001', p_design: 'K1', priority: '00 NORMAL', release_type: 'Normal Run', release: '2,004', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00432', so_no: '06-2025-00576', customer_name: 'PROPAN RAYA', plan_qty: 2000, due_date: '16/06/2025', status: 'Active', master_card_no: 'OL-0000267', model: 'POLYURETHANE WOOD FINISH', product: '001', p_design: 'P1', priority: '00 NORMAL', release_type: 'Normal Run', release: '2,000', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00431', so_no: '06-2025-00542', customer_name: 'PROPAN RAYA', plan_qty: 3000, due_date: '16/06/2025', status: 'Active', master_card_no: 'OL-0000267', model: 'POLYURETHANE WOOD FINISH', product: '001', p_design: 'P1', priority: '00 NORMAL', release_type: 'Normal Run', release: '3,000', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00430', so_no: '06-2025-00544', customer_name: 'PROPAN RAYA', plan_qty: 3000, due_date: '16/06/2025', status: 'Active', master_card_no: 'OL-0000267', model: 'POLYURETHANE WOOD FINISH', product: '001', p_design: 'P1', priority: '00 NORMAL', release_type: 'Normal Run', release: '3,000', allowance: '', book_excess: '' },
-        { work_order_no: '06-2025-00429', so_no: '05-2025-02496', customer_name: 'HOLLYLAND F', plan_qty: 9200, due_date: '13/06/2025', status: 'Active', master_card_no: '2064353', model: 'PAPER CUP', product: '001', p_design: 'C1', priority: '00 NORMAL', release_type: 'Normal Run', release: '9,200', allowance: '', book_excess: '' },
-    ];
-    filteredWorkOrders.value = workOrders.value; // Initialize filtered with all data
-};
-
-const filterWorkOrders = () => {
-    const queryPart1 = workOrderSearchQueryParts.value.part1;
-    const queryPart2 = workOrderSearchQueryParts.value.part2;
-    const queryPart3 = workOrderSearchQueryParts.value.part3;
-
-    filteredWorkOrders.value = workOrders.value.filter(wo => {
-        const woParts = wo.work_order_no.split('-');
-        const matchesPart1 = queryPart1 === '' || woParts[0].includes(queryPart1);
-        const matchesPart2 = queryPart2 === '' || woParts[1].includes(queryPart2);
-        const matchesPart3 = queryPart3 === '' || woParts[2].includes(queryPart3);
-        return matchesPart1 && matchesPart2 && matchesPart3;
-    });
-};
-
-const selectWorkOrder = (wo) => {
-    selectedWorkOrder.value = wo;
 };
 
 // New: Functions for Delivery Order Search Modals
@@ -1613,17 +1245,46 @@ const openDeliveryOrderTableModal = () => {
     fetchDeliveryOrders();
 };
 
-const fetchDeliveryOrders = () => {
-    // Dummy data for now. Replace with actual API call later.
-    deliveryOrders.value = [
-        { do_no: '06-2025-99999', do_date: '31/05/2025', customer: '000117-05', vehicle_no: 'A9489EX', item_no: '1', pc_mode: '2 Multiple', status: 'Cancel', customer_name_detail: 'KARYA INDAH MULTIGUNA, PT', salesperson_code: 'S100', cticket_no: '00-0000-00000', on_hold: 'No', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', agent_cust: '', sales_type: 'Sales', do_inst1: 'NO LOT : 05-25', do_inst2: 'NO SEAL : 000003', prepared_by: 'whs21', prepared_date: '30/05/2025', cancelled_by: 'whs08', cancelled_date: '30/05/2025', amended_by: '', amended_date: '', printed_by: 'whs12', printed_date: '02/06/2025' },
-        { do_no: '06-2025-96013', do_date: '05/06/2025', customer: '000541-04', vehicle_no: 'B980KCE', item_no: '1', pc_mode: '0 Multiple', status: 'Active', customer_name_detail: 'TEST CUSTOMER', salesperson_code: 'S200', cticket_no: '01-1111-11111', on_hold: 'No', order_mode: '1-Order by Customer + Deliver to Customer', agent_cust: 'AGENT A', sales_type: 'Online', do_inst1: 'LOT X', do_inst2: 'SEAL Y', prepared_by: 'user01', prepared_date: '01/06/2025', cancelled_by: '', cancelled_date: '', amended_by: '', amended_date: '', printed_by: 'user02', printed_date: '03/06/2025' },
-        { do_no: '06-2025-96012', do_date: '04/06/2025', customer: '000541-04', vehicle_no: 'B970KCE', item_no: '1', pc_mode: '0 Multiple', status: 'Active', customer_name_detail: 'TEST CUSTOMER', salesperson_code: 'S200', cticket_no: '01-1111-11111', on_hold: 'No', order_mode: '1-Order by Customer + Deliver to Customer', agent_cust: 'AGENT A', sales_type: 'Online', do_inst1: 'LOT X', do_inst2: 'SEAL Y', prepared_by: 'user01', prepared_date: '01/06/2025', cancelled_by: '', cancelled_date: '', amended_by: '', amended_date: '', printed_by: 'user02', printed_date: '03/06/2025' },
-        { do_no: '06-2025-96007', do_date: '03/06/2025', customer: '000541-04', vehicle_no: 'B9471KCE', item_no: '1', pc_mode: '0 Multiple', status: 'Active', customer_name_detail: 'TEST CUSTOMER', salesperson_code: 'S200', cticket_no: '01-1111-11111', on_hold: 'No', order_mode: '1-Order by Customer + Deliver to Customer', agent_cust: 'AGENT A', sales_type: 'Online', do_inst1: 'LOT X', do_inst2: 'SEAL Y', prepared_by: 'user01', prepared_date: '01/06/2025', cancelled_by: '', cancelled_date: '', amended_by: '', amended_date: '', printed_by: 'user02', printed_date: '03/06/2025' },
-        { do_no: '06-2025-96006', do_date: '03/06/2025', customer: '000541-04', vehicle_no: 'B9753KXV', item_no: '1', pc_mode: '0 Multiple', status: 'Active', customer_name_detail: 'TEST CUSTOMER', salesperson_code: 'S200', cticket_no: '01-1111-11111', on_hold: 'No', order_mode: '1-Order by Customer + Deliver to Customer', agent_cust: 'AGENT A', sales_type: 'Online', do_inst1: 'LOT X', do_inst2: 'SEAL Y', prepared_by: 'user01', prepared_date: '01/06/2025', cancelled_by: '', cancelled_date: '', amended_by: '', amended_date: '', printed_by: 'user02', printed_date: '03/06/2025' },
-        { do_no: '06-2025-96005', do_date: '03/06/2025', customer: '000541-04', vehicle_no: 'B9753KXV', item_no: '1', pc_mode: '0 Multiple', status: 'Active', customer_name_detail: 'TEST CUSTOMER', salesperson_code: 'S200', cticket_no: '01-1111-11111', on_hold: 'No', order_mode: '1-Order by Customer + Deliver to Customer', agent_cust: 'AGENT A', sales_type: 'Online', do_inst1: 'LOT X', do_inst2: 'SEAL Y', prepared_by: 'user01', prepared_date: '01/06/2025', cancelled_by: '', cancelled_date: '', amended_by: '', amended_date: '', printed_by: 'user02', printed_date: '03/06/2025' },
-    ];
-    filteredDeliveryOrders.value = deliveryOrders.value; // Initialize filtered with all data
+const fetchDeliveryOrders = async () => {
+    try {
+        const response = await axios.get('/api/invoices/delivery-orders');
+        const data = response.data;
+
+        const rawOrders = Array.isArray(data) ? data : (data.data || []);
+
+        deliveryOrders.value = rawOrders.map(order => ({
+            do_no: order.do_number || order.DO_Num || '',
+            do_date: order.do_date || order.DO_DMY || '',
+            customer: order.customer_code || order.AC_Num || '',
+            vehicle_no: order.vehicle_no || order.DO_VHC_Num || '',
+            item_no: typeof order.item_count !== 'undefined' ? order.item_count : (order.item_no || 1),
+            pc_mode: order.mode || order.pc_mode || '',
+            status: order.status || order.Status || '',
+            customer_name_detail: order.customer_name || order.AC_Name || '',
+            salesperson_code: order.salesperson_code || order.salesperson || '',
+            cticket_no: order.cticket_no || '',
+            on_hold: order.on_hold || '',
+            order_mode: order.order_mode || '',
+            agent_cust: order.agent_cust || '',
+            sales_type: order.sales_type || '',
+            do_inst1: order.remark1 || order.DO_Remark1 || '',
+            do_inst2: order.remark2 || order.DO_Remark2 || '',
+            prepared_by: order.prepared_by || '',
+            prepared_date: order.prepared_date || '',
+            cancelled_by: order.cancelled_by || '',
+            cancelled_date: order.cancelled_date || '',
+            amended_by: order.amended_by || '',
+            amended_date: order.amended_date || '',
+            printed_by: order.printed_by || '',
+            printed_date: order.printed_date || '',
+        }));
+
+        filteredDeliveryOrders.value = deliveryOrders.value;
+    } catch (error) {
+        console.error('Error fetching delivery orders:', error);
+        deliveryOrders.value = [];
+        filteredDeliveryOrders.value = [];
+    }
 };
 
 const filterDeliveryOrders = () => {
@@ -1664,18 +1325,46 @@ const openInvoiceTableModal = () => {
     fetchInvoices();
 };
 
-const fetchInvoices = () => {
-    // Dummy data for now. Replace with actual API call later.
-    invoices.value = [
-        { invoice_no: '06-2025-00408', inv_date: '05/06/2025', customer_code: '000541-04', tax: 'NIL', mode: 'Manual', pc_status: '0 Amd', post_status: 'UnPost', customer_name_detail: 'ZINUS DREAM INDONESIA, PT', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', customer_agent: '', second_invoice_ref: '', issued_by: 'fin02', issued_date: '5/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-        { invoice_no: '06-2025-00407', inv_date: '04/06/2025', customer_code: '000100', tax: 'PPN11', mode: 'Manual', pc_status: '1 New', post_status: 'UnPost', customer_name_detail: 'Customer B', order_mode: '1-Order by Customer', customer_agent: 'Agent B', second_invoice_ref: 'REF-001', issued_by: 'fin01', issued_date: '04/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-        { invoice_no: '06-2025-00406', inv_date: '04/06/2025', customer_code: '000045', tax: 'PPN11', mode: 'Manual', pc_status: '0 New', post_status: 'UnPost', customer_name_detail: 'Customer C', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', customer_agent: '', second_invoice_ref: '', issued_by: 'fin02', issued_date: '04/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-        { invoice_no: '06-2025-00405', inv_date: '04/06/2025', customer_code: '000045', tax: 'PPN11', mode: 'Manual', pc_status: '0 New', post_status: 'UnPost', customer_name_detail: 'Customer C', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', customer_agent: '', second_invoice_ref: '', issued_by: 'fin02', issued_date: '04/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-        { invoice_no: '06-2025-00404', inv_date: '04/06/2025', customer_code: '000045', tax: 'PPN11', mode: 'Manual', pc_status: '0 New', post_status: 'UnPost', customer_name_detail: 'Customer C', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', customer_agent: '', second_invoice_ref: '', issued_by: 'fin02', issued_date: '04/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-        { invoice_no: '06-2025-00403', inv_date: '04/06/2025', customer_code: '000045', tax: 'PPN11', mode: 'Manual', pc_status: '0 New', post_status: 'UnPost', customer_name_detail: 'Customer C', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', customer_agent: '', second_invoice_ref: '', issued_by: 'fin02', issued_date: '04/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-        { invoice_no: '06-2025-00402', inv_date: '04/06/2025', customer_code: '000045', tax: 'PPN11', mode: 'Manual', pc_status: '0 New', post_status: 'UnPost', customer_name_detail: 'Customer C', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', customer_agent: '', second_invoice_ref: '', issued_by: 'fin02', issued_date: '04/06/2025', amended_by: '', amended_date: '', cancelled_by: '', cancelled_date: '', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-    ];
-    filteredInvoices.value = invoices.value; // Initialize filtered with all data
+const fetchInvoices = async () => {
+    try {
+        const response = await axios.get('/api/invoices');
+        const payload = response.data;
+        const data = Array.isArray(payload) ? payload : (payload.data || []);
+
+        invoices.value = data.map(inv => ({
+            // Core fields from backend
+            invoice_no: inv.invoice_no || inv.IV_NUM || '',
+            inv_date: inv.invoice_date || inv.inv_date || '',
+            customer_code: inv.customer_code || inv.AC_NUM || '',
+            tax: inv.tax_code || inv.tax || '',
+            mode: inv.mode || 'Manual',
+            pc_status: inv.pc_status ?? '',
+            post_status: inv.post_status ?? '',
+
+            // Detail fields used in the bottom panel
+            customer_name_detail: inv.customer_name || inv.customer_name_detail || '',
+            order_mode: inv.order_mode || '',
+            customer_agent: inv.customer_agent || '',
+            second_invoice_ref: inv.second_invoice_ref || inv.ref2 || '',
+            issued_by: inv.issued_by || '',
+            issued_date: inv.issued_date || '',
+            amended_by: inv.amended_by || '',
+            amended_date: inv.amended_date || '',
+            cancelled_by: inv.cancelled_by || '',
+            cancelled_date: inv.cancelled_date || '',
+            printed_by: inv.printed_by || '',
+            printed_date: inv.printed_date || '',
+            posted_by: inv.posted_by || '',
+            posted_date: inv.posted_date || '',
+            reason: inv.cancelled_reason_1 || inv.cancelled_reason_2 || '',
+        }));
+
+        filteredInvoices.value = invoices.value;
+    } catch (error) {
+        console.error('Error fetching invoices:', error);
+        invoices.value = [];
+        filteredInvoices.value = [];
+    }
 };
 
 const filterInvoices = () => {
@@ -1709,8 +1398,13 @@ const openCustomerAccountSearchModal = async (targetInput) => {
 const fetchCustomerAccounts = async () => {
     try {
         const response = await axios.get('/api/customer-accounts');
-        customerAccounts.value = response.data;
-        filteredCustomerAccounts.value = response.data; // Initially display all
+        const payload = response.data;
+
+        // Backend returns `{ data: [...] }`; also support direct array for flexibility
+        const data = Array.isArray(payload) ? payload : (payload.data || []);
+
+        customerAccounts.value = data;
+        filteredCustomerAccounts.value = data; // Initially display all
     } catch (error) {
         console.error('Error fetching customer accounts:', error);
         // Optionally, show a notification to the user
@@ -1719,10 +1413,13 @@ const fetchCustomerAccounts = async () => {
 
 const filterCustomerAccounts = () => {
     const query = customerSearchQuery.value.toLowerCase();
-    filteredCustomerAccounts.value = customerAccounts.value.filter(customer =>
-        customer.customer_code.toLowerCase().includes(query) ||
-        customer.customer_name.toLowerCase().includes(query)
-    );
+    const source = Array.isArray(customerAccounts.value) ? customerAccounts.value : [];
+
+    filteredCustomerAccounts.value = source.filter(customer => {
+        const code = (customer.customer_code || '').toString().toLowerCase();
+        const name = (customer.customer_name || '').toString().toLowerCase();
+        return code.includes(query) || name.includes(query);
+    });
 };
 
 const selectCustomer = (customer) => {
@@ -1735,8 +1432,6 @@ const confirmCustomerSelection = () => {
             customerCodeMasterCard.value = selectedCustomerAccount.value.customer_code;
         } else if (currentCustomerCodeTarget.value === 'purchaseOrderRef') {
             customerCodePurchaseOrderRef.value = selectedCustomerAccount.value.customer_code;
-        } else if (currentCustomerCodeTarget.value === 'boardPurchase') {
-            customerCodeBoardPurchase.value = selectedCustomerAccount.value.customer_code;
         } else if (currentCustomerCodeTarget.value === 'customerCodeFrom' || currentCustomerCodeTarget.value === 'customerCodeTo') {
             emit('customerSelected', { customer: selectedCustomerAccount.value, target: currentCustomerCodeTarget.value });
         }
@@ -1746,8 +1441,6 @@ const confirmCustomerSelection = () => {
             showMasterCardSearchModal.value = true;
         } else if (currentCustomerCodeTarget.value === 'purchaseOrderRef') {
             showPurchaseOrderRefSearchModal.value = true;
-        } else if (currentCustomerCodeTarget.value === 'boardPurchase') {
-            showBoardPurchaseSearchModal.value = true;
         }
     }
 };
@@ -1796,39 +1489,6 @@ const retrySearch = () => {
             completed: false,
             cancelled: false,
         };
-    } else if (showDirectPurchaseOrderSearchModal.value) { // New: Handle retry for direct PO modal
-        purchaseOrderRefSearch.value = '';
-        customerCodePurchaseOrderRef.value = '';
-        purchaseOrderStartSOPeriod.value = { month: '0', year: '0' };
-        purchaseOrderSortOption.value = '1-P/O Ref# + S/Order#';
-        purchaseOrderStatus.value = {
-            outstanding: true,
-            partialCompleted: true,
-            closedManually: true,
-            completed: false,
-            cancelled: false,
-        };
-    } else if (showBoardPurchaseSearchModal.value) { // New: Handle retry for Board Purchase modal
-        customerCodeBoardPurchase.value = '';
-        boardPurchaseRefSearch.value = '';
-        boardPurchaseSortOption.value = '1-M/C Seq# + S/Order#';
-        boardPurchaseOrderStatus.value = {
-            outstanding: true,
-            partialCompleted: true,
-            closedManually: true,
-            completed: false,
-            cancelled: false,
-        };
-    } else if (showInitialWorkOrderModal.value || showWorkOrderTableModal.value) { // New: Handle retry for Work Order modals
-        workOrderParts.value = {
-            part1: '0',
-            part2: '0',
-            part3: '0',
-            part4: 'mm-yyyy-ccccc',
-        };
-        workOrderSearchQueryParts.value = { part1: '', part2: '', part3: '' };
-        selectedWorkOrder.value = null;
-        fetchWorkOrders(); // Re-fetch initial data for table
     } else if (showInitialDeliveryOrderModal.value || showDeliveryOrderTableModal.value) { // New: Handle retry for Delivery Order modals
         deliveryOrderParts.value = {
             part1: '0',
@@ -1863,7 +1523,8 @@ const handleOptionSelection = () => {
     }
 };
 
-const emit = defineEmits(['customerSelected']);
+// Declare emits so Vue recognizes listeners passed from parent (e.g. @show-notification)
+const emit = defineEmits(['customerSelected', 'showNotification']);
 
 defineExpose({
     openInitialSalesOrderModal,
@@ -1871,13 +1532,11 @@ defineExpose({
     performSearch,
     retrySearch,
     openMasterCardSearchDirectlyModal,
-    openPurchaseOrderRefSearchDirectlyModal,
-    openBoardPurchaseSearchModal, // New: Expose the new function
-    openInitialWorkOrderModal, // New: Expose Work Order functions
     openInitialDeliveryOrderModal, // New: Expose Delivery Order functions
     openInitialInvoiceModal, // New: Expose Invoice functions
     openCustomerAccountSearchModal, // Expose this for other components to use
 });
+
 </script>
 
 <style scoped>
@@ -1897,4 +1556,4 @@ defineExpose({
     transform: scale(0.95);
     opacity: 0;
 }
-</style> 
+</style>

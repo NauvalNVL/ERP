@@ -283,11 +283,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, defineAsyncComponent } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import axios from 'axios'
-import SalesOrderTableModal from './SalesOrderTableModal.vue'
-import SalesOrderDetailModal from './SalesOrderDetailModal.vue'
+
+const SalesOrderTableModal = defineAsyncComponent(() => import('./SalesOrderTableModal.vue'))
+const SalesOrderDetailModal = defineAsyncComponent(() => import('./SalesOrderDetailModal.vue'))
 
 const { success, error, info } = useToast()
 
@@ -369,6 +370,7 @@ const loadItemDetailsFromSo = async (soNumber) => {
         mainRow.pDesign = details.pd ?? ''
         mainRow.pcs = details.pcs ?? ''
         mainRow.unit = details.unit ?? ''
+        mainRow.partNumber = data.part_number ?? ''
       }
 
       if (Array.isArray(data.fittings)) {
@@ -379,6 +381,7 @@ const loadItemDetailsFromSo = async (soNumber) => {
               row.pDesign = fitting.design || ''
               row.pcs = fitting.pcs || ''
               row.unit = fitting.unit || ''
+              row.partNumber = fitting.part_number || ''
             }
           }
         })

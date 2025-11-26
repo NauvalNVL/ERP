@@ -446,23 +446,6 @@
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">
-                    Sales Tax:
-                    <span class="text-xs text-gray-400 font-normal">Tick for Y-Yes</span>
-                  </label>
-                  <div class="flex items-center space-x-2">
-                    <input
-                      v-model="orderDetails.salesTax"
-                      type="checkbox"
-                      class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      title="Tick for Y-Yes"
-                    >
-                    <span class="text-sm text-gray-700">
-                      {{ orderDetails.salesTax ? 'Y-Yes' : 'N-No' }}
-                    </span>
-                  </div>
-                </div>
-                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Lot Number:</label>
                   <input
                     v-model="orderDetails.lotNumber"
@@ -624,6 +607,7 @@
       @save="saveDeliverySchedule"
       :order-details="orderDetails"
       :mc-components="mcComponentsForDesign"
+      ref="deliveryScheduleModalRef"
     />
 
     <!-- Sales Order Table Modal -->
@@ -637,15 +621,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick, defineAsyncComponent } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import UpdateMcModal from '@/Components/UpdateMcModal.vue'
-import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue'
-import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue'
-import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
-import SalesOrderTableModal from '@/Components/SalesOrderTableModal.vue'
 import { useToast } from '@/Composables/useToast'
+
+const CustomerAccountModal = defineAsyncComponent(() => import('@/Components/customer-account-modal.vue'))
+const UpdateMcModal = defineAsyncComponent(() => import('@/Components/UpdateMcModal.vue'))
+const ProductDesignScreenModal = defineAsyncComponent(() => import('@/Components/ProductDesignScreenModal.vue'))
+const DeliveryScheduleModal = defineAsyncComponent(() => import('@/Components/DeliveryScheduleModal.vue'))
+const DeliveryLocationModal = defineAsyncComponent(() => import('@/Components/DeliveryLocationModal.vue'))
+const SalesOrderTableModal = defineAsyncComponent(() => import('@/Components/SalesOrderTableModal.vue'))
 
 const { success, error, info } = useToast()
 
@@ -709,7 +694,6 @@ const orderDetails = reactive({
   setQuantity: '',
   orderGroup: 'Sales',
   orderType: 'S1-Sales',
-  salesTax: false,
   lotNumber: '',
   remark: '',
   instruction1: '',
@@ -731,6 +715,8 @@ const showDeliveryScheduleModal = ref(false)
 const showSalesOrderTableModal = ref(false)
 // Ref to Product Design modal for live quantity sync
 const productDesignModalRef = ref(null)
+// Ref to Delivery Schedule modal to allow hard reset from parent
+const deliveryScheduleModalRef = ref(null)
 
 // Normalize setQuantity to number
 const normalizedSetQuantity = computed(() => {
@@ -824,8 +810,7 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: true,
-      requiresInvoice: true,
-      salesTax: true
+      requiresInvoice: true
     },
     {
       code: 'S2-Sales',
@@ -836,8 +821,7 @@ const orderTypesConfig = {
       requiresProduction: false,
       requiresDelivery: true,
       requiresInvoice: true,
-      isKanban: true,
-      salesTax: true
+      isKanban: true
     },
     {
       code: 'S3-Sales',
@@ -848,8 +832,7 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: true,
       requiresInvoice: true,
-      skipCorrugator: true,
-      salesTax: true
+      skipCorrugator: true
     }
   ],
   'Non-Sales': [
@@ -861,8 +844,7 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: true,
-      requiresInvoice: false,
-      salesTax: false
+      requiresInvoice: false
     },
     {
       code: 'N2-NonSales',
@@ -872,8 +854,7 @@ const orderTypesConfig = {
       requiresInventory: false,
       requiresProduction: false,
       requiresDelivery: true,
-      requiresInvoice: false,
-      salesTax: false
+      requiresInvoice: false
     },
     {
       code: 'N3-NonSales',
@@ -883,8 +864,7 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: false,
-      requiresInvoice: false,
-      salesTax: false
+      requiresInvoice: false
     },
     {
       code: 'N4-NonSales',
@@ -895,8 +875,7 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: false,
       requiresInvoice: false,
-      corrugatorOnly: true,
-      salesTax: false
+      corrugatorOnly: true
     }
   ]
 }
@@ -963,9 +942,6 @@ const updateOrderTypeUI = () => {
     delivery: typeConfig.requiresDelivery,
     invoice: typeConfig.requiresInvoice
   })
-
-  // Update sales tax based on order type configuration
-  orderDetails.salesTax = typeConfig.salesTax || false
 
   // Special handling for Kanban/JIT orders
   if (typeConfig.isKanban) {
@@ -1038,6 +1014,14 @@ const refreshPage = () => {
   showSalesOrderTableModal.value = false
   showMcsTableModal.value = false
 
+  // Hard reset child modal internal states (if already mounted)
+  if (productDesignModalRef.value && typeof productDesignModalRef.value.resetModalState === 'function') {
+    productDesignModalRef.value.resetModalState()
+  }
+  if (deliveryScheduleModalRef.value && typeof deliveryScheduleModalRef.value.resetScheduleState === 'function') {
+    deliveryScheduleModalRef.value.resetScheduleState()
+  }
+
   // Reset all form data
   Object.assign(currentPeriod, {
     month: new Date().getMonth() + 1,
@@ -1081,7 +1065,6 @@ const refreshPage = () => {
     setQuantity: '',
     orderGroup: 'Sales',
     orderType: 'S1-Sales',
-    salesTax: false,
     lotNumber: '',
     remark: '',
     instruction1: '',
@@ -1574,6 +1557,18 @@ const saveProductDesign = async (designData) => {
       return
     }
 
+    // Detect if user already provided Set Quantity before opening Product Design.
+    // When Set Quantity exists, we keep Set-based mode and do not switch to
+    // per-component (product-design-driven) quantity behaviour.
+    let hadInitialSetQuantity = false
+    const existingSetRaw = orderDetails.setQuantity
+    if (existingSetRaw !== undefined && existingSetRaw !== null && existingSetRaw !== '') {
+      const existingSetNum = typeof existingSetRaw === 'string'
+        ? parseFloat(existingSetRaw)
+        : Number(existingSetRaw)
+      hadInitialSetQuantity = !isNaN(existingSetNum) && existingSetNum > 0
+    }
+
     const requestData = {
       master_card_seq: selectedMasterCard.seq,
       items: designData.items || [],
@@ -1603,7 +1598,9 @@ const saveProductDesign = async (designData) => {
           if (mainItem.unitPrice != null) {
             orderDetails.unitPrice = Number(mainItem.unitPrice) || 0
           }
-          if (mainItem.quantity != null) {
+          // Only let Product Design overwrite header Set Quantity when user did not
+          // provide Set Quantity beforehand. If user already filled Set, keep it as master.
+          if (!hadInitialSetQuantity && mainItem.quantity != null) {
             orderDetails.setQuantity = Number(mainItem.quantity) || 0
           }
           if (mainItem.unit) {
@@ -1630,8 +1627,18 @@ const saveProductDesign = async (designData) => {
         // Once Product Design is used, treat quantities as product-design-driven
         // regardless of whether setQuantity was filled earlier
         if (totalDesignQty > 0) {
-          orderDetails.mainQuantity = totalDesignQty
-          orderDetails.isProductDesignQuantity = true
+          if (hadInitialSetQuantity) {
+            // Keep Set-based scheduling: mainQuantity left empty so summaries
+            // fall back to Set Quantity, and DeliverySchedule stays in Set mode.
+            orderDetails.mainQuantity = ''
+            orderDetails.isProductDesignQuantity = false
+          } else {
+            // No prior Set Quantity: quantities are driven from Product Design
+            // (per-component Main/Fit) and DeliverySchedule should use
+            // product-design mode.
+            orderDetails.mainQuantity = totalDesignQty
+            orderDetails.isProductDesignQuantity = true
+          }
         }
       } catch (e) {
         console.warn('Failed to map product design values to order details:', e)
@@ -1853,7 +1860,7 @@ const saveDeliverySchedule = async (scheduleData) => {
       so_number: soNumber,
       entries: scheduleData.entries
     }
-    
+
     console.log('Transformed delivery schedule data:', requestData)
 
     // Debug CSRF token for delivery schedule
@@ -1929,7 +1936,6 @@ const createSalesOrder = async () => {
       po_date: orderDetails.pOrderDate,
       order_group: orderDetails.orderGroup,
       order_type: orderDetails.orderType,
-      sales_tax: orderDetails.salesTax,
       lot_number: orderDetails.lotNumber,
       remark: orderDetails.remark,
       instruction1: orderDetails.instruction1,
