@@ -220,7 +220,6 @@ const hasPermission = (menuKey) => {
     menuKey === 'view_print_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
     menuKey === 'reactive_unobsolete_user' ||
-<<<<<<< HEAD
     menuKey === 'obsolete_unobsolete_sales_team' ||
     menuKey === 'obsolete_unobsolete_salesperson' ||
     menuKey === 'obsolete_unobsolete_salesperson_team' ||
@@ -234,11 +233,9 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_paper_size' ||
     menuKey === 'obsolete_unobsolete_color_group' ||
     menuKey === 'obsolete_unobsolete_color' ||
-    menuKey === 'obsolete_unobsolete_finishing'
-=======
+    menuKey === 'obsolete_unobsolete_finishing' ||
     menuKey === 'obsolete_unobsolete_vehicle' ||
     menuKey === 'obsolete_unobsolete_vehicle_class'
->>>>>>> 6389bc7f445a933a1b6552c6ca3ffe5caa0795f3
   ) {
     return true;
   }
