@@ -369,6 +369,7 @@ const loadItemDetailsFromSo = async (soNumber) => {
         mainRow.pDesign = details.pd ?? ''
         mainRow.pcs = details.pcs ?? ''
         mainRow.unit = details.unit ?? ''
+        mainRow.partNumber = data.part_number ?? ''
       }
 
       if (Array.isArray(data.fittings)) {
@@ -379,6 +380,7 @@ const loadItemDetailsFromSo = async (soNumber) => {
               row.pDesign = fitting.design || ''
               row.pcs = fitting.pcs || ''
               row.unit = fitting.unit || ''
+              row.partNumber = fitting.part_number || ''
             }
           }
         })
