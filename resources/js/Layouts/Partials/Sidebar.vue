@@ -220,25 +220,15 @@ const hasPermission = (menuKey) => {
     menuKey === 'view_print_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
     menuKey === 'reactive_unobsolete_user' ||
-<<<<<<< HEAD
-    menuKey === 'obsolete_unobsolete_sales_team' ||
-    menuKey === 'obsolete_unobsolete_salesperson' ||
-    menuKey === 'obsolete_unobsolete_salesperson_team' ||
-    menuKey === 'obsolete_unobsolete_industry' ||
-    menuKey === 'obsolete_unobsolete_geo' ||
-    menuKey === 'obsolete_unobsolete_product_group' ||
-    menuKey === 'obsolete_unobsolete_product' ||
-    menuKey === 'obsolete_unobsolete_product_design' ||
     menuKey === 'obsolete_unobsolete_scoring_tool' ||
     menuKey === 'obsolete_unobsolete_paper_flute' ||
     menuKey === 'obsolete_unobsolete_paper_size' ||
     menuKey === 'obsolete_unobsolete_color_group' ||
     menuKey === 'obsolete_unobsolete_color' ||
-    menuKey === 'obsolete_unobsolete_finishing'
-=======
+    menuKey === 'obsolete_unobsolete_finishing' ||
     menuKey === 'obsolete_unobsolete_vehicle' ||
-    menuKey === 'obsolete_unobsolete_vehicle_class'
->>>>>>> 6389bc7f445a933a1b6552c6ca3ffe5caa0795f3
+    menuKey === 'obsolete_unobsolete_vehicle_class' ||
+    menuKey === 'obsolete_unobsolete_analysis_code'
   ) {
     return true;
   }
@@ -316,6 +306,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
     'Define Analysis Code': 'define_analysis_code',
+    'Obsolete/Unobsolete Analysis Code': 'obsolete_unobsolete_analysis_code',
 
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
@@ -609,6 +600,7 @@ const salesManagementItems = [
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
           { title: 'Obsolete/Unobsolete Finishing', icon: 'fas fa-ban', route: '/finishing/status' },
           { title: 'Define Analysis Code', icon: 'fas fa-code-branch', route: '/analysis-code' },
+          { title: 'Obsolete/Unobsolete Analysis Code', icon: 'fas fa-ban', route: '/analysis-code/status' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
           { title: 'Define Reinforcement Tape', icon: 'fas fa-tape', route: '/reinforcement-tape' },

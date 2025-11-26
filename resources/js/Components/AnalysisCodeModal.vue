@@ -32,6 +32,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('analysis_name')">Analysis Name</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Group</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Group2</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Status</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -45,9 +46,21 @@
                   <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">{{ code.analysis_group }}</span>
                 </td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ code.analysis_group2 }}</td>
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span
+                    :class="[
+                      code.status === 'Obs'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-emerald-100 text-emerald-800',
+                      'px-2 py-1 text-xs font-medium rounded-full'
+                    ]"
+                  >
+                    {{ code.status === 'Obs' ? 'Obsolete' : 'Active' }}
+                  </span>
+                </td>
               </tr>
               <tr v-if="filteredAnalysisCodes.length === 0">
-                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No analysis codes found.</td>
+                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No analysis codes found.</td>
               </tr>
             </tbody>
           </table>
@@ -91,30 +104,30 @@ const sortAsc = ref(true);
 
 const filteredAnalysisCodes = computed(() => {
     let filtered = props.analysisCodes || [];
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(code => 
+        filtered = filtered.filter(code =>
             code.analysis_code?.toLowerCase().includes(query) ||
             code.analysis_name?.toLowerCase().includes(query) ||
             code.analysis_group?.toLowerCase().includes(query) ||
             code.analysis_group2?.toLowerCase().includes(query)
         );
     }
-    
+
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
         const aVal = a[sortKey.value] || '';
         const bVal = b[sortKey.value] || '';
-        
+
         if (sortAsc.value) {
             return aVal.toString().localeCompare(bVal.toString());
         } else {
             return bVal.toString().localeCompare(aVal.toString());
         }
     });
-    
+
     return sorted;
 });
 

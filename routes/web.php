@@ -438,6 +438,7 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
 
 Route::get('/analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.analysis-code.index');
+Route::get('/analysis-code/status', [AnalysisCodeController::class, 'vueManageStatus'])->name('vue.analysis-code.status');
 Route::get('/analysis-code/view-print', function () {
     return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-analysis-code');
 })->name('vue.analysis-code.view-print');

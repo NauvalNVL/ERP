@@ -138,6 +138,7 @@ Route::get('/analysis-codes/{code}', [AnalysisCodeController::class, 'show']);
 Route::post('/analysis-codes', [AnalysisCodeController::class, 'store']);
 Route::put('/analysis-codes/{code}', [AnalysisCodeController::class, 'update']);
 Route::delete('/analysis-codes/{code}', [AnalysisCodeController::class, 'destroy']);
+Route::put('/analysis-codes/{code}/status', [AnalysisCodeController::class, 'toggleStatus']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();

@@ -19,6 +19,7 @@ class AnalysisCode extends Model
         'analysis_name',
         'analysis_group',
         'analysis_group2',
+        'status',
     ];
 
     protected $casts = [
