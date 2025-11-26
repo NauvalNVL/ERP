@@ -138,6 +138,7 @@ Route::get('/analysis-codes/{code}', [AnalysisCodeController::class, 'show']);
 Route::post('/analysis-codes', [AnalysisCodeController::class, 'store']);
 Route::put('/analysis-codes/{code}', [AnalysisCodeController::class, 'update']);
 Route::delete('/analysis-codes/{code}', [AnalysisCodeController::class, 'destroy']);
+Route::put('/analysis-codes/{code}/status', [AnalysisCodeController::class, 'toggleStatus']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();
@@ -399,17 +400,17 @@ Route::post('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController:
 
 // Obsolete & Reactive MC API routes
 // Public routes (read-only)
-Route::get('/obsolete-reactive-mc', [App\Http\Controllers\ObsolateReactiveMcController::class, 'apiIndex']);
-Route::get('/obsolete-reactive-mc/by-customer/{customerCode}', [App\Http\Controllers\ObsolateReactiveMcController::class, 'getByCustomer']);
-Route::get('/mc/update-log/{mcsNum}', [App\Http\Controllers\ObsolateReactiveMcController::class, 'getUpdateLog']);
-Route::get('/mc/details/{mcsNum}', [App\Http\Controllers\ObsolateReactiveMcController::class, 'getMcDetails']);
+Route::get('/obsolete-reactive-mc', [UpdateMcController::class, 'obsoleteReactiveApiIndex']);
+Route::get('/obsolete-reactive-mc/by-customer/{customerCode}', [UpdateMcController::class, 'getByCustomer']);
+Route::get('/mc/update-log/{mcsNum}', [UpdateMcController::class, 'getUpdateLog']);
+Route::get('/mc/details/{mcsNum}', [UpdateMcController::class, 'getMcDetails']);
 
 // Protected routes (write operations - require authentication)
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::post('/obsolete-reactive-mc/{mcsNum}/obsolete', [App\Http\Controllers\ObsolateReactiveMcController::class, 'obsolate']);
-    Route::post('/obsolete-reactive-mc/{mcsNum}/reactive', [App\Http\Controllers\ObsolateReactiveMcController::class, 'reactive']);
-    Route::post('/obsolete-reactive-mc/bulk-obsolete', [App\Http\Controllers\ObsolateReactiveMcController::class, 'bulkObsolete']);
-    Route::post('/obsolete-reactive-mc/bulk-reactive', [App\Http\Controllers\ObsolateReactiveMcController::class, 'bulkReactivate']);
+    Route::post('/obsolete-reactive-mc/{mcsNum}/obsolete', [UpdateMcController::class, 'obsolate']);
+    Route::post('/obsolete-reactive-mc/{mcsNum}/reactive', [UpdateMcController::class, 'reactive']);
+    Route::post('/obsolete-reactive-mc/bulk-obsolete', [UpdateMcController::class, 'bulkObsolete']);
+    Route::post('/obsolete-reactive-mc/bulk-reactive', [UpdateMcController::class, 'bulkReactivate']);
 });
 
 // Sales Order Report API routes

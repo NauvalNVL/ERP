@@ -19,7 +19,12 @@ class ColorGroup extends Model
     protected $fillable = [
         'CG',
         'CG_Name',
-        'CG_Type'
+        'CG_Type',
+        'is_active'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean'
     ];
 
     /**

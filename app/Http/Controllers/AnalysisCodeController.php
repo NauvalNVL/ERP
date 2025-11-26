@@ -16,10 +16,29 @@ class AnalysisCodeController extends Controller
     public function index()
     {
         $analysisCodes = AnalysisCode::orderBy('analysis_code')->get();
-        
+
         return Inertia::render('sales-management/system-requirement/standard-requirement/AnalysisCode', [
             'analysisCodes' => $analysisCodes
         ]);
+    }
+
+    public function vueManageStatus()
+    {
+        try {
+            $analysisCodes = AnalysisCode::orderBy('analysis_code')->get();
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteAnalysisCode', [
+                'analysisCodes' => $analysisCodes,
+                'header' => 'Manage Analysis Code Status',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching analysis codes for status management', ['error' => $e->getMessage()]);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteAnalysisCode', [
+                'analysisCodes' => [],
+                'header' => 'Manage Analysis Code Status',
+            ]);
+        }
     }
 
     /**
@@ -43,11 +62,11 @@ class AnalysisCodeController extends Controller
     {
         try {
             $analysisCode = AnalysisCode::find($code);
-            
+
             if (!$analysisCode) {
                 return response()->json(['message' => 'Analysis code not found'], 404);
             }
-            
+
             return response()->json($analysisCode);
         } catch (\Exception $e) {
             Log::error('Error fetching analysis code', ['code' => $code, 'error' => $e->getMessage()]);
@@ -66,10 +85,16 @@ class AnalysisCodeController extends Controller
                 'analysis_name' => 'required|string|max:255',
                 'analysis_group' => 'required|string|max:50',
                 'analysis_group2' => 'required|string|max:50',
+                'status' => 'nullable|string|max:3',
             ]);
 
             // Validate business rules
             $this->validateAnalysisGroupRules($validated['analysis_group'], $validated['analysis_group2']);
+
+            // Set default status if not provided
+            if (!isset($validated['status']) || $validated['status'] === null || $validated['status'] === '') {
+                $validated['status'] = 'Act';
+            }
 
             $analysisCode = AnalysisCode::create($validated);
 
@@ -102,7 +127,7 @@ class AnalysisCodeController extends Controller
     {
         try {
             $analysisCode = AnalysisCode::find($code);
-            
+
             if (!$analysisCode) {
                 return response()->json([
                     'success' => false,
@@ -114,10 +139,16 @@ class AnalysisCodeController extends Controller
                 'analysis_name' => 'required|string|max:255',
                 'analysis_group' => 'required|string|max:50',
                 'analysis_group2' => 'required|string|max:50',
+                'status' => 'nullable|string|max:3',
             ]);
 
             // Validate business rules
             $this->validateAnalysisGroupRules($validated['analysis_group'], $validated['analysis_group2']);
+
+            // Preserve existing status if none provided
+            if (!isset($validated['status']) || $validated['status'] === null || $validated['status'] === '') {
+                $validated['status'] = $analysisCode->status ?? 'Act';
+            }
 
             $analysisCode->update($validated);
 
@@ -150,7 +181,38 @@ class AnalysisCodeController extends Controller
     {
         try {
             $analysisCode = AnalysisCode::find($code);
-            
+
+            if (!$analysisCode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Analysis code not found'
+                ]);
+            }
+
+            // Soft delete: mark as obsolete instead of hard delete
+            $analysisCode->status = 'Obs';
+            $analysisCode->save();
+
+            Log::info('Analysis code marked as obsolete', ['code' => $code]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Analysis code marked as obsolete successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting analysis code', ['code' => $code, 'error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete analysis code'
+            ], 500);
+        }
+    }
+
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $analysisCode = AnalysisCode::find($code);
+
             if (!$analysisCode) {
                 return response()->json([
                     'success' => false,
@@ -158,19 +220,31 @@ class AnalysisCodeController extends Controller
                 ], 404);
             }
 
-            $analysisCode->delete();
+            $status = $request->input('status');
 
-            Log::info('Analysis code deleted', ['code' => $code]);
+            if (!in_array($status, ['Act', 'Obs'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid status value'
+                ], 422);
+            }
+
+            $analysisCode->status = $status;
+            $analysisCode->save();
+
+            Log::info('Analysis code status updated', ['code' => $code, 'status' => $status]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Analysis code deleted successfully'
+                'message' => 'Analysis code status updated successfully',
+                'data' => $analysisCode
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting analysis code', ['code' => $code, 'error' => $e->getMessage()]);
+            Log::error('Error updating analysis code status', ['code' => $code, 'error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete analysis code'
+                'message' => 'Failed to update analysis code status'
             ], 500);
         }
     }

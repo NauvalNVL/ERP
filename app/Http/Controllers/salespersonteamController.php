@@ -149,11 +149,13 @@ class SalespersonTeamController extends Controller
         try {
             // Validate request
             $validator = Validator::make($request->all(), [
-                's_person_code' => 'required|string|max:255',
-                'salesperson_name' => 'required|string|max:255',
-                'st_code' => 'required|string|max:255',
-                'sales_team_name' => 'required|string|max:255',
-                'sales_team_position' => 'required|string|max:255',
+                's_person_code' => 'nullable|string|max:255',
+                'salesperson_name' => 'nullable|string|max:255',
+                'st_code' => 'nullable|string|max:255',
+                'sales_team_name' => 'nullable|string|max:255',
+                'sales_team_position' => 'nullable|string|max:255',
+                'is_active' => 'nullable|boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -164,17 +166,35 @@ class SalespersonTeamController extends Controller
                 ], 422);
             }
 
+            // Build update data
+            $updateData = ['updated_at' => now()];
+            
+            if ($request->has('s_person_code')) {
+                $updateData['s_person_code'] = $request->s_person_code;
+            }
+            if ($request->has('salesperson_name')) {
+                $updateData['salesperson_name'] = $request->salesperson_name;
+            }
+            if ($request->has('st_code')) {
+                $updateData['st_code'] = $request->st_code;
+            }
+            if ($request->has('sales_team_name')) {
+                $updateData['sales_team_name'] = $request->sales_team_name;
+            }
+            if ($request->has('sales_team_position')) {
+                $updateData['sales_team_position'] = $request->sales_team_position;
+            }
+            if ($request->has('is_active')) {
+                $updateData['is_active'] = $request->is_active;
+            }
+            if ($request->has('status')) {
+                $updateData['status'] = $request->status;
+            }
+
             // Update salesperson team
             $updated = DB::table('salesperson_teams')
                 ->where('id', $id)
-                ->update([
-                    's_person_code' => $request->s_person_code,
-                    'salesperson_name' => $request->salesperson_name,
-                    'st_code' => $request->st_code,
-                    'sales_team_name' => $request->sales_team_name,
-                    'sales_team_position' => $request->sales_team_position,
-                    'updated_at' => now()
-                ]);
+                ->update($updateData);
 
             if (!$updated) {
                 return response()->json([
@@ -204,7 +224,9 @@ class SalespersonTeamController extends Controller
                     'salesperson_name' => $updatedData->salesperson_name,
                     'st_code' => $updatedData->st_code,
                     'sales_team_name' => $updatedData->sales_team_name,
-                    'sales_team_position' => $updatedData->sales_team_position
+                    'sales_team_position' => $updatedData->sales_team_position,
+                    'is_active' => $updatedData->is_active ?? true,
+                    'status' => $updatedData->status ?? 'Act'
                 ]
             ]);
 
@@ -289,6 +311,53 @@ class SalespersonTeamController extends Controller
     }
 
     /**
+     * Display the Vue version of salesperson team status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $salespersonTeams = DB::table('salesperson_teams')
+                ->select(
+                    'id',
+                    's_person_code',
+                    'salesperson_name',
+                    'st_code',
+                    'sales_team_name',
+                    'sales_team_position',
+                    'status',
+                    'is_active'
+                )
+                ->orderBy('s_person_code')
+                ->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-salesperson-team', [
+                'salespersonTeams' => $salespersonTeams->items(),
+                'pagination' => [
+                    'currentPage' => $salespersonTeams->currentPage(),
+                    'perPage' => $salespersonTeams->perPage(),
+                    'total' => $salespersonTeams->total()
+                ],
+                'header' => 'Manage Salesperson Team Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonTeamController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-salesperson-team', [
+                'salespersonTeams' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Salesperson Team Status',
+                'error' => 'Error displaying salesperson teams: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * API endpoint to get all salesperson teams for Vue component.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -303,21 +372,23 @@ class SalespersonTeamController extends Controller
                     'salesperson_name',
                     'st_code',
                     'sales_team_name',
-                    'sales_team_position'
+                    'sales_team_position',
+                    'status',
+                    'is_active'
                 )
                 ->orderBy('s_person_code')
-                ->get();
+                ->get()
+                ->map(function ($team) {
+                    // Ensure is_active and status have default values
+                    $team->is_active = $team->is_active ?? true;
+                    $team->status = $team->status ?? 'Act';
+                    return $team;
+                });
 
-            return response()->json([
-                'success' => true,
-                'data' => $salespersonTeams
-            ]);
+            return response()->json($salespersonTeams);
         } catch (\Exception $e) {
             Log::error('Error in SalespersonTeamController@apiIndex: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load salesperson team data'
-            ], 500);
+            return response()->json(['error' => 'Failed to load salesperson team data'], 500);
         }
     }
 

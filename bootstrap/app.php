@@ -13,9 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [
-            HandleInertiaRequests::class,
-        ]);
+        $middleware
+            // CSRF hanya dilewati untuk login/logout, route lain tetap terlindungi
+            ->validateCsrfTokens(except: [
+                '/login',
+                '/logout',
+            ])
+            ->web(append: [
+                HandleInertiaRequests::class,
+            ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -16,7 +16,13 @@ class SalespersonTeam extends Model
         'salesperson_name',
         'st_code',
         'sales_team_name',
-        'sales_team_position'
+        'sales_team_position',
+        'status',
+        'is_active'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     // Relationship with SalesTeam

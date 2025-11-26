@@ -26,7 +26,8 @@ class PaperFlute extends Model
         'A_C_E',    // [A/C/E] in database
         '_2L',      // [2L] in database
         'Height',
-        'Starch'
+        'Starch',
+        'is_active',
     ];
 
     protected $casts = [
@@ -37,6 +38,7 @@ class PaperFlute extends Model
         'A_C_E' => 'float',
         '_2L' => 'float',
         'Height' => 'float',
-        'Starch' => 'float'
+        'Starch' => 'float',
+        'is_active' => 'boolean',
     ];
 }

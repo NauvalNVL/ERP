@@ -207,6 +207,41 @@ class PaperSizeController extends Controller
     }
 
     /**
+     * Display the Vue version of paper size status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $paperSizes = PaperSize::orderBy('millimeter', 'asc')->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-size', [
+                'paperSizes' => $paperSizes->items(),
+                'pagination' => [
+                    'currentPage' => $paperSizes->currentPage(),
+                    'perPage' => $paperSizes->perPage(),
+                    'total' => $paperSizes->total()
+                ],
+                'header' => 'Manage Paper Size Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperSizeController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-size', [
+                'paperSizes' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Paper Size Status',
+                'error' => 'Error displaying paper sizes: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Return all paper sizes as JSON for the API.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -236,12 +271,13 @@ class PaperSizeController extends Controller
             
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'millimeter' => [
-                    'required',
+                    'nullable',
                     'numeric',
                     'min:0.01',
                     Rule::unique('paper_sizes', 'millimeter')->ignore($id)
                 ],
-                'inches' => 'required|numeric|min:0.01'
+                'inches' => 'nullable|numeric|min:0.01',
+                'is_active' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -251,10 +287,12 @@ class PaperSizeController extends Controller
                 ], 422);
             }
             
-            $paperSize->update([
-                'millimeter' => $request->millimeter,
-                'inches' => $request->inches
-            ]);
+            $updateData = [];
+            if ($request->has('millimeter')) $updateData['millimeter'] = $request->millimeter;
+            if ($request->has('inches')) $updateData['inches'] = $request->inches;
+            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            
+            $paperSize->update($updateData);
 
             return response()->json([
                 'success' => true,

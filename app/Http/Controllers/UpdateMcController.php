@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\MasterCard;
 use App\Models\Mc;
+use App\Models\McUpdateLog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,44 @@ class UpdateMcController extends Controller
     public function index()
     {
         return Inertia::render('sales-management/system-requirement/master-card/update-mc');
+    }
+
+    /**
+     * Display the Obsolete & Reactive MC page.
+     *
+     * Halaman ini menggunakan controller yang sama dengan Update MC
+     * sementara aksi obsolete/reactive tetap ditangani via API.
+     *
+     * @return \Inertia\Response
+     */
+    public function obsoleteReactiveIndex()
+    {
+        return Inertia::render('sales-management/system-requirement/master-card/obsolete-reactive-mc');
+    }
+
+    private function getCurrentUserId()
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if (!empty($user->userID ?? null)) {
+                return $user->userID;
+            }
+
+            if (!empty($user->user_id ?? null)) {
+                return $user->user_id;
+            }
+
+            if (!empty($user->id ?? null)) {
+                return (string) $user->id;
+            }
+
+            if (!empty($user->username ?? null)) {
+                return $user->username;
+            }
+        }
+
+        return 'SYSTEM';
     }
 
     /**
@@ -1377,14 +1416,6 @@ class UpdateMcController extends Controller
     }
 
     /**
-     * Display the Obsolete & Reactive MC page
-     */
-    public function obsoleteReactiveIndex()
-    {
-        return inertia('sales-management/system-requirement/master-card/obsolete-reactive-mc');
-    }
-
-    /**
      * Get MCs by customer with pagination (for UpdateMcModal)
      */
     public function getMcsByCustomerPaginated(Request $request)
@@ -1473,74 +1504,33 @@ class UpdateMcController extends Controller
      */
     public function getMcDetails($mcsNum)
     {
-        try {
-            Log::info('getMcDetails called', ['mcs_num' => $mcsNum]);
+        // Get MC details with customer information (legacy style)
+        $mc = DB::table('MC')
+            ->leftJoin('CUSTOMER', 'MC.AC_NUM', '=', 'CUSTOMER.CODE')
+            ->select(
+                'MC.*',
+                'CUSTOMER.NAME as AC_NAME',
+                'CUSTOMER.SLM as salesperson_code'
+            )
+            ->where('MC.MCS_Num', $mcsNum)
+            ->first();
 
-            $mc = DB::table('MC')->where('MCS_Num', $mcsNum)->first();
+        if (!$mc) {
+            return response()->json(['error' => 'Master Card not found'], 404);
+        }
 
-            if (!$mc) {
-                return response()->json(['message' => 'Master Card not found.'], 404);
-            }
-
-            // Get customer name from MC.AC_NAME or CUSTOMER table
-            $customerName = '';
-            if (!empty($mc->AC_NAME)) {
-                $customerName = $mc->AC_NAME;
-            } elseif (!empty($mc->AC_NUM)) {
-                $customerName = DB::table('CUSTOMER')->where('CODE', $mc->AC_NUM)->value('NAME') ?? '';
-            }
-
-            // Get salesperson from CUSTOMER.SLM field (CPS style - same as Update Customer Account)
-            $salespersonCode = '';
-            $salespersonName = '';
-            if (!empty($mc->AC_NUM)) {
-                $customer = DB::table('CUSTOMER')->where('CODE', $mc->AC_NUM)->first();
-
-                if ($customer && !empty($customer->SLM)) {
-                    $salespersonCode = $customer->SLM; // Use original SLM code (e.g., S101)
-
-                    // Get salesperson name from salesperson table (same as Update Customer Account)
-                    $salesperson = DB::table('salesperson')->where('Code', $customer->SLM)->first();
-                    if ($salesperson) {
-                        $salespersonName = $salesperson->Name ?? '';
-                    }
-                }
-            }
-
-            // Get last update log
-            $lastUpdate = DB::table('MC_UPDATE_LOG')
-                ->where('MCS_Num', $mcsNum)
-                ->orderBy('updated_at', 'desc')
+        // Get salesperson name from salesperson table
+        if (!empty($mc->salesperson_code)) {
+            $salesperson = DB::table('salesperson')
+                ->where('Code', $mc->salesperson_code)
                 ->first();
 
-            $totalUpdate = DB::table('MC_UPDATE_LOG')->where('MCS_Num', $mcsNum)->count();
-
-            return response()->json([
-                'customer_name' => $customerName,
-                'model' => $mc->MODEL ?? '',
-                'salesperson_code' => $salespersonCode,
-                'salesperson_name' => $salespersonName,
-                'status' => $mc->STS ?? 'Active',
-                'last_update' => $lastUpdate ? [
-                    'status' => $lastUpdate->status ?? '',
-                    'user_id' => $lastUpdate->user_id ?? '',
-                    'date' => $lastUpdate->updated_at ? \Carbon\Carbon::parse($lastUpdate->updated_at)->timezone('Asia/Jakarta')->format('d/m/Y') : '',
-                    'time' => $lastUpdate->updated_at ? \Carbon\Carbon::parse($lastUpdate->updated_at)->timezone('Asia/Jakarta')->format('H:i') : '',
-                    'reason' => $lastUpdate->reason ?? '',
-                    'total_update' => $totalUpdate,
-                ] : [
-                    'status' => $mc->STS ?? '',
-                    'user_id' => '',
-                    'date' => '',
-                    'time' => '',
-                    'reason' => '',
-                    'total_update' => $totalUpdate,
-                ],
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Get MC Details Error', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error occurred.', 'error' => $e->getMessage()], 500);
+            if ($salesperson) {
+                $mc->salesperson_name = $salesperson->Name;
+            }
         }
+
+        return response()->json($mc);
     }
 
     /**
@@ -1779,5 +1769,165 @@ class UpdateMcController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getUpdateLog($mcsNum)
+    {
+        $logs = McUpdateLog::where('MCS_Num', $mcsNum)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($logs);
+    }
+
+    public function obsolate(Request $request, $mcsNum)
+    {
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $masterCard = DB::table('MC')->where('MCS_Num', $mcsNum)->first();
+
+        if (!$masterCard) {
+            return response()->json(['error' => 'Master Card not found'], 404);
+        }
+
+        DB::table('MC')
+            ->where('MCS_Num', $mcsNum)
+            ->update(['STS' => 'OBSOLETE']);
+
+        McUpdateLog::create([
+            'MCS_Num' => $mcsNum,
+            'status' => 'OBSOLETE',
+            'reason' => $validated['reason'] ?? 'No reason provided',
+            'user_id' => $this->getCurrentUserId(),
+        ]);
+
+        return response()->json([
+            'message' => 'Master Card has been marked as obsolete',
+            'mcs_num' => $mcsNum,
+        ]);
+    }
+
+    public function reactive(Request $request, $mcsNum)
+    {
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $masterCard = DB::table('MC')->where('MCS_Num', $mcsNum)->first();
+
+        if (!$masterCard) {
+            return response()->json(['error' => 'Master Card not found'], 404);
+        }
+
+        DB::table('MC')
+            ->where('MCS_Num', $mcsNum)
+            ->update(['STS' => 'ACTIVE']);
+
+        McUpdateLog::create([
+            'MCS_Num' => $mcsNum,
+            'status' => 'ACTIVE',
+            'reason' => $validated['reason'] ?? 'No reason provided',
+            'user_id' => $this->getCurrentUserId(),
+        ]);
+
+        return response()->json([
+            'message' => 'Master Card has been reactivated',
+            'mcs_num' => $mcsNum,
+        ]);
+    }
+
+    public function bulkObsolete(Request $request)
+    {
+        $validated = $request->validate([
+            'mcs_nums' => 'required|array',
+            'mcs_nums.*' => 'string',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $userId = $this->getCurrentUserId();
+        $mcsNums = $validated['mcs_nums'];
+        $reason = $validated['reason'] ?? 'No reason provided';
+
+        DB::table('MC')
+            ->whereIn('MCS_Num', $mcsNums)
+            ->update(['STS' => 'OBSOLETE']);
+
+        foreach ($mcsNums as $num) {
+            McUpdateLog::create([
+                'MCS_Num' => $num,
+                'status' => 'OBSOLETE',
+                'reason' => $reason,
+                'user_id' => $userId,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Master cards have been obsoleted successfully.',
+            'count' => count($mcsNums),
+        ]);
+    }
+
+    public function bulkReactivate(Request $request)
+    {
+        $validated = $request->validate([
+            'mcs_nums' => 'required|array',
+            'mcs_nums.*' => 'string',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $userId = $this->getCurrentUserId();
+        $mcsNums = $validated['mcs_nums'];
+        $reason = $validated['reason'] ?? 'No reason provided';
+
+        DB::table('MC')
+            ->whereIn('MCS_Num', $mcsNums)
+            ->update(['STS' => 'ACTIVE']);
+
+        foreach ($mcsNums as $num) {
+            McUpdateLog::create([
+                'MCS_Num' => $num,
+                'status' => 'ACTIVE',
+                'reason' => $reason,
+                'user_id' => $userId,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Master cards have been reactivated successfully.',
+            'count' => count($mcsNums),
+        ]);
+    }
+
+    public function obsoleteReactiveApiIndex()
+    {
+        $masterCards = DB::table('MC')
+            ->select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
+            ->orderBy('MCS_Num')
+            ->get();
+
+        return response()->json($masterCards);
+    }
+
+    public function getByCustomer($customerCode)
+    {
+        $masterCards = DB::table('MC')
+            ->select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
+            ->where('AC_NUM', $customerCode)
+            ->orderBy('MCS_Num')
+            ->get();
+
+        return response()->json($masterCards);
+    }
+
+    public function viewAndPrint()
+    {
+        return Inertia::render('sales-management/system-requirement/master-card/view-and-print-MC');
+    }
+
+    public function viewAndPrintMcMaintenanceLog()
+    {
+        return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log');
     }
 }

@@ -673,17 +673,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, defineAsyncComponent } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { Head } from '@inertiajs/vue3'
 import { route } from '@/ziggy'
-import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import SalespersonModal from '@/Components/salesperson-modal.vue'
-import IndustryModal from '@/Components/industry-modal.vue'
-import GeoModal from '@/Components/geo-modal.vue'
-import CustomerGroupModal from '@/Components/customer-group-modal.vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import axios from 'axios'
+
+const CustomerAccountModal = defineAsyncComponent(() => import('@/Components/customer-account-modal.vue'))
+const SalespersonModal = defineAsyncComponent(() => import('@/Components/salesperson-modal.vue'))
+const IndustryModal = defineAsyncComponent(() => import('@/Components/industry-modal.vue'))
+const GeoModal = defineAsyncComponent(() => import('@/Components/geo-modal.vue'))
+const CustomerGroupModal = defineAsyncComponent(() => import('@/Components/customer-group-modal.vue'))
 
 // Component state
 const page = usePage()

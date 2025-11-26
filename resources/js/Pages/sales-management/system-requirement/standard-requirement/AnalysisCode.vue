@@ -51,7 +51,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                         <div class="flex items-center">
@@ -341,7 +341,7 @@ const getCsrfToken = () => {
     return token || '';
 };
 
-const analysisCodes = ref(props.analysisCodes || []);
+const analysisCodes = ref((props.analysisCodes || []).filter(code => !code.status || code.status === 'Act'));
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -376,9 +376,9 @@ const fetchCodes = async () => {
         const data = await response.json();
 
         if (Array.isArray(data)) {
-            analysisCodes.value = data;
+            analysisCodes.value = data.filter(code => !code.status || code.status === 'Act');
         } else if (data.data && Array.isArray(data.data)) {
-            analysisCodes.value = data.data;
+            analysisCodes.value = data.data.filter(code => !code.status || code.status === 'Act');
         } else {
             analysisCodes.value = [];
             console.error('Unexpected data format:', data);

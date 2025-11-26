@@ -209,9 +209,10 @@ class ColorController extends Controller
             Log::info('Request data:', $request->all());
 
             $validator = Validator::make($request->all(), [
-                'color_name' => 'required|string|max:150',
-                'color_group_id' => 'required|string|max:15',
-                'cg_type' => 'required|string|max:50',
+                'color_name' => 'nullable|string|max:150',
+                'color_group_id' => 'nullable|string|max:15',
+                'cg_type' => 'nullable|string|max:50',
+                'is_active' => 'nullable|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -234,11 +235,13 @@ class ColorController extends Controller
             }
 
             // Update the color with transformed field names
-            $color->update([
-                'Color_Name' => trim($request->color_name),
-                'GroupCode' => trim($request->color_group_id),
-                'Group' => trim($request->cg_type)
-            ]);
+            $updateData = [];
+            if ($request->has('color_name')) $updateData['Color_Name'] = trim($request->color_name);
+            if ($request->has('color_group_id')) $updateData['GroupCode'] = trim($request->color_group_id);
+            if ($request->has('cg_type')) $updateData['Group'] = trim($request->cg_type);
+            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            
+            $color->update($updateData);
 
             Log::info('Color updated successfully:', ['Color_Code' => $color_id]);
             
@@ -248,7 +251,8 @@ class ColorController extends Controller
                 'color_name' => $color->Color_Name,
                 'color_group_id' => $color->GroupCode,
                 'cg_type' => $color->Group,
-                'origin' => 'ID'
+                'origin' => 'ID',
+                'is_active' => $color->is_active
             ];
             
             return response()->json([
@@ -397,7 +401,8 @@ class ColorController extends Controller
                     'color_name' => $color->Color_Name,
                     'color_group_id' => $color->GroupCode,
                     'cg_type' => $color->Group,
-                    'origin' => 'ID' // Default value
+                    'origin' => 'ID', // Default value
+                    'is_active' => $color->is_active
                 ];
             });
             
@@ -448,11 +453,13 @@ class ColorController extends Controller
             // Transform data to match Vue component expected format
             $colorsTransformed = $colors->map(function($color) {
                 return [
-                    'color_id' => $color->Color_Code,
+                    'color_code' => $color->Color_Code,
                     'color_name' => $color->Color_Name,
                     'color_group_id' => $color->GroupCode,
+                    'group_name' => $color->colorGroup ? $color->colorGroup->Color_Name : '',
                     'cg_type' => $color->Group,
-                    'origin' => 'ID'
+                    'origin' => 'ID',
+                    'is_active' => $color->is_active ?? true
                 ];
             });
 
@@ -464,10 +471,7 @@ class ColorController extends Controller
                 ];
             });
 
-            return response()->json([
-                'colors' => $colorsTransformed,
-                'color_groups' => $colorGroupsTransformed
-            ]);
+            return response()->json($colorsTransformed);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@apiIndex: ' . $e->getMessage());
             return response()->json([
@@ -495,6 +499,9 @@ class ColorController extends Controller
      *
      * @return \Inertia\Response
      */
+    /**
+     * Display the Vue version for printing
+     */
     public function vueViewAndPrint()
     {
         try {
@@ -506,6 +513,57 @@ class ColorController extends Controller
             return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-color', [
                 'header' => 'View & Print Colors',
                 'error' => 'Failed to load color data for printing'
+            ]);
+        }
+    }
+
+    /**
+     * Display the Vue version of color status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            // Get only colors (not color groups) from COLOR table
+            $colors = Color::whereNotNull('GroupCode')
+                ->whereRaw('GroupCode != Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->paginate(15);
+
+            // Transform data
+            $colorsTransformed = $colors->getCollection()->map(function($color) {
+                return [
+                    'color_code' => $color->Color_Code,
+                    'color_name' => $color->Color_Name,
+                    'group_name' => $color->colorGroup ? $color->colorGroup->Color_Name : '',
+                    'is_active' => $color->is_active ?? true
+                ];
+            });
+            
+            $colors->setCollection($colorsTransformed);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-color', [
+                'colors' => $colors->items(),
+                'pagination' => [
+                    'currentPage' => $colors->currentPage(),
+                    'perPage' => $colors->perPage(),
+                    'total' => $colors->total()
+                ],
+                'header' => 'Manage Color Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-color', [
+                'colors' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Color Status',
+                'error' => 'Error displaying colors: ' . $e->getMessage()
             ]);
         }
     }

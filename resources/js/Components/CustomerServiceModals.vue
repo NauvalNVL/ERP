@@ -1523,7 +1523,8 @@ const handleOptionSelection = () => {
     }
 };
 
-const emit = defineEmits(['customerSelected']);
+// Declare emits so Vue recognizes listeners passed from parent (e.g. @show-notification)
+const emit = defineEmits(['customerSelected', 'showNotification']);
 
 defineExpose({
     openInitialSalesOrderModal,

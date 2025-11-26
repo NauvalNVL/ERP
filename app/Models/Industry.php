@@ -15,5 +15,9 @@ class Industry extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
-    protected $fillable = ['code', 'name'];
+    protected $fillable = ['code', 'name', 'description', 'status', 'is_active'];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

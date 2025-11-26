@@ -180,10 +180,6 @@
                                                 <LockClosedIcon class="h-4 w-4 mr-1.5" />
                                                 <span class="hidden sm:inline">Access</span>
                                             </Link>
-                                            <button @click="confirmDelete(user.user_id)" class="inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 rounded-lg border text-xs sm:text-sm bg-red-50 text-red-700 border-red-200 hover:bg-red-100" title="Delete User">
-                                                <TrashIcon class="h-4 w-4 mr-1.5" />
-                                                <span class="hidden sm:inline">Delete</span>
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -211,18 +207,18 @@
                         <nav class="flex justify-center" aria-label="Pagination">
                             <div class="flex space-x-2">
                                 <div v-for="(link, i) in users.links" :key="i">
-                                    <span v-if="link.url === null" 
+                                    <span v-if="link.url === null"
                                           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-xl cursor-not-allowed"
                                           v-html="link.label">
                                     </span>
-                                    <Link v-else 
+                                    <Link v-else
                                           :href="link.url"
                                           :class="{
-                                              'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow': link.active, 
+                                              'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow': link.active,
                                               'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600 shadow': !link.active
                                           }"
-                                          class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 transition-colors duration-200" 
-                                          v-html="link.label">
+                                          class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 transition-colors duration-200">
+                                        <span v-html="link.label"></span>
                                     </Link>
                                 </div>
                             </div>
@@ -237,13 +233,12 @@
 <script>
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { 
-    UserIcon, 
-    UserGroupIcon, 
-    UserPlusIcon as UserAddIcon, 
-    PencilIcon, 
-    TrashIcon, 
-    KeyIcon, 
+import {
+    UserIcon,
+    UserGroupIcon,
+    UserPlusIcon as UserAddIcon,
+    PencilIcon,
+    KeyIcon,
     LockClosedIcon,
     CogIcon,
     IdentificationIcon,
@@ -253,19 +248,17 @@ import {
     ExclamationCircleIcon,
     MagnifyingGlassIcon
 } from '@heroicons/vue/24/outline';
-import Swal from 'sweetalert2';
 
 export default {
     components: {
         AppLayout,
         Head,
         Link,
-        UserIcon, 
-        UserGroupIcon, 
-        UserAddIcon, 
-        PencilIcon, 
-        TrashIcon, 
-        KeyIcon, 
+        UserIcon,
+        UserGroupIcon,
+        UserAddIcon,
+        PencilIcon,
+        KeyIcon,
         LockClosedIcon,
         CogIcon,
         IdentificationIcon,
@@ -297,23 +290,6 @@ export default {
                 );
             });
         }
-    },
-    methods: {
-        confirmDelete(userId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to delete this user. This action cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.$inertia.delete(`/user/${userId}`);
-                }
-            });
-        }
     }
 }
 </script>
@@ -329,24 +305,24 @@ export default {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(-20px) scale(0.95); 
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
 @keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(-30px); 
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateX(0); 
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
@@ -413,24 +389,24 @@ export default {
         margin: 0;
         padding: 0 1rem;
     }
-    
+
     .rounded-2xl {
         border-radius: 1rem;
     }
-    
+
     .p-8 {
         padding: 1.5rem;
     }
-    
+
     .text-3xl {
         font-size: 1.875rem;
     }
-    
+
     .px-8 {
         padding-left: 1rem;
         padding-right: 1rem;
     }
-    
+
     .py-6 {
         padding-top: 1rem;
         padding-bottom: 1rem;
@@ -542,13 +518,13 @@ export default {
     .bg-white\/80 {
         background-color: rgba(31, 41, 55, 0.8);
     }
-    
+
     .text-gray-800 {
         color: #f9fafb;
     }
-    
+
     .border-gray-200 {
         border-color: #374151;
     }
 }
-</style> 
+</style>

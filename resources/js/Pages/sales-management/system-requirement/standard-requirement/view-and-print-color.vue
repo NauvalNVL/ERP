@@ -171,14 +171,15 @@ const fetchColors = async () => {
         }
 
         const data = await response.json();
+        console.log('Fetched colors:', data);
 
-        // Handle different response formats
+        // API now returns array directly with color_code
         if (Array.isArray(data)) {
-            colors.value = data;
-        } else if (data.colors && Array.isArray(data.colors)) {
-            colors.value = data.colors;
-        } else if (data.data && Array.isArray(data.data)) {
-            colors.value = data.data;
+            // Map color_code to color_id for compatibility with this component
+            colors.value = data.map(color => ({
+                ...color,
+                color_id: color.color_code || color.color_id
+            }));
         } else {
             colors.value = [];
             console.error('Unexpected data format for colors:', data);

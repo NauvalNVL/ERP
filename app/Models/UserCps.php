@@ -5,27 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
 
 class UserCps extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     protected $table = 'usercps';
-    
+
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
     protected $primaryKey = 'userID';
-    
+
     /**
      * Indicates if the model's ID is auto-incrementing.
      *
      * @var bool
      */
     public $incrementing = false;
-    
+
     /**
      * The data type of the auto-incrementing ID.
      *
@@ -90,7 +91,7 @@ class UserCps extends Authenticatable
      */
     protected $appends = [
         'user_id',
-        'username', 
+        'username',
         'official_name',
         'official_title',
         'mobile_number',
@@ -301,7 +302,17 @@ class UserCps extends Authenticatable
 
     public function getPasswordExpiryDateAttribute()
     {
-        return $this->attributes['EXPIRY_DATE'] ?? null;
+        $value = $this->attributes['EXPIRY_DATE'] ?? null;
+
+        if (! $value) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return $value;
+        }
     }
 
     public function getAmendExpiredPasswordAttribute()

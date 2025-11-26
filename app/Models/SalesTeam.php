@@ -16,6 +16,12 @@ class SalesTeam extends Model
     protected $fillable = [
         'code',
         'name',
+        'status',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**

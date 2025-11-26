@@ -408,15 +408,16 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, computed, watch } from 'vue'
-import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import CustomerSalesTaxIndexTableModalForInvoice from '@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue'
-import CheckSalesTaxModal from '@/Components/CheckSalesTaxModal.vue'
-import DeliveryOrderScreenModal from '@/Components/DeliveryOrderScreenModal.vue'
-import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderTableModal.vue'
-import FinalScreenModal from '@/Components/FinalScreen.vue'
-import SalesOrderItemsModal from '@/Components/SalesOrderItemsModal.vue'
-import InvoiceNumberOptionModal from '@/Components/InvoiceNumberOptionModal.vue'
+import { ref, computed, watch, defineAsyncComponent } from 'vue'
+
+const CustomerAccountModal = defineAsyncComponent(() => import('@/Components/customer-account-modal.vue'))
+const CustomerSalesTaxIndexTableModalForInvoice = defineAsyncComponent(() => import('@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue'))
+const CheckSalesTaxModal = defineAsyncComponent(() => import('@/Components/CheckSalesTaxModal.vue'))
+const DeliveryOrderScreenModal = defineAsyncComponent(() => import('@/Components/DeliveryOrderScreenModal.vue'))
+const DeliveryOrderSelectionModal = defineAsyncComponent(() => import('@/Components/DeliveryOrderTableModal.vue'))
+const FinalScreenModal = defineAsyncComponent(() => import('@/Components/FinalScreen.vue'))
+const SalesOrderItemsModal = defineAsyncComponent(() => import('@/Components/SalesOrderItemsModal.vue'))
+const InvoiceNumberOptionModal = defineAsyncComponent(() => import('@/Components/InvoiceNumberOptionModal.vue'))
 
 const { openPeriod } = defineProps({
   openPeriod: { type: Boolean, default: false }

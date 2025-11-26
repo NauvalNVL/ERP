@@ -14,12 +14,14 @@ class PaperSize extends Model
     // Simplified to match CPS structure: NO, MILLIMETER, INCHES
     protected $fillable = [
         'millimeter',
-        'inches'
+        'inches',
+        'is_active',
     ];
     
     protected $casts = [
         'millimeter' => 'decimal:2',
-        'inches' => 'decimal:2'
+        'inches' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
     
     // Disable timestamps

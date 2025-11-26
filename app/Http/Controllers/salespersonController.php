@@ -127,13 +127,14 @@ class SalespersonController extends Controller
             $salesperson = Salesperson::where('Code', $code)->firstOrFail();
 
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:50',
+                'name' => 'nullable|string|max:50',
                 'grup' => 'nullable|string|max:20',
                 'code_grup' => 'nullable|string|max:50',
                 'target_sales' => 'nullable|numeric|min:0',
                 'internal' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:100',
-                'status' => 'nullable|string|max:10'
+                'status' => 'nullable|string|max:10',
+                'is_active' => 'nullable|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -144,13 +145,31 @@ class SalespersonController extends Controller
             }
 
             // Update using direct column mapping
-            $salesperson->Name = $request->name;
-            $salesperson->Grup = $request->grup;
-            $salesperson->CodeGrup = $request->code_grup;
-            $salesperson->TargetSales = $request->target_sales ?? 0;
-            $salesperson->Internal = $request->internal;
-            $salesperson->Email = $request->email;
-            $salesperson->status = $request->status ?? 'Active';
+            if ($request->has('name')) {
+                $salesperson->Name = $request->name;
+            }
+            if ($request->has('grup')) {
+                $salesperson->Grup = $request->grup;
+            }
+            if ($request->has('code_grup')) {
+                $salesperson->CodeGrup = $request->code_grup;
+            }
+            if ($request->has('target_sales')) {
+                $salesperson->TargetSales = $request->target_sales ?? 0;
+            }
+            if ($request->has('internal')) {
+                $salesperson->Internal = $request->internal;
+            }
+            if ($request->has('email')) {
+                $salesperson->Email = $request->email;
+            }
+            if ($request->has('status')) {
+                $salesperson->status = $request->status ?? 'Active';
+            }
+            if ($request->has('is_active')) {
+                $salesperson->is_active = $request->is_active;
+            }
+            
             $salesperson->save();
 
             // Get the updated data
@@ -327,6 +346,42 @@ class SalespersonController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in SalespersonController@vueIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load salesperson data'], 500);
+        }
+    }
+
+    /**
+     * Display the Vue version of salesperson status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $salespersons = Salesperson::orderBy('Code', 'asc')
+                ->paginate(15);
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-salesperson', [
+                'salespersons' => $salespersons->items(),
+                'pagination' => [
+                    'currentPage' => $salespersons->currentPage(),
+                    'perPage' => $salespersons->perPage(),
+                    'total' => $salespersons->total()
+                ],
+                'header' => 'Manage Salesperson Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-salesperson', [
+                'salespersons' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Salesperson Status',
+                'error' => 'Error displaying salespersons: ' . $e->getMessage()
+            ]);
         }
     }
 

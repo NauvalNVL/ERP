@@ -98,9 +98,10 @@ class ScoringToolController extends Controller
         $scoringTool = ScoringTool::findOrFail($id);
         
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|max:10|unique:scoring_tools,code,' . $id,
-            'name' => 'required|string|max:100',
-            'scorer_gap' => 'required|numeric|min:0'
+            'code' => 'nullable|string|max:10|unique:scoring_tools,code,' . $id,
+            'name' => 'nullable|string|max:100',
+            'scorer_gap' => 'nullable|numeric|min:0',
+            'is_active' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -111,11 +112,13 @@ class ScoringToolController extends Controller
             }
 
             // Update the scoring tool
-            $scoringTool->update([
-                'code' => $request->code,
-                'name' => $request->name,
-                'scorer_gap' => $request->scorer_gap
-            ]);
+            $updateData = [];
+            if ($request->has('code')) $updateData['code'] = $request->code;
+            if ($request->has('name')) $updateData['name'] = $request->name;
+            if ($request->has('scorer_gap')) $updateData['scorer_gap'] = $request->scorer_gap;
+            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            
+            $scoringTool->update($updateData);
 
             // Get the updated data
             $updatedTool = ScoringTool::find($id);
@@ -312,6 +315,41 @@ class ScoringToolController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in ScoringToolController@vueIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load scoring tool data'], 500);
+        }
+    }
+
+    /**
+     * Display the Vue version of scoring tool status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $scoringTools = ScoringTool::orderBy('code', 'asc')->paginate(15);
+
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-scoring-tool', [
+                'scoringTools' => $scoringTools->items(),
+                'pagination' => [
+                    'currentPage' => $scoringTools->currentPage(),
+                    'perPage' => $scoringTools->perPage(),
+                    'total' => $scoringTools->total()
+                ],
+                'header' => 'Manage Scoring Tool Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ScoringToolController@vueManageStatus: ' . $e->getMessage());
+
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-scoring-tool', [
+                'scoringTools' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Scoring Tool Status',
+                'error' => 'Error displaying scoring tools: ' . $e->getMessage()
+            ]);
         }
     }
     

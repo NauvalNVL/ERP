@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('analysis_name', 255);
             $table->string('analysis_group', 50); // MC-Master Card, SD-Sales Order
             $table->string('analysis_group2', 50); // CS, RS, AM, CM, CL, UN
+            $table->string('status', 3)->default('Act'); // Act = Active, Obs = Obsolete
             $table->timestamps();
         });
     }

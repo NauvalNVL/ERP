@@ -77,19 +77,39 @@ class GeoController extends Controller
     {
         try {
             $request->validate([
-                'country' => 'required',
-                'state' => 'required',
-                'town' => 'required',
-                'town_section' => 'required',
-                'area' => 'required',
+                'country' => 'nullable',
+                'state' => 'nullable',
+                'town' => 'nullable',
+                'town_section' => 'nullable',
+                'area' => 'nullable',
+                'is_active' => 'nullable|boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             $geo = Geo::where('CODE', $code)->firstOrFail();
-            $geo->COUNTRY = $request->country;
-            $geo->STATE = $request->state;
-            $geo->TOWN = $request->town;
-            $geo->TOWN_SECTION = $request->town_section;
-            $geo->AREA = $request->area;
+            
+            if ($request->has('country')) {
+                $geo->COUNTRY = $request->country;
+            }
+            if ($request->has('state')) {
+                $geo->STATE = $request->state;
+            }
+            if ($request->has('town')) {
+                $geo->TOWN = $request->town;
+            }
+            if ($request->has('town_section')) {
+                $geo->TOWN_SECTION = $request->town_section;
+            }
+            if ($request->has('area')) {
+                $geo->AREA = $request->area;
+            }
+            if ($request->has('is_active')) {
+                $geo->IS_ACTIVE = $request->is_active;
+            }
+            if ($request->has('status')) {
+                $geo->STATUS = $request->status;
+            }
+            
             $geo->save();
 
             return response()->json([
@@ -175,6 +195,41 @@ class GeoController extends Controller
                 'geos' => [],
                 'header' => 'Geo Management',
                 'error' => 'Error displaying geo data: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Display the Vue version of geo status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $geos = Geo::orderBy('CODE', 'asc')->paginate(15);
+
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-geo', [
+                'geos' => $geos->items(),
+                'pagination' => [
+                    'currentPage' => $geos->currentPage(),
+                    'perPage' => $geos->perPage(),
+                    'total' => $geos->total()
+                ],
+                'header' => 'Manage Geo Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in GeoController@vueManageStatus: ' . $e->getMessage());
+
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-geo', [
+                'geos' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Geo Status',
+                'error' => 'Error displaying geos: ' . $e->getMessage()
             ]);
         }
     }
