@@ -220,6 +220,14 @@ const hasPermission = (menuKey) => {
     menuKey === 'view_print_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
     menuKey === 'reactive_unobsolete_user' ||
+    menuKey === 'obsolete_unobsolete_sales_team' ||
+    menuKey === 'obsolete_unobsolete_salesperson' ||
+    menuKey === 'obsolete_unobsolete_salesperson_team' ||
+    menuKey === 'obsolete_unobsolete_industry' ||
+    menuKey === 'obsolete_unobsolete_geo' ||
+    menuKey === 'obsolete_unobsolete_product_group' ||
+    menuKey === 'obsolete_unobsolete_product' ||
+    menuKey === 'obsolete_unobsolete_product_design' ||
     menuKey === 'obsolete_unobsolete_scoring_tool' ||
     menuKey === 'obsolete_unobsolete_paper_flute' ||
     menuKey === 'obsolete_unobsolete_paper_size' ||
