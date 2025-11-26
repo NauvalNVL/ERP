@@ -13,30 +13,31 @@
                     Enter your credentials to access the system
                 </p>
             </div>
-            
-            <div v-if="Object.keys($page.props.errors).length > 0" 
-                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative animate-shake" 
+
+            <div v-if="Object.keys($page.props.errors).length > 0"
+                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative animate-shake"
                 role="alert">
                 <ul>
                     <li v-for="(error, index) in Object.values($page.props.errors)" :key="index">{{ error }}</li>
                 </ul>
             </div>
 
-            <form class="mt-8 space-y-6 animate-fadeIn animation-delay-700" @submit.prevent="submit">
+            <form class="mt-8 space-y-6 animate-fadeIn animation-delay-700" method="POST" action="/login" @submit="isLoading = true">
+                <input type="hidden" name="_token" :value="csrfToken" />
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
                         <label for="user_id" class="sr-only">User ID</label>
-                        <input id="user_id" v-model="form.user_id" type="text" required 
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-300" 
+                        <input id="user_id" name="user_id" v-model="userId" type="text" required
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-300"
                             placeholder="User ID"
-                            :disabled="isLoading">
+                            :readonly="isLoading">
                     </div>
                     <div class="relative">
                         <label for="password" class="sr-only">Password</label>
-                        <input id="password" v-model="form.password" :type="showPassword ? 'text' : 'password'" required 
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-300 pr-10" 
+                        <input id="password" name="password" v-model="password" :type="showPassword ? 'text' : 'password'" required
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-300 pr-10"
                             placeholder="Password"
-                            :disabled="isLoading">
+                            :readonly="isLoading">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                             <button type="button" @click="showPassword = !showPassword" class="text-gray-400 hover:text-gray-600 focus:outline-none" :disabled="isLoading">
                                 <EyeIcon v-if="!showPassword" class="h-5 w-5" />
@@ -48,7 +49,7 @@
 
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <input id="remember" v-model="form.remember" type="checkbox" 
+                        <input id="remember" name="remember" v-model="remember" type="checkbox"
                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300"
                             :disabled="isLoading">
                         <label for="remember" class="ml-2 block text-sm text-gray-900">
@@ -58,17 +59,17 @@
                 </div>
 
                 <div>
-                    <button type="submit" 
+                    <button type="submit"
                         class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]"
                         :class="[isLoading ? 'bg-blue-500' : 'bg-blue-600 hover:bg-blue-700']"
                         :disabled="isLoading">
-                        
+
                         <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center">
                             <div class="loader">
                                 <div class="dot-pulse"></div>
                             </div>
                         </div>
-                        
+
                         <span v-else class="flex items-center">
                             <i class="fas fa-sign-in-alt mr-2"></i>
                             Sign in
@@ -81,39 +82,18 @@
 </template>
 
 <script setup>
-import { useForm, router } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { EyeIcon, EyeSlashIcon as EyeOffIcon } from '@heroicons/vue/24/outline';
 
 const isLoading = ref(false);
 const showPassword = ref(false);
+const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content || '';
 
-const form = useForm({
-    user_id: '',
-    password: '',
-    remember: false
-});
-
-const submit = () => {
-    isLoading.value = true;
-    
-    router.post('/login', {
-        user_id: form.user_id,
-        password: form.password,
-        remember: form.remember
-    }, {
-        onFinish: () => {
-            form.reset('password');
-            setTimeout(() => {
-                isLoading.value = false;
-            }, 500);
-        },
-        onError: () => {
-            isLoading.value = false;
-        }
-    });
-};
+// Optional v-model bindings for nicer UX
+const userId = ref('');
+const password = ref('');
+const remember = ref(false);
 </script>
 
 <style scoped>

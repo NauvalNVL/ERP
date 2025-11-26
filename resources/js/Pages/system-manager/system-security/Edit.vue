@@ -62,8 +62,8 @@
                                             </div>
                                             User ID <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.user_id" 
+                                        <input type="text"
+                                               v-model="form.user_id"
                                                class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
                                                placeholder="Example: USER001"
                                                required>
@@ -77,8 +77,8 @@
                                             </div>
                                             Username <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.username" 
+                                        <input type="text"
+                                               v-model="form.username"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Login username"
                                                required>
@@ -92,8 +92,8 @@
                                             </div>
                                             Official Name <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.official_name" 
+                                        <input type="text"
+                                               v-model="form.official_name"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Full name"
                                                required>
@@ -107,8 +107,8 @@
                                             </div>
                                             Official Title
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.official_title" 
+                                        <input type="text"
+                                               v-model="form.official_title"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Job position">
                                     </div>
@@ -135,8 +135,8 @@
                                             </div>
                                             Password Expiry Date
                                         </label>
-                                        <input type="number" 
-                                               v-model="form.password_expiry_date" 
+                                        <input type="number"
+                                               v-model="form.password_expiry_date"
                                                class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
                                                placeholder="0 Days [Zero for None]"
                                                min="0">
@@ -170,8 +170,8 @@
                                             </div>
                                             User Printer
                                         </label>
-                                        <input type="text" 
-                                               v-model="form.user_printer" 
+                                        <input type="text"
+                                               v-model="form.user_printer"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Default printer">
                                     </div>
@@ -240,8 +240,8 @@
                                             </div>
                                             Mobile Number
                                         </label>
-                                        <input type="tel" 
-                                               v-model="form.mobile_number" 
+                                        <input type="tel"
+                                               v-model="form.mobile_number"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="08xxxxxxxxxx">
                                     </div>
@@ -254,8 +254,8 @@
                                             </div>
                                             <span class="text-gray-900">Official Telephone</span>
                                         </label>
-                                        <input type="tel" 
-                                               v-model="form.official_tel" 
+                                        <input type="tel"
+                                               v-model="form.official_tel"
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="021xxxxxxx">
                                     </div>
@@ -368,12 +368,12 @@
                                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <UserIcon class="h-5 w-5 text-gray-400" />
                                                 </div>
-                                                <input type="text" 
-                                                       v-model="form.salesperson_code" 
+                                                <input type="text"
+                                                       v-model="form.salesperson_code"
                                                        class="block w-full pl-10 pr-3 py-2 border border-r-0 border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                                        placeholder="Salesperson Code">
                                             </div>
-                                            <button type="button" 
+                                            <button type="button"
                                                     @click="openSalespersonModal"
                                                     class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                 <MagnifyingGlassIcon class="h-4 w-4 mr-1 text-white" />
@@ -449,12 +449,12 @@
                     <!-- Action Buttons -->
                     <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
                         <div class="flex flex-col sm:flex-row gap-4 justify-end">
-                            <Link href="/user" 
+                            <Link href="/user"
                                 class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                                 <XIcon class="h-6 w-6 mr-3" />
                                 Cancel
                             </Link>
-                            <button type="submit" 
+                            <button type="submit"
                                 class="flex-1 inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
                                 <SaveIcon class="h-6 w-6 mr-3" />
                                 Update User
@@ -464,7 +464,7 @@
                 </form>
 
                 <!-- Salesperson Selection Modal -->
-                <SalespersonModal 
+                <SalespersonModal
                     :show="showSalespersonModal"
                     :salespersons="salespersons"
                     @close="showSalespersonModal = false"
@@ -479,16 +479,16 @@
 import { Head, Link } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { 
-    RadioGroup, 
-    RadioGroupLabel, 
-    RadioGroupOption, 
-    Switch, 
-    SwitchGroup, 
-    SwitchLabel 
+import {
+    RadioGroup,
+    RadioGroupLabel,
+    RadioGroupOption,
+    Switch,
+    SwitchGroup,
+    SwitchLabel
 } from '@headlessui/vue';
-import { 
-    UserIcon, 
+import {
+    UserIcon,
     UserCircleIcon,
     AtSymbolIcon,
     BriefcaseIcon,
@@ -501,6 +501,7 @@ import {
     IdentificationIcon,
     ExclamationCircleIcon,
     PrinterIcon,
+    LockClosedIcon,
     ArrowsRightLeftIcon as SwitchHorizontalIcon,
     Bars3BottomLeftIcon as MenuAlt2Icon,
     ShoppingCartIcon,
@@ -515,18 +516,54 @@ import {
 // Import the salesperson modal component
 import SalespersonModal from '@/Components/salesperson-modal.vue';
 
+// Helper to convert expiry date (Y-m-d or datetime string) to remaining days (integer)
+function calculatePasswordExpiryDays(value) {
+    if (value === null || value === undefined || value === '') {
+        return 0;
+    }
+
+    if (typeof value === 'number') {
+        return value;
+    }
+
+    const str = String(value).trim();
+
+    // If it's already a plain integer string, use it directly
+    if (/^\d+$/.test(str)) {
+        return Number(str);
+    }
+
+    try {
+        const expiry = new Date(str);
+        if (Number.isNaN(expiry.getTime())) {
+            return 0;
+        }
+
+        const today = new Date();
+        expiry.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        const diffMs = expiry.getTime() - today.getTime();
+        const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        return days < 0 ? 0 : days;
+    } catch (e) {
+        console.error('Failed to parse expiry date:', value, e);
+        return 0;
+    }
+}
+
 export default {
     components: {
         AppLayout,
         Head,
         Link,
-        RadioGroup, 
-        RadioGroupLabel, 
+        RadioGroup,
+        RadioGroupLabel,
         RadioGroupOption,
         Switch,
         SwitchGroup,
         SwitchLabel,
-        UserIcon, 
+        UserIcon,
         UserCircleIcon,
         AtSymbolIcon,
         BriefcaseIcon,
@@ -539,6 +576,7 @@ export default {
         IdentificationIcon,
         ExclamationCircleIcon,
         PrinterIcon,
+        LockClosedIcon,
         SwitchHorizontalIcon,
         MenuAlt2Icon,
         ShoppingCartIcon,
@@ -567,7 +605,8 @@ export default {
                 password: '',
                 password_confirmation: '',
                 status: this.user.status,
-                password_expiry_date: this.user.password_expiry_date,
+                // Convert backend expiry date string to numeric days for the number input
+                password_expiry_date: calculatePasswordExpiryDays(this.user.password_expiry_date),
                 amend_expired_password: this.user.amend_expired_password,
                 // Printer & Menu
                 user_printer: this.user.PRINTER || '',
@@ -606,9 +645,13 @@ export default {
             }
         },
         submitForm() {
+            // Normalise password expiry to integer days
+            const passwordExpiry = Math.max(0, Number(this.form.password_expiry_date) || 0);
+
             // Add CSRF token to form data
             const formData = {
                 ...this.form,
+                password_expiry_date: passwordExpiry,
                 user_printer: this.form.user_printer,
                 print_route: this.form.print_route,
                 menu_type: this.form.menu_type,
@@ -621,8 +664,8 @@ export default {
                 board_rc_cost: this.form.board_rc_cost,
                 _token: this.$page.props.csrf_token || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
             };
-            
-            this.$inertia.put(`/user/${this.user.id}`, formData, {
+
+            this.$inertia.put(`/user/${this.user.user_id}`, formData, {
                 preserveState: true,
                 preserveScroll: true,
                 onError: (errors) => {
@@ -645,24 +688,24 @@ export default {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(-20px) scale(0.95); 
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
 @keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(-30px); 
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateX(0); 
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
@@ -733,28 +776,28 @@ button, a, input, select, textarea, .transition-all, .transition {
         margin: 0;
         padding: 0 1rem;
     }
-    
+
     .rounded-2xl {
         border-radius: 1rem;
     }
-    
+
     .p-8 {
         padding: 1.5rem;
     }
-    
+
     .text-3xl {
         font-size: 1.875rem;
     }
-    
+
     .grid-cols-1.lg\:grid-cols-2 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
     }
-    
+
     .backdrop-blur-sm {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
     }
-    
+
     .shadow-xl, .shadow-2xl, .shadow-lg {
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
@@ -765,11 +808,11 @@ button, a, input, select, textarea, .transition-all, .transition {
     .bg-white\/80 {
         background-color: rgba(31, 41, 55, 0.8);
     }
-    
+
     .text-gray-800 {
         color: #f9fafb;
     }
-    
+
     .border-gray-200 {
         border-color: #374151;
     }

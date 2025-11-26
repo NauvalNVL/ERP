@@ -174,6 +174,10 @@ import SidebarDropdown from './SidebarDropdown.vue';
 import sidebarStore from './sidebarStore';
 
 const page = usePage();
+const getCsrfToken = () => {
+  const tokenTag = document.head.querySelector('meta[name="csrf-token"]');
+  return tokenTag ? tokenTag.content : null;
+};
 const user = computed(() => page.props.auth?.user);
 const userPermissions = computed(() => page.props.auth?.permissions || []);
 const userInitial = computed(() => user.value?.username ? user.value.username.charAt(0).toUpperCase() : 'G');
@@ -484,8 +488,9 @@ const getPermissionKeyFromTitle = (title) => {
 };
 
 const logout = () => {
-  // Simple Inertia logout; backend redirects to /login
-  router.post('/logout', {}, {
+  // Simple Inertia logout menggunakan GET; backend akan redirect ke /login
+  router.visit('/logout', {
+    method: 'get',
     preserveScroll: false,
     preserveState: false,
   });

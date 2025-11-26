@@ -132,11 +132,12 @@ return response()->json([
 // Guest Routes
 Route::middleware('guest')->group(function () {
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 });
 
 // Logout Route (accessible to authenticated users)
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
@@ -581,9 +582,6 @@ return Inertia::render('sales-management/system-requirement/master-card/view-and
 Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-by-machine', function() {
 return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-by-machine');
 })->name('vue.master-card.view-and-print-mc-by-machine');
-
-// Auth Routes
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Warehouse Management Routes
 Route::get('/warehouse-management/finished-goods', function () {
