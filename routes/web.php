@@ -470,6 +470,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/define-bundling-string', [BundlingStringController::class, 'index'])->name('vue.define-bundling-string');
 
          Route::get('/wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.wrapping-material.index');
+         Route::get('/wrapping-material/status', [WrappingMaterialController::class, 'vueManageStatus'])->name('vue.wrapping-material.status');
          Route::get('/wrapping-material/view-print', [WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
          // Alias for search menu
          Route::get('/define-wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');

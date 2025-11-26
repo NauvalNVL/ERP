@@ -15,6 +15,7 @@ class WrappingMaterial extends Model
         'code',
         'name',
         'description',
+        'status',
         'is_active'
     ];
 

@@ -375,6 +375,7 @@ Route::post('/bundling-strings/seed', [App\Http\Controllers\BundlingStringContro
 Route::get('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'apiIndex']);
 Route::post('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'store']);
 Route::put('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'update']);
+Route::put('/wrapping-materials/{code}/status', [App\Http\Controllers\WrappingMaterialController::class, 'toggleStatus']);
 Route::delete('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'destroy']);
 Route::post('/wrapping-materials/seed', [App\Http\Controllers\WrappingMaterialController::class, 'seed']);
 
