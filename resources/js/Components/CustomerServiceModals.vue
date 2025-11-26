@@ -299,7 +299,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">M/Card Seq#:</label>
                     <div class="flex items-center">
                         <input type="text" v-model="masterCardSearch" class="form-input w-full px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500">
-                        <button class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
+                        <button type="button" @click="openMasterCardListModal" class="ml-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">
                             <i class="fas fa-table"></i>
                         </button>
                     </div>
@@ -554,7 +554,6 @@
         </div>
     </div>
 
-    <!-- New: Delivery Order Table Modal (Image 2) -->
     <div v-if="showDeliveryOrderTableModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl overflow-hidden transform transition-all duration-300 ease-in-out scale-95 opacity-0" :class="{'scale-100 opacity-100': showDeliveryOrderTableModal}">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
@@ -870,6 +869,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Master Card List Modal integration -->
+    <MasterCardSearchSelectModal
+        :show="showMasterCardListModal"
+        :customer-code="customerCodeMasterCard"
+        @close="showMasterCardListModal = false"
+        @select-mc="handleMasterCardSelected"
+        @reopen-options="showMasterCardSearchModal = true"
+        @zoom-mc="handleMasterCardSelected"
+    />
 </template>
 
 <script setup>
@@ -882,6 +891,7 @@ import {
     TransitionRoot,
 } from '@headlessui/vue'
 import axios from 'axios'; // Import axios
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue'
 
 const showInitialSalesOrderModal = ref(false); // For the first "Search by Sales Order" modal
 const showOptionsModal = ref(false);         // For the modal with radio button options
@@ -967,6 +977,8 @@ const masterCardStatus = ref({
 
 const masterCardSortOption = ref('1-M/C Seq# + S/Order#');
 
+const showMasterCardListModal = ref(false);
+
 const salesOrderStatus = ref({
     outstanding: true,
     partialCompleted: true,
@@ -1008,6 +1020,7 @@ const closeAllModals = () => {
     selectedCustomerAccount.value = null; // Clear selected customer
     customerSearchQuery.value = ''; // Clear search query
     filteredCustomerAccounts.value = []; // Clear filtered results
+    showMasterCardListModal.value = false;
 };
 
 const openInitialSalesOrderModal = () => {
@@ -1178,6 +1191,22 @@ const openMasterCardSearchDirectlyModal = () => {
         completed: false,
         cancelled: false,
     };
+};
+
+const openMasterCardListModal = () => {
+    // Require customer code first to match CPS flow
+    if (!customerCodeMasterCard.value) {
+        console.warn('Customer code is required before browsing Master Cards');
+        return;
+    }
+    showMasterCardListModal.value = true;
+};
+
+const handleMasterCardSelected = (mc) => {
+    if (!mc) return;
+    // Fill M/Card Seq# with selected MC sequence
+    masterCardSearch.value = mc.mc_seq || mc.seq || '';
+    showMasterCardListModal.value = false;
 };
 
 const openPurchaseOrderRefSearchModal = () => {
@@ -1369,8 +1398,13 @@ const openCustomerAccountSearchModal = async (targetInput) => {
 const fetchCustomerAccounts = async () => {
     try {
         const response = await axios.get('/api/customer-accounts');
-        customerAccounts.value = response.data;
-        filteredCustomerAccounts.value = response.data; // Initially display all
+        const payload = response.data;
+
+        // Backend returns `{ data: [...] }`; also support direct array for flexibility
+        const data = Array.isArray(payload) ? payload : (payload.data || []);
+
+        customerAccounts.value = data;
+        filteredCustomerAccounts.value = data; // Initially display all
     } catch (error) {
         console.error('Error fetching customer accounts:', error);
         // Optionally, show a notification to the user
@@ -1379,10 +1413,13 @@ const fetchCustomerAccounts = async () => {
 
 const filterCustomerAccounts = () => {
     const query = customerSearchQuery.value.toLowerCase();
-    filteredCustomerAccounts.value = customerAccounts.value.filter(customer =>
-        customer.customer_code.toLowerCase().includes(query) ||
-        customer.customer_name.toLowerCase().includes(query)
-    );
+    const source = Array.isArray(customerAccounts.value) ? customerAccounts.value : [];
+
+    filteredCustomerAccounts.value = source.filter(customer => {
+        const code = (customer.customer_code || '').toString().toLowerCase();
+        const name = (customer.customer_name || '').toString().toLowerCase();
+        return code.includes(query) || name.includes(query);
+    });
 };
 
 const selectCustomer = (customer) => {
@@ -1498,6 +1535,7 @@ defineExpose({
     openInitialInvoiceModal, // New: Expose Invoice functions
     openCustomerAccountSearchModal, // Expose this for other components to use
 });
+
 </script>
 
 <style scoped>

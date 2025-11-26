@@ -90,8 +90,8 @@
                   No Master Cards found.
                 </td>
               </tr>
-              <tr 
-                v-for="mc in filteredMasterCards" 
+              <tr
+                v-for="mc in filteredMasterCards"
                 :key="mc.mc_seq"
                 @click="selectRow(mc)"
                 :class="{ 'bg-blue-100 cursor-pointer': selectedRowMc && selectedRowMc.mc_seq === mc.mc_seq, 'hover:bg-gray-50 cursor-pointer': !selectedRowMc || selectedRowMc.mc_seq !== mc.mc_seq }"
@@ -157,22 +157,24 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { usePage } from '@inertiajs/vue3'; 
+import { usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 
 const props = defineProps({
   show: Boolean,
   targetField: String, // 'mcsFrom' or 'mcsTo'
   initialSortColumn: { type: String, default: 'mc_seq' },
   initialSortDirection: { type: String, default: 'asc' },
-  initialFilterStatus: { 
-    type: Object, 
+  initialFilterStatus: {
+    type: Object,
     default: () => ({ active: true, obsolete: false, pending: false })
   },
+  customerCode: { type: String, default: '' },
 });
 
 const emit = defineEmits(['close', 'select-mc', 'reopen-options', 'zoom-mc']);
 
-const masterCards = ref([]); 
+const masterCards = ref([]);
 const searchTerm = ref('');
 const sortColumn = ref(props.initialSortColumn);
 const sortDirection = ref(props.initialSortDirection);
@@ -192,23 +194,44 @@ watch(() => props.show, (newVal) => {
   }
 }, { immediate: true });
 
-// Mock API call to fetch master cards
+// Fetch master cards for the given customer from backend API
 const fetchMasterCards = async () => {
   try {
-    masterCards.value = [
-      { mc_seq: '1609138', mc_model: 'BOX BASO 4,5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-01', id: 'ID-01', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609144', mc_model: 'BOX IKAN HARIMAU 4.5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-02', id: 'ID-02', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609145', mc_model: 'BOX SRIKAYA 4.5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-03', id: 'ID-03', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609162', mc_model: 'BIHUN FANIA 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Obsolete', ed: 'ED-04', id: 'ID-04', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609163', mc_model: 'BIHUN IKAN TUNA 4.5 KG BARU', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-05', id: 'ID-05', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609164', mc_model: 'BIHUN IKAN TUNA 5 KG BARU', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Pending', ed: 'ED-06', id: 'ID-06', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609166', mc_model: 'BIHUN PIRING MAS 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-07', id: 'ID-07', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609173', mc_model: 'BOX JAGUNG SRIKAYA 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Obsolete', ed: 'ED-08', id: 'ID-08', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609181', mc_model: 'BIHUN POHON KOPI 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-09', id: 'ID-09', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-      { mc_seq: '1609182', mc_model: 'BIHUN DELLIS 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Pending', ed: 'ED-10', id: 'ID-10', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
-    ];
+    if (!props.customerCode) {
+      masterCards.value = [];
+      return;
+    }
+
+    const params = {
+      customer_code: props.customerCode,
+      query: searchTerm.value || '',
+      sortBy: sortColumn.value || 'mc_seq',
+      sortOrder: sortDirection.value || 'asc',
+      per_page: 50,
+      // Let backend default status filter handle Active; frontend checkboxes further filter
+    };
+
+    const response = await axios.get('/api/update-mc/master-cards', { params });
+    const payload = response.data;
+    const raw = Array.isArray(payload) ? payload : (payload.data || []);
+
+    masterCards.value = raw.map((item) => ({
+      mc_seq: item.mc_seq || item.seq || '',
+      mc_model: item.mc_model || item.model || '',
+      part: item.part || item.part_no || '',
+      comp: item.comp || item.comp_no || 'Main',
+      p_design: item.p_design || item.pd || '',
+      status: item.status === 'Act' ? 'Active' : (item.status || 'Active'),
+      ext_dim_1: item.ext_dim_1,
+      ext_dim_2: item.ext_dim_2,
+      ext_dim_3: item.ext_dim_3,
+      int_dim_1: item.int_dim_1,
+      int_dim_2: item.int_dim_2,
+      int_dim_3: item.int_dim_3,
+    }));
   } catch (error) {
     console.error('Error fetching master cards:', error);
+    masterCards.value = [];
   }
 };
 
@@ -279,4 +302,4 @@ const closeModal = () => {
 
 <style scoped>
 /* Add any specific styles for this modal here */
-</style> 
+</style>
