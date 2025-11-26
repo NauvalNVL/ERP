@@ -14,12 +14,30 @@ class VehicleClass extends Model
     protected $fillable = [
         'NO_',
         'VEHICLE_CLASS_CODE',
-        'DESCRIPTION'
+        'DESCRIPTION',
+        'STATUS'
     ];
 
     protected $casts = [
     ];
 
+    // Scope for active vehicle classes
+    public function scopeActive($query)
+    {
+        return $query->where('STATUS', 'A');
+    }
+
+    // Scope for inactive/obsolete vehicle classes
+    public function scopeInactive($query)
+    {
+        return $query->where('STATUS', 'O');
+    }
+
+    // Accessor for formatted status label
+    public function getFormattedStatusAttribute()
+    {
+        return $this->STATUS === 'A' ? 'Active' : 'Obsolete';
+    }
 
     /**
      * Scope for searching vehicle classes

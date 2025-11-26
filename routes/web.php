@@ -695,12 +695,19 @@ Route::get('/warehouse-management/delivery-order/setup/vehicle', [VehicleControl
 ->name('vue.warehouse-management.delivery-order.setup.vehicle');
 Route::get('/warehouse-management/delivery-order/setup/vehicle/view-print', [VehicleController::class, 'viewPrint'])
 ->name('vue.warehouse-management.delivery-order.setup.vehicle.view-print');
+Route::get('/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle', function () {
+return Inertia::render('warehouse-management/DeliveryOrder/Setup/ObsoleteUnobsoleteVehicle');
+})->name('vue.warehouse-management.delivery-order.setup.obsolete-unobsolete-vehicle');
 
 // Warehouse Management - Delivery Order - Setup - Vehicle Class
 Route::get('/warehouse-management/delivery-order/setup/vehicle-class', [VehicleClassController::class, 'index'])
 ->name('vue.warehouse-management.delivery-order.setup.vehicle-class');
 Route::get('/warehouse-management/delivery-order/setup/vehicle-class/view-print', [VehicleClassController::class, 'viewPrint'])
 ->name('vue.warehouse-management.delivery-order.setup.vehicle-class.view-print');
+
+Route::get('/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle-class', function () {
+return Inertia::render('warehouse-management/DeliveryOrder/Setup/ObsoleteUnobsoleteVehicleClass');
+})->name('vue.warehouse-management.delivery-order.setup.obsolete-unobsolete-vehicle-class');
 
 // Warehouse Management - Delivery Order - DO Processing
 Route::get('/warehouse-management/delivery-order/do-processing/prepare-multiple', function () {

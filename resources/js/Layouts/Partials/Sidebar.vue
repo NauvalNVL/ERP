@@ -215,7 +215,9 @@ const hasPermission = (menuKey) => {
     menuKey === 'define_machine' ||
     menuKey === 'view_print_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
-    menuKey === 'reactive_unobsolete_user'
+    menuKey === 'reactive_unobsolete_user' ||
+    menuKey === 'obsolete_unobsolete_vehicle' ||
+    menuKey === 'obsolete_unobsolete_vehicle_class'
   ) {
     return true;
   }
@@ -422,6 +424,8 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Transport Contractor': 'define_transport_contractor',
     'Define Vehicle Class': 'define_vehicle_class',
     'Define Vehicle': 'define_vehicle',
+    'Obsolete/Unobsolete Vehicle Class': 'obsolete_unobsolete_vehicle_class',
+    'Obsolete/Unobsolete Vehicle': 'obsolete_unobsolete_vehicle',
     'Define DORN Code': 'define_dorn_code',
     'Define Greeting Message': 'define_greeting_message',
     'Define Alternate Unit': 'define_alternate_unit',
@@ -649,7 +653,9 @@ const warehouseManagementItems = [
         icon: 'fas fa-cogs',
         children: [
           { title: 'Define Vehicle Class', icon: 'fas fa-layer-group', route: '/warehouse-management/delivery-order/setup/vehicle-class' },
+          { title: 'Obsolete/Unobsolete Vehicle Class', icon: 'fas fa-ban', route: '/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle-class' },
           { title: 'Define Vehicle', icon: 'fas fa-truck', route: '/warehouse-management/delivery-order/setup/vehicle' },
+          { title: 'Obsolete/Unobsolete Vehicle', icon: 'fas fa-ban', route: '/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle' },
           { title: 'View & Print Vehicle', icon: 'fas fa-print', route: '/warehouse-management/delivery-order/setup/vehicle/view-print' },
           { title: 'View & Print Vehicle Class', icon: 'fas fa-print', route: '/warehouse-management/delivery-order/setup/vehicle-class/view-print' },
         ]

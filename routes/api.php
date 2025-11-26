@@ -538,10 +538,13 @@ Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
 Route::post('/vehicles', [VehicleController::class, 'apiStore']);
 Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
 Route::put('/vehicles/{vehicle}', [VehicleController::class, 'apiUpdate']);
+Route::put('/vehicles/{vehicle}/status', [VehicleController::class, 'apiUpdateStatus']);
 Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'apiDestroy']);
+
 Route::get('/vehicle-classes', [\App\Http\Controllers\VehicleClassController::class, 'apiIndex']);
 Route::post('/vehicle-classes', [\App\Http\Controllers\VehicleClassController::class, 'apiStore']);
 Route::put('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiUpdate']);
+Route::put('/vehicle-classes/{vehicleClass}/status', [\App\Http\Controllers\VehicleClassController::class, 'apiUpdateStatus']);
 Route::delete('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiDestroy']);
 
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);

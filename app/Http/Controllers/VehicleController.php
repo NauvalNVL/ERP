@@ -137,7 +137,7 @@ class VehicleController extends Controller
             ]);
 
             $vehicle = Vehicle::create($data);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Vehicle created successfully',
@@ -199,7 +199,7 @@ class VehicleController extends Controller
             ]);
 
             $vehicle->update($data);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Vehicle updated successfully',
@@ -213,6 +213,41 @@ class VehicleController extends Controller
         }
     }
 
+    public function apiUpdateStatus(Request $request, Vehicle $vehicle)
+    {
+        $validator = Validator::make($request->all(), [
+            'VEHICLE_STATUS' => 'required|string|in:A,O',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $status = $validator->validated()['VEHICLE_STATUS'];
+
+            $vehicle->update([
+                'VEHICLE_STATUS' => $status,
+                'STATUS' => $status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicle status updated successfully',
+                'data' => $vehicle->fresh()->load('vehicleClass'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating vehicle status: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Delete a vehicle
      */
@@ -220,7 +255,7 @@ class VehicleController extends Controller
     {
         try {
             $vehicle->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Vehicle deleted successfully'
