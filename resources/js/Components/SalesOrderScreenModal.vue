@@ -5,116 +5,171 @@
 
     <!-- Modal Container -->
     <div class="flex min-h-full items-center justify-center p-4">
-      <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden">
+      <div class="relative w-full max-w-6xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden">
         <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
-          <h3 class="text-lg font-semibold text-white">Sales Order Screen</h3>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-xl">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-white/20 rounded-lg">
+              <i class="fas fa-clipboard-list text-white text-lg"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-white">Sales Order Screen</h3>
+          </div>
+          <button @click="closeModal" class="p-2 rounded-full hover:bg-white/20 text-white transition-colors">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
 
         <!-- Modal Content -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
-          <!-- Order Information Section -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Order Group:</label>
-              <input
-                v-model="orderInfo.orderGroup"
-                type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter order group"
-              >
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Order Mode:</label>
-              <input
-                v-model="orderInfo.orderMode"
-                type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter order mode"
-              >
+        <div class="flex-1 overflow-y-auto p-4 bg-gray-50">
+          <!-- Compact Header Information -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Order Information -->
+              <div class="space-y-2">
+                <h4 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-1">Order Configuration</h4>
+                <div class="space-y-2 text-xs">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-gray-600 w-20">Order Group:</span>
+                    <input
+                      v-model="orderInfo.orderGroup"
+                      type="text"
+                      class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                      placeholder="Enter order group"
+                    >
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-gray-600 w-20">Order Mode:</span>
+                    <input
+                      v-model="orderInfo.orderMode"
+                      type="text"
+                      class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                      placeholder="Enter order mode"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Information -->
+              <div class="space-y-2">
+                <h4 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-1">Additional Information</h4>
+                <div class="space-y-2 text-xs">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-gray-600 w-20">Model:</span>
+                    <input
+                      v-model="bottomInfo.model"
+                      type="text"
+                      class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500"
+                      placeholder="Enter model"
+                    >
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-gray-600 w-20">S/O Ins1:</span>
+                    <input
+                      v-model="bottomInfo.soIns1"
+                      type="text"
+                      class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500"
+                      placeholder="Enter S/O instruction 1"
+                    >
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-gray-600 w-20">S/O Ins2:</span>
+                    <input
+                      v-model="bottomInfo.soIns2"
+                      type="text"
+                      class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500"
+                      placeholder="Enter S/O instruction 2"
+                    >
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Sales Order Entry Section -->
-          <div class="space-y-4">
-            <h4 class="text-md font-semibold text-gray-800">Sales Order Entry</h4>
-
-            <!-- Sales Order Table -->
-            <div class="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
-              <table class="min-w-[720px] divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+          <!-- Compact Sales Order Entry Table -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-2 border-b border-gray-200">
+              <h4 class="text-sm font-semibold text-gray-700 flex items-center">
+                <i class="fas fa-list text-gray-500 mr-2"></i>
+                Sales Order Entry
+              </h4>
+            </div>
+            <div class="overflow-x-auto max-h-64">
+              <table class="w-full text-xs">
+                <thead class="bg-gray-100 sticky top-0 z-10">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No.</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S/Order#</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Order Ref#</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Set Qty</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Un.FG</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300 w-12">No.</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">S/Order#</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">M/Card Seq#</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">P/Order Ref#</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">Set Qty</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700">Un.FG</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="divide-y divide-gray-200">
                   <tr
                     v-for="(entry, index) in salesOrderEntries"
                     :key="index"
                     @click="selectEntry(index)"
                     :class="[
-                      'cursor-pointer hover:bg-gray-50',
+                      'cursor-pointer hover:bg-blue-50 transition-colors',
                       selectedEntryIndex === index ? 'bg-blue-100 border-l-4 border-blue-500' : ''
                     ]"
                   >
-                    <td class="px-3 py-2 text-sm text-gray-900">{{ String(index + 1).padStart(2, '0') }}</td>
-                    <td class="px-3 py-2">
+                    <td class="px-2 py-1.5 font-medium text-gray-900 border-r border-gray-200">{{ String(index + 1).padStart(2, '0') }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200">
                       <div class="flex items-center space-x-1">
                         <input
                           v-model="entry.sOrder"
                           type="text"
-                          class="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                          placeholder="S/Order"
+                          class="w-12 px-1 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="MM"
                         >
+                        <span class="text-gray-400">-</span>
                         <input
                           v-model="entry.sOrder2"
                           type="text"
-                          class="w-12 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                          placeholder="0"
+                          class="w-14 px-1 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="YYYY"
                         >
+                        <span class="text-gray-400">-</span>
                         <input
                           v-model="entry.sOrder3"
                           type="text"
-                          class="w-12 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                          placeholder="0"
+                          class="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="Seq"
                         >
                         <button
                           @click="openSalesOrderTable"
-                          class="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                          class="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
                           title="Sales Order Table"
                         >
                           <i class="fas fa-table text-xs"></i>
                         </button>
                       </div>
                     </td>
-                    <td class="px-3 py-2">
-                      <div v-if="selectedEntryIndex === index" class="bg-blue-200 h-8 rounded flex items-center px-2">
-                        <span class="text-sm text-blue-800">Selected Entry Details</span>
+                    <td class="px-2 py-1.5 border-r border-gray-200">
+                      <div v-if="selectedEntryIndex === index" class="bg-blue-100 px-2 py-1 rounded text-xs text-blue-800 font-medium">
+                        {{ entry.mcardSeq || 'M/Card Seq' }}
                       </div>
-                      <div v-else class="h-8"></div>
+                      <div v-else class="h-6"></div>
                     </td>
-                    <td class="px-3 py-2">
-                      <div v-if="selectedEntryIndex === index" class="bg-blue-200 h-8 rounded flex items-center px-2">
-                        <span class="text-sm text-blue-800">P/Order Ref</span>
+                    <td class="px-2 py-1.5 border-r border-gray-200">
+                      <div v-if="selectedEntryIndex === index" class="bg-blue-100 px-2 py-1 rounded text-xs text-blue-800 font-medium">
+                        {{ entry.pOrderRef || 'P/Order Ref' }}
                       </div>
-                      <div v-else class="h-8"></div>
+                      <div v-else class="h-6"></div>
                     </td>
-                    <td class="px-3 py-2">
-                      <div v-if="selectedEntryIndex === index" class="bg-blue-200 h-8 rounded flex items-center px-2">
-                        <span class="text-sm text-blue-800">Set Qty</span>
+                    <td class="px-2 py-1.5 border-r border-gray-200">
+                      <div v-if="selectedEntryIndex === index" class="bg-blue-100 px-2 py-1 rounded text-xs text-blue-800 font-medium">
+                        Set Qty
                       </div>
-                      <div v-else class="h-8"></div>
+                      <div v-else class="h-6"></div>
                     </td>
-                    <td class="px-3 py-2">
-                      <div v-if="selectedEntryIndex === index" class="bg-blue-200 h-8 rounded flex items-center px-2">
-                        <span class="text-sm text-blue-800">Un.FG</span>
+                    <td class="px-2 py-1.5">
+                      <div v-if="selectedEntryIndex === index" class="bg-blue-100 px-2 py-1 rounded text-xs text-blue-800 font-medium">
+                        Un.FG
                       </div>
-                      <div v-else class="h-8"></div>
+                      <div v-else class="h-6"></div>
                     </td>
                   </tr>
                 </tbody>
@@ -122,71 +177,75 @@
             </div>
           </div>
 
-          <!-- Item Details Table -->
-          <div class="space-y-4">
-            <h4 class="text-md font-semibold text-gray-800">Item Details</h4>
-
-            <div class="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
-              <table class="min-w-[720px] divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+          <!-- Compact Item Details Table -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-2 border-b border-gray-200">
+              <h4 class="text-sm font-semibold text-gray-700 flex items-center">
+                <i class="fas fa-boxes text-gray-500 mr-2"></i>
+                Item Details
+              </h4>
+            </div>
+            <div class="overflow-x-auto max-h-96">
+              <table class="w-full text-xs">
+                <thead class="bg-gray-100 sticky top-0 z-10">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pcs</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part#</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DO Qty</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DO KG</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">Item</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">P/Design</th>
+                    <th class="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-300">Pcs</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">Unit</th>
+                    <th class="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-300">Part#</th>
+                    <th class="px-2 py-1.5 text-right font-medium text-gray-700 border-r border-gray-300">DO Qty</th>
+                    <th class="px-2 py-1.5 text-right font-medium text-gray-700 bg-gray-50">DO KG</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="(item, index) in itemDetails" :key="index">
-                    <td class="px-3 py-2 text-sm text-gray-900">{{ item.name }}</td>
-                    <td class="px-3 py-2">
+                <tbody class="divide-y divide-gray-200">
+                  <tr v-for="(item, index) in itemDetails" :key="index" class="hover:bg-blue-50 transition-colors">
+                    <td class="px-2 py-1.5 font-medium text-gray-900 border-r border-gray-200">{{ item.name }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200">
                       <input
                         v-model="item.pDesign"
                         type="text"
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-transparent hover:bg-gray-50"
                         placeholder="P/Design"
                       >
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-2 py-1.5 text-center border-r border-gray-200">
                       <input
                         v-model="item.pcs"
                         type="text"
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-transparent hover:bg-gray-50 text-center"
                         placeholder="Pcs"
                       >
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-2 py-1.5 border-r border-gray-200">
                       <input
                         v-model="item.unit"
                         type="text"
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-transparent hover:bg-gray-50"
                         placeholder="Unit"
                       >
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-2 py-1.5 border-r border-gray-200">
                       <input
                         v-model="item.partNumber"
                         type="text"
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-transparent hover:bg-gray-50"
                         placeholder="Part#"
                       >
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-2 py-1.5 text-right border-r border-gray-200">
                       <input
                         v-model="item.doQty"
                         type="text"
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-transparent hover:bg-gray-50 text-right"
                         placeholder="DO Qty"
                       >
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-2 py-1.5 text-right bg-gray-50">
                       <input
                         v-model="item.doKg"
                         type="text"
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-gray-50 hover:bg-gray-100 text-right"
                         placeholder="DO KG"
                       >
                     </td>
@@ -195,66 +254,27 @@
               </table>
             </div>
           </div>
-
-          <!-- Bottom Information Section -->
-          <div class="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-5 border border-orange-200">
-            <div class="flex items-center mb-4">
-              <div class="p-2 bg-orange-600 rounded-lg">
-                <i class="fas fa-clipboard-list text-white"></i>
-              </div>
-              <h4 class="ml-3 text-md font-semibold text-gray-800">Additional Information</h4>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Model:</label>
-                <input
-                  v-model="bottomInfo.model"
-                  type="text"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
-                  placeholder="Enter model"
-                >
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins1:</label>
-                <input
-                  v-model="bottomInfo.soIns1"
-                  type="text"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
-                  placeholder="Enter S/O instruction 1"
-                >
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins2:</label>
-                <input
-                  v-model="bottomInfo.soIns2"
-                  type="text"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
-                  placeholder="Enter S/O instruction 2"
-                >
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-          <div class="text-sm text-white">
-            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+        <div class="flex items-center justify-between p-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 rounded-b-xl">
+          <div class="text-xs text-gray-600">
+            <i class="fas fa-info-circle mr-1"></i>
             Select sales order and configure items for delivery
           </div>
           <div class="flex items-center space-x-3">
             <button
               @click="closeModal"
-              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all shadow-sm"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             >
               <i class="fas fa-times mr-2"></i>
               Cancel
             </button>
             <button
               @click="handleSave"
-              class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 border border-transparent rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-lg"
+              class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg shadow-lg hover:shadow-xl transition-all"
             >
-              <i class="fas fa-check mr-2"></i>
+              <i class="fas fa-arrow-right mr-2"></i>
               Proceed to Details
             </button>
           </div>
@@ -369,7 +389,7 @@ const loadItemDetailsFromSo = async (soNumber) => {
       if (mainRow) {
         mainRow.pDesign = details.pd ?? ''
         mainRow.pcs = details.pcs ?? ''
-        mainRow.unit = details.unit ?? ''
+        mainRow.unit = details.unit ?? '' // This now comes from SO table Main component
         mainRow.partNumber = data.part_number ?? ''
       }
 
@@ -380,7 +400,7 @@ const loadItemDetailsFromSo = async (soNumber) => {
             if (row) {
               row.pDesign = fitting.design || ''
               row.pcs = fitting.pcs || ''
-              row.unit = fitting.unit || ''
+              row.unit = fitting.unit || '' // This now comes from SO table for each component
               row.partNumber = fitting.part_number || ''
             }
           }
@@ -499,7 +519,132 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Modal Animation */
+/* Modern table styling */
+.border-0 {
+  border: none !important;
+}
+
+.border-0:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Table cell styling with hover effects */
+td input {
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+td input:hover {
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+td input:focus {
+  background: #e0f2fe;
+  outline: 2px solid #0ea5e9;
+  outline-offset: -1px;
+  border-radius: 4px;
+}
+
+/* Custom scrollbar for modal content */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Table container scrollbar */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Input field focus styling */
+input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+/* Checkbox styling */
+input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Table row hover animation */
+tr {
+  transition: background-color 0.2s ease;
+}
+
+/* Modal backdrop blur effect */
+.fixed.inset-0 > .bg-black {
+  backdrop-filter: blur(4px);
+}
+
+/* Header icon animation */
+.fas.fa-clipboard-list {
+  transition: transform 0.2s ease;
+}
+
+.fas.fa-clipboard-list:hover {
+  transform: scale(1.1);
+}
+
+/* Selected entry styling */
+.bg-blue-100 {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* SO number input styling */
+input[type="text"]:not([readonly]):focus {
+  background: #f0f9ff;
+  border-color: #3b82f6;
+}
+
+/* Modal animation */
 @keyframes modalAppear {
   from {
     opacity: 0;
@@ -515,45 +660,35 @@ onMounted(() => {
   animation: modalAppear 0.3s ease-out;
 }
 
-/* Custom scrollbar for better UX */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 8px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
-  border-radius: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #94a3b8, #64748b);
-  border-radius: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #64748b, #475569);
-}
-
-/* Input focus effects */
-input:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Table row hover effect */
-tr:hover {
-  transform: scale(1.001);
-}
-
-/* Button hover effects */
-button {
-  transition: all 0.2s ease-in-out;
-}
-
+/* Enhanced button hover effects */
 button:hover {
   transform: translateY(-1px);
 }
 
 button:active {
   transform: translateY(0);
+}
+
+/* Sticky table header styling */
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Card shadow effects */
+.shadow-sm:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease;
+}
+
+/* Icon styling in headers */
+.fas.fa-list, .fas.fa-boxes {
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.fas.fa-list:hover, .fas.fa-boxes:hover {
+  color: #3b82f6;
 }
 </style>

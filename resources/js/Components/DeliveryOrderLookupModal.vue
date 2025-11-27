@@ -8,11 +8,8 @@
             <i class="fas fa-search text-xl text-orange-600"></i>
             <div>
               <h2 class="text-lg font-semibold text-gray-800">Delivery Order Lookup</h2>
-              <p v-if="context === 'amend'" class="text-xs text-orange-600">
-                Showing only Draft and Saved orders (amendable)
-              </p>
-              <p v-else-if="context === 'cancel'" class="text-xs text-red-600">
-                Showing only Draft and Saved orders (cancellable)
+              <p v-if="context === 'amend' || context === 'cancel'" class="text-xs text-orange-600">
+                Showing only Main components (Draft and Saved orders)
               </p>
               <p v-else-if="context === 'print'" class="text-xs text-blue-600">
                 Showing only Saved and Completed orders (printable)
@@ -307,6 +304,8 @@ const searchDeliveryOrders = async () => {
       if (!filters.status) {
         params.append('status_in', 'Draft,Saved')
       }
+      // For amend and cancel contexts, only show Main components
+      params.append('comp_main', 'true')
     } else if (props.context === 'print') {
       // Only fetch Saved and Completed orders for print context
       if (!filters.status) {
@@ -385,6 +384,8 @@ const selectDeliveryOrder = (deliveryOrder) => {
   }
   
   emit('select', deliveryOrder)
+  // Auto-close modal after successful selection
+  emit('close')
 }
 
 const getStatusClass = (status) => {

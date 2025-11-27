@@ -383,7 +383,7 @@ const updateOrderInfo = async () => {
           itemDetails.value[0].main = data.item_details.pd ?? ''
           // PCS (Pieces per set)
           itemDetails.value[1].main = data.item_details.pcs ?? ''
-          // UNIT
+          // UNIT - This now comes from SO table Main component
           itemDetails.value[2].main = data.item_details.unit ?? ''
           // ORDER (Order Quantity)
           itemDetails.value[3].main = data.item_details.order_qty ?? ''
@@ -403,7 +403,7 @@ const updateOrderInfo = async () => {
               itemDetails.value[0][colKey] = fitting.design || ''
               // PCS row - fitting pcs
               itemDetails.value[1][colKey] = fitting.pcs || ''
-              // UNIT row - fitting unit
+              // UNIT row - fitting unit (now from SO table)
               itemDetails.value[2][colKey] = fitting.unit || ''
               
               // ORDER row - fitting order quantity
@@ -519,7 +519,7 @@ const searchOrders = async () => {
             customerName: order.customer_name || '',
             model: order.master_card_model || '',
             salespersonCode: order.salesperson_code || '',
-            salespersonName: order.salesperson_code || '',
+            salespersonName: order.salesperson_name || '',
             orderGroup: order.order_group || 'Sales',
             orderType: order.order_type || 'S1'
           }

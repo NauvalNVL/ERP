@@ -271,6 +271,15 @@ class DeliveryOrderController extends Controller
                         ->get();
                 }
 
+                // Fetch SO components for unit mapping
+                $soComponents = [];
+                if (!empty($soNumber)) {
+                    $soComponents = DB::table('so')
+                        ->where('SO_Num', $soNumber)
+                        ->get()
+                        ->keyBy('COMP_Num'); // Key by component name for easy lookup
+                }
+
                 $lineNo = 1;
                 foreach ($items as $item) {
                     $compName = isset($item['name']) ? (string) $item['name'] : '';
@@ -300,6 +309,12 @@ class DeliveryOrderController extends Controller
                         } else {
                             continue;
                         }
+                    }
+
+                    // Get unit from SO table based on component type (Main/Fit)
+                    $componentUnit = 'PCS'; // Default fallback
+                    if (isset($soComponents[$targetComp])) {
+                        $componentUnit = $soComponents[$targetComp]->UNIT ?? 'PCS';
                     }
 
                     $compModel = $compRow->MODEL ?? ($mc->MODEL ?? '');
@@ -350,7 +365,7 @@ class DeliveryOrderController extends Controller
                         'PCS_PER_SET' => is_numeric($item['pcs'] ?? null)
                             ? (float) $item['pcs']
                             : (float)($compRow->PCS_SET ?? $mc->PCS_SET ?? 1),
-                        'Unit' => $item['unit'] ?? ($request->unit ?? ($so ? ($so->UNIT ?? 'PCS') : 'PCS')),
+                        'Unit' => $componentUnit, // Use unit from SO table based on component type
                         'Part_Number' => (string) $compPartNumber,
                         'INT_L' => $compIntL,
                         'INT_W' => $compIntW,
@@ -467,9 +482,25 @@ class DeliveryOrderController extends Controller
                 $query->where('Status', $request->status);
             }
 
+            // Filter by status_in (multiple values)
+            if ($request->has('status_in')) {
+                $statuses = explode(',', $request->status_in);
+                $query->whereIn('Status', $statuses);
+            }
+
             // Filter by customer
             if ($request->has('customer_code')) {
                 $query->where('AC_Num', $request->customer_code);
+            }
+
+            // Filter by DO number
+            if ($request->has('do_number')) {
+                $query->where('DO_Num', 'like', '%' . $request->do_number . '%');
+            }
+
+            // Filter by comp_main (only show Main components)
+            if ($request->has('comp_main') && $request->comp_main === 'true') {
+                $query->where('COMP', 'Main');
             }
 
             $deliveryOrders = $query->orderBy('DO_Num', 'desc')->paginate(20);
@@ -596,20 +627,27 @@ class DeliveryOrderController extends Controller
                 $updateData['Cancelled_Reason'] = $request->cancelled_reason;
             }
 
-            // Update the delivery order
-            DB::table('DO')
+            // Update ALL delivery orders with the same DO number
+            $affectedRows = DB::table('DO')
                 ->where('DO_Num', $doNumber)
                 ->update($updateData);
+
+            Log::info('Bulk update delivery orders', [
+                'do_number' => $doNumber,
+                'affected_rows' => $affectedRows,
+                'updated_data' => $updateData
+            ]);
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Delivery order amended successfully',
+                'message' => "Delivery order {$doNumber} amended successfully. {$affectedRows} record(s) updated.",
                 'data' => [
                     'do_number' => $doNumber,
                     'do_date' => $orderDate->format('d/m/Y'),
-                    'vehicle_number' => $request->vehicle_number
+                    'vehicle_number' => $request->vehicle_number,
+                    'affected_rows' => $affectedRows
                 ]
             ]);
 
@@ -697,23 +735,30 @@ class DeliveryOrderController extends Controller
                 ], 400);
             }
 
-            // Update the delivery order status and cancellation reason
-            DB::table('DO')
+            // Update ALL delivery orders with the same DO number
+            $affectedRows = DB::table('DO')
                 ->where('DO_Num', $doNumber)
                 ->update([
                     'Status' => 'Cancelled',
                     'Cancelled_Reason' => $request->cancellation_reason
                 ]);
 
+            Log::info('Bulk cancel delivery orders', [
+                'do_number' => $doNumber,
+                'affected_rows' => $affectedRows,
+                'cancellation_reason' => $request->cancellation_reason
+            ]);
+
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Delivery order cancelled successfully',
+                'message' => "Delivery order {$doNumber} cancelled successfully. {$affectedRows} record(s) updated.",
                 'data' => [
                     'do_number' => $doNumber,
                     'status' => 'Cancelled',
-                    'cancellation_reason' => $request->cancellation_reason
+                    'cancellation_reason' => $request->cancellation_reason,
+                    'affected_rows' => $affectedRows
                 ]
             ]);
 
