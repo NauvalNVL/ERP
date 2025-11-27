@@ -15,6 +15,7 @@ class PaperSize extends Model
     protected $fillable = [
         'millimeter',
         'inches',
+        'status',
         'is_active',
     ];
     

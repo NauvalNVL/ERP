@@ -28,9 +28,10 @@
           <table class="w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('size_id')">NO.</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('millimeter')">MILLIMETER</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('inches')">INCHES</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('size_id')">NO.</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('millimeter')">MILLIMETER</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('inches')">INCHES</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">STATUS</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -41,6 +42,14 @@
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ 'PS' + String(size.id).padStart(3, '0') }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.millimeter).toFixed(2) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.inches).toFixed(2) }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">
+                  <span v-if="size.status === 'Act'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    Active
+                  </span>
+                  <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                    Obsolete
+                  </span>
+                </td>
               </tr>
               <tr v-if="filteredSizes.length === 0">
                 <td colspan="3" class="px-4 py-4 text-center text-gray-500">No paper sizes found.</td>

@@ -37,7 +37,7 @@ class PaperSizeSeeder extends Seeder
         foreach ($paperSizes as $paperSize) {
             PaperSize::updateOrCreate(
                 ['millimeter' => $paperSize['millimeter']],
-                ['inches' => $paperSize['inches']]
+                ['inches' => $paperSize['inches'], 'status' => 'Act']
             );
         }
     }

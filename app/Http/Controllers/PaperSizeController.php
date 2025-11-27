@@ -70,7 +70,8 @@ class PaperSizeController extends Controller
             
             PaperSize::create([
                 'millimeter' => $validated['millimeter'],
-                'inches' => $inches
+                'inches' => $inches,
+                'status' => 'Act'
             ]);
 
             return redirect()->route('paper-size.index')
@@ -121,7 +122,8 @@ class PaperSizeController extends Controller
             
             $paperSize->update([
                 'millimeter' => $validated['millimeter'],
-                'inches' => $inches
+                'inches' => $inches,
+                'status' => 'Act'
             ]);
 
             return redirect()->route('paper-size.index')
@@ -146,6 +148,35 @@ class PaperSizeController extends Controller
             Log::error('Error in PaperSizeController@destroy: ' . $e->getMessage());
             return redirect()->route('paper-size.index')
                 ->with('error', 'Gagal menghapus ukuran kertas: ' . $e->getMessage());
+        }
+    }
+
+    public function toggleStatus($id)
+    {
+        try {
+            $paperSize = PaperSize::find($id);
+            
+            if (!$paperSize) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Paper size not found'
+                ], 404);
+            }
+
+            $paperSize->status = ($paperSize->status === 'Act') ? 'Obs' : 'Act';
+            $paperSize->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper size status updated successfully',
+                'data' => $paperSize
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperSizeController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling paper size status: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -290,7 +321,8 @@ class PaperSizeController extends Controller
             $updateData = [];
             if ($request->has('millimeter')) $updateData['millimeter'] = $request->millimeter;
             if ($request->has('inches')) $updateData['inches'] = $request->inches;
-            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            // Status update should be done via toggleStatus, but if provided here, handle it
+            // if ($request->has('status')) $updateData['status'] = $request->status;
             
             $paperSize->update($updateData);
 
@@ -331,7 +363,8 @@ class PaperSizeController extends Controller
             
             $paperSize = PaperSize::create([
                 'millimeter' => $request->millimeter,
-                'inches' => $request->inches
+                'inches' => $request->inches,
+                'status' => 'Act'
             ]);
 
             return response()->json([

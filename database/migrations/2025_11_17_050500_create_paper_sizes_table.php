@@ -19,6 +19,7 @@ return new class extends Migration
                 $table->id(); // NO column (auto increment)
                 $table->decimal('millimeter', 10, 2)->unique(); // MILLIMETER column
                 $table->decimal('inches', 10, 2); // INCHES column
+                $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             });
         }
     }

@@ -34,6 +34,7 @@ use App\Http\Controllers\DeliveryOrderController;
 use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\PaperQualityController;
+use App\Http\Controllers\PaperSizeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,6 +123,13 @@ Route::post('/paper-qualities', [PaperQualityController::class, 'apiStore']);
 Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'apiDestroy'])->where('id', '[0-9]+');
 Route::put('/paper-qualities/{id}/status', [PaperQualityController::class, 'toggleStatus'])->where('id', '[0-9]+');
+
+// Paper Size API routes
+Route::get('/paper-sizes', [PaperSizeController::class, 'apiIndex']);
+Route::post('/paper-sizes', [PaperSizeController::class, 'apiStore']);
+Route::put('/paper-sizes/{id}', [PaperSizeController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/paper-sizes/{id}', [PaperSizeController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/paper-sizes/{id}/status', [PaperSizeController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 

@@ -420,6 +420,7 @@ Route::get('/define-paper-flute', [PaperFluteController::class, 'vueIndex'])->na
 
 Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
 Route::get('/paper-size/status', [PaperSizeController::class, 'vueManageStatus'])->name('vue.paper-size.status');
+Route::get('/paper-size/obsolete-unobsolete', [PaperSizeController::class, 'vueManageStatus'])->name('vue.paper-size.obsolete-unobsolete');
 Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
 // Alias for search menu
 Route::get('/define-paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.define-paper-size');
