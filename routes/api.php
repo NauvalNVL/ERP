@@ -140,6 +140,13 @@ Route::put('/color-groups/{code}/status', [ColorGroupController::class, 'toggleS
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 
+// Color API routes
+Route::get('/colors', [ColorController::class, 'apiIndex']);
+Route::post('/colors', [ColorController::class, 'store']);
+Route::put('/colors/{color_id}', [ColorController::class, 'update']);
+Route::delete('/colors/{color_id}', [ColorController::class, 'destroy']);
+Route::put('/colors/{color_code}/status', [ColorController::class, 'toggleStatus']);
+
 // Scoring Tool API routes
 Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
 Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update'])->where('id', '[0-9]+');

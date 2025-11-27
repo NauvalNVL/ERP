@@ -434,6 +434,7 @@ Route::get('/define-color-group', [ColorGroupController::class, 'index'])->name(
 
 Route::get('/color', [ColorController::class, 'vueIndex'])->name('color.index');
 Route::get('/color/status', [ColorController::class, 'vueManageStatus'])->name('color.status');
+Route::get('/color/obsolete-unobsolete', [ColorController::class, 'vueManageStatus'])->name('color.obsolete-unobsolete');
 Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('color.view-print');
 // Alias for search menu
 Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.define-color');
