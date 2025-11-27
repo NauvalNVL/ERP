@@ -551,6 +551,7 @@ Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
 Route::put('/vehicles/{vehicle}', [VehicleController::class, 'apiUpdate']);
 Route::put('/vehicles/{vehicle}/status', [VehicleController::class, 'apiUpdateStatus']);
 Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'apiDestroy']);
+Route::get('/vehicle/driver/{vehicleNo}', [VehicleController::class, 'getDriverByVehicle']);
 
 Route::get('/vehicle-classes', [\App\Http\Controllers\VehicleClassController::class, 'apiIndex']);
 Route::post('/vehicle-classes', [\App\Http\Controllers\VehicleClassController::class, 'apiStore']);

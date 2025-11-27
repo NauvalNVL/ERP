@@ -51,9 +51,8 @@
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salesperson Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salesperson Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales Team</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salesperson</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
@@ -61,12 +60,11 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="team in filteredSalespersonTeams" :key="team.id" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ team.s_person_code }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ team.salesperson_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ team.sales_team_name || 'N/A' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ team.sales_team_position || 'N/A' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ team.salesperson_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ team.sales_team_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ getPositionLabel(team.sales_team_position) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="team.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="team.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -76,19 +74,19 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="toggleSalespersonTeamStatus(team)" :disabled="isToggling"
                                 :class="[
-                                    team.is_active
+                                    team.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[team.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ team.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[team.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ team.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
                     <tr v-if="filteredSalespersonTeams.length === 0">
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No salesperson teams found.</td>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No salesperson teams found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -137,7 +135,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -171,6 +168,14 @@ const notification = ref({
     message: '',
     type: 'success'
 });
+
+// Helper function to get position label
+const getPositionLabel = (position) => {
+    if (position === 'E-Executive') return 'Executive';
+    if (position === 'M-Manager') return 'Manager';
+    if (position === 'S-Supervisor') return 'Supervisor';
+    return position || 'N/A';
+};
 
 // Fetch salesperson teams with pagination
 const fetchSalespersonTeams = async (page = 1) => {
@@ -214,17 +219,16 @@ const filteredSalespersonTeams = computed(() => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(team => 
-            team.s_person_code.toLowerCase().includes(query) || 
-            team.salesperson_name.toLowerCase().includes(query) ||
-            (team.sales_team_name && team.sales_team_name.toLowerCase().includes(query)) ||
+            team.salesperson_name.toLowerCase().includes(query) || 
+            team.sales_team_name.toLowerCase().includes(query) ||
             (team.sales_team_position && team.sales_team_position.toLowerCase().includes(query))
         );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(team => team.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(team => team.status === targetStatus);
     }
     
     return filtered;
@@ -234,7 +238,7 @@ const filteredSalespersonTeams = computed(() => {
 const toggleSalespersonTeamStatus = async (team) => {
     if (isToggling.value) return;
     
-    const confirmMessage = `Are you sure you want to change the status for "${team.salesperson_name}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${team.salesperson_name} - ${team.sales_team_name}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -246,11 +250,10 @@ const toggleSalespersonTeamStatus = async (team) => {
             throw new Error('CSRF token not found');
         }
         
-        // Toggle the is_active property
+        // Toggle the status property
         const updatedData = {
             ...team,
-            is_active: !team.is_active,
-            status: !team.is_active ? 'Act' : 'Obs'
+            status: team.status === 'Act' ? 'Obs' : 'Act'
         };
         
         const response = await fetch(`/api/salesperson-teams/${team.id}`, {
@@ -268,11 +271,10 @@ const toggleSalespersonTeamStatus = async (team) => {
         }
         
         // Update the local state
-        team.is_active = !team.is_active;
-        team.status = team.is_active ? 'Act' : 'Obs';
+        team.status = team.status === 'Act' ? 'Obs' : 'Act';
         
         // Show success message
-        const statusText = team.is_active ? 'activated' : 'deactivated';
+        const statusText = team.status === 'Act' ? 'activated' : 'deactivated';
         showNotification(`Salesperson team "${team.salesperson_name}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling salesperson team status:', error);

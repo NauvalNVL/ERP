@@ -24,11 +24,10 @@ class Geo extends Model
         'TOWN_SECTION',
         'AREA',
         'STATUS',
-        'IS_ACTIVE',
     ];
 
     // Accessors for lowercase attribute names (for Vue compatibility)
-    protected $appends = ['code', 'country', 'state', 'town', 'town_section', 'area', 'status', 'is_active'];
+    protected $appends = ['code', 'country', 'state', 'town', 'town_section', 'area', 'status'];
 
     public function getCodeAttribute()
     {
@@ -99,15 +98,5 @@ class Geo extends Model
     public function setStatusAttribute($value)
     {
         $this->attributes['STATUS'] = $value;
-    }
-
-    public function getIsActiveAttribute()
-    {
-        return $this->attributes['IS_ACTIVE'] ?? true;
-    }
-
-    public function setIsActiveAttribute($value)
-    {
-        $this->attributes['IS_ACTIVE'] = $value;
     }
 }

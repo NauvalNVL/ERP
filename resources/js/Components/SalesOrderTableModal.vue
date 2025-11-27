@@ -398,12 +398,41 @@ const updateOrderInfo = async () => {
           data.fittings.forEach((fitting, index) => {
             if (index < 9) { // F1-F9
               const colKey = `f${index + 1}`
+              
               // PD row - fitting design
               itemDetails.value[0][colKey] = fitting.design || ''
               // PCS row - fitting pcs
               itemDetails.value[1][colKey] = fitting.pcs || ''
               // UNIT row - fitting unit
               itemDetails.value[2][colKey] = fitting.unit || ''
+              
+              // ORDER row - fitting order quantity
+              // Jika API menyediakan order_qty untuk fitting, gunakan itu
+              // Jika tidak, hitung dari main order qty * pcs fitting
+              if (fitting.order_qty !== undefined && fitting.order_qty !== null) {
+                itemDetails.value[3][colKey] = fitting.order_qty
+              } else {
+                const mainOrderQty = parseFloat(data.item_details.order_qty) || 0
+                const fittingPcs = parseFloat(fitting.pcs) || 1
+                itemDetails.value[3][colKey] = mainOrderQty * fittingPcs
+              }
+              
+              // NET DELIVERY row - fitting net delivery
+              // Jika API menyediakan net_delivery untuk fitting, gunakan itu
+              if (fitting.net_delivery !== undefined && fitting.net_delivery !== null) {
+                itemDetails.value[4][colKey] = fitting.net_delivery
+              } else {
+                itemDetails.value[4][colKey] = 0
+              }
+              
+              // BALANCE row - fitting balance (ORDER - NET DELIVERY)
+              if (fitting.balance !== undefined && fitting.balance !== null) {
+                itemDetails.value[5][colKey] = fitting.balance
+              } else {
+                const orderQty = parseFloat(itemDetails.value[3][colKey]) || 0
+                const netDelivery = parseFloat(itemDetails.value[4][colKey]) || 0
+                itemDetails.value[5][colKey] = orderQty - netDelivery
+              }
             }
           })
         }

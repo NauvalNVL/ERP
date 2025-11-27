@@ -51,18 +51,18 @@
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Group ID</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Group Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="productGroup in filteredProductGroups" :key="productGroup.id" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ productGroup.product_group_id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ productGroup.product_group_name }}</td>
+                    <tr v-for="group in filteredProductGroups" :key="group.id" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ group.product_group_id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ group.product_group_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="productGroup.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="group.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -70,16 +70,16 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                            <button @click="toggleProductGroupStatus(productGroup)" :disabled="isToggling"
+                            <button @click="toggleProductGroupStatus(group)" :disabled="isToggling"
                                 :class="[
-                                    productGroup.is_active
+                                    group.is_active
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[productGroup.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ productGroup.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[group.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ group.is_active ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
@@ -133,7 +133,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -209,26 +208,26 @@ const filteredProductGroups = computed(() => {
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(pg => 
-            pg.product_group_id.toLowerCase().includes(query) || 
-            pg.product_group_name.toLowerCase().includes(query)
+        filtered = filtered.filter(group => 
+            group.product_group_id.toLowerCase().includes(query) || 
+            group.product_group_name.toLowerCase().includes(query)
         );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
         const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(pg => pg.is_active === isActive);
+        filtered = filtered.filter(group => group.is_active === isActive);
     }
     
     return filtered;
 });
 
 // Toggle product group status
-const toggleProductGroupStatus = async (productGroup) => {
+const toggleProductGroupStatus = async (group) => {
     if (isToggling.value) return;
     
-    const confirmMessage = `Are you sure you want to change the status for "${productGroup.product_group_name}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${group.product_group_id} - ${group.product_group_name}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -242,11 +241,12 @@ const toggleProductGroupStatus = async (productGroup) => {
         
         // Toggle the is_active property
         const updatedData = {
-            name: productGroup.product_group_name,
-            is_active: !productGroup.is_active
+            name: group.product_group_name,
+            is_active: !group.is_active,
+            status: !group.is_active ? 'Act' : 'Obs'
         };
         
-        const response = await fetch(`/api/product-groups/${productGroup.id}`, {
+        const response = await fetch(`/api/product-groups/${group.id}`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -261,11 +261,12 @@ const toggleProductGroupStatus = async (productGroup) => {
         }
         
         // Update the local state
-        productGroup.is_active = !productGroup.is_active;
+        group.is_active = !group.is_active;
+        group.status = group.is_active ? 'Act' : 'Obs';
         
         // Show success message
-        const statusText = productGroup.is_active ? 'activated' : 'deactivated';
-        showNotification(`Product Group "${productGroup.product_group_name}" successfully ${statusText}`, 'success');
+        const statusText = group.is_active ? 'activated' : 'deactivated';
+        showNotification(`Product group "${group.product_group_id}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling product group status:', error);
         showNotification('Error updating status: ' + error.message, 'error');

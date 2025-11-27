@@ -53,18 +53,18 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales Team</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="salesperson in filteredSalespersons" :key="salesperson.Code || salesperson.code" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ salesperson.Code || salesperson.code }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ salesperson.Name || salesperson.name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ salesperson.Grup || salesperson.grup || 'N/A' }}</td>
+                    <tr v-for="person in filteredSalespersons" :key="person.code" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ person.code }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ person.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ person.email || '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="salesperson.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="person.status === 'Active'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -72,16 +72,16 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                            <button @click="toggleSalespersonStatus(salesperson)" :disabled="isToggling"
+                            <button @click="toggleSalespersonStatus(person)" :disabled="isToggling"
                                 :class="[
-                                    salesperson.is_active
+                                    person.status === 'Active'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[salesperson.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ salesperson.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[person.status === 'Active' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ person.status === 'Active' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
@@ -135,7 +135,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -211,30 +210,27 @@ const filteredSalespersons = computed(() => {
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(salesperson => {
-            const code = (salesperson.Code || salesperson.code || '').toLowerCase();
-            const name = (salesperson.Name || salesperson.name || '').toLowerCase();
-            const grup = (salesperson.Grup || salesperson.grup || '').toLowerCase();
-            
-            return code.includes(query) || name.includes(query) || grup.includes(query);
-        });
+        filtered = filtered.filter(person => 
+            person.code.toLowerCase().includes(query) || 
+            person.name.toLowerCase().includes(query) ||
+            (person.email && person.email.toLowerCase().includes(query))
+        );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(salesperson => salesperson.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Active' : 'Inactive';
+        filtered = filtered.filter(person => person.status === targetStatus);
     }
     
     return filtered;
 });
 
 // Toggle salesperson status
-const toggleSalespersonStatus = async (salesperson) => {
+const toggleSalespersonStatus = async (person) => {
     if (isToggling.value) return;
     
-    const name = salesperson.Name || salesperson.name;
-    const confirmMessage = `Are you sure you want to change the status for "${name}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${person.code} - ${person.name}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -246,20 +242,15 @@ const toggleSalespersonStatus = async (salesperson) => {
             throw new Error('CSRF token not found');
         }
         
-        // Use Code as identifier since it's the primary key
-        const code = salesperson.Code || salesperson.code;
-        
-        if (!code) {
-            throw new Error('Salesperson code not found');
-        }
-        
-        // Toggle the is_active property
+        // Toggle the status property
         const updatedData = {
-            is_active: !salesperson.is_active,
-            status: !salesperson.is_active ? 'Act' : 'Obs'
+            code: person.code,
+            name: person.name,
+            email: person.email,
+            status: person.status === 'Active' ? 'Inactive' : 'Active'
         };
         
-        const response = await fetch(`/api/salesperson/update/${code}`, {
+        const response = await fetch(`/api/salesperson/update/${person.code}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -270,23 +261,15 @@ const toggleSalespersonStatus = async (salesperson) => {
         });
         
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-            throw new Error(errorData.message || 'Failed to toggle salesperson status');
+            throw new Error('Failed to toggle salesperson status');
         }
         
-        const result = await response.json();
+        // Update the local state
+        person.status = person.status === 'Active' ? 'Inactive' : 'Active';
         
-        if (result.success) {
-            // Update the local state
-            salesperson.is_active = !salesperson.is_active;
-            salesperson.status = salesperson.is_active ? 'Act' : 'Obs';
-            
-            // Show success message
-            const statusText = salesperson.is_active ? 'activated' : 'deactivated';
-            showNotification(`Salesperson "${name}" successfully ${statusText}`, 'success');
-        } else {
-            throw new Error(result.message || 'Failed to update status');
-        }
+        // Show success message
+        const statusText = person.status === 'Active' ? 'activated' : 'deactivated';
+        showNotification(`Salesperson "${person.code}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling salesperson status:', error);
         showNotification('Error updating status: ' + error.message, 'error');
