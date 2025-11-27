@@ -393,6 +393,7 @@ Route::get('/define-product', [ProductController::class, 'vueIndex'])->name('vue
 
 Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
 Route::get('/product-design/status', [ProductDesignController::class, 'vueManageStatus'])->name('vue.product-design.status');
+Route::get('/product-design/obsolete-unobsolete', [ProductDesignController::class, 'vueManageStatus'])->name('vue.product-design.obsolete-unobsolete');
 Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
 // Alias for search menu
 Route::get('/define-product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.define-product-design');

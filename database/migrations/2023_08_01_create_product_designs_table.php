@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('flute_style');
             $table->string('print_flute');
             $table->string('input_weight');
+            $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             $table->timestamps();
         });
     }

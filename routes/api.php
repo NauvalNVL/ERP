@@ -131,6 +131,13 @@ Route::put('/product-groups/{id}', [App\Http\Controllers\ProductGroupController:
 Route::delete('/product-groups/{id}', [App\Http\Controllers\ProductGroupController::class, 'apiDestroy'])->where('id', '[0-9]+');
 Route::put('/product-groups/{id}/status', [App\Http\Controllers\ProductGroupController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
+// Product Design API routes
+Route::get('/product-designs', [App\Http\Controllers\ProductDesignController::class, 'getDesignsJson']);
+Route::post('/product-designs', [App\Http\Controllers\ProductDesignController::class, 'apiStore']);
+Route::put('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/product-designs/{id}/status', [App\Http\Controllers\ProductDesignController::class, 'toggleStatus'])->where('id', '[0-9]+');
+
 
 // Color API routes
 Route::get('/colors', [ColorController::class, 'apiIndex']);
