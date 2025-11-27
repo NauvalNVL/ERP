@@ -366,7 +366,7 @@ const selectInvoice = async (invoice) => {
     console.log('📋 Invoice selected:', invoice);
 
     try {
-        // Fetch full invoice details
+        // Fetch full invoice header details
         const res = await axios.get(`/api/invoices/${encodeURIComponent(invoice.invoice_no)}`);
 
         if (res.data) {
@@ -376,7 +376,7 @@ const selectInvoice = async (invoice) => {
                 return;
             }
 
-            // Set selected invoice
+            // Set selected invoice header
             selectedInvoice.value = {
                 invoice_no: res.data.invoice_no,
                 invoice_date: res.data.invoice_date,
@@ -404,8 +404,21 @@ const selectInvoice = async (invoice) => {
                 po_number: res.data.po_number,
                 model: res.data.model,
                 printed_by: res.data.printed_by,
-                printed_date: res.data.printed_date
+                printed_date: res.data.printed_date,
+                // Detailed items (Main + Fit) for printing, loaded below
+                items: []
             };
+
+            // Try to load detailed items (Main + Fit) for this invoice
+            try {
+                const itemsRes = await axios.get(`/api/invoices/${encodeURIComponent(invoice.invoice_no)}/with-items`);
+                if (itemsRes.data && Array.isArray(itemsRes.data.items)) {
+                    selectedInvoice.value.items = itemsRes.data.items;
+                    console.log('✅ Loaded invoice items for print:', selectedInvoice.value.items.length);
+                }
+            } catch (err) {
+                console.warn('⚠️ Failed to load invoice items for print, using header only:', err);
+            }
 
             // Close modal
             showInvoiceTable.value = false;
@@ -558,21 +571,84 @@ const generateInvoicePDF = (invoice) => {
     if (printOptions.value.includeDetails) {
         doc.setFont('helvetica', 'normal');
 
-        // Item 1 - Main line
-        doc.text('1  SO#  : ' + (invoice.so_number || ''), 15, currentY);
-        doc.text('PO#  : ' + (invoice.po_number || ''), 25, currentY + 4);
+        // Y untuk baris Qty/Harga/Jumlah akan diselaraskan dengan baris 'Main :'
+        let mainLineY = currentY;
 
-        // Model info
+        // Persiapan data Main & Fit dari invoice.items (jika ada)
+        const rawItems = Array.isArray(invoice.items) ? invoice.items : [];
+
+        const mainItem = rawItems.find((item) => {
+            const comp = (item.comp || '').toString().trim().toLowerCase();
+            return comp === 'main' || comp === '';
+        });
+
+        // Deskripsi main: PRIORITAS PART (part number), lalu PRODUCT (item_code), lalu item_desc, terakhir 'BOX'
+        let mainDesc = 'BOX';
+        if (mainItem) {
+            const mainPart = (mainItem.part || '').toString().trim();
+            const mainCode = (mainItem.item_code || '').toString().trim();
+
+            if (mainPart) {
+                mainDesc = mainPart; // contoh: 'BOX'
+            } else if (mainCode) {
+                mainDesc = mainCode; // contoh: 'OX BASO 4.5 KG'
+            } else if (mainItem.item_desc) {
+                mainDesc = mainItem.item_desc;
+            }
+        }
+
+        const fitItems = rawItems
+            .filter((item) => {
+                const comp = (item.comp || '').toString().trim().toLowerCase();
+                return comp.startsWith('fit');
+            })
+            .sort((a, b) => (a.line_no || 0) - (b.line_no || 0));
+
+        // Baris 1: nomor + SO# dan PO# pada baris yang sama
+        const soText = invoice.so_number || '';
+        const poText = invoice.po_number || '';
+        doc.text(`1  SO#  : ${soText};  PO# : ${poText}`, 15, currentY);
+
+        // Baris berikutnya: Model (jika ada)
         const modelText = invoice.model || '';
         if (modelText) {
-          doc.text('Model : ' + modelText, 25, currentY + 8);
+            currentY += 4;
+            doc.text('   Model: ' + modelText, 15, currentY);
         }
-        doc.text('Main  : BOX', 25, currentY + 12);
 
-        // DO reference
-        doc.text('DO#   : ' + (invoice.do_number || invoice.second_ref || ''), 25, currentY + 16);
+        // Baris selanjutnya: Main
+        currentY += 4;
+        doc.text('   Main : ' + mainDesc, 15, currentY);
+        // Set posisi kolom Qty/Harga/Jumlah sejajar dengan baris Main
+        mainLineY = currentY;
 
-        // Quantities and amounts
+        // Baris berikutnya: Fit1..Fit9 (jika ada)
+        fitItems.forEach((item) => {
+            if (currentY >= 220) return; // jangan nabrak area total
+
+            currentY += 4;
+            const compLabel = (item.comp || '').toString().trim() || 'Fit';
+
+            const itemCode = (item.item_code || '').toString().trim();
+            const itemPart = (item.part || '').toString().trim();
+
+            let desc = '';
+            if (itemPart) {
+                desc = itemPart; // contoh: 'Box B'
+            } else if (itemCode) {
+                desc = itemCode;
+            } else {
+                desc = item.item_desc || '';
+            }
+
+            doc.text(`   ${compLabel}: ` + desc, 15, currentY);
+        });
+
+        // Baris terakhir: DO# (hanya dari nomor DO yang sudah di-resolve, tanpa fallback second_ref)
+        currentY += 4;
+        doc.text('   DO#  : ' + (invoice.do_number || ''), 15, currentY);
+
+        // Qty/Harga/Jumlah hanya di baris nomor 1 (Main)
         const qtyNumber =
           invoice.quantity !== undefined && invoice.quantity !== null
             ? Number(invoice.quantity)
@@ -581,11 +657,9 @@ const generateInvoicePDF = (invoice) => {
         const unitPrice = formatCurrency(invoice.unit_price ?? 0);
         const amount = formatCurrency(invoice.total_amount ?? 0);
 
-        doc.text(qty + 'Pcs', 110, currentY, { align: 'right' });
-        doc.text(unitPrice, 140, currentY, { align: 'right' });
-        doc.text(amount, 180, currentY, { align: 'right' });
-
-        currentY += 22;
+        doc.text(qty + 'Pcs', 110, mainLineY, { align: 'right' });
+        doc.text(unitPrice, 140, mainLineY, { align: 'right' });
+        doc.text(amount, 180, mainLineY, { align: 'right' });
     }
 
     // ==== TOTALS SECTION ====
@@ -655,10 +729,11 @@ const generateInvoicePDF = (invoice) => {
     doc.text('Banten, ' + signDate, 140, sigY);
     doc.text('PT. MULTIBOX INDAH', 140, sigY + 4);
 
-    // Signature name (fixed as EVA KENPI to match CPS layout)
+    // Signature name (fixed as EVA KENPI to match CPS layout) – sejajar dengan PT. MULTIBOX INDAH
     doc.setFont('helvetica', 'bold');
     const signerName = 'EVA KENPI';
-    doc.text(signerName.toUpperCase(), 160, sigY + 33, { align: 'center' });
+    // Gunakan X yang sama (140) tanpa align center agar kiri teks sejajar
+    doc.text(signerName.toUpperCase(), 140, sigY + 33);
 
     // ==== FOOTER ====
     doc.setFontSize(7);
