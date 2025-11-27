@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\SalesTeam;
 use App\Models\ProductGroup;
@@ -28,8 +29,9 @@ class DashboardController extends Controller
             'customerGroups' => CustomerGroup::count(),
         ];
 
-        $salesOrdersCount = Schema::hasTable((new SalesOrder())->getTable())
-            ? SalesOrder::count()
+        // Sales Orders: gunakan tabel legacy CPS 'SO' (bukan tabel Laravel 'sales_orders')
+        $salesOrdersCount = Schema::hasTable('SO')
+            ? DB::table('SO')->count()
             : 0;
 
         $businessStats = [
