@@ -441,6 +441,7 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
 
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
          Route::get('/finishing/status', [FinishingController::class, 'vueManageStatus'])->name('vue.finishing.status');
+         Route::get('/finishing/obsolete-unobsolete', [FinishingController::class, 'vueManageStatus'])->name('vue.finishing.obsolete-unobsolete');
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
          // Alias for search menu
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');

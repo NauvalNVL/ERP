@@ -67,6 +67,7 @@ class FinishingController extends Controller
                 'code' => $request->code,
                 'description' => $request->description,
                 'is_compute' => $request->is_compute ?? false,
+                'status' => 'Act'
             ]);
 
             return response()->json([
@@ -108,7 +109,14 @@ class FinishingController extends Controller
             }
 
             // Update the finishing
-            $finishing->update($request->only(['code', 'description', 'is_compute', 'is_active']));
+            $updateData = [];
+            if ($request->has('code')) $updateData['code'] = $request->code;
+            if ($request->has('description')) $updateData['description'] = $request->description;
+            if ($request->has('is_compute')) $updateData['is_compute'] = $request->is_compute;
+            // Status update should be done via toggleStatus
+            // if ($request->has('status')) $updateData['status'] = $request->status;
+            
+            $finishing->update($updateData);
 
             // Get the updated data
             $updatedFinishing = Finishing::where('code', $request->code ?? $finishing->code)->first();
@@ -137,8 +145,19 @@ class FinishingController extends Controller
         try {
             $finishings = Finishing::orderBy('code')->get();
             
+            // Transform data to include status
+            $finishingsTransformed = $finishings->map(function($finishing) {
+                return [
+                    'id' => $finishing->id,
+                    'code' => $finishing->code,
+                    'description' => $finishing->description,
+                    'is_compute' => $finishing->is_compute,
+                    'status' => $finishing->status
+                ];
+            });
+            
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-finishing', [
-                'finishings' => $finishings,
+                'finishings' => $finishingsTransformed,
                 'header' => 'Manage Finishing Status'
             ]);
         } catch (\Exception $e) {
@@ -147,6 +166,41 @@ class FinishingController extends Controller
                 'finishings' => [],
                 'header' => 'Manage Finishing Status'
             ]);
+        }
+    }
+
+    public function toggleStatus($code)
+    {
+        try {
+            $finishing = Finishing::where('code', $code)->first();
+            
+            if (!$finishing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Finishing not found'
+                ], 404);
+            }
+
+            $finishing->status = ($finishing->status === 'Act') ? 'Obs' : 'Act';
+            $finishing->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Finishing status updated successfully',
+                'data' => [
+                    'id' => $finishing->id,
+                    'code' => $finishing->code,
+                    'description' => $finishing->description,
+                    'is_compute' => $finishing->is_compute,
+                    'status' => $finishing->status
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in FinishingController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling finishing status: ' . $e->getMessage()
+            ], 500);
         }
     }
 

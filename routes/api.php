@@ -147,6 +147,13 @@ Route::put('/colors/{color_id}', [ColorController::class, 'update']);
 Route::delete('/colors/{color_id}', [ColorController::class, 'destroy']);
 Route::put('/colors/{color_code}/status', [ColorController::class, 'toggleStatus']);
 
+// Finishing API routes
+Route::get('/finishings', [FinishingController::class, 'apiIndex']);
+Route::post('/finishings', [FinishingController::class, 'store']);
+Route::put('/finishings/{code}', [FinishingController::class, 'update']);
+Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
+Route::put('/finishings/{code}/status', [FinishingController::class, 'toggleStatus']);
+
 // Scoring Tool API routes
 Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
 Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update'])->where('id', '[0-9]+');
