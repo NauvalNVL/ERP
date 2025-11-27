@@ -20,6 +20,7 @@
                         <tr>
                             <th class="px-4 py-2 text-left font-semibold w-32">Code</th>
                             <th class="px-4 py-2 text-left font-semibold">Name</th>
+                            <th class="px-4 py-2 text-left font-semibold">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,9 +34,12 @@
                         >
                             <td class="px-4 py-2">{{ group.code }}</td>
                             <td class="px-4 py-2">{{ group.name }}</td>
+                            <td class="px-4 py-2">
+                                {{ group.status === 'O' ? 'Obsolete' : 'Active' }}
+                            </td>
                         </tr>
                         <tr v-if="taxGroups.length === 0">
-                            <td colspan="2" class="px-4 py-6 text-center text-gray-500">No tax groups found</td>
+                            <td colspan="3" class="px-4 py-6 text-center text-gray-500">No tax groups found</td>
                         </tr>
                     </tbody>
                 </table>

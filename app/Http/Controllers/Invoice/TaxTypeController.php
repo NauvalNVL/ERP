@@ -21,6 +21,28 @@ class TaxTypeController extends Controller
     }
 
     /**
+     * Display the Obsolete/Unobsolete Tax Type status management page.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $taxTypes = TaxType::orderBy('code')->get();
+
+            return Inertia::render('warehouse-management/Invoice/Setup/ObsoleteUnobsoleteTaxType', [
+                'taxTypes' => $taxTypes,
+                'header' => 'Manage Tax Type Status',
+            ]);
+        } catch (\Exception $e) {
+            return Inertia::render('warehouse-management/Invoice/Setup/ObsoleteUnobsoleteTaxType', [
+                'taxTypes' => [],
+                'header' => 'Manage Tax Type Status',
+            ]);
+        }
+    }
+
+    /**
      * Get all tax types.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -211,6 +233,50 @@ class TaxTypeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting tax type: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle tax type status (Active/Obsolete).
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $taxType = TaxType::where('code', $code)->first();
+
+            if (!$taxType) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tax type not found'
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['A', 'O'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid status value'
+                ], 422);
+            }
+
+            $taxType->status = $status;
+            $taxType->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tax type status updated successfully',
+                'data' => $taxType
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating tax type status: ' . $e->getMessage()
             ], 500);
         }
     }

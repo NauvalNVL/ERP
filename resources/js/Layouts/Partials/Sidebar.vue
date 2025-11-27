@@ -243,7 +243,10 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_reinforcement_tape' ||
     menuKey === 'obsolete_unobsolete_bundling_string' ||
     menuKey === 'obsolete_unobsolete_wrapping_material' ||
-    menuKey === 'obsolete_unobsolete_glueing_material'
+    menuKey === 'obsolete_unobsolete_glueing_material' ||
+    menuKey === 'obsolete_unobsolete_tax_type' ||
+    menuKey === 'obsolete_unobsolete_tax_group' ||
+    menuKey === 'obsolete_unobsolete_customer_sales_tax_index'
   ) {
     return true;
   }
@@ -513,7 +516,10 @@ const getPermissionKeyFromTitle = (title) => {
 
     // Warehouse Management - Invoice Setup
     'Define Tax Type': 'define_tax_type',
+    'Obsolete/Unobsolete Tax Type': 'obsolete_unobsolete_tax_type',
     'Define Tax Group': 'define_tax_group',
+    'Obsolete/Unobsolete Tax Group': 'obsolete_unobsolete_tax_group',
+    'Obsolete/Unobsolete Customer Sales Tax Index': 'obsolete_unobsolete_customer_sales_tax_index',
     'Define Customer Sales Tax Index': 'define_customer_sales_tax_index',
     'View & Print Tax Type': 'view_print_tax_type',
     'View & Print Tax Group': 'view_print_tax_group',
@@ -755,8 +761,11 @@ const warehouseManagementItems = [
         icon: 'fas fa-cogs',
         children: [
           { title: 'Define Tax Type', icon: 'fas fa-percent', route: '/warehouse-management/invoice/setup/define-tax-type' },
+          { title: 'Obsolete/Unobsolete Tax Type', icon: 'fas fa-ban', route: '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-type' },
           { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/warehouse-management/invoice/setup/define-tax-group' },
+          { title: 'Obsolete/Unobsolete Tax Group', icon: 'fas fa-ban', route: '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-group' },
           { title: 'Define Customer Sales Tax Index', icon: 'fas fa-user-tag', route: '/warehouse-management/invoice/setup/define-customer-sales-tax-index' },
+          { title: 'Obsolete/Unobsolete Customer Sales Tax Index', icon: 'fas fa-ban', route: '/warehouse-management/invoice/setup/obsolete-unobsolete-customer-sales-tax-index' },
           { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/print-tax-type' },
           { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/print-tax-group' },
           { title: 'View & Print Customer Sales Tax Index', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/print-customer-sales-tax-index' },

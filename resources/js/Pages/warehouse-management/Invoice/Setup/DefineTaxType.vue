@@ -281,6 +281,7 @@
                                 <th class="px-4 py-2 text-left font-semibold">Apply</th>
                                 <th class="px-4 py-2 text-left font-semibold">Tax Rate %</th>
                                 <th class="px-4 py-2 text-left font-semibold">Custom Type</th>
+                                <th class="px-4 py-2 text-left font-semibold">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -297,9 +298,12 @@
                                 <td class="px-4 py-2">{{ tx.apply }}</td>
                                 <td class="px-4 py-2">{{ Number(tx.rate).toFixed(2) }}</td>
                                 <td class="px-4 py-2">{{ tx.custom_type }}</td>
+                                <td class="px-4 py-2">
+                                    {{ tx.status === 'O' ? 'Obsolete' : 'Active' }}
+                                </td>
                             </tr>
                             <tr v-if="taxTypes.length === 0">
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">No tax types found</td>
+                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">No tax types found</td>
                             </tr>
                         </tbody>
                     </table>

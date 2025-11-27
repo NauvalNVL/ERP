@@ -190,6 +190,7 @@ Route::post('/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::
 Route::get('/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'show']);
 Route::put('/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'update']);
 Route::delete('/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'destroy']);
+Route::put('/tax-types/{code}/status', [App\Http\Controllers\Invoice\TaxTypeController::class, 'toggleStatus']);
 
 // Tax Group API routes (CPS-style Define Tax Group) - MUST be before wildcard routes
 Route::get('/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'index']);
@@ -202,12 +203,14 @@ Route::get('/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGrou
 Route::post('/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'saveTaxTypes']);
 Route::put('/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'update']);
 Route::delete('/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'destroy']);
+Route::put('/tax-groups/{code}/status', [App\Http\Controllers\Invoice\TaxGroupController::class, 'toggleStatus']);
 
 // Customer Sales Tax Index routes - MUST be before wildcard routes
 Route::get('/customer-tax-indices/{customerCode}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getCustomerIndices']);
 Route::get('/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'show']);
 Route::post('/customer-tax-indices', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'store']);
 Route::delete('/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'destroy']);
+Route::put('/customer-tax-indices/{customerCode}/{indexNumber}/status', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'toggleStatus']);
 Route::get('/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getProductTieups']);
 Route::post('/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'saveProductTieups']);
 

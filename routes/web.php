@@ -770,7 +770,19 @@ Route::get('/warehouse-management/invoice/setup/define-tax-type', function () {
 return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxType');
 })->name('vue.warehouse-management.invoice.setup.define-tax-type');
 
+Route::get('/warehouse-management/invoice/setup/obsolete-unobsolete-tax-type', [App\Http\Controllers\Invoice\TaxTypeController::class, 'vueManageStatus'])->name('vue.warehouse-management.invoice.setup.obsolete-unobsolete-tax-type');
+
+Route::get(
+    '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-group',
+    [App\Http\Controllers\Invoice\TaxGroupController::class, 'vueManageStatus']
+)->name('vue.warehouse-management.invoice.setup.obsolete-unobsolete-tax-group');
+
 Route::get('/warehouse-management/invoice/setup/define-customer-sales-tax-index', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'index'])->name('vue.warehouse-management.invoice.setup.define-customer-sales-tax-index');
+
+Route::get(
+    '/warehouse-management/invoice/setup/obsolete-unobsolete-customer-sales-tax-index',
+    [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'vueManageStatus']
+)->name('vue.warehouse-management.invoice.setup.obsolete-unobsolete-customer-sales-tax-index');
 
 // Invoice → Setup → View & Print (Tax masters)
 Route::get('/warehouse-management/invoice/setup/print-tax-type', function () {
@@ -1041,12 +1053,6 @@ Route::post('/realese-approve-mc/release/{id}', [RealeseApproveMcController::cla
 Route::post('/realese-approve-mc/unreleased/{id}', [RealeseApproveMcController::class, 'unreleased']);
 Route::get('/realese-approve-mc/by-customer/{customerId}', [RealeseApproveMcController::class, 'getByCustomer']);
 
-// ObsolateReactiveMC API routes
-Route::get('/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'apiIndex']);
-Route::post('/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'store']);
-Route::post('/obsolate-reactive-mc/obsolate/{id}', [ObsolateReactiveMcController::class, 'obsolate']);
-Route::post('/obsolate-reactive-mc/reactive/{id}', [ObsolateReactiveMcController::class, 'reactive']);
-Route::get('/obsolate-reactive-mc/by-customer/{customerId}', [ObsolateReactiveMcController::class, 'getByCustomer']);
 
 // Delivery Order API routes
 Route::get('/delivery-orders', [DeliveryOrderController::class, 'index']);

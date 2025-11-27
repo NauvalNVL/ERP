@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class TaxGroupController extends Controller
 {
@@ -56,6 +57,72 @@ class TaxGroupController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch tax groups with types: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display the Obsolete/Unobsolete Tax Group status management page.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $taxGroups = TaxGroup::orderBy('code')->get();
+
+            return Inertia::render('warehouse-management/Invoice/Setup/ObsoleteUnobsoleteTaxGroup', [
+                'taxGroups' => $taxGroups,
+                'header' => 'Manage Tax Group Status',
+            ]);
+        } catch (\Exception $e) {
+            return Inertia::render('warehouse-management/Invoice/Setup/ObsoleteUnobsoleteTaxGroup', [
+                'taxGroups' => [],
+                'header' => 'Manage Tax Group Status',
+            ]);
+        }
+    }
+
+    /**
+     * Toggle tax group status (Active/Obsolete).
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $taxGroup = TaxGroup::find($code);
+
+            if (!$taxGroup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tax group not found',
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['A', 'O'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid status value',
+                ], 422);
+            }
+
+            $taxGroup->status = $status;
+            $taxGroup->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tax group status updated successfully',
+                'data' => $taxGroup,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update tax group status: ' . $e->getMessage(),
             ], 500);
         }
     }
