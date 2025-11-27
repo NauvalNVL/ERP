@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="$emit('close')"></div>
-    
+
     <!-- Modal Container -->
     <div class="relative bg-white w-full max-w-7xl max-h-[90vh] rounded-2xl shadow-2xl border border-white/20 animate-fade-in-up overflow-hidden">
       <!-- Modal Header -->
@@ -17,7 +17,7 @@
               <p class="text-blue-100 text-sm">[Sorted by S/Order#] - Select a sales order to continue</p>
             </div>
           </div>
-          <button 
+          <button
             @click="$emit('close')"
             class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors"
           >
@@ -33,32 +33,32 @@
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
               <label class="text-sm font-semibold text-gray-700">Search:</label>
-              <input 
-                v-model="searchParams.month" 
-                type="number" 
-                min="1" 
-                max="12" 
-                class="modern-input w-16 text-center" 
+              <input
+                v-model="searchParams.month"
+                type="number"
+                min="1"
+                max="12"
+                class="modern-input w-16 text-center"
                 placeholder="MM"
               />
               <span class="text-gray-400">/</span>
-              <input 
-                v-model="searchParams.year" 
-                type="number" 
-                min="2000" 
-                max="2099" 
-                class="modern-input w-20 text-center" 
+              <input
+                v-model="searchParams.year"
+                type="number"
+                min="2000"
+                max="2099"
+                class="modern-input w-20 text-center"
                 placeholder="YYYY"
               />
               <span class="text-gray-400">/</span>
-              <input 
-                v-model="searchParams.seq" 
-                type="text" 
-                class="modern-input w-24" 
+              <input
+                v-model="searchParams.seq"
+                type="text"
+                class="modern-input w-24"
                 placeholder="Seq"
               />
             </div>
-            <button 
+            <button
               @click="searchSalesOrders"
               class="modern-btn-primary"
             >
@@ -66,10 +66,10 @@
             </button>
             <div class="flex items-center gap-2 ml-auto">
               <label class="text-sm font-semibold text-gray-700">S/Order#:</label>
-              <input 
-                v-model="quickSearch" 
-                type="text" 
-                class="modern-input w-32" 
+              <input
+                v-model="quickSearch"
+                type="text"
+                class="modern-input w-32"
                 placeholder="Quick search..."
                 @keyup.enter="quickSearchOrders"
               />
@@ -97,8 +97,8 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr 
-                    v-for="order in salesOrders" 
+                  <tr
+                    v-for="order in salesOrders"
                     :key="order.so_number"
                     @click="selectOrder(order)"
                     :class="[
@@ -119,7 +119,7 @@
                   </tr>
                 </tbody>
               </table>
-              
+
               <!-- Loading State -->
               <div v-if="loading" class="flex items-center justify-center py-8">
                 <div class="flex items-center gap-3">
@@ -127,7 +127,7 @@
                   <span class="text-gray-600">Loading sales orders...</span>
                 </div>
               </div>
-              
+
               <!-- Empty State -->
               <div v-else-if="salesOrders.length === 0" class="flex items-center justify-center py-8">
                 <div class="text-center">
@@ -143,7 +143,7 @@
             <div class="bg-white border-b border-gray-200 px-4 py-2">
               <h3 class="text-sm font-semibold text-gray-700">Order Details</h3>
             </div>
-            
+
             <div class="flex-1 overflow-auto p-4">
               <div v-if="selectedOrder" class="space-y-4">
                 <!-- Customer Information -->
@@ -181,7 +181,7 @@
                 </div>
 
               </div>
-              
+
               <!-- No Selection State -->
               <div v-else class="flex items-center justify-center h-full">
                 <div class="text-center text-gray-500">
@@ -199,21 +199,14 @@
             <span v-if="salesOrders.length > 0">{{ salesOrders.length }} sales order(s) found</span>
           </div>
           <div class="flex gap-3">
-            <button 
-              @click="$emit('zoom', selectedOrder)"
-              :disabled="!selectedOrder"
-              class="modern-btn-secondary"
-            >
-              <i class="fa-solid fa-magnifying-glass-plus mr-2"></i>Zoom
-            </button>
-            <button 
+            <button
               @click="handleSelect"
               :disabled="!selectedOrder"
               class="modern-btn-confirm"
             >
               <i class="fa-solid fa-check mr-2"></i>Select
             </button>
-            <button 
+            <button
               @click="$emit('close')"
               class="modern-btn-cancel"
             >
@@ -241,7 +234,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'select', 'zoom'])
+const emit = defineEmits(['close', 'select'])
 
 // Reactive data
 const salesOrders = ref([])
@@ -279,7 +272,7 @@ async function searchSalesOrders() {
         status: props.searchParams.status
       }
     })
-    
+
     if (response.data.success) {
       const salesOrdersData = response.data.data.map(order => ({
         so_number: order.so_number,
@@ -305,7 +298,7 @@ async function searchSalesOrders() {
           { item_code: 'PD', quantity: '1', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' }
         ]
       }))
-      
+
       salesOrders.value = salesOrdersData
       if (salesOrdersData.length > 0) {
         selectedOrder.value = salesOrdersData[0]
@@ -324,7 +317,7 @@ async function searchSalesOrders() {
 function quickSearchOrders() {
   if (quickSearch.value.trim()) {
     // Filter existing data or make new API call
-    const filtered = salesOrders.value.filter(order => 
+    const filtered = salesOrders.value.filter(order =>
       order.so_number.toLowerCase().includes(quickSearch.value.toLowerCase()) ||
       order.customer_po_number?.toLowerCase().includes(quickSearch.value.toLowerCase())
     )
@@ -367,33 +360,33 @@ watch(() => props.isOpen, (isOpen) => {
 <style scoped>
 /* Modern Input Styles */
 .modern-input {
-  @apply w-full px-3 py-2 border border-gray-200 rounded-lg text-sm transition-all duration-200 
-         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 
+  @apply w-full px-3 py-2 border border-gray-200 rounded-lg text-sm transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
          hover:border-gray-300 bg-white;
 }
 
 /* Modern Button Styles */
 .modern-btn-primary {
-  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white 
-         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white
+         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
          transition-all duration-200 hover:from-blue-600 hover:to-blue-700;
 }
 
 .modern-btn-secondary {
-  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white 
-         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white
+         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
          transition-all duration-200 hover:from-gray-600 hover:to-gray-700 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .modern-btn-confirm {
-  @apply inline-flex items-center px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
-         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 
+  @apply inline-flex items-center px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white
+         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
          transition-all duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .modern-btn-cancel {
-  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white 
-         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white
+         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
          transition-all duration-200 hover:from-red-600 hover:to-red-700;
 }
 
