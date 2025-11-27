@@ -38,7 +38,8 @@ class MachineController extends Controller
                     'process' => $machine->process,
                     'sub_process' => $machine->sub_process,
                     'resource_type' => $machine->resource_type,
-                    'finisher_type' => $machine->finisher_type
+                    'finisher_type' => $machine->finisher_type,
+                    'status' => $machine->status ?? 'Act',
                 ];
             });
             
@@ -96,7 +97,8 @@ class MachineController extends Controller
                 'process' => 'nullable|string|max:100',
                 'sub_process' => 'nullable|string|max:100',
                 'resource_type' => 'nullable|string|max:50',
-                'finisher_type' => 'nullable|string|max:50'
+                'finisher_type' => 'nullable|string|max:50',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -112,13 +114,19 @@ class MachineController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = 'Act';
+            }
+
             $machine = Machine::create([
                 'machine_code' => trim($request->machine_code),
                 'machine_name' => trim($request->machine_name),
                 'process' => $request->process ? trim($request->process) : null,
                 'sub_process' => $request->sub_process ? trim($request->sub_process) : null,
                 'resource_type' => $request->resource_type ? trim($request->resource_type) : null,
-                'finisher_type' => $request->finisher_type ? trim($request->finisher_type) : null
+                'finisher_type' => $request->finisher_type ? trim($request->finisher_type) : null,
+                'status' => $status,
             ]);
             
             Log::info('Machine created successfully:', ['machine_code' => $machine->machine_code]);
@@ -131,7 +139,8 @@ class MachineController extends Controller
                 'process' => $machine->process,
                 'sub_process' => $machine->sub_process,
                 'resource_type' => $machine->resource_type,
-                'finisher_type' => $machine->finisher_type
+                'finisher_type' => $machine->finisher_type,
+                'status' => $machine->status ?? 'Act',
             ];
             
             if ($request->wantsJson() || $request->ajax()) {
@@ -172,7 +181,8 @@ class MachineController extends Controller
                 'process' => 'nullable|string|max:100',
                 'sub_process' => 'nullable|string|max:100',
                 'resource_type' => 'nullable|string|max:50',
-                'finisher_type' => 'nullable|string|max:50'
+                'finisher_type' => 'nullable|string|max:50',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -193,12 +203,18 @@ class MachineController extends Controller
                 ], 404);
             }
 
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = $machine->status ?? 'Act';
+            }
+
             $machine->update([
                 'machine_name' => trim($request->machine_name),
                 'process' => $request->process ? trim($request->process) : null,
                 'sub_process' => $request->sub_process ? trim($request->sub_process) : null,
                 'resource_type' => $request->resource_type ? trim($request->resource_type) : null,
-                'finisher_type' => $request->finisher_type ? trim($request->finisher_type) : null
+                'finisher_type' => $request->finisher_type ? trim($request->finisher_type) : null,
+                'status' => $status,
             ]);
 
             Log::info('Machine updated successfully:', ['id' => $id]);
@@ -211,13 +227,14 @@ class MachineController extends Controller
                 'process' => $machine->process,
                 'sub_process' => $machine->sub_process,
                 'resource_type' => $machine->resource_type,
-                'finisher_type' => $machine->finisher_type
+                'finisher_type' => $machine->finisher_type,
+                'status' => $machine->status ?? 'Act',
             ];
             
             return response()->json([
                 'success' => true,
                 'message' => 'Machine berhasil diperbarui',
-                'data' => $machineResponse
+                'data' => $machineResponse,
             ]);
 
         } catch (\Exception $e) {
@@ -232,7 +249,7 @@ class MachineController extends Controller
     }
 
     /**
-     * Remove the specified machine from storage.
+     * Remove the specified machine from storage (soft delete via status).
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
@@ -241,38 +258,39 @@ class MachineController extends Controller
     {
         try {
             $machine = Machine::find($id);
-            
+
             if ($machine) {
-                $machine->delete();
-                
+                $machine->status = 'Obs';
+                $machine->save();
+
                 if (request()->wantsJson() || request()->ajax()) {
                     return response()->json([
                         'success' => true,
-                        'message' => 'Machine berhasil dihapus'
+                        'message' => 'Machine berhasil dihapus (marked as obsolete)'
                     ]);
                 }
-                
-                return redirect()->route('machine.index')->with('success', 'Machine berhasil dihapus');
-            } else {
-                if (request()->wantsJson() || request()->ajax()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Machine tidak ditemukan'
-                    ], 404);
-                }
-                
-                return back()->with('error', 'Machine tidak ditemukan');
+
+                return redirect()->route('machine.index')->with('success', 'Machine berhasil dihapus (marked as obsolete)');
             }
+
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Machine tidak ditemukan'
+                ], 404);
+            }
+
+            return back()->with('error', 'Machine tidak ditemukan');
         } catch (\Exception $e) {
             Log::error('Error in MachineController@destroy: ' . $e->getMessage());
-            
+
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error deleting machine: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -322,6 +340,101 @@ class MachineController extends Controller
     }
 
     /**
+     * Display the Obsolete/Unobsolete Machine status management page.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $machines = Machine::orderBy('machine_code', 'asc')->get();
+
+            $machinesTransformed = $machines->map(function ($machine) {
+                return [
+                    'id' => $machine->id,
+                    'machine_code' => $machine->machine_code,
+                    'machine_name' => $machine->machine_name,
+                    'process' => $machine->process,
+                    'sub_process' => $machine->sub_process,
+                    'resource_type' => $machine->resource_type,
+                    'finisher_type' => $machine->finisher_type,
+                    'status' => $machine->status ?? 'Act',
+                ];
+            });
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteMachine', [
+                'machines' => $machinesTransformed,
+                'header' => 'Manage Machine Status',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in MachineController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteMachine', [
+                'machines' => [],
+                'header' => 'Manage Machine Status',
+                'error' => 'Error displaying machine data',
+            ]);
+        }
+    }
+
+    /**
+     * Toggle machine status (Act/Obs) via API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $machine = Machine::where('machine_code', $code)->first();
+
+            if (!$machine) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Machine tidak ditemukan',
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['Act', 'Obs'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid',
+                ], 422);
+            }
+
+            $machine->status = $status;
+            $machine->save();
+
+            $machineResponse = [
+                'id' => $machine->id,
+                'machine_code' => $machine->machine_code,
+                'machine_name' => $machine->machine_name,
+                'process' => $machine->process,
+                'sub_process' => $machine->sub_process,
+                'resource_type' => $machine->resource_type,
+                'finisher_type' => $machine->finisher_type,
+                'status' => $machine->status ?? 'Act',
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status machine berhasil diperbarui',
+                'data' => $machineResponse,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in MachineController@toggleStatus: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating machine status: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Seed machine data (private method for internal use).
      *
      * @return void
@@ -336,7 +449,8 @@ class MachineController extends Controller
                     'process' => '10 - CORRUGATING',
                     'sub_process' => '10 - PRINTER',
                     'resource_type' => 'I-InHouse',
-                    'finisher_type' => 'S-Stitcher'
+                    'finisher_type' => 'S-Stitcher',
+                    'status' => 'Act',
                 ],
                 [
                     'machine_code' => 'M002',
@@ -344,7 +458,8 @@ class MachineController extends Controller
                     'process' => '10 - CORRUGATING',
                     'sub_process' => '20 - DIECUTTER',
                     'resource_type' => 'I-InHouse',
-                    'finisher_type' => 'G-Gluer'
+                    'finisher_type' => 'G-Gluer',
+                    'status' => 'Act',
                 ],
                 [
                     'machine_code' => 'M003',
@@ -352,7 +467,8 @@ class MachineController extends Controller
                     'process' => '20 - CONVERTING',
                     'sub_process' => '10 - PRINTER',
                     'resource_type' => 'E-External',
-                    'finisher_type' => 'X-N/Applicable'
+                    'finisher_type' => 'X-N/Applicable',
+                    'status' => 'Act',
                 ],
                 [
                     'machine_code' => 'M004',
@@ -360,7 +476,8 @@ class MachineController extends Controller
                     'process' => '20 - CONVERTING',
                     'sub_process' => '20 - DIECUTTER',
                     'resource_type' => 'I-InHouse',
-                    'finisher_type' => 'L-Stitcher'
+                    'finisher_type' => 'L-Stitcher',
+                    'status' => 'Act',
                 ],
                 [
                     'machine_code' => 'M005',
@@ -368,7 +485,8 @@ class MachineController extends Controller
                     'process' => '30 - WAREHOUSE',
                     'sub_process' => '30 - FINISHER',
                     'resource_type' => 'I-InHouse',
-                    'finisher_type' => 'A-Assembler'
+                    'finisher_type' => 'A-Assembler',
+                    'status' => 'Act',
                 ]
             ];
 

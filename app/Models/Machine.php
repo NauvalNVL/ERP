@@ -17,7 +17,8 @@ class Machine extends Model
         'process',
         'sub_process',
         'resource_type',
-        'finisher_type'
+        'finisher_type',
+        'status'
     ];
 
     protected $casts = [

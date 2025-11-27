@@ -391,6 +391,7 @@ Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialCont
 Route::get('/machines', [MachineController::class, 'index']);
 Route::post('/machines', [MachineController::class, 'store']);
 Route::put('/machines/{id}', [MachineController::class, 'update']);
+Route::put('/machines/{code}/status', [MachineController::class, 'toggleStatus']);
 Route::delete('/machines/{id}', [MachineController::class, 'destroy']);
 Route::post('/machines/seed', [MachineController::class, 'seed']);
 

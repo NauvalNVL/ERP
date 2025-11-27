@@ -482,6 +482,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/define-glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
 
          Route::get('/machine', [MachineController::class, 'index'])->name('vue.machine.index');
+         Route::get('/machine/status', [MachineController::class, 'vueManageStatus'])->name('vue.machine.status');
          Route::post('/machine', [MachineController::class, 'store'])->name('vue.machine.store');
          Route::put('/machine/{id}', [MachineController::class, 'update'])->name('vue.machine.update');
          Route::delete('/machine/{id}', [MachineController::class, 'destroy'])->name('vue.machine.destroy');

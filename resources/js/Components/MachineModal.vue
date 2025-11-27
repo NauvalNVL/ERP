@@ -34,6 +34,7 @@
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('sub_process')">Sub-Process</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('resource_type')">Resource Type</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('finisher_type')">Finisher Type</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -47,9 +48,17 @@
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.sub_process || '-' }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.resource_type || '-' }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.finisher_type || '-' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">
+                  <span v-if="(machine.status || 'Act') === 'Act'" class="px-2 py-1 inline-flex text-[10px] leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                    Active
+                  </span>
+                  <span v-else class="px-2 py-1 inline-flex text-[10px] leading-4 font-semibold rounded-full bg-red-100 text-red-800">
+                    Obsolete
+                  </span>
+                </td>
               </tr>
               <tr v-if="filteredMachines.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No machine data available.</td>
+                <td colspan="7" class="px-6 py-4 text-center text-gray-500">No machine data available.</td>
               </tr>
             </tbody>
           </table>

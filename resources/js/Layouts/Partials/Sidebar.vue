@@ -218,6 +218,7 @@ const hasPermission = (menuKey) => {
   if (
     menuKey === 'define_machine' ||
     menuKey === 'view_print_machine' ||
+    menuKey === 'obsolete_unobsolete_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
     menuKey === 'reactive_unobsolete_user' ||
     menuKey === 'obsolete_unobsolete_sales_team' ||
@@ -393,6 +394,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Glueing Material': 'define_glueing_material',
     'Obsolete/Unobsolete Glueing Material': 'obsolete_unobsolete_glueing_material',
     'Define Machine': 'define_machine',
+    'Obsolete/Unobsolete Machine': 'obsolete_unobsolete_machine',
     'View & Print Sales Team': 'view_print_sales_team',
     'View & Print Salesperson': 'view_print_salesperson',
     'View & Print Salesperson Team': 'view_print_salesperson_team',
@@ -634,6 +636,7 @@ const salesManagementItems = [
           { title: 'Define Glueing Material', icon: 'fas fa-vial', route: '/glueing-material' },
           { title: 'Obsolete/Unobsolete Glueing Material', icon: 'fas fa-ban', route: '/glueing-material/status' },
           { title: 'Define Machine', icon: 'fas fa-cogs', route: '/machine' },
+          { title: 'Obsolete/Unobsolete Machine', icon: 'fas fa-ban', route: '/machine/status' },
           // View & Print Section
           { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },
           { title: 'View & Print Salesperson', icon: 'fas fa-print', route: '/sales-person/view-print' },
