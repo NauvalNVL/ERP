@@ -17,7 +17,6 @@ return new class extends Migration
                 $table->string('product_group_id', 50)->unique();
                 $table->string('product_group_name');
                 $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
-                $table->boolean('is_active')->default(true);
                 $table->timestamps();
             });
         }

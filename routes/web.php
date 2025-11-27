@@ -380,6 +380,7 @@ Route::get('/define-geo', [GeoController::class, 'vueIndex'])->name('vue.define-
 Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
 Route::get('/product-group/status', [ProductGroupController::class, 'vueManageStatus'])->name('vue.product-group.status');
 Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');
+Route::get('/product-group/obsolete-unobsolete', [ProductGroupController::class, 'vueManageStatus'])->name('vue.product-group.obsolete-unobsolete');
 // Alias for search menu
 Route::get('/define-product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.define-product-group');
 
@@ -970,6 +971,7 @@ Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
 Route::post('/product-groups', [ProductGroupController::class, 'apiStore']);
 Route::put('/product-groups/{id}', [ProductGroupController::class, 'apiUpdate']);
 Route::delete('/product-groups/{id}', [ProductGroupController::class, 'apiDestroy']);
+Route::put('/product-groups/{id}/status', [ProductGroupController::class, 'toggleStatus']);
 Route::post('/product-groups/seed', [ProductGroupController::class, 'apiSeed']);
 
 // Salesperson Team API routes

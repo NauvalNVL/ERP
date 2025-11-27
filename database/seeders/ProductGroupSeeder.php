@@ -18,27 +18,27 @@ class ProductGroupSeeder extends Seeder
             [
                 'product_group_id' => 'B',
                 'product_group_name' => 'BOX',
-                'is_active' => true
+                'status' => 'Act'
             ],
             [
                 'product_group_id' => 'OF',
                 'product_group_name' => 'OFFSET',
-                'is_active' => true
+                'status' => 'Act'
             ],
             [
                 'product_group_id' => 'OT',
                 'product_group_name' => 'OTHER',
-                'is_active' => true
+                'status' => 'Act'
             ],
             [
                 'product_group_id' => 'R',
                 'product_group_name' => 'PAPER ROLL',
-                'is_active' => true
+                'status' => 'Act'
             ],
             [
                 'product_group_id' => 'S',
                 'product_group_name' => 'SHEET BOARD',
-                'is_active' => true
+                'status' => 'Act'
             ],
         ];
 

@@ -68,6 +68,7 @@ class ProductGroupController extends Controller
             $productGroup = ProductGroup::create([
                 'product_group_id' => $request->code,
                 'product_group_name' => $request->name,
+                'status' => $request->has('status') ? $request->status : 'Act',
                 'is_active' => $request->has('is_active') ? $request->is_active : true
             ]);
 
@@ -165,6 +166,34 @@ class ProductGroupController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting product group: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle product group status (Active/Obsolete)
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            $productGroup = ProductGroup::findOrFail($id);
+            // Toggle status between 'Act' and 'Obs'
+            $productGroup->status = ($productGroup->status === 'Act') ? 'Obs' : 'Act';
+            $productGroup->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product group status updated successfully',
+                'data' => $productGroup
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling product group status: ' . $e->getMessage()
             ], 500);
         }
     }

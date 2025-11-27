@@ -62,7 +62,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ group.product_group_id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ group.product_group_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="group.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="group.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -72,14 +72,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="toggleProductGroupStatus(group)" :disabled="isToggling"
                                 :class="[
-                                    group.is_active
+                                    group.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[group.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ group.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[group.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ group.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
@@ -216,8 +216,8 @@ const filteredProductGroups = computed(() => {
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(group => group.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(group => group.status === targetStatus);
     }
     
     return filtered;
@@ -239,34 +239,31 @@ const toggleProductGroupStatus = async (group) => {
             throw new Error('CSRF token not found');
         }
         
-        // Toggle the is_active property
-        const updatedData = {
-            name: group.product_group_name,
-            is_active: !group.is_active,
-            status: !group.is_active ? 'Act' : 'Obs'
-        };
-        
-        const response = await fetch(`/api/product-groups/${group.id}`, {
+        const response = await fetch(`/api/product-groups/${group.id}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
+            }
         });
         
         if (!response.ok) {
             throw new Error('Failed to toggle product group status');
         }
         
-        // Update the local state
-        group.is_active = !group.is_active;
-        group.status = group.is_active ? 'Act' : 'Obs';
+        const result = await response.json();
         
-        // Show success message
-        const statusText = group.is_active ? 'activated' : 'deactivated';
-        showNotification(`Product group "${group.product_group_id}" successfully ${statusText}`, 'success');
+        if (result.success) {
+            // Update the local state
+            group.status = (group.status === 'Act') ? 'Obs' : 'Act';
+            
+            // Show success message
+            const statusText = (group.status === 'Act') ? 'activated' : 'deactivated';
+            showNotification(`Product group "${group.product_group_id}" successfully ${statusText}`, 'success');
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
     } catch (error) {
         console.error('Error toggling product group status:', error);
         showNotification('Error updating status: ' + error.message, 'error');
