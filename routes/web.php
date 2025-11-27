@@ -400,6 +400,7 @@ Route::get('/define-product-design', [ProductDesignController::class, 'vueIndex'
 
 Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
 Route::get('/scoring-tool/status', [ScoringToolController::class, 'vueManageStatus'])->name('vue.scoring-tool.status');
+Route::get('/scoring-tool/obsolete-unobsolete', [ScoringToolController::class, 'vueManageStatus'])->name('vue.scoring-tool.obsolete-unobsolete');
 Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
 // Alias for search menu
 Route::get('/define-scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.define-scoring-tool');

@@ -14,12 +14,11 @@ class ScoringTool extends Model
         'code',
         'name',
         'scorer_gap',
-        'is_active',
+        'status',
     ];
 
     protected $casts = [
         'scorer_gap' => 'float',
-        'is_active' => 'boolean',
     ];
     
     // Disable timestamps

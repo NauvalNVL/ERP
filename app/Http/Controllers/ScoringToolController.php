@@ -101,7 +101,8 @@ class ScoringToolController extends Controller
             'code' => 'nullable|string|max:10|unique:scoring_tools,code,' . $id,
             'name' => 'nullable|string|max:100',
             'scorer_gap' => 'nullable|numeric|min:0',
-            'is_active' => 'nullable|boolean',
+            'scorer_gap' => 'nullable|numeric|min:0',
+            'status' => 'nullable|string|in:Act,Obs',
         ]);
 
         if ($validator->fails()) {
@@ -116,7 +117,7 @@ class ScoringToolController extends Controller
             if ($request->has('code')) $updateData['code'] = $request->code;
             if ($request->has('name')) $updateData['name'] = $request->name;
             if ($request->has('scorer_gap')) $updateData['scorer_gap'] = $request->scorer_gap;
-            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            if ($request->has('status')) $updateData['status'] = $request->status;
             
             $scoringTool->update($updateData);
 
@@ -184,6 +185,47 @@ class ScoringToolController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting scoring tool: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle scoring tool status (Active/Obsolete)
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            // Try to find by ID first
+            $tool = ScoringTool::find($id);
+            
+            // If not found, try by code
+            if (!$tool) {
+                $tool = ScoringTool::where('code', $id)->first();
+            }
+
+            if (!$tool) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Scoring tool not found with identifier: ' . $id
+                ], 404);
+            }
+
+            $tool->status = ($tool->status === 'Act') ? 'Obs' : 'Act';
+            $tool->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Scoring tool status updated successfully',
+                'data' => $tool
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error toggling scoring tool status: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling scoring tool status: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -263,8 +305,8 @@ class ScoringToolController extends Controller
                 $newToolsArray .= "                'gap' => {$tool['gap']},\n";
                 $newToolsArray .= "                'specification' => '',\n";
                 $newToolsArray .= "                'description' => '{$tool['name']}',\n";
-                $newToolsArray .= "                'is_active' => true,\n";
-                $newToolsArray .= "            ],\n";
+                $newToolsArray .= "                'status' => 'Act',\n";
+            $newToolsArray .= "            ],\n";
             }
             $newToolsArray .= "        ]";
             
@@ -284,7 +326,7 @@ class ScoringToolController extends Controller
                         'gap' => $tool['gap'],
                         'specification' => '',
                         'description' => $tool['name'],
-                        'is_active' => true
+                        'status' => 'Act'
                     ]
                 );
             }
@@ -427,7 +469,7 @@ class ScoringToolController extends Controller
                         'gap' => $tool['gap'],
                         'specification' => $tool['specification'],
                         'description' => $tool['description'],
-                        'is_active' => true
+                        'status' => 'Act'
                     ]);
                     
                     $createdTools[] = $newTool;
@@ -481,7 +523,7 @@ class ScoringToolController extends Controller
                 'gap' => 'required|numeric|min:0',
                 'specification' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
-                'is_active' => 'boolean',
+                'status' => 'nullable|string|in:Act,Obs',
             ]);
 
             if ($validator->fails()) {
@@ -498,7 +540,7 @@ class ScoringToolController extends Controller
                 'gap' => $request->gap,
                 'specification' => $request->specification,
                 'description' => $request->description,
-                'is_active' => $request->is_active ?? true,
+                'status' => $request->status ?? 'Act',
             ]);
             
             // Update the seeder file

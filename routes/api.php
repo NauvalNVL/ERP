@@ -32,6 +32,7 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\DeliveryOrderController;
 use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
+use App\Http\Controllers\ScoringToolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +116,12 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+
+// Scoring Tool API routes
+Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
+Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update'])->where('id', '[0-9]+');
+Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy'])->where('id', '[0-9]+');
+Route::put('/scoring-tools/{id}/status', [ScoringToolController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 // Product API routes
 Route::get('/products', [ProductController::class, 'getProductsJson']);

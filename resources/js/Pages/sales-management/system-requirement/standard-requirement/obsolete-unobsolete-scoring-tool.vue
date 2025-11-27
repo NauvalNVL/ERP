@@ -59,12 +59,12 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="tool in filteredTools" :key="tool.id" class="hover:bg-gray-50">
+                    <tr v-for="tool in filteredScoringTools" :key="tool.id" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ tool.code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ tool.name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ tool.scorer_gap }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ tool.scorer_gap }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="tool.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="tool.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -72,24 +72,53 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                            <button @click="toggleToolStatus(tool)" :disabled="isToggling"
+                            <button @click="toggleScoringToolStatus(tool)" :disabled="isToggling"
                                 :class="[
-                                    tool.is_active
+                                    tool.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[tool.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ tool.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[tool.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ tool.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
-                    <tr v-if="filteredTools.length === 0">
+                    <tr v-if="filteredScoringTools.length === 0">
                         <td colspan="5" class="px-6 py-4 text-center text-gray-500">No scoring tools found.</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div v-if="pagination.total > pagination.perPage" class="flex items-center justify-between mt-6">
+            <div class="flex-1 flex justify-between items-center">
+                <button 
+                    @click="changePage(pagination.currentPage - 1)" 
+                    :disabled="pagination.currentPage === 1"
+                    :class="[
+                        pagination.currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700',
+                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
+                    ]">
+                    Previous
+                </button>
+                
+                <span class="text-sm text-gray-700">
+                    Page {{ pagination.currentPage }} of {{ Math.ceil(pagination.total / pagination.perPage) }}
+                </span>
+                
+                <button 
+                    @click="changePage(pagination.currentPage + 1)" 
+                    :disabled="pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage)"
+                    :class="[
+                        pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700',
+                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
+                    ]">
+                    Next
+                </button>
+            </div>
         </div>
     </div>
 
@@ -106,38 +135,79 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
+// Props from controller
 const props = defineProps({
-    scoringTools: { type: Array, default: () => [] },
-    pagination: { type: Object, default: () => ({ currentPage: 1, perPage: 15, total: 0 }) },
-    header: { type: String, default: 'Manage Scoring Tool Status' }
+    scoringTools: {
+        type: Array,
+        default: () => []
+    },
+    pagination: {
+        type: Object,
+        default: () => ({
+            currentPage: 1,
+            perPage: 15,
+            total: 0
+        })
+    },
+    header: {
+        type: String,
+        default: 'Manage Scoring Tool Status'
+    }
 });
 
+// Data
 const scoringTools = ref(props.scoringTools || []);
+const pagination = ref(props.pagination);
 const loading = ref(false);
 const isToggling = ref(false);
 const searchQuery = ref('');
 const statusFilter = ref('all');
-const notification = ref({ show: false, message: '', type: 'success' });
+const notification = ref({
+    show: false,
+    message: '',
+    type: 'success'
+});
 
-const fetchScoringTools = async () => {
+// Fetch scoring tools with pagination
+const fetchScoringTools = async (page = 1) => {
     loading.value = true;
+    
     try {
-        const response = await fetch('/api/scoring-tools', {
-            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        const response = await fetch(`/api/scoring-tools?page=${page}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
-        if (!response.ok) throw new Error('Failed to fetch scoring tools');
-        scoringTools.value = await response.json();
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch scoring tools');
+        }
+        
+        const data = await response.json();
+        
+        if (data) {
+            scoringTools.value = data;
+            pagination.value = {
+                currentPage: page,
+                perPage: 15,
+                total: data.length
+            };
+        }
     } catch (error) {
+        console.error('Error fetching scoring tools:', error);
         showNotification('Error loading scoring tools: ' + error.message, 'error');
     } finally {
         loading.value = false;
     }
 };
 
-const filteredTools = computed(() => {
+// Filter scoring tools based on search query and status filter
+const filteredScoringTools = computed(() => {
     let filtered = [...scoringTools.value];
+    
+    // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(tool => 
@@ -145,48 +215,91 @@ const filteredTools = computed(() => {
             tool.name.toLowerCase().includes(query)
         );
     }
+    
+    // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(tool => tool.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(tool => tool.status === targetStatus);
     }
+    
     return filtered;
 });
 
-const toggleToolStatus = async (tool) => {
+// Toggle scoring tool status
+const toggleScoringToolStatus = async (tool) => {
     if (isToggling.value) return;
-    if (!confirm(`Are you sure you want to change the status for "${tool.name}"?`)) return;
+    
+    const confirmMessage = `Are you sure you want to change the status for "${tool.code} - ${tool.name}"?`;
+    if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
+    
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        if (!csrfToken) throw new Error('CSRF token not found');
         
-        const response = await fetch(`/api/scoring-tools/${tool.id}`, {
+        if (!csrfToken) {
+            throw new Error('CSRF token not found');
+        }
+        
+        const response = await fetch(`/api/scoring-tools/${tool.id}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ is_active: !tool.is_active })
+            }
         });
         
-        if (!response.ok) throw new Error('Failed to toggle scoring tool status');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Failed to toggle scoring tool status');
+        }
         
-        tool.is_active = !tool.is_active;
-        const statusText = tool.is_active ? 'activated' : 'deactivated';
-        showNotification(`Scoring Tool "${tool.name}" successfully ${statusText}`, 'success');
+        const result = await response.json();
+        
+        if (result.success) {
+            // Update the local state
+            tool.status = (tool.status === 'Act') ? 'Obs' : 'Act';
+            
+            // Show success message
+            const statusText = (tool.status === 'Act') ? 'activated' : 'deactivated';
+            showNotification(`Scoring tool "${tool.code}" successfully ${statusText}`, 'success');
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
     } catch (error) {
+        console.error('Error toggling scoring tool status:', error);
         showNotification('Error updating status: ' + error.message, 'error');
     } finally {
         isToggling.value = false;
     }
 };
 
-const showNotification = (message, type = 'success') => {
-    notification.value = { show: true, message, type };
-    setTimeout(() => { notification.value.show = false; }, 3000);
+// Change page
+const changePage = (page) => {
+    if (page < 1 || page > Math.ceil(pagination.value.total / pagination.value.perPage)) {
+        return;
+    }
+    
+    fetchScoringTools(page);
 };
 
-onMounted(() => { fetchScoringTools(); });
+// Show notification
+const showNotification = (message, type = 'success') => {
+    notification.value = {
+        show: true,
+        message,
+        type
+    };
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+        notification.value.show = false;
+    }, 3000);
+};
+
+// Load data on component mount
+onMounted(() => {
+    fetchScoringTools();
+});
 </script>
