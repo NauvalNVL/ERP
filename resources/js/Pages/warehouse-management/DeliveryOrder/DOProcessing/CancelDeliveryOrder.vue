@@ -170,6 +170,8 @@
             <p>• Cancelled delivery orders cannot be amended or processed further.</p>
             <p>• Cancellation reason is mandatory and will be logged for audit purposes.</p>
             <p>• Once cancelled, the delivery order status will be changed to "Cancelled".</p>
+            <p>• <strong>Bulk Cancel:</strong> All DO records with the same DO number will be cancelled together.</p>
+            <p>• Only Main component records are shown in the lookup for cancellation.</p>
           </div>
         </div>
 
@@ -292,7 +294,7 @@ const selectDeliveryOrder = async (deliveryOrderData) => {
   // Parse DO number parts
   parseDeliveryOrderNumber(deliveryOrderData.DO_Num)
   
-  showDeliveryOrderModal.value = false
+  // Modal will auto-close via emit('close') from the modal component
   success(`Delivery Order ${deliveryOrderData.DO_Num} selected successfully`)
 }
 
@@ -339,7 +341,12 @@ const cancelDeliveryOrder = async () => {
     const response = await axios.post(`/api/delivery-orders/${selectedDeliveryOrder.doNumber}/cancel`, cancelData)
     
     if (response.data.success) {
-      success(`Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully`)
+      const affectedRows = response.data.data?.affected_rows || 1
+      const message = affectedRows > 1 
+        ? `Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully. ${affectedRows} records updated.`
+        : `Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully.`
+      
+      success(message)
       
       // Update the status
       selectedDeliveryOrder.status = 'Cancelled'

@@ -2,17 +2,6 @@
   <AppLayout header="Print Delivery Order">
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" v-page-transition>
       <div class="max-w-6xl mx-auto px-4 py-8">
-        <!-- Header Section -->
-        <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
-            <i class="fa-solid fa-print text-white text-2xl"></i>
-          </div>
-          <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Print Delivery Order
-          </h1>
-          <p class="text-gray-600 text-lg">Generate and print delivery order reports with modern interface</p>
-        </div>
-
         <!-- Main Card -->
         <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 animate-fade-in-up">
           <!-- Card Header -->
@@ -495,28 +484,51 @@ function formatPreviewText(rows) {
       remainingPcs = doQty
     }
 
-    // Header text (same untuk semua komponen di DO ini)
-    lines.push('PT. MULTIBOX INDAH'.padEnd(50) + `No. SJ    : ${doNum}`)
-    lines.push('Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo'.padEnd(50) + `Tanggal   : ${doDate}`)
-    lines.push('Kec. Jawilan, Serang - Banten 42180'.padEnd(50) + 'Halaman   : 1')
+    // Constants matching PDF coordinates
+    const LEFT = 0          // PDF left = 50pt
+    const RIGHT = 80        // PDF right = 545pt (approx 80 characters at 6.8pt per char)
+    const CENTER = 40       // PDF center = 297.5pt
+    const QTY_COL = 50      // PDF qtyColX = 385pt (right - 160)
+    const UNIT_COL = 80     // PDF unitColX = 545pt (right)
+    const DIM_POS = 25      // PDF dimensions at left + 100pt
+
+    // Header Section - match PDF exactly
+    lines.push(`PT. MULTIBOX INDAH${' '.repeat(RIGHT - 18)}No. SJ    : ${doNum}`)
+    lines.push(`Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo${' '.repeat(RIGHT - 47)}Tanggal   : ${doDate}`)
+    lines.push(`Kec. Jawilan, Serang - Banten 42180${' '.repeat(RIGHT - 38)}Halaman   : 1`)
     lines.push('Phone : (0254)404060 (Hunting)')
     lines.push('Fax   : (021)8252690')
     lines.push('')
-    lines.push('                           SURAT JALAN')
+    lines.push(`${' '.repeat(CENTER - 6)}SURAT JALAN`)  // Centered title
     lines.push('')
-    lines.push(`Kirim ke :`.padEnd(50) + `Nomor Truk : ${vhc || '-'}`)
-    lines.push(`${cust || '-'}`.padEnd(50) + `Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`)
+    lines.push(`Kirim ke :${' '.repeat(RIGHT - 10)}Nomor Truk : ${vhc || '-'}`)
+    lines.push(`${cust || '-'}${' '.repeat(Math.max(0, RIGHT - (cust || '-').length))}Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`)
 
-    // Customer address from database
+    // Customer address from database - match PDF positioning
+    let addressLines = []
     if (custAddress1) {
-      lines.push(custAddress1.padEnd(50) + 'Dibuat Oleh : whs12')
+      // Simulate word wrap like PDF
+      const maxWidth = 40 // characters
+      if (custAddress1.length > maxWidth) {
+        addressLines.push(custAddress1.substring(0, maxWidth))
+        if (custAddress1.length > maxWidth) {
+          addressLines.push(custAddress1.substring(maxWidth))
+        }
+      } else {
+        addressLines.push(custAddress1)
+      }
     }
-    if (custAddress2) {
-      lines.push(custAddress2)
-    }
-    if (custAddress3) {
-      lines.push(custAddress3)
-    }
+    if (custAddress2) addressLines.push(custAddress2)
+    if (custAddress3) addressLines.push(custAddress3)
+
+    // Print address lines with "Dibuat Oleh" positioned at first address line
+    addressLines.forEach((line, index) => {
+      if (index === 0) {
+        lines.push(`${line}${' '.repeat(Math.max(0, RIGHT - line.length))}Dibuat Oleh : ${currentUser.value.username || currentUser.value.user_id || 'whs12'}`)
+      } else {
+        lines.push(line)
+      }
+    })
 
     lines.push('')
 
@@ -529,15 +541,18 @@ function formatPreviewText(rows) {
     }
 
     lines.push('')
-    lines.push('No. Nama Barang'.padEnd(60) + 'Jumlah'.padStart(12) + ' '.repeat(4) + 'Satuan')
-    lines.push(''.padEnd(110, '-'))
+    
+    // Table header with separate columns - match PDF exactly
+    lines.push(`No. Nama Barang${' '.repeat(QTY_COL - 14)}Jumlah${' '.repeat(UNIT_COL - QTY_COL - 6)}Satuan`)
+    lines.push(''.padEnd(UNIT_COL, '-'))
+    
+    // Main item details
     const qtyStrPrev = `${Number(doQty)}${unitLower}`
     const unitStrPrev = `${bundles}BDL x ${pcsPerBld}Pcs + ${remainingPcs}Pcs`
-    lines.push(`1 SO# : ${soNum}/PO# / ${poNum}`.padEnd(60) + qtyStrPrev.padStart(12) + '    ' + unitStrPrev)
+    lines.push(`1 SO# : ${soNum}/PO# / ${poNum}`)
     lines.push(`  Model : ${model}`)
 
-    // Tampilkan semua komponen (Main, Fit1..Fit9) dalam satu DO dengan detail quantity masing-masing
-    // Dedup berdasarkan COMP agar data duplikat dari join tidak tercetak ganda
+    // Render all components with exact PDF positioning
     const seenComps = new Set()
     groupRows.forEach(r => {
       const compLabel = r.COMP || 'Main'
@@ -575,28 +590,65 @@ function formatPreviewText(rows) {
 
       const cleanLabel = compLabel ? String(compLabel).trim() : 'Main'
       
-      // Format line dengan quantity dan dimension
+      // Format exactly like PDF - component on left, dimensions at DIM_POS, qty/unit at right columns
       const compText = `  ${cleanLabel} : ${design}`
+      const dimText = `${dimL} x ${dimW} x ${dimH}`
       const qtyStr = `${Number(compQty)}${compUnitLower}`
       const unitStr = `${compBundles}BDL x ${compPcsPerBld}Pcs + ${compRemainingPcs}Pcs`
       
-      lines.push(compText.padEnd(60) + qtyStr.padStart(12) + '    ' + unitStr)
-      lines.push(`    Dimensi : ${dimL} x ${dimW} x ${dimH}`)
+      // Build line with exact positioning like PDF
+      let line = compText
+      // Add spaces until DIM_POS, then place dimensions
+      if (compText.length < DIM_POS) {
+        line += ' '.repeat(DIM_POS - compText.length) + dimText
+      } else {
+        line += ' ' + dimText
+      }
+      // Add spaces until QTY_COL, then place quantity
+      if (line.length < QTY_COL) {
+        line += ' '.repeat(QTY_COL - line.length) + qtyStr.padStart(12)
+      } else {
+        line += ' ' + qtyStr.padStart(12)
+      }
+      // Add spaces until UNIT_COL, then place unit
+      if (line.length < UNIT_COL) {
+        line += ' '.repeat(UNIT_COL - line.length) + unitStr
+      } else {
+        line += ' ' + unitStr
+      }
+      lines.push(line)
     })
 
-    lines.push('')
-    lines.push('')
+    // Calculate footer positioning - match PDF logic
+    let currentY = 0
+    // Count lines to simulate Y position
+    currentY = lines.length + 10 // Approximate Y position in lines
+    
+    // Add spacing to reach footer position (PDF uses y=650 or y+=40)
+    const targetFooterY = 50  // Simulate PDF's 650pt position in lines
+    if (currentY < targetFooterY) {
+      const spacingNeeded = targetFooterY - currentY
+      for (let i = 0; i < spacingNeeded; i++) {
+        lines.push('')
+      }
+    } else {
+      lines.push('')
+      lines.push('')
+      lines.push('')
+    }
+
+    // Footer section - match PDF exactly
     lines.push('Keterangan :')
     lines.push('')
-    lines.push('Yang menerima Jam : ..........    Yang mengantar              Hormat kami')
+    lines.push(`Yang menerima Jam : ..........${' '.repeat(CENTER - 30)}Yang mengantar${' '.repeat(RIGHT - CENTER - 13)}Hormat kami`)
     lines.push('')
-    lines.push('(Nama Jelas dan Cap Perusahaan)  [Driver Name]                 Gudang    _____')
-    lines.push('Akhir dari halaman                Sopir')
-    lines.push(''.padEnd(110, '-'))
+    lines.push(`(Nama Jelas dan Cap Perusahaan)${' '.repeat(CENTER - 30)}[Driver Name]${' '.repeat(RIGHT - CENTER - 13)}Gudang    _____`)
+    lines.push(`Akhir dari halaman${' '.repeat(CENTER - 18)}Sopir`)
+    lines.push(''.padEnd(UNIT_COL, '-'))
 
     if (groupIndex < totalGroups) {
       lines.push('')
-      lines.push(''.padEnd(110, '='))
+      lines.push(''.padEnd(UNIT_COL, '='))
       lines.push('')
     }
   }

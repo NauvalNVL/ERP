@@ -2124,11 +2124,27 @@ class SalesOrderController extends Controller
                 'delivery_address_2' => $salesOrder->DELIVERY_ADD_2 ?? '',
             ];
 
-            // Format item details from SO table
+            // Format item details from SO table - Get Main component unit
+            $mainUnit = 'PCS'; // Default fallback
+            try {
+                $mainSO = DB::table('so')
+                    ->where('SO_Num', $soNumber)
+                    ->where('COMP_Num', 'Main')
+                    ->first();
+                if ($mainSO && !empty($mainSO->UNIT)) {
+                    $mainUnit = $mainSO->UNIT;
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error fetching Main component unit from SO table', [
+                    'so_number' => $soNumber,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
             $itemDetails = [
                 'pd' => $salesOrder->P_DESIGN ?? '',
                 'pcs' => $salesOrder->PER_SET ?? '1',
-                'unit' => $salesOrder->UNIT ?? '',
+                'unit' => $mainUnit,
                 'order_qty' => $salesOrder->SO_QTY ?? '0',
                 'net_delivery' => '0',
                 'balance' => $salesOrder->SO_QTY ?? '0',
@@ -2193,13 +2209,14 @@ class SalesOrderController extends Controller
                             continue;
                         }
 
-                        // Get order_qty from SO table for this component
+                        // Get order_qty and unit from SO table for this component
                         $componentSO = DB::table('so')
                             ->where('SO_Num', $soNumber)
                             ->where('COMP_Num', $compName)
                             ->first();
 
                         $componentOrderQty = $componentSO ? ($componentSO->SO_QTY ?? 0) : 0;
+                        $componentUnit = $componentSO ? ($componentSO->UNIT ?? 'PCS') : 'PCS';
 
                         // Calculate net delivery from DO table for this component
                         $componentNetDelivery = 0;
@@ -2230,10 +2247,10 @@ class SalesOrderController extends Controller
                         $fittings[] = [
                             // Optional name for debugging/other UIs; frontend consumers use index-based mapping
                             'name' => $compName,
-                            // Use P_DESIGN, PCS_SET, UNIT and PART_NO from each MC component row
+                            // Use P_DESIGN, PCS_SET from each MC component row, but UNIT from SO table
                             'design' => $componentRow->P_DESIGN ?? '',
                             'pcs' => $componentRow->PCS_SET ?? '',
-                            'unit' => $componentRow->UNIT ?? '',
+                            'unit' => $componentUnit, // Use unit from SO table for this component
                             'part_number' => $componentRow->PART_NO ?? '',
                             // Add order, delivery, and balance per component
                             'order_qty' => $componentOrderQty,

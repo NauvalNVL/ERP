@@ -256,6 +256,8 @@
             <p>• Only Draft and Saved delivery orders can be amended.</p>
             <p>• Cancelled delivery orders cannot be amended.</p>
             <p>• Changes will be logged for audit purposes.</p>
+            <p>• <strong>Bulk Update:</strong> All DO records with the same DO number will be updated together.</p>
+            <p>• Only Main component records are shown in the lookup for amendment.</p>
           </div>
         </div>
 
@@ -422,7 +424,7 @@ const selectDeliveryOrder = async (doData) => {
   // Load the delivery order details
   await loadDeliveryOrderDetails(doData.DO_Num)
   
-  showDeliveryOrderModal.value = false
+  // Modal will auto-close via emit('close') from the modal component
   success(`Delivery Order ${doData.DO_Num} selected successfully`)
 }
 
@@ -565,10 +567,15 @@ const saveAmendedDeliveryOrder = async () => {
     const response = await axios.put(`/api/delivery-orders/${selectedDeliveryOrder.doNumber}`, amendedData)
     
     if (response.data.success) {
-      success(`Delivery order ${selectedDeliveryOrder.doNumber} amended successfully`)
+      const affectedRows = response.data.data?.affected_rows || 1
+      const message = affectedRows > 1 
+        ? `Delivery order ${selectedDeliveryOrder.doNumber} amended successfully. ${affectedRows} records updated.`
+        : `Delivery order ${selectedDeliveryOrder.doNumber} amended successfully.`
       
-      // Reload the delivery order details
-      await loadDeliveryOrderDetails(selectedDeliveryOrder.doNumber)
+      success(message)
+      
+      // Reset form after successful save
+      refreshPage()
     } else {
       error(response.data.message || 'Failed to amend delivery order')
     }
