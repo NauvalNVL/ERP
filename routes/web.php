@@ -387,6 +387,7 @@ Route::get('/define-product-group', [ProductGroupController::class, 'vueIndex'])
 Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
 Route::get('/product/status', [ProductController::class, 'vueManageStatus'])->name('vue.product.status');
 Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
+Route::get('/product/obsolete-unobsolete', [ProductController::class, 'vueManageStatus'])->name('vue.product.obsolete-unobsolete');
 // Alias for search menu
 Route::get('/define-product', [ProductController::class, 'vueIndex'])->name('vue.define-product');
 

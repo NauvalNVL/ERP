@@ -122,6 +122,7 @@ Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
 Route::post('/products', [ProductController::class, 'apiStore']);
 Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/products/{id}/status', [ProductController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 // Product Group API routes
 Route::get('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'index']);

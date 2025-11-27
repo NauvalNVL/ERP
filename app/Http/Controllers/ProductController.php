@@ -49,7 +49,7 @@ class ProductController extends Controller
             'description' => $request->description,
             'product_group_id' => $request->product_group_id,
             'category' => $request->category,
-            'is_active' => true
+            'status' => 'Act'
         ]);
 
         return redirect()->route('product.index')->with('success', 'Produk berhasil ditambahkan');
@@ -245,7 +245,7 @@ class ProductController extends Controller
                     'category',
                     'unit',
                     'product_group_id',
-                    'is_active',
+                    'status',
                     'created_at',
                     'updated_at'
                 )
@@ -263,10 +263,10 @@ class ProductController extends Controller
                     'category_id' => $product->category,
                     'category_code' => $product->category,
                     'unit' => $product->unit ?? '',
-                    'product_group_id' => $product->product_group_id,
-                    'is_active' => $product->is_active ? true : false,
-                    'created_at' => $product->created_at ? $product->created_at->toISOString() : null,
-                    'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null
+                'product_group_id' => $product->product_group_id,
+                'status' => $product->status,
+                'created_at' => $product->created_at ? $product->created_at->toISOString() : null,
+                'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null
                 ];
             });
             
@@ -305,7 +305,7 @@ class ProductController extends Controller
                 'category' => $request->category_id, // Map Vue 'category_id' to DB 'category'
                 'unit' => $request->unit ?? '',
                 'product_group_id' => $request->product_group_id ?? '',
-                'is_active' => true
+                'status' => 'Act'
             ]);
 
             // Transform for response
@@ -362,7 +362,7 @@ class ProductController extends Controller
                 'description' => 'nullable|string|max:255',
                 'category_id' => 'nullable|string',
                 'category' => 'nullable|string',
-                'is_active' => 'nullable|boolean',
+                'status' => 'nullable|string|in:Act,Obs',
             ]);
 
             if ($validator->fails()) {
@@ -394,8 +394,8 @@ class ProductController extends Controller
                 $updateData['product_group_id'] = $request->product_group_id;
             }
             
-            if ($request->has('is_active')) {
-                $updateData['is_active'] = $request->is_active;
+            if ($request->has('status')) {
+                $updateData['status'] = $request->status;
             }
 
             $product->update($updateData);
@@ -411,7 +411,7 @@ class ProductController extends Controller
                 'category' => $product->category,
                 'unit' => $product->unit ?? '',
                 'product_group_id' => $product->product_group_id,
-                'is_active' => $product->is_active
+                'status' => $product->status
             ];
 
             return response()->json([
@@ -457,6 +457,35 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle product status (Active/Obsolete)
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            // Find by id column (not primary key which is product_code)
+            $product = Product::where('id', $id)->firstOrFail();
+            // Toggle status between 'Act' and 'Obs'
+            $product->status = ($product->status === 'Act') ? 'Obs' : 'Act';
+            $product->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product status updated successfully',
+                'data' => $product
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling product status: ' . $e->getMessage()
             ], 500);
         }
     }

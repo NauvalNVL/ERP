@@ -21,7 +21,7 @@ class Product extends Model
         'product_group_id',
         'category',
         'unit',
-        'is_active'
+        'status'
     ];
 
     public function productGroup()
