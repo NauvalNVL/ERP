@@ -536,7 +536,7 @@ function formatPreviewText(rows) {
     lines.push(`1 SO# : ${soNum}/PO# / ${poNum}`.padEnd(60) + qtyStrPrev.padStart(12) + '    ' + unitStrPrev)
     lines.push(`  Model : ${model}`)
 
-    // Tampilkan semua komponen (Main, Fit1..Fit9) dalam satu DO
+    // Tampilkan semua komponen (Main, Fit1..Fit9) dalam satu DO dengan detail quantity masing-masing
     // Dedup berdasarkan COMP agar data duplikat dari join tidak tercetak ganda
     const seenComps = new Set()
     groupRows.forEach(r => {
@@ -557,9 +557,31 @@ function formatPreviewText(rows) {
       const dimW = extW || intW
       const dimH = extH || intH
 
+      // Get component-specific quantity
+      const compQty = parseFloat(r.DO_Qty || 0)
+      const compUnit = r.Unit || unit || ''
+      const compUnitLower = (compUnit || '').toLowerCase()
+      const compPcsPerBld = parseFloat(r.PCS_PER_BLD || pcsPerBld || 1)
+
+      // Calculate bundle quantities for this component
+      let compBundles = 0
+      let compRemainingPcs = 0
+      if (compPcsPerBld > 0 && compQty > 0) {
+        compBundles = Math.floor(compQty / compPcsPerBld)
+        compRemainingPcs = compQty - compBundles * compPcsPerBld
+      } else {
+        compRemainingPcs = compQty
+      }
+
       const cleanLabel = compLabel ? String(compLabel).trim() : 'Main'
-      const compText = `${cleanLabel} : ${design}`
-      lines.push(compText.padEnd(40) + `${dimL} x ${dimW} x ${dimH}`)
+      
+      // Format line dengan quantity dan dimension
+      const compText = `  ${cleanLabel} : ${design}`
+      const qtyStr = `${Number(compQty)}${compUnitLower}`
+      const unitStr = `${compBundles}BDL x ${compPcsPerBld}Pcs + ${compRemainingPcs}Pcs`
+      
+      lines.push(compText.padEnd(60) + qtyStr.padStart(12) + '    ' + unitStr)
+      lines.push(`    Dimensi : ${dimL} x ${dimW} x ${dimH}`)
     })
 
     lines.push('')
@@ -568,7 +590,7 @@ function formatPreviewText(rows) {
     lines.push('')
     lines.push('Yang menerima Jam : ..........    Yang mengantar              Hormat kami')
     lines.push('')
-    lines.push('(Nama Jelas dan Cap Perusahaan)  SUHERMAN                     Gudang    1773.98')
+    lines.push('(Nama Jelas dan Cap Perusahaan)  [Driver Name]                 Gudang    _____')
     lines.push('Akhir dari halaman                Sopir')
     lines.push(''.padEnd(110, '-'))
 
@@ -625,7 +647,7 @@ async function downloadPdf() {
     let page = 0
     for (const [, groupRows] of groups) {
       if (page > 0) doc.addPage()
-      renderSuratJalan(doc, groupRows)
+      await renderSuratJalan(doc, groupRows)
       page++
     }
 
@@ -642,7 +664,7 @@ async function downloadPdf() {
   }
 }
 
-function renderSuratJalan(doc, groupRows) {
+async function renderSuratJalan(doc, groupRows) {
   const left = 50
   const right = 545
   const center = (left + right) / 2
@@ -679,6 +701,20 @@ function renderSuratJalan(doc, groupRows) {
   const unit = base.Unit || base.SO_Unit || ''
   const unitLower = (unit || '').toLowerCase()
   const pcsPerBld = parseFloat(base.PCS_PER_BLD || 1)
+  
+  // Fetch driver name based on truck number
+  let driverName = 'SUHERMAN' // default fallback
+  try {
+    if (truck) {
+      const driverRes = await fetch(`/api/vehicle/driver/${encodeURIComponent(truck)}`, { headers: { Accept: 'application/json' } })
+      const driverData = await driverRes.json()
+      if (driverData && driverData.success && driverData.driver_name) {
+        driverName = driverData.driver_name
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to fetch driver name:', e)
+  }
 
   // Calculate bundle quantities
   let bundles = 0
@@ -733,11 +769,16 @@ function renderSuratJalan(doc, groupRows) {
   doc.text(`Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`, right, y, { align: 'right' })
   y += 12
 
-  // Customer address from database
+  // Customer address from database with word-wrap
   if (custAddress1) {
-    doc.text(custAddress1, left, y)
-    doc.text(`Dibuat Oleh : ${currentUser.value.username || currentUser.value.user_id || 'whs12'}`, right, y, { align: 'right' })
-    y += 12
+    const addressMaxWidth = 280 // Maximum width before wrapping
+    const addressLines = doc.splitTextToSize(custAddress1, addressMaxWidth)
+    addressLines.forEach(line => {
+      doc.text(line, left, y)
+      y += 12
+    })
+    // Position "Dibuat Oleh" at the first address line
+    doc.text(`Dibuat Oleh : ${currentUser.value.username || currentUser.value.user_id || 'whs12'}`, right, y - (addressLines.length * 12), { align: 'right' })
   }
 
   if (custAddress2) {
@@ -777,17 +818,12 @@ function renderSuratJalan(doc, groupRows) {
 
   // Item details with proper bundle calculation
   doc.text(`1 SO# : ${soNum}/PO# / ${poNum}`, left, y)
-  // Align DO_Qty under 'Jumlah' and unit breakdown under 'Satuan'
-  const qtyStr = `${Number(doQty)}${unitLower}`
-  const unitStr = `${bundles}BDL x ${pcsPerBld}Pcs + ${remainingPcs}Pcs`
-  doc.text(qtyStr, qtyColX, y, { align: 'right' })
-  doc.text(unitStr, unitColX, y, { align: 'right' })
   y += 12
 
   doc.text(`  Model : ${model}`, left, y)
   y += 12
 
-  // Render all components (Main, Fit1..Fit9) for this DO
+  // Render all components (Main, Fit1..Fit9) for this DO with quantity details
   // Deduplicate by COMP so duplicate backend rows do not print twice
   const seenComps = new Set()
   rows.forEach(r => {
@@ -804,13 +840,37 @@ function renderSuratJalan(doc, groupRows) {
     const extL = r.EXT_L || 0
     const extW = r.EXT_W || 0
     const extH = r.EXT_H || 0
-    const dimL = extL || intL
-    const dimW = extW || intW
-    const dimH = extH || intH
+    const dimL = Math.floor(extL || intL)
+    const dimW = Math.floor(extW || intW)
+    const dimH = Math.floor(extH || intH)
 
-    const compText = `${compLabel} : ${design}`
+    // Get component-specific quantity
+    const compQty = parseFloat(r.DO_Qty || 0)
+    const compUnit = r.Unit || unit || ''
+    const compUnitLower = (compUnit || '').toLowerCase()
+    const compPcsPerBld = parseFloat(r.PCS_PER_BLD || pcsPerBld || 1)
+
+    // Calculate bundle quantities for this component
+    let compBundles = 0
+    let compRemainingPcs = 0
+    if (compPcsPerBld > 0 && compQty > 0) {
+      compBundles = Math.floor(compQty / compPcsPerBld)
+      compRemainingPcs = compQty - compBundles * compPcsPerBld
+    } else {
+      compRemainingPcs = compQty
+    }
+
+    // Component line with name, design, dimensions, quantity, and unit all on same line
+    const compText = `  ${compLabel} : ${design}`
+    const dimText = `${dimL} x ${dimW} x ${dimH}`
+    const compQtyStr = `${Number(compQty)}${compUnitLower}`
+    const compUnitStr = `${compBundles}BDL x ${compPcsPerBld}Pcs + ${compRemainingPcs}Pcs`
+    
+    // Position text elements: component on left, dimensions shifted left, quantity/unit on right
     doc.text(compText, left, y)
-    doc.text(`${dimL} x ${dimW} x ${dimH}`, left + 150, y)
+    doc.text(dimText, left + 100, y) // Shifted left from 180 to 100
+    doc.text(compQtyStr, qtyColX, y, { align: 'right' })
+    doc.text(compUnitStr, unitColX, y, { align: 'right' })
     y += 12
   })
 
@@ -834,8 +894,8 @@ function renderSuratJalan(doc, groupRows) {
 
   // Signature names
   doc.text('(Nama Jelas dan Cap Perusahaan)', left, y)
-  doc.text('SUHERMAN', center - 50, y)
-  doc.text('Gudang    1773.98', right, y, { align: 'right' })
+  doc.text(driverName, center - 50, y)
+  doc.text('Gudang    _____', right, y, { align: 'right' })
   y += 12
 
   doc.text('Akhir dari halaman', left, y)

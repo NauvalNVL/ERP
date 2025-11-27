@@ -289,4 +289,33 @@ class VehicleController extends Controller
             'data' => ['KIM', 'CUSTOMER', 'MBI']
         ]);
     }
+
+    /**
+     * Get driver name by vehicle number
+     */
+    public function getDriverByVehicle($vehicleNo)
+    {
+        try {
+            $vehicle = Vehicle::where('VEHICLE_NO', $vehicleNo)->first();
+            
+            if (!$vehicle) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vehicle not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'driver_name' => $vehicle->DRIVER_NAME,
+                'driver_code' => $vehicle->DRIVER_CODE,
+                'vehicle_no' => $vehicle->VEHICLE_NO
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching driver: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
