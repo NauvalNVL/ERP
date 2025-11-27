@@ -407,6 +407,7 @@ Route::get('/define-scoring-tool', [ScoringToolController::class, 'vueIndex'])->
 
 Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
 Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
+Route::get('/paper-quality/obsolete-unobsolete', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.obsolete-unobsolete');
 Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueViewAndPrint'])->name('vue.paper-quality.view-print');
 // Alias for search menu
 Route::get('/define-paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.define-paper-quality');

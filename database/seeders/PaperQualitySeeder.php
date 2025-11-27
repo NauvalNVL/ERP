@@ -36,8 +36,8 @@ class PaperQualitySeeder extends Seeder
                 'created_by' => 'system',
                 'updated_by' => 'system',
                 'created_at' => $now,
+                'created_at' => $now,
                 'updated_at' => $now,
-                'is_active' => ($status === 'Act'),
             ];
         };
         

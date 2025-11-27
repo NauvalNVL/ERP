@@ -66,7 +66,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.weight_kg_m }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.type || 'N/A' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="quality.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="quality.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -76,14 +76,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="togglePaperQualityStatus(quality)" :disabled="isToggling"
                                 :class="[
-                                    quality.is_active
+                                    quality.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[quality.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ quality.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[quality.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ quality.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
@@ -137,6 +137,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -190,12 +191,22 @@ const fetchPaperQualities = async (page = 1) => {
         const data = await response.json();
         
         if (data) {
-            paperQualities.value = data;
-            pagination.value = {
-                currentPage: page,
-                perPage: 15,
-                total: data.length
-            };
+            // Check if data is paginated or array
+            if (Array.isArray(data)) {
+                paperQualities.value = data;
+                pagination.value = {
+                    currentPage: 1,
+                    perPage: data.length,
+                    total: data.length
+                };
+            } else if (data.data) {
+                paperQualities.value = data.data;
+                pagination.value = {
+                    currentPage: data.current_page || page,
+                    perPage: data.per_page || 15,
+                    total: data.total || 0
+                };
+            }
         }
     } catch (error) {
         console.error('Error fetching paper qualities:', error);
@@ -213,16 +224,18 @@ const filteredPaperQualities = computed(() => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(quality => 
-            quality.paper_quality.toLowerCase().includes(query) || 
-            quality.paper_name.toLowerCase().includes(query) || 
+            (quality.paper_quality && quality.paper_quality.toLowerCase().includes(query)) || 
+            (quality.paper_name && quality.paper_name.toLowerCase().includes(query)) || 
             (quality.type && quality.type.toLowerCase().includes(query))
         );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(quality => quality.is_active === isActive);
+        const isAct = statusFilter.value === 'active';
+        filtered = filtered.filter(quality => 
+            isAct ? quality.status === 'Act' : quality.status === 'Obs'
+        );
     }
     
     return filtered;
@@ -244,33 +257,35 @@ const togglePaperQualityStatus = async (quality) => {
             throw new Error('CSRF token not found');
         }
         
-        // Toggle the is_active property
-        const updatedData = {
-            ...quality,
-            is_active: !quality.is_active,
-            status: !quality.is_active ? 'Act' : 'Obs'
-        };
-        
-        const response = await fetch(`/api/paper-qualities/${quality.id}`, {
+        const response = await fetch(`/api/paper-qualities/${quality.id}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
+            }
         });
         
         if (!response.ok) {
-            throw new Error('Failed to toggle paper quality status');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Failed to toggle paper quality status');
         }
         
+        const result = await response.json();
+        
         // Update the local state
-        quality.is_active = !quality.is_active;
-        quality.status = quality.is_active ? 'Act' : 'Obs';
+        if (result.data) {
+            const index = paperQualities.value.findIndex(q => q.id === quality.id);
+            if (index !== -1) {
+                paperQualities.value[index] = result.data;
+            }
+        } else {
+             // Fallback if no data returned
+            quality.status = (quality.status === 'Act') ? 'Obs' : 'Act';
+        }
         
         // Show success message
-        const statusText = quality.is_active ? 'activated' : 'deactivated';
+        const statusText = (quality.status === 'Act') ? 'activated' : 'deactivated';
         showNotification(`Paper quality "${quality.paper_quality}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling paper quality status:', error);
@@ -305,6 +320,8 @@ const showNotification = (message, type = 'success') => {
 
 // Load data on component mount
 onMounted(() => {
-    fetchPaperQualities();
+    if (paperQualities.value.length === 0) {
+        fetchPaperQualities();
+    }
 });
 </script>

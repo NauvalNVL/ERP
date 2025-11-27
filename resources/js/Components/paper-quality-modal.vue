@@ -43,7 +43,14 @@
                 @click="selectRow(quality)"
                 @dblclick="selectAndClose(quality)">
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ quality.paper_quality }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.status }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">
+                  <span v-if="quality.status === 'Act'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    Active
+                  </span>
+                  <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                    Obsolete
+                  </span>
+                </td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.paper_name }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.weight_kg_m }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.commercial_code || '' }}</td>

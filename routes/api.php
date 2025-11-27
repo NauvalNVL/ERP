@@ -33,6 +33,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\DeliveryOrderController;
 use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 use App\Http\Controllers\ScoringToolController;
+use App\Http\Controllers\PaperQualityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +115,13 @@ Route::post('/users/{userId}/permissions', [UserController::class, 'updateUserPe
 Route::middleware(['web', 'auth'])->group(function () {
     Route::put('/users/{userId}/status', [UserController::class, 'apiToggleStatus']);
 });
+
+// Paper Quality API routes
+Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+Route::post('/paper-qualities', [PaperQualityController::class, 'apiStore']);
+Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/paper-qualities/{id}/status', [PaperQualityController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 
