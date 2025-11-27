@@ -26,7 +26,6 @@ return new class extends Migration
             $table->string('il', 5)->nullable()->comment('IL');
             $table->string('a_c_e', 5)->nullable()->comment('A/C/E');
             $table->string('2l', 5)->nullable()->comment('2L');
-            $table->boolean('is_active')->default(true);
             $table->string('created_by')->default('system');
             $table->string('updated_by')->default('system');
             $table->timestamps();

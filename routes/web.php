@@ -387,23 +387,27 @@ Route::get('/define-product-group', [ProductGroupController::class, 'vueIndex'])
 Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
 Route::get('/product/status', [ProductController::class, 'vueManageStatus'])->name('vue.product.status');
 Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
+Route::get('/product/obsolete-unobsolete', [ProductController::class, 'vueManageStatus'])->name('vue.product.obsolete-unobsolete');
 // Alias for search menu
 Route::get('/define-product', [ProductController::class, 'vueIndex'])->name('vue.define-product');
 
 Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
 Route::get('/product-design/status', [ProductDesignController::class, 'vueManageStatus'])->name('vue.product-design.status');
+Route::get('/product-design/obsolete-unobsolete', [ProductDesignController::class, 'vueManageStatus'])->name('vue.product-design.obsolete-unobsolete');
 Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
 // Alias for search menu
 Route::get('/define-product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.define-product-design');
 
 Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
 Route::get('/scoring-tool/status', [ScoringToolController::class, 'vueManageStatus'])->name('vue.scoring-tool.status');
+Route::get('/scoring-tool/obsolete-unobsolete', [ScoringToolController::class, 'vueManageStatus'])->name('vue.scoring-tool.obsolete-unobsolete');
 Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
 // Alias for search menu
 Route::get('/define-scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.define-scoring-tool');
 
 Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
 Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
+Route::get('/paper-quality/obsolete-unobsolete', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.obsolete-unobsolete');
 Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueViewAndPrint'])->name('vue.paper-quality.view-print');
 // Alias for search menu
 Route::get('/define-paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.define-paper-quality');

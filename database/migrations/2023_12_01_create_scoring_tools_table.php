@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('code', 10)->unique(); // CODE column
             $table->string('name', 100); // NAME column
             $table->decimal('scorer_gap', 8, 1)->default(0.0); // SCORER GAP column
+            $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
         });
     }
 

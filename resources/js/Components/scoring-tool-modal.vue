@@ -36,6 +36,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scorer Gap</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -51,6 +52,14 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ tool.code }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tool.name }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tool.scorer_gap }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <span v-if="tool.status === 'Act'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  Active
+                </span>
+                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                  Obsolete
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>

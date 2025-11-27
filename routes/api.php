@@ -32,6 +32,8 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\DeliveryOrderController;
 use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
+use App\Http\Controllers\ScoringToolController;
+use App\Http\Controllers\PaperQualityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,7 +116,20 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::put('/users/{userId}/status', [UserController::class, 'apiToggleStatus']);
 });
 
+// Paper Quality API routes
+Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+Route::post('/paper-qualities', [PaperQualityController::class, 'apiStore']);
+Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/paper-qualities/{id}/status', [PaperQualityController::class, 'toggleStatus'])->where('id', '[0-9]+');
+
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+
+// Scoring Tool API routes
+Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
+Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update'])->where('id', '[0-9]+');
+Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy'])->where('id', '[0-9]+');
+Route::put('/scoring-tools/{id}/status', [ScoringToolController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 // Product API routes
 Route::get('/products', [ProductController::class, 'getProductsJson']);
@@ -122,6 +137,7 @@ Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
 Route::post('/products', [ProductController::class, 'apiStore']);
 Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/products/{id}/status', [ProductController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 // Product Group API routes
 Route::get('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'index']);
@@ -129,6 +145,13 @@ Route::post('/product-groups', [App\Http\Controllers\ProductGroupController::cla
 Route::put('/product-groups/{id}', [App\Http\Controllers\ProductGroupController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/product-groups/{id}', [App\Http\Controllers\ProductGroupController::class, 'apiDestroy'])->where('id', '[0-9]+');
 Route::put('/product-groups/{id}/status', [App\Http\Controllers\ProductGroupController::class, 'toggleStatus'])->where('id', '[0-9]+');
+
+// Product Design API routes
+Route::get('/product-designs', [App\Http\Controllers\ProductDesignController::class, 'getDesignsJson']);
+Route::post('/product-designs', [App\Http\Controllers\ProductDesignController::class, 'apiStore']);
+Route::put('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/product-designs/{id}/status', [App\Http\Controllers\ProductDesignController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 
 // Color API routes

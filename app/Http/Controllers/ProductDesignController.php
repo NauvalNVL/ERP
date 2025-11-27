@@ -330,6 +330,7 @@ class ProductDesignController extends Controller
                 'flute_style',
                 'print_flute',
                 'input_weight',
+                'status',
             )->get();
             
             return response()->json($designs);
@@ -427,7 +428,7 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
-            'is_active' => 'nullable|boolean',
+            'status' => 'nullable|string|in:Act,Obs',
         ]);
 
         if ($validator->fails()) {
@@ -486,8 +487,8 @@ class ProductDesignController extends Controller
             if ($request->has('input_weight')) {
                 $updateData['input_weight'] = $request->input_weight;
             }
-            if ($request->has('is_active')) {
-                $updateData['is_active'] = $request->is_active;
+            if ($request->has('status')) {
+                $updateData['status'] = $request->status;
             }
 
             $productDesign->update($updateData);
@@ -531,6 +532,35 @@ class ProductDesignController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete product design: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle product design status (Active/Obsolete)
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            // Find by id column
+            $productDesign = ProductDesign::where('id', $id)->firstOrFail();
+            // Toggle status between 'Act' and 'Obs'
+            $productDesign->status = ($productDesign->status === 'Act') ? 'Obs' : 'Act';
+            $productDesign->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product design status updated successfully',
+                'data' => $productDesign
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductDesignController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling product design status: ' . $e->getMessage()
             ], 500);
         }
     }

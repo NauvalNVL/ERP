@@ -52,8 +52,8 @@
                 <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Group</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
@@ -62,9 +62,9 @@
                     <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.product_code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.description }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.product_group_id || '-' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ product.category }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="product.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="product.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -74,14 +74,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="toggleProductStatus(product)" :disabled="isToggling"
                                 :class="[
-                                    product.is_active
+                                    product.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[product.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ product.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[product.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ product.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
@@ -213,14 +213,14 @@ const filteredProducts = computed(() => {
         filtered = filtered.filter(product => 
             product.product_code.toLowerCase().includes(query) || 
             product.description.toLowerCase().includes(query) ||
-            (product.product_group_id && product.product_group_id.toLowerCase().includes(query))
+            (product.category && product.category.toLowerCase().includes(query))
         );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(product => product.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(product => product.status === targetStatus);
     }
     
     return filtered;
@@ -242,37 +242,31 @@ const toggleProductStatus = async (product) => {
             throw new Error('CSRF token not found');
         }
         
-        // Toggle the is_active property
-        const updatedData = {
-            product_code: product.product_code,
-            description: product.description,
-            product_group_id: product.product_group_id,
-            category: product.category,
-            is_active: !product.is_active,
-            status: !product.is_active ? 'Act' : 'Obs'
-        };
-        
-        const response = await fetch(`/api/products/${product.id}`, {
+        const response = await fetch(`/api/products/${product.id}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
+            }
         });
         
         if (!response.ok) {
             throw new Error('Failed to toggle product status');
         }
         
-        // Update the local state
-        product.is_active = !product.is_active;
-        product.status = product.is_active ? 'Act' : 'Obs';
+        const result = await response.json();
         
-        // Show success message
-        const statusText = product.is_active ? 'activated' : 'deactivated';
-        showNotification(`Product "${product.product_code}" successfully ${statusText}`, 'success');
+        if (result.success) {
+            // Update the local state
+            product.status = (product.status === 'Act') ? 'Obs' : 'Act';
+            
+            // Show success message
+            const statusText = (product.status === 'Act') ? 'activated' : 'deactivated';
+            showNotification(`Product "${product.product_code}" successfully ${statusText}`, 'success');
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
     } catch (error) {
         console.error('Error toggling product status:', error);
         showNotification('Error updating status: ' + error.message, 'error');

@@ -51,20 +51,20 @@
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PD Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PD Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Design Type</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="design in filteredDesigns" :key="design.id" class="hover:bg-gray-50">
+                    <tr v-for="design in filteredProductDesigns" :key="design.id" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ design.pd_code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ design.pd_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ design.pd_design_type }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ design.pd_design_type }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="design.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="design.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -72,20 +72,20 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                            <button @click="toggleDesignStatus(design)" :disabled="isToggling"
+                            <button @click="toggleProductDesignStatus(design)" :disabled="isToggling"
                                 :class="[
-                                    design.is_active
+                                    design.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[design.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ design.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[design.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ design.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
-                    <tr v-if="filteredDesigns.length === 0">
+                    <tr v-if="filteredProductDesigns.length === 0">
                         <td colspan="5" class="px-6 py-4 text-center text-gray-500">No product designs found.</td>
                     </tr>
                 </tbody>
@@ -135,7 +135,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -205,7 +204,7 @@ const fetchProductDesigns = async (page = 1) => {
 };
 
 // Filter product designs based on search query and status filter
-const filteredDesigns = computed(() => {
+const filteredProductDesigns = computed(() => {
     let filtered = [...productDesigns.value];
     
     // Apply search filter
@@ -220,18 +219,18 @@ const filteredDesigns = computed(() => {
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(design => design.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(design => design.status === targetStatus);
     }
     
     return filtered;
 });
 
 // Toggle product design status
-const toggleDesignStatus = async (design) => {
+const toggleProductDesignStatus = async (design) => {
     if (isToggling.value) return;
     
-    const confirmMessage = `Are you sure you want to change the status for "${design.pd_name}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${design.pd_code} - ${design.pd_name}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -243,31 +242,31 @@ const toggleDesignStatus = async (design) => {
             throw new Error('CSRF token not found');
         }
         
-        // Toggle the is_active property
-        const updatedData = {
-            is_active: !design.is_active
-        };
-        
-        const response = await fetch(`/api/product-designs/${design.id}`, {
+        const response = await fetch(`/api/product-designs/${design.id}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
+            }
         });
         
         if (!response.ok) {
             throw new Error('Failed to toggle product design status');
         }
         
-        // Update the local state
-        design.is_active = !design.is_active;
+        const result = await response.json();
         
-        // Show success message
-        const statusText = design.is_active ? 'activated' : 'deactivated';
-        showNotification(`Product Design "${design.pd_name}" successfully ${statusText}`, 'success');
+        if (result.success) {
+            // Update the local state
+            design.status = (design.status === 'Act') ? 'Obs' : 'Act';
+            
+            // Show success message
+            const statusText = (design.status === 'Act') ? 'activated' : 'deactivated';
+            showNotification(`Product design "${design.pd_code}" successfully ${statusText}`, 'success');
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
     } catch (error) {
         console.error('Error toggling product design status:', error);
         showNotification('Error updating status: ' + error.message, 'error');

@@ -58,7 +58,7 @@ class PaperQualityController extends Controller
                 'il' => 'nullable|string|max:5',
                 'a_c_e' => 'nullable|string|max:5',
                 '2l' => 'nullable|string|max:5',
-                'is_active' => 'required|boolean'
+                'status' => 'nullable|string|in:Act,Obs'
             ], [
                 'paper_quality.required' => 'Kode kualitas kertas harus diisi',
                 'paper_quality.unique' => 'Kode kualitas kertas ini sudah terdaftar',
@@ -69,7 +69,7 @@ class PaperQualityController extends Controller
 
             // Set status if not provided
             if (!isset($validated['status'])) {
-                $validated['status'] = $validated['is_active'] ? 'Act' : 'Obs';
+                $validated['status'] = 'Act';
             }
 
             $paperQuality = PaperQuality::create([
@@ -86,7 +86,8 @@ class PaperQualityController extends Controller
                 'il' => $validated['il'] ?? null,
                 'a_c_e' => $validated['a_c_e'] ?? null,
                 '2l' => $validated['2l'] ?? null,
-                'is_active' => $validated['is_active'],
+                'a_c_e' => $validated['a_c_e'] ?? null,
+                '2l' => $validated['2l'] ?? null,
                 'created_by' => $createdBy,
                 'updated_by' => $createdBy
             ]);
@@ -139,7 +140,7 @@ class PaperQualityController extends Controller
                 'il' => 'nullable|string|max:5',
                 'a_c_e' => 'nullable|string|max:5',
                 '2l' => 'nullable|string|max:5',
-                'is_active' => 'required|boolean'
+                'status' => 'nullable|string|in:Act,Obs'
             ], [
                 'paper_quality.required' => 'Kode kualitas kertas harus diisi',
                 'paper_quality.unique' => 'Kode kualitas kertas ini sudah terdaftar',
@@ -150,7 +151,7 @@ class PaperQualityController extends Controller
 
             // Set status if not provided
             if (!isset($validated['status'])) {
-                $validated['status'] = $validated['is_active'] ? 'Act' : 'Obs';
+                $validated['status'] = 'Act';
             }
 
             $paperQuality->update([
@@ -167,7 +168,8 @@ class PaperQualityController extends Controller
                 'il' => $validated['il'] ?? null,
                 'a_c_e' => $validated['a_c_e'] ?? null,
                 '2l' => $validated['2l'] ?? null,
-                'is_active' => $validated['is_active'],
+                'a_c_e' => $validated['a_c_e'] ?? null,
+                '2l' => $validated['2l'] ?? null,
                 'updated_by' => $updatedBy
             ]);
 
@@ -199,19 +201,36 @@ class PaperQualityController extends Controller
     public function toggleStatus($id)
     {
         try {
-            $paperQuality = PaperQuality::findOrFail($id);
-            $paperQuality->is_active = !$paperQuality->is_active;
-            $paperQuality->status = $paperQuality->is_active ? 'Act' : 'Obs';
+            // Try to find by ID first
+            $paperQuality = PaperQuality::find($id);
+            
+            // If not found, try by code (if applicable, though ID is safer)
+            if (!$paperQuality) {
+                 $paperQuality = PaperQuality::where('paper_quality', $id)->first();
+            }
+
+            if (!$paperQuality) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Paper quality not found'
+                ], 404);
+            }
+
+            $paperQuality->status = ($paperQuality->status === 'Act') ? 'Obs' : 'Act';
             $paperQuality->updated_by = Auth::check() ? Auth::user()->user_id : 'system';
             $paperQuality->save();
 
-            $status = $paperQuality->is_active ? 'diaktifkan' : 'dinonaktifkan';
-            return redirect()->route('paper-quality.index')
-                ->with('success', "Kualitas kertas berhasil $status");
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper quality status updated successfully',
+                'data' => $paperQuality
+            ]);
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@toggleStatus: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Gagal mengubah status kualitas kertas: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling paper quality status: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -431,7 +450,6 @@ class PaperQualityController extends Controller
                 'wet_end_code' => $request->wet_end_code,
                 'decc_code' => $request->decc_code,
                 'status' => 'Act',
-                'is_active' => true,
                 'created_by' => $createdBy,
                 'updated_by' => $createdBy
             ]);

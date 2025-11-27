@@ -15,22 +15,26 @@ class ScoringToolSeeder extends Seeder
         [
             'code' => 'P',
             'name' => 'N/A',
-            'scorer_gap' => 0.0
+            'scorer_gap' => 0.0,
+            'status' => 'Act'
         ],
         [
             'code' => '1',
             'name' => 'MALE FEMAIL 10MM',
-            'scorer_gap' => 0.0
+            'scorer_gap' => 0.0,
+            'status' => 'Act'
         ],
         [
             'code' => '2',
             'name' => 'MALE PHAT',
-            'scorer_gap' => 0.0
+            'scorer_gap' => 0.0,
+            'status' => 'Act'
         ],
         [
             'code' => '3',
             'name' => 'MALE FEMAIL 8MM',
-            'scorer_gap' => 0.0
+            'scorer_gap' => 0.0,
+            'status' => 'Act'
         ]
     ];
 
