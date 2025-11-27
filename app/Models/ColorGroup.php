@@ -20,11 +20,7 @@ class ColorGroup extends Model
         'CG',
         'CG_Name',
         'CG_Type',
-        'is_active'
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean'
+        'status'
     ];
 
     /**

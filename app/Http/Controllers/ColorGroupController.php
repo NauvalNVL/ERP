@@ -86,7 +86,8 @@ class ColorGroupController extends Controller
             $colorGroup = ColorGroup::create([
                 'CG' => trim($request->cg),
                 'CG_Name' => trim($request->cg_name),
-                'CG_Type' => trim($request->cg_type)
+                'CG_Type' => trim($request->cg_type),
+                'status' => 'Act'
             ]);
 
             Log::info('Color group created successfully:', ['CG' => $colorGroup->CG]);
@@ -95,7 +96,8 @@ class ColorGroupController extends Controller
             $colorGroupResponse = [
                 'cg' => $colorGroup->CG,
                 'cg_name' => $colorGroup->CG_Name,
-                'cg_type' => $colorGroup->CG_Type
+                'cg_type' => $colorGroup->CG_Type,
+                'status' => $colorGroup->status
             ];
 
             return response()->json([
@@ -154,7 +156,8 @@ class ColorGroupController extends Controller
             $updateData = [];
             if ($request->has('cg_name')) $updateData['CG_Name'] = trim($request->cg_name);
             if ($request->has('cg_type')) $updateData['CG_Type'] = trim($request->cg_type);
-            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            // Status update should be done via toggleStatus
+            // if ($request->has('status')) $updateData['status'] = $request->status;
             
             $colorGroup->update($updateData);
 
@@ -165,7 +168,7 @@ class ColorGroupController extends Controller
                 'cg' => $colorGroup->CG,
                 'cg_name' => $colorGroup->CG_Name,
                 'cg_type' => $colorGroup->CG_Type,
-                'is_active' => $colorGroup->is_active
+                'status' => $colorGroup->status
             ];
 
             return response()->json([
@@ -224,6 +227,40 @@ class ColorGroupController extends Controller
         }
     }
 
+    public function toggleStatus($code)
+    {
+        try {
+            $colorGroup = ColorGroup::where('CG', $code)->first();
+            
+            if (!$colorGroup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color group not found'
+                ], 404);
+            }
+
+            $colorGroup->status = ($colorGroup->status === 'Act') ? 'Obs' : 'Act';
+            $colorGroup->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Color group status updated successfully',
+                'data' => [
+                    'cg' => $colorGroup->CG,
+                    'cg_name' => $colorGroup->CG_Name,
+                    'cg_type' => $colorGroup->CG_Type,
+                    'status' => $colorGroup->status
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorGroupController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling color group status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Display the Vue version for printing
      */
@@ -250,26 +287,24 @@ class ColorGroupController extends Controller
     public function vueManageStatus()
     {
         try {
-            $colorGroups = ColorGroup::orderBy('CG', 'asc')->paginate(15);
+            $colorGroups = ColorGroup::orderBy('CG', 'asc')->get();
 
             // Transform data
-            $colorGroupsTransformed = $colorGroups->getCollection()->map(function($group) {
+            $colorGroupsTransformed = $colorGroups->map(function($group) {
                 return [
                     'cg' => $group->CG,
                     'cg_name' => $group->CG_Name,
                     'cg_type' => $group->CG_Type,
-                    'is_active' => $group->is_active
+                    'status' => $group->status
                 ];
             });
-            
-            $colorGroups->setCollection($colorGroupsTransformed);
 
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-color-group', [
-                'colorGroups' => $colorGroups->items(),
+                'colorGroups' => $colorGroupsTransformed,
                 'pagination' => [
-                    'currentPage' => $colorGroups->currentPage(),
-                    'perPage' => $colorGroups->perPage(),
-                    'total' => $colorGroups->total()
+                    'currentPage' => 1,
+                    'perPage' => $colorGroupsTransformed->count(),
+                    'total' => $colorGroupsTransformed->count()
                 ],
                 'header' => 'Manage Color Group Status'
             ]);
@@ -280,7 +315,7 @@ class ColorGroupController extends Controller
                 'colorGroups' => [],
                 'pagination' => [
                     'currentPage' => 1,
-                    'perPage' => 15,
+                    'perPage' => 0,
                     'total' => 0
                 ],
                 'header' => 'Manage Color Group Status',
@@ -303,7 +338,7 @@ class ColorGroupController extends Controller
                     'cg' => $group->CG,
                     'cg_name' => $group->CG_Name,
                     'cg_type' => $group->CG_Type,
-                    'is_active' => $group->is_active
+                    'status' => $group->status
                 ];
             });
             

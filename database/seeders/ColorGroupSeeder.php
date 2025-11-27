@@ -40,7 +40,7 @@ class ColorGroupSeeder extends Seeder
         foreach ($colorGroups as $group) {
             ColorGroup::updateOrCreate(
                 ['CG' => $group['CG']],
-                $group
+                array_merge($group, ['status' => 'Act'])
             );
         }
     }

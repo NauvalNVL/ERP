@@ -131,6 +131,13 @@ Route::put('/paper-sizes/{id}', [PaperSizeController::class, 'apiUpdate'])->wher
 Route::delete('/paper-sizes/{id}', [PaperSizeController::class, 'apiDestroy'])->where('id', '[0-9]+');
 Route::put('/paper-sizes/{id}/status', [PaperSizeController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
+// Color Group API routes
+Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
+Route::post('/color-groups', [ColorGroupController::class, 'store']);
+Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
+Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
+Route::put('/color-groups/{code}/status', [ColorGroupController::class, 'toggleStatus']);
+
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 
 // Scoring Tool API routes

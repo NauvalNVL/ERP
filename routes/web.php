@@ -427,6 +427,7 @@ Route::get('/define-paper-size', [PaperSizeController::class, 'vueIndex'])->name
 
 Route::get('/color-group', [ColorGroupController::class, 'index'])->name('vue.color-group.index');
 Route::get('/color-group/status', [ColorGroupController::class, 'vueManageStatus'])->name('vue.color-group.status');
+Route::get('/color-group/obsolete-unobsolete', [ColorGroupController::class, 'vueManageStatus'])->name('vue.color-group.obsolete-unobsolete');
 Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
 // Alias for search menu
 Route::get('/define-color-group', [ColorGroupController::class, 'index'])->name('vue.define-color-group');

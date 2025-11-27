@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('CG', 15)->primary()->collation($collation);
             $table->string('CG_Name', 150)->nullable()->collation($collation);
             $table->string('CG_Type', 50)->nullable()->collation($collation);
+            $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             
             // No timestamps - matching CPS database structure
         });
