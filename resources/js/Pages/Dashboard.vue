@@ -45,7 +45,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-500">Sales Teams</p>
-                        <p class="text-2xl font-semibold text-gray-900">12</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ dashboardStats.salesTeams || 0 }}</p>
                         <p class="text-sm text-blue-600 flex items-center">
                             <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Active teams</span>
                         </p>
@@ -64,7 +64,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-500">Product Groups</p>
-                        <p class="text-2xl font-semibold text-gray-900">45</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ dashboardStats.productGroups || 0 }}</p>
                         <p class="text-sm text-green-600 flex items-center">
                             <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Defined groups</span>
                         </p>
@@ -83,7 +83,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-500">Machines</p>
-                        <p class="text-2xl font-semibold text-gray-900">28</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ dashboardStats.machines || 0 }}</p>
                         <p class="text-sm text-purple-600 flex items-center">
                             <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Active machines</span>
                         </p>
@@ -102,12 +102,24 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-500">Paper Qualities</p>
-                        <p class="text-2xl font-semibold text-gray-900">67</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ dashboardStats.paperQualities || 0 }}</p>
                         <p class="text-sm text-orange-600 flex items-center">
                             <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Defined qualities</span>
                         </p>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Master Data Overview Chart -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-lg font-semibold text-gray-800">
+                    Master Data Overview
+                </h4>
+            </div>
+            <div class="h-64">
+                <canvas ref="kpiChart" class="w-full h-full"></canvas>
             </div>
         </div>
 
@@ -157,98 +169,100 @@
                 </div>
             </div>
 
-            <!-- Recent Activities -->
+            <!-- Business Snapshot (real metrics) -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Recent Activities
+                    Business Snapshot
                 </h4>
                 <div class="space-y-4">
-                    <div class="flex items-start">
-                        <div class="bg-blue-100 p-2 rounded-full mr-3">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4 text-blue-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                                />
-                            </svg>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-user-friends text-blue-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">
+                                    Total Customers
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    From CUSTOMER master
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium">New Order #1234</p>
-                            <p class="text-xs text-gray-500">2 hours ago</p>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ businessStats.customers || 0 }}
                         </div>
                     </div>
-                    <div class="flex items-start">
-                        <div class="bg-green-100 p-2 rounded-full mr-3">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4 text-green-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                            </svg>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-file-invoice-dollar text-green-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">
+                                    Total Invoices
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    From INV table
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium">Payment Received</p>
-                            <p class="text-xs text-gray-500">4 hours ago</p>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ businessStats.invoices || 0 }}
                         </div>
                     </div>
-                    <div class="flex items-start">
-                        <div class="bg-yellow-100 p-2 rounded-full mr-3">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4 text-yellow-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                />
-                            </svg>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-file-signature text-purple-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">
+                                    Sales Orders
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    From sales orders module
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium">Low Stock Alert</p>
-                            <p class="text-xs text-gray-500">6 hours ago</p>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ businessStats.salesOrders || 0 }}
                         </div>
                     </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-orange-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-truck-loading text-orange-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">
+                                    Delivery Orders
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    From DO table
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ businessStats.deliveryOrders || 0 }}
+                        </div>
+                    </div>
+
                 </div>
-                <button
-                    class="w-full mt-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded hover:bg-gray-200 transition duration-300"
-                >
-                    View All Activities
-                </button>
             </div>
         </div>
 
-        <!-- Recent Orders and Quick Actions -->
+        <!-- Recent Data and Quick Actions -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Recent Orders Table -->
+            <!-- Recent Industries Table (real data) -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-semibold text-gray-800">
-                        Recent Orders
+                        Recent Industries
                     </h4>
-                    <a href="#" class="text-sm text-blue-500 hover:underline"
-                        >View All</a
-                    >
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -257,93 +271,51 @@
                                 <th
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    ID
+                                    Code
                                 </th>
                                 <th
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Customer
+                                    Name
                                 </th>
                                 <th
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
                                     Status
                                 </th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Total
-                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
+                            <tr v-if="!recentIndustries || recentIndustries.length === 0">
                                 <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
+                                    colspan="3"
+                                    class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500"
                                 >
-                                    #1234
-                                </td>
-                                <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm text-gray-500"
-                                >
-                                    Ahmad Fauzi
-                                </td>
-                                <td class="px-4 py-3 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                                        >Completed</span
-                                    >
-                                </td>
-                                <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm text-gray-500"
-                                >
-                                    $1,250.00
+                                    No recent industries found.
                                 </td>
                             </tr>
-                            <tr>
+                            <tr v-for="industry in recentIndustries" :key="industry.code">
                                 <td
                                     class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
-                                    #1233
+                                    {{ industry.code }}
                                 </td>
                                 <td
                                     class="px-4 py-3 whitespace-nowrap text-sm text-gray-500"
                                 >
-                                    Siti Nurhaliza
+                                    {{ industry.name }}
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
-                                        >Processing</span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                        :class="['A', 'ACT', 'ACTIVE'].includes(((industry.status ?? '').toString().trim().toUpperCase()))
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'"
                                     >
-                                </td>
-                                <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm text-gray-500"
-                                >
-                                    $850.00
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
-                                >
-                                    #1232
-                                </td>
-                                <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm text-gray-500"
-                                >
-                                    Budi Santoso
-                                </td>
-                                <td class="px-4 py-3 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
-                                        >Cancelled</span
-                                    >
-                                </td>
-                                <td
-                                    class="px-4 py-3 whitespace-nowrap text-sm text-gray-500"
-                                >
-                                    $2,100.00
+                                        {{ ['A', 'ACT', 'ACTIVE'].includes(((industry.status ?? '').toString().trim().toUpperCase()))
+                                            ? 'Active'
+                                            : 'Obsolete' }}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -427,112 +399,83 @@
             </div>
         </div>
 
-        <!-- ERP System Information -->
+        <!-- Invoices Overview (real data) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Invoice Trend Chart -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Recently Added Data
+                    Invoice Trend (Last 6 Months)
                 </h4>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-users-cog text-blue-500 mr-3"></i>
-                            <span class="text-sm font-medium">Sales Team "Team Alpha"</span>
-                        </div>
-                        <span class="text-xs text-gray-500">2 hours ago</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-cogs text-green-500 mr-3"></i>
-                            <span class="text-sm font-medium">Machine "Corrugator-01"</span>
-                        </div>
-                        <span class="text-xs text-gray-500">4 hours ago</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-scroll text-purple-500 mr-3"></i>
-                            <span class="text-sm font-medium">Paper Quality "Premium Grade"</span>
-                        </div>
-                        <span class="text-xs text-gray-500">6 hours ago</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-boxes text-orange-500 mr-3"></i>
-                            <span class="text-sm font-medium">Product Group "Packaging"</span>
-                        </div>
-                        <span class="text-xs text-gray-500">8 hours ago</span>
-                    </div>
+                <div class="h-64">
+                    <canvas ref="invoiceChart" class="w-full h-full"></canvas>
                 </div>
             </div>
 
-            <!-- System Status -->
+            <!-- Invoice Summary -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    System Status
+                    Invoice Summary
                 </h4>
                 <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700"
-                                >Data Completeness</span
-                            >
-                            <span class="text-sm font-medium text-gray-700"
-                                >95%</span
-                            >
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">
+                                Total Invoices (All Time)
+                            </p>
+                            <p class="text-xs text-gray-500">From INV table</p>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                class="bg-blue-600 h-2.5 rounded-full"
-                                style="width: 95%"
-                            ></div>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ businessStats.invoices || 0 }}
                         </div>
                     </div>
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700"
-                                >Active Modules</span
-                            >
-                            <span class="text-sm font-medium text-gray-700"
-                                >8/10</span
-                            >
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">
+                                Current Month
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Invoices this month
+                            </p>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                class="bg-green-600 h-2.5 rounded-full"
-                                style="width: 80%"
-                            ></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700"
-                                >User Activity</span
-                            >
-                            <span class="text-sm font-medium text-gray-700"
-                                >Active</span
-                            >
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                class="bg-green-600 h-2.5 rounded-full"
-                                style="width: 100%"
-                            ></div>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ invoiceTrendData.data && invoiceTrendData.data.length
+                                ? invoiceTrendData.data[invoiceTrendData.data.length - 1]
+                                : 0 }}
                         </div>
                     </div>
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700"
-                                >System Health</span
-                            >
-                            <span class="text-sm font-medium text-gray-700"
-                                >Excellent</span
-                            >
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">
+                                Previous Month
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Invoices last month
+                            </p>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                class="bg-green-600 h-2.5 rounded-full"
-                                style="width: 98%"
-                            ></div>
+                        <div class="text-xl font-semibold text-gray-900">
+                            {{ invoiceTrendData.data && invoiceTrendData.data.length > 1
+                                ? invoiceTrendData.data[invoiceTrendData.data.length - 2]
+                                : 0 }}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">
+                                Month-over-Month Change
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Current vs previous month
+                            </p>
+                        </div>
+                        <div
+                            class="text-sm font-semibold"
+                            :class="invoiceChange >= 0 ? 'text-green-600' : 'text-red-600'"
+                        >
+                            <span v-if="invoiceChange >= 0">+{{ invoiceChange }}</span>
+                            <span v-else>{{ invoiceChange }}</span>
                         </div>
                     </div>
                 </div>
@@ -544,26 +487,135 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { Head } from "@inertiajs/vue3";
-import { usePage } from '@inertiajs/vue3';
-import AppLayout from '../Layouts/AppLayout.vue';
+import { Head, usePage } from "@inertiajs/vue3";
+import AppLayout from "../Layouts/AppLayout.vue";
+import Chart from "chart.js/auto";
 
 const page = usePage();
+
 const user = computed(() => page.props.auth.user);
+const dashboardStats = computed(() => page.props.dashboardStats || {});
+const businessStats = computed(() => page.props.businessStats || {});
+const recentIndustries = computed(() => page.props.recentIndustries || []);
+const kpiChartData = computed(
+    () => page.props.kpiChartData || { labels: [], data: [] }
+);
+const invoiceTrendData = computed(
+    () => page.props.invoiceTrendData || { labels: [], data: [] }
+);
 
 const formattedDate = computed(() => {
     const now = new Date();
-    return now.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    return now.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
     });
 });
 
-// ERP Dashboard initialization
+const kpiChart = ref(null);
+let kpiChartInstance = null;
+
+const invoiceChart = ref(null);
+let invoiceChartInstance = null;
+
 onMounted(() => {
-    console.log('ERP Dashboard loaded for user:', user.value?.username);
+    console.log("ERP Dashboard loaded for user:", user.value?.username);
+
+    if (kpiChart.value) {
+        const ctx = kpiChart.value.getContext("2d");
+
+        if (kpiChartInstance) {
+            kpiChartInstance.destroy();
+        }
+
+        kpiChartInstance = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: kpiChartData.value.labels,
+                datasets: [
+                    {
+                        label: "Count",
+                        data: kpiChartData.value.data,
+                        backgroundColor: [
+                            "rgba(59, 130, 246, 0.6)", // blue
+                            "rgba(34, 197, 94, 0.6)", // green
+                            "rgba(147, 51, 234, 0.6)", // purple
+                            "rgba(249, 115, 22, 0.6)", // orange
+                        ],
+                        borderColor: [
+                            "rgba(59, 130, 246, 1)",
+                            "rgba(34, 197, 94, 1)",
+                            "rgba(147, 51, 234, 1)",
+                            "rgba(249, 115, 22, 1)",
+                        ],
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    if (invoiceChart.value) {
+        const ctx2 = invoiceChart.value.getContext("2d");
+
+        if (invoiceChartInstance) {
+            invoiceChartInstance.destroy();
+        }
+
+        invoiceChartInstance = new Chart(ctx2, {
+            type: "line",
+            data: {
+                labels: invoiceTrendData.value.labels,
+                datasets: [
+                    {
+                        label: "Invoices per Month",
+                        data: invoiceTrendData.value.data,
+                        borderColor: "rgba(59, 130, 246, 1)",
+                        backgroundColor: "rgba(59, 130, 246, 0.15)",
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+            },
+        });
+    }
 });
 </script>
 
