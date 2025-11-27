@@ -23,6 +23,7 @@ use App\Http\Controllers\MachineController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductGroupController;
 use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
@@ -121,6 +122,14 @@ Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
 Route::post('/products', [ProductController::class, 'apiStore']);
 Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
 Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
+
+// Product Group API routes
+Route::get('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'index']);
+Route::post('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'apiStore']);
+Route::put('/product-groups/{id}', [App\Http\Controllers\ProductGroupController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/product-groups/{id}', [App\Http\Controllers\ProductGroupController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/product-groups/{id}/status', [App\Http\Controllers\ProductGroupController::class, 'toggleStatus'])->where('id', '[0-9]+');
+
 
 // Color API routes
 Route::get('/colors', [ColorController::class, 'apiIndex']);

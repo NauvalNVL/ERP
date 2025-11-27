@@ -14,7 +14,7 @@ class ProductGroup extends Model
     protected $fillable = [
         'product_group_id',
         'product_group_name',
-        'is_active'
+        'status'
     ];
     
     /**
@@ -23,6 +23,6 @@ class ProductGroup extends Model
      * @var array
      */
     protected $casts = [
-        'is_active' => 'boolean',
+        //
     ];
 }

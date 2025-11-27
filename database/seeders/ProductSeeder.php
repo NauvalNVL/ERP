@@ -19,7 +19,7 @@ class ProductSeeder extends Seeder
             ['product_group_id' => 'DEFAULT'],
             [
                 'product_group_name' => 'Default Product Group',
-                'is_active' => true
+                'status' => 'Act'
             ]
         );
 
@@ -57,7 +57,7 @@ class ProductSeeder extends Seeder
                     'product_group_id' => $defaultGroup->product_group_id,
                     'category' => $productData['category'],
                     'unit' => $productData['unit'],
-                    'is_active' => true
+                    'status' => 'Act'
                 ]
             );
         }
