@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('industry', function (Blueprint $table) {
             $table->string('code', 5)->primary();
             $table->string('name', 30);
+            $table->string('description', 100)->nullable();
+            $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
         });
     }
 

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('st_code', 2);
             $table->string('sales_team_name', 100);
             $table->string('sales_team_position', 20)->default('E-Executive');
+            $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             $table->timestamps();
             $table->softDeletes();
         });

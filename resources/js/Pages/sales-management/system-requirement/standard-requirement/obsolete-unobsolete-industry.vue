@@ -51,8 +51,9 @@
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
@@ -61,8 +62,9 @@
                     <tr v-for="industry in filteredIndustries" :key="industry.code" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ industry.code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ industry.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ industry.description || '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="industry.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="industry.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -72,19 +74,19 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="toggleIndustryStatus(industry)" :disabled="isToggling"
                                 :class="[
-                                    industry.is_active
+                                    industry.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[industry.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ industry.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[industry.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ industry.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
                     <tr v-if="filteredIndustries.length === 0">
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">No industries found.</td>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No industries found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -133,7 +135,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -211,14 +212,15 @@ const filteredIndustries = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(industry => 
             industry.code.toLowerCase().includes(query) || 
-            industry.name.toLowerCase().includes(query)
+            industry.name.toLowerCase().includes(query) ||
+            (industry.description && industry.description.toLowerCase().includes(query))
         );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(industry => industry.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(industry => industry.status === targetStatus);
     }
     
     return filtered;
@@ -228,7 +230,7 @@ const filteredIndustries = computed(() => {
 const toggleIndustryStatus = async (industry) => {
     if (isToggling.value) return;
     
-    const confirmMessage = `Are you sure you want to change the status for "${industry.name}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${industry.code} - ${industry.name}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -240,17 +242,14 @@ const toggleIndustryStatus = async (industry) => {
             throw new Error('CSRF token not found');
         }
         
-        if (!industry.code) {
-            throw new Error('Industry code not found');
-        }
-        
-        // Toggle the is_active property
+        // Toggle the status property
         const updatedData = {
-            is_active: !industry.is_active,
-            status: !industry.is_active ? 'Act' : 'Obs'
+            code: industry.code,
+            name: industry.name,
+            description: industry.description,
+            status: industry.status === 'Act' ? 'Obs' : 'Act'
         };
         
-        // Use code as identifier (primary key)
         const response = await fetch(`/api/industry/${industry.code}`, {
             method: 'PUT',
             headers: {
@@ -262,23 +261,15 @@ const toggleIndustryStatus = async (industry) => {
         });
         
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-            throw new Error(errorData.message || 'Failed to toggle industry status');
+            throw new Error('Failed to toggle industry status');
         }
         
-        const result = await response.json();
+        // Update the local state
+        industry.status = industry.status === 'Act' ? 'Obs' : 'Act';
         
-        if (result.success) {
-            // Update the local state
-            industry.is_active = !industry.is_active;
-            industry.status = industry.is_active ? 'Act' : 'Obs';
-            
-            // Show success message
-            const statusText = industry.is_active ? 'activated' : 'deactivated';
-            showNotification(`Industry "${industry.name}" successfully ${statusText}`, 'success');
-        } else {
-            throw new Error(result.message || 'Failed to update status');
-        }
+        // Show success message
+        const statusText = industry.status === 'Act' ? 'activated' : 'deactivated';
+        showNotification(`Industry "${industry.code}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling industry status:', error);
         showNotification('Error updating status: ' + error.message, 'error');

@@ -7,7 +7,7 @@
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-sync-alt mr-3"></i> Manage Geo Status (Obsolete/Unobsolete)
         </h2>
-        <p class="text-emerald-100">Toggle the active status of geo locations.</p>
+        <p class="text-emerald-100">Toggle the active status of geographic locations.</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6">
@@ -46,49 +46,63 @@
             <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
-        <!-- Geo Table -->
+        <!-- Geo Locations Table -->
         <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Town</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Town</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area</th>
+                        <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="geo in filteredGeos" :key="geo.code" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ geo.code }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ geo.country }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ geo.state }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ geo.town }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="geo.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ geo.code }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ geo.country }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ geo.state }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ geo.town }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full" 
+                                :class="{
+                                    'bg-blue-100 text-blue-800': geo.country === 'Indonesia',
+                                    'bg-red-100 text-red-800': geo.country === 'Malaysia',
+                                    'bg-green-100 text-green-800': geo.country === 'Singapore',
+                                    'bg-yellow-100 text-yellow-800': geo.country === 'Thailand',
+                                    'bg-purple-100 text-purple-800': geo.country === 'Vietnam',
+                                    'bg-gray-100 text-gray-800': !['Indonesia', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam'].includes(geo.country)
+                                }">
+                                {{ geo.area }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-center">
+                            <span v-if="geo.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                 <i class="fas fa-times-circle mr-1"></i> Obsolete
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="toggleGeoStatus(geo)" :disabled="isToggling"
                                 :class="[
-                                    geo.is_active
+                                    geo.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[geo.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ geo.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[geo.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ geo.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
                     <tr v-if="filteredGeos.length === 0">
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No geo locations found.</td>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">No geo locations found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -137,7 +151,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -199,7 +212,7 @@ const fetchGeos = async (page = 1) => {
             };
         }
     } catch (error) {
-        console.error('Error fetching geo locations:', error);
+        console.error('Error fetching geos:', error);
         showNotification('Error loading geo locations: ' + error.message, 'error');
     } finally {
         loading.value = false;
@@ -217,14 +230,15 @@ const filteredGeos = computed(() => {
             geo.code.toLowerCase().includes(query) || 
             geo.country.toLowerCase().includes(query) ||
             geo.state.toLowerCase().includes(query) ||
-            geo.town.toLowerCase().includes(query)
+            geo.town.toLowerCase().includes(query) ||
+            geo.area.toLowerCase().includes(query)
         );
     }
     
     // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(geo => geo.is_active === isActive);
+        const targetStatus = statusFilter.value === 'active' ? 'Act' : 'Obs';
+        filtered = filtered.filter(geo => geo.status === targetStatus);
     }
     
     return filtered;
@@ -234,7 +248,7 @@ const filteredGeos = computed(() => {
 const toggleGeoStatus = async (geo) => {
     if (isToggling.value) return;
     
-    const confirmMessage = `Are you sure you want to change the status for "${geo.code}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${geo.code} - ${geo.country}, ${geo.town}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -246,7 +260,7 @@ const toggleGeoStatus = async (geo) => {
             throw new Error('CSRF token not found');
         }
         
-        // Toggle the is_active property
+        // Toggle the status property
         const updatedData = {
             code: geo.code,
             country: geo.country,
@@ -254,8 +268,7 @@ const toggleGeoStatus = async (geo) => {
             town: geo.town,
             town_section: geo.town_section,
             area: geo.area,
-            is_active: !geo.is_active,
-            status: !geo.is_active ? 'Act' : 'Obs'
+            status: geo.status === 'Act' ? 'Obs' : 'Act'
         };
         
         const response = await fetch(`/api/geo/${geo.code}`, {
@@ -273,12 +286,11 @@ const toggleGeoStatus = async (geo) => {
         }
         
         // Update the local state
-        geo.is_active = !geo.is_active;
-        geo.status = geo.is_active ? 'Act' : 'Obs';
+        geo.status = geo.status === 'Act' ? 'Obs' : 'Act';
         
         // Show success message
-        const statusText = geo.is_active ? 'activated' : 'deactivated';
-        showNotification(`Geo "${geo.code}" successfully ${statusText}`, 'success');
+        const statusText = geo.status === 'Act' ? 'activated' : 'deactivated';
+        showNotification(`Geo location "${geo.code}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling geo status:', error);
         showNotification('Error updating status: ' + error.message, 'error');

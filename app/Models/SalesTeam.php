@@ -17,12 +17,9 @@ class SalesTeam extends Model
         'code',
         'name',
         'status',
-        'is_active',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    // No casts needed for status as it's a string
 
     /**
      * Boot method to register model events

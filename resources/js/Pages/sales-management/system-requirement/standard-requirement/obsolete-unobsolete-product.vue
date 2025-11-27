@@ -51,7 +51,7 @@
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Group</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -59,10 +59,10 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="product in filteredProducts" :key="product.product_code" class="hover:bg-gray-50">
+                    <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.product_code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.description }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.product_group_id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.product_group_id || '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                             <span v-if="product.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
@@ -135,7 +135,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Props from controller
 const props = defineProps({
@@ -231,7 +230,7 @@ const filteredProducts = computed(() => {
 const toggleProductStatus = async (product) => {
     if (isToggling.value) return;
     
-    const confirmMessage = `Are you sure you want to change the status for "${product.description}"?`;
+    const confirmMessage = `Are you sure you want to change the status for "${product.product_code} - ${product.description}"?`;
     if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
@@ -249,11 +248,11 @@ const toggleProductStatus = async (product) => {
             description: product.description,
             product_group_id: product.product_group_id,
             category: product.category,
-            unit: product.unit,
-            is_active: !product.is_active
+            is_active: !product.is_active,
+            status: !product.is_active ? 'Act' : 'Obs'
         };
         
-        const response = await fetch(`/api/products/${product.product_code}`, {
+        const response = await fetch(`/api/products/${product.id}`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -269,10 +268,11 @@ const toggleProductStatus = async (product) => {
         
         // Update the local state
         product.is_active = !product.is_active;
+        product.status = product.is_active ? 'Act' : 'Obs';
         
         // Show success message
         const statusText = product.is_active ? 'activated' : 'deactivated';
-        showNotification(`Product "${product.description}" successfully ${statusText}`, 'success');
+        showNotification(`Product "${product.product_code}" successfully ${statusText}`, 'success');
     } catch (error) {
         console.error('Error toggling product status:', error);
         showNotification('Error updating status: ' + error.message, 'error');

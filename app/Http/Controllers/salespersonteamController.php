@@ -154,7 +154,6 @@ class SalespersonTeamController extends Controller
                 'st_code' => 'nullable|string|max:255',
                 'sales_team_name' => 'nullable|string|max:255',
                 'sales_team_position' => 'nullable|string|max:255',
-                'is_active' => 'nullable|boolean',
                 'status' => 'nullable|string|max:3',
             ]);
 
@@ -183,9 +182,6 @@ class SalespersonTeamController extends Controller
             }
             if ($request->has('sales_team_position')) {
                 $updateData['sales_team_position'] = $request->sales_team_position;
-            }
-            if ($request->has('is_active')) {
-                $updateData['is_active'] = $request->is_active;
             }
             if ($request->has('status')) {
                 $updateData['status'] = $request->status;
@@ -326,8 +322,7 @@ class SalespersonTeamController extends Controller
                     'st_code',
                     'sales_team_name',
                     'sales_team_position',
-                    'status',
-                    'is_active'
+                    'status'
                 )
                 ->orderBy('s_person_code')
                 ->paginate(15);

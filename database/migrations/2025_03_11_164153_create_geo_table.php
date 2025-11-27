@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('TOWN', 50);
             $table->string('TOWN_SECTION', 50);
             $table->string('AREA', 50);
+            $table->string('STATUS', 3)->default('Act')->comment('Status (Act/Obs)');
             
             // No timestamps - matching CPS database structure
         });

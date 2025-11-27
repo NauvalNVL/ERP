@@ -18,12 +18,9 @@ class SalespersonTeam extends Model
         'sales_team_name',
         'sales_team_position',
         'status',
-        'is_active'
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    // No casts needed for status as it's a string
 
     // Relationship with SalesTeam
     public function salesTeam()

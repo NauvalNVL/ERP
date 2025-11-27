@@ -82,7 +82,6 @@ class GeoController extends Controller
                 'town' => 'nullable',
                 'town_section' => 'nullable',
                 'area' => 'nullable',
-                'is_active' => 'nullable|boolean',
                 'status' => 'nullable|string|max:3',
             ]);
 
@@ -102,9 +101,6 @@ class GeoController extends Controller
             }
             if ($request->has('area')) {
                 $geo->AREA = $request->area;
-            }
-            if ($request->has('is_active')) {
-                $geo->IS_ACTIVE = $request->is_active;
             }
             if ($request->has('status')) {
                 $geo->STATUS = $request->status;

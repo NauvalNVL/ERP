@@ -143,7 +143,6 @@ class SalesTeamController extends Controller
                 'code' => 'required|string|max:10|unique:sales_team,code,' . $salesTeam->id,
                 'name' => 'nullable|string|max:100', // name might be description in frontend
                 'description' => 'nullable|string|max:100', // handle description alias
-                'is_active' => 'nullable|boolean',
                 'status' => 'nullable|string|max:3',
             ]);
 
@@ -161,7 +160,6 @@ class SalesTeamController extends Controller
             $salesTeam->update([
                 'code' => $request->code,
                 'name' => $name,
-                'is_active' => $request->has('is_active') ? $request->is_active : $salesTeam->is_active,
                 'status' => $request->has('status') ? $request->status : $salesTeam->status,
                 'updated_at' => now()
             ]);

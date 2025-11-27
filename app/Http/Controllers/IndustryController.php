@@ -62,7 +62,6 @@ class IndustryController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:30',
             'description' => 'nullable|string|max:100',
-            'is_active' => 'nullable|boolean',
             'status' => 'nullable|string|max:3',
         ]);
 
@@ -72,9 +71,6 @@ class IndustryController extends Controller
         }
         if ($request->has('description')) {
             $updateData['description'] = $request->description;
-        }
-        if ($request->has('is_active')) {
-            $updateData['is_active'] = $request->is_active;
         }
         if ($request->has('status')) {
             $updateData['status'] = $request->status;
@@ -221,7 +217,6 @@ class IndustryController extends Controller
                 ->map(function ($industry) {
                     // Ensure all fields have values
                     $industry->description = $industry->description ?? $industry->name;
-                    $industry->is_active = $industry->is_active ?? true;
                     $industry->status = $industry->status ?? 'Act';
                     return $industry;
                 });

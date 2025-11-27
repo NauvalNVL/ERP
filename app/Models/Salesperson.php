@@ -35,13 +35,11 @@ class Salesperson extends Model
         'Internal',
         'Email',
         'status',
-        'is_active'
     ];
 
     protected $casts = [
         'TargetSales' => 'decimal:2',
         'status' => 'string', // This will auto-trim CHAR fields
-        'is_active' => 'boolean',
     ];
 
     /**
