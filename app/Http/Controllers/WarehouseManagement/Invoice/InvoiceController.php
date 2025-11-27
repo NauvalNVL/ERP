@@ -55,6 +55,64 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Resolve DO number for printing (CPS-like behaviour)
+     *
+     * Priority:
+     * 1) If IV_SECOND_REF matches a DO record, use that DO_Num
+     * 2) Else, find DO by SO_Num and AC_Num (latest DO_Num)
+     * 3) Fallback to raw IV_SECOND_REF (may be empty or free text)
+     *
+     * @param object $invoice
+     * @return string
+     */
+    private function resolveDoNumberForPrint($invoice): string
+    {
+        $doNumber = $invoice->IV_SECOND_REF ?? '';
+
+        try {
+            // 1) Direct match on DO_Num
+            if (!empty($doNumber)) {
+                $doByRef = DB::table('DO')
+                    ->where('DO_Num', $doNumber)
+                    ->first();
+                if ($doByRef) {
+                    return (string) $doByRef->DO_Num;
+                }
+            }
+
+            // 2) Find DO by SO number + customer (latest DO)
+            if (!empty($invoice->SO_NUM) && !empty($invoice->AC_NUM)) {
+                $doCandidate = DB::table('DO')
+                    ->where('SO_Num', $invoice->SO_NUM)
+                    ->where('AC_Num', $invoice->AC_NUM)
+                    ->orderByDesc('DO_Num')
+                    ->first();
+
+                if ($doCandidate) {
+                    return (string) $doCandidate->DO_Num;
+                }
+            }
+
+            // 3) Fallback: only by SO number
+            if (!empty($invoice->SO_NUM)) {
+                $doCandidate = DB::table('DO')
+                    ->where('SO_Num', $invoice->SO_NUM)
+                    ->orderByDesc('DO_Num')
+                    ->first();
+
+                if ($doCandidate) {
+                    return (string) $doCandidate->DO_Num;
+                }
+            }
+        } catch (\Exception $e) {
+            Log::info('Failed to resolve DO number for invoice ' . ($invoice->IV_NUM ?? '') . ': ' . $e->getMessage());
+        }
+
+        // Fallback: raw IV_SECOND_REF (may be empty or free text)
+        return (string) ($doNumber ?? '');
+    }
+
+    /**
      * Get current authenticated user ID for audit trail
      * Returns userID from UserCps model or null
      *
@@ -189,6 +247,28 @@ class InvoiceController extends Controller
         }
 
         return intval($value);
+    }
+
+    /**
+     * Normalize various date representations into DD/MM/YYYY string for INV.*_DMY columns
+     */
+    private function normalizeDateToDmy($value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->format('d/m/Y');
+        } catch (\Exception $e) {
+            Log::warning('Failed to normalize date to DMY format', [
+                'raw_value' => $value,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Fallback: return original string if it looks like a date, otherwise null
+            return is_string($value) ? $value : null;
+        }
     }
 
     /**
@@ -809,10 +889,16 @@ class InvoiceController extends Controller
                 }
 
                 // CPS-Compatible: Check if DO is already fully invoiced by calculating from INV table
+                // IMPORTANT: Only count Main component lines to avoid double-counting Fit components
                 /** @var float $invoicedQty */
                 $invoicedQty = DB::table('INV')
                     ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
                     ->where('IV_STS', '!=', 'Cancelled')
+                    ->where(function ($q) {
+                        $q->whereNull('COMP')
+                          ->orWhere('COMP', '')
+                          ->orWhere('COMP', 'Main');
+                    })
                     ->sum('IV_QTY');
 
                 /** @var float $doQty */
@@ -998,11 +1084,13 @@ class InvoiceController extends Controller
                 if ($soNum) {
                     try {
                         $soData = DB::table('so')->where('SO_Num', $soNum)->first();
-                        $soDmy = $soData ? ($soData->SO_DMY ?? null) : null;
+                        $rawSoDmy = $soData ? ($soData->SO_DMY ?? null) : null;
+                        $soDmy = $this->normalizeDateToDmy($rawSoDmy);
 
                         Log::info('✅ Retrieved SO_DMY from SO table', [
                             'so_num' => $soNum,
-                            'so_dmy' => $soDmy
+                            'raw_so_dmy' => $rawSoDmy,
+                            'normalized_so_dmy' => $soDmy,
                         ]);
                     } catch (\Exception $e) {
                         Log::warning('❌ Cannot fetch SO_DMY from SO table', [
@@ -1020,6 +1108,10 @@ class InvoiceController extends Controller
                 foreach ($doRecords as $line) {
                     // Base quantity per line
                     $lineQty = $this->toDecimalOrNull($this->getProperty($line, 'DO_Qty'), 0);
+
+                    // Normalize PO date for INV.PO_DMY
+                    $poDateRaw = $this->getProperty($line, 'PO_Date');
+                    $poDmy = $this->normalizeDateToDmy($poDateRaw);
 
                     // Raw values from DO line for M2 & KG
                     $grossM2PerPcs = $this->toDecimalOrNull($this->getProperty($line, 'MC_Gross_M2_Per_Pcs'));
@@ -1060,12 +1152,14 @@ class InvoiceController extends Controller
                         $totalNetKg = round($netKgPerPcs * $lineQty, 4);
                     }
 
-                    // Determine Main vs Fit component
+                    // Determine Main vs Fit component (still used for informational flags/printing)
                     $comp = trim((string) ($line->COMP ?? ''));
                     $isMain = ($itemNo === 1) || strcasecmp($comp, 'Main') === 0;
 
-                    // Only Main carries invoice quantity; Fit lines are informational (qty 0)
-                    $ivQty = $isMain ? $lineQty : 0;
+                    // Both Main and Fit components carry their DO quantity in INV.IV_QTY
+                    // DO-level remaining quantity checks now only sum Main components (see above),
+                    // so this will not cause double-counting for status calculations.
+                    $ivQty = $lineQty;
 
                     // Line-level amounts from DO line
                     $lineTranAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Tran_Amt'), 0);
@@ -1130,7 +1224,7 @@ class InvoiceController extends Controller
                         'SO_TYPE' => $this->getProperty($line, 'SO_Type'),
                         'SO_DMY' => $soDmy,
                         'PO_NUM' => $this->getProperty($line, 'PO_Num'),
-                        'PO_DMY' => $this->getProperty($line, 'PO_Date'),
+                        'PO_DMY' => $poDmy,
                         'LOT_NUM' => $this->getProperty($line, 'LOT_Num'),
 
                         // Quantities
@@ -1870,7 +1964,8 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = DB::table('INV');
+            // Only show one row per invoice number: use ITEM = 1 (Main component line)
+            $query = DB::table('INV')->where('ITEM', 1);
 
             // Filter by MM (month)
             if ($request->has('mm') && !empty($request->mm)) {
@@ -2023,6 +2118,9 @@ class InvoiceController extends Controller
                 }
             }
 
+            // Resolve DO number for printing (independent from second_ref text)
+            $doNumberForPrint = $this->resolveDoNumberForPrint($invoice);
+
             return response()->json([
                 'invoice_no' => $invoice->IV_NUM ?? '',
                 'customer_code' => $invoice->AC_NUM ?? '',
@@ -2041,7 +2139,7 @@ class InvoiceController extends Controller
                 'tax_code' => $invoice->IV_TAX_CODE ?? '',
                 'tax_percent' => (float)($invoice->IV_TAX_PERCENT ?? 0),
                 'invoice_date' => $invoiceDate,
-                // ✅ Map IV_SECOND_REF to ref2 for frontend compatibility
+                // ✅ Map IV_SECOND_REF to ref2/second_ref (raw value from CPS)
                 'ref2' => $invoice->IV_SECOND_REF ?? '',
                 'second_ref' => $invoice->IV_SECOND_REF ?? '',
                 'remark' => $invoice->IV_REMARK ?? '',
@@ -2056,7 +2154,8 @@ class InvoiceController extends Controller
                 'model' => $invoice->MODEL ?? '',
                 // Related documents (for calculating total if needed)
                 'so_number' => $invoice->SO_NUM ?? '',
-                'do_number' => $invoice->IV_SECOND_REF ?? '',
+                // DO number used for printing (resolved from DO table when possible)
+                'do_number' => $doNumberForPrint,
                 // ✅ Complete Audit trail (CPS-compatible with TIME fields)
                 'issued_by' => $invoice->NW_UID ?? '',
                 'issued_date' => $invoice->NW_DATE ?? '',
@@ -2123,13 +2222,44 @@ class InvoiceController extends Controller
 
                 // Calculate total from items if header total is 0
                 if ($totalAmount == 0 && $items->count() > 0) {
-                    $totalAmount = $items->sum(function($item) {
+                    $totalAmount = $items->sum(function ($item) {
                         return (float)($item->AMOUNT ?? 0);
                     });
                 }
             } catch (\Exception $e) {
                 // INVDET table doesn't exist or error querying, use header total only
                 Log::info('Cannot fetch items for invoice ' . $invoiceNo . ': ' . $e->getMessage());
+            }
+
+            // Fallback: if INVDET has no rows, build items from INV lines (Main + Fit)
+            if ($items->isEmpty()) {
+                $invLines = DB::table('INV')
+                    ->where('IV_NUM', $invoiceNo)
+                    ->orderBy('ITEM')
+                    ->get();
+
+                if ($invLines->count() > 0) {
+                    $items = $invLines->map(function ($line) {
+                        return (object) [
+                            'ITEM_CODE' => $line->PRODUCT ?? $line->MCS_NUM ?? '',
+                            'ITEM_DESC' => trim(($line->MODEL ?? '') . ' ' . ($line->P_DESIGN ?? '')),
+                            'QTY' => $line->IV_QTY ?? 0,
+                            'UNIT_PRICE' => $line->IV_UNIT_PRICE ?? 0,
+                            'AMOUNT' => $line->IV_TRAN_AMT ?? 0,
+                            'LINE_NO' => $line->ITEM ?? 0,
+                            'COMP' => $line->COMP ?? '',
+                            // PART: nama/part number seperti "BOX", "Box B", dll.
+                            'PART' => $line->PART ?? '',
+                        ];
+                    });
+
+                    // If header total is still 0, calculate from INV lines
+                    if ($totalAmount == 0) {
+                        $totalAmount = $items->sum(function ($item) {
+                            return (float)($item->AMOUNT ?? 0);
+                        });
+                    }
+                }
             }
 
             // If total still 0, try to use net amount
@@ -2146,14 +2276,18 @@ class InvoiceController extends Controller
                 'tax_amount' => (float)($invoice->IV_TAX_AMT ?? 0),
                 'net_amount' => (float)($invoice->IV_NET_AMT ?? 0),
                 'tax_code' => $invoice->IV_TAX_CODE ?? '',
-                'items' => $items->map(function($item) {
+                'items' => $items->map(function ($item) {
                     return [
-                        'item_code' => $item->ITEM_CODE,
-                        'item_desc' => $item->ITEM_DESC,
+                        'item_code' => $item->ITEM_CODE ?? '',
+                        'item_desc' => $item->ITEM_DESC ?? '',
                         'qty' => (float)($item->QTY ?? 0),
                         'unit_price' => (float)($item->UNIT_PRICE ?? 0),
                         'amount' => (float)($item->AMOUNT ?? 0),
-                        'line_no' => $item->LINE_NO
+                        'line_no' => $item->LINE_NO ?? 0,
+                        // Component type (Main / Fit) when built from INV lines
+                        'comp' => isset($item->COMP) ? ($item->COMP ?? '') : '',
+                        // Part name/number (BOX, Box B, etc.) when available
+                        'part' => isset($item->PART) ? ($item->PART ?? '') : '',
                     ];
                 })
             ]);
