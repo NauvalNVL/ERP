@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\CustomerSalesType;
-use App\Models\UpdateCustomerAccount;
+use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,9 +16,17 @@ class CustomerSalesTypeController extends Controller
      */
     public function index()
     {
-        $customers = UpdateCustomerAccount::orderBy('customer_name')->get();
+        // Load base customers from legacy CUSTOMER master table
+        // Map columns to the structure expected by the Vue page
+        $customers = Customer::select([
+                'CODE as customer_code',
+                'NAME as customer_name',
+                'CUST_TYPE as sales_type',
+            ])
+            ->orderBy('NAME')
+            ->get();
         $salesTypes = CustomerSalesType::orderBy('customer_name')->get();
-        
+
         return Inertia::render('sales-management/system-requirement/customer-account/customer-sales-type', [
             'customers' => $customers,
             'salesTypes' => $salesTypes
@@ -31,7 +39,7 @@ class CustomerSalesTypeController extends Controller
     public function viewAndPrint()
     {
         $salesTypes = CustomerSalesType::orderBy('customer_name')->get();
-        
+
         return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-sales-type', [
             'salesTypes' => $salesTypes
         ]);
@@ -90,7 +98,7 @@ class CustomerSalesTypeController extends Controller
         }
 
         $userId = Auth::id() ?? 1; // Get authenticated user ID or default to 1
-        
+
         $salesType = CustomerSalesType::findOrFail($id);
         $salesType->update([
             'customer_code' => $request->customer_code,

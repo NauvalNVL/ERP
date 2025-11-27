@@ -620,8 +620,10 @@ Route::put('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClas
 Route::put('/vehicle-classes/{vehicleClass}/status', [\App\Http\Controllers\VehicleClassController::class, 'apiUpdateStatus']);
 Route::delete('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiDestroy']);
 
-Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
-Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']);
+Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'apiIndex']);
+Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'apiStore']);
+Route::put('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiUpdate']);
+Route::delete('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiDestroy']);
 
 
 // Industry, Geo, and Salesperson API routes

@@ -504,6 +504,17 @@ const invoiceTrendData = computed(
     () => page.props.invoiceTrendData || { labels: [], data: [] }
 );
 
+// Month-over-month change in invoice count (current month - previous month)
+const invoiceChange = computed(() => {
+    const data = invoiceTrendData.value?.data || [];
+    if (!Array.isArray(data) || data.length < 2) {
+        return 0;
+    }
+    const current = Number(data[data.length - 1] ?? 0) || 0;
+    const previous = Number(data[data.length - 2] ?? 0) || 0;
+    return current - previous;
+});
+
 const formattedDate = computed(() => {
     const now = new Date();
     return now.toLocaleDateString("en-US", {

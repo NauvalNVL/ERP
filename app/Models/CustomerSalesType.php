@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Customer;
 
 class CustomerSalesType extends Model
 {
@@ -41,7 +42,7 @@ class CustomerSalesType extends Model
      */
     public function customer()
     {
-        return $this->belongsTo(UpdateCustomerAccount::class, 'customer_code', 'customer_code');
+        return $this->belongsTo(Customer::class, 'customer_code', 'CODE');
     }
 }
 

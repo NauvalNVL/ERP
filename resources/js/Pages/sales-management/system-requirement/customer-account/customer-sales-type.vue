@@ -128,9 +128,9 @@ const filteredCustomers = computed(() => {
     if (!searchTerm.value) {
         return customersList.value;
     }
-    
+
     const searchLower = searchTerm.value.toLowerCase();
-    return customersList.value.filter(customer => 
+    return customersList.value.filter(customer =>
         customer.customer_code.toLowerCase().includes(searchLower) ||
         customer.customer_name.toLowerCase().includes(searchLower)
     );
@@ -140,7 +140,8 @@ const filteredCustomers = computed(() => {
 const refreshData = async () => {
     try {
         const response = await axios.get('/api/customer-accounts');
-        customersList.value = response.data;
+        const payload = response.data?.data ?? response.data ?? [];
+        customersList.value = Array.isArray(payload) ? payload : [];
         showToast('Data refreshed successfully', 'success');
     } catch (error) {
         console.error('Error refreshing data:', error);
@@ -164,7 +165,7 @@ const saveCustomerSalesType = async (customer) => {
     try {
         // Check if this customer already has a sales type record
         const existingSalesType = salesTypesList.value.find(st => st.customer_code === customer.customer_code);
-        
+
         if (existingSalesType) {
             // Update existing record
             await axios.put(`/api/customer-sales-types/${existingSalesType.id}`, {
@@ -180,7 +181,7 @@ const saveCustomerSalesType = async (customer) => {
                 sales_type: customer.sales_type || 'LC'
             });
         }
-        
+
         showToast('Sales type saved successfully', 'success');
     } catch (error) {
         console.error('Error saving sales type:', error);
@@ -200,11 +201,11 @@ onMounted(async () => {
     if (!customersList.value.length) {
         await refreshData();
     }
-    
+
     try {
         const response = await axios.get('/api/customer-sales-types');
         salesTypesList.value = response.data;
-        
+
         // Apply existing sales types to customers
         salesTypesList.value.forEach(salesType => {
             const customer = customersList.value.find(c => c.customer_code === salesType.customer_code);
