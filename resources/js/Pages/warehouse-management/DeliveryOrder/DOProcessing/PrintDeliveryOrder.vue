@@ -541,11 +541,11 @@ function formatPreviewText(rows) {
     }
 
     lines.push('')
-    
+
     // Table header with separate columns - match PDF exactly
     lines.push(`No. Nama Barang${' '.repeat(QTY_COL - 14)}Jumlah${' '.repeat(UNIT_COL - QTY_COL - 6)}Satuan`)
     lines.push(''.padEnd(UNIT_COL, '-'))
-    
+
     // Main item details
     const qtyStrPrev = `${Number(doQty)}${unitLower}`
     const unitStrPrev = `${bundles}BDL x ${pcsPerBld}Pcs + ${remainingPcs}Pcs`
@@ -589,13 +589,13 @@ function formatPreviewText(rows) {
       }
 
       const cleanLabel = compLabel ? String(compLabel).trim() : 'Main'
-      
+
       // Format exactly like PDF - component on left, dimensions at DIM_POS, qty/unit at right columns
       const compText = `  ${cleanLabel} : ${design}`
       const dimText = `${dimL} x ${dimW} x ${dimH}`
       const qtyStr = `${Number(compQty)}${compUnitLower}`
       const unitStr = `${compBundles}BDL x ${compPcsPerBld}Pcs + ${compRemainingPcs}Pcs`
-      
+
       // Build line with exact positioning like PDF
       let line = compText
       // Add spaces until DIM_POS, then place dimensions
@@ -623,7 +623,7 @@ function formatPreviewText(rows) {
     let currentY = 0
     // Count lines to simulate Y position
     currentY = lines.length + 10 // Approximate Y position in lines
-    
+
     // Add spacing to reach footer position (PDF uses y=650 or y+=40)
     const targetFooterY = 50  // Simulate PDF's 650pt position in lines
     if (currentY < targetFooterY) {
@@ -696,8 +696,55 @@ async function downloadPdf() {
       groups.get(groupKey).push(r)
     })
 
+    // Extra safety: filter groups by DO number range (inclusive) based on From/To input
+    const fromYearNum = parseInt(effFromYear, 10)
+    const fromMonthNum = parseInt(effFromMonth, 10)
+    const fromSeqNum = parseInt(effFromNumber, 10)
+    const toYearNum = parseInt(effToYear, 10)
+    const toMonthNum = parseInt(effToMonth, 10)
+    const toSeqNum = parseInt(effToNumber, 10)
+
+    let filteredEntries = Array.from(groups.entries())
+
+    if (
+      !Number.isNaN(fromYearNum) &&
+      !Number.isNaN(fromMonthNum) &&
+      !Number.isNaN(fromSeqNum) &&
+      !Number.isNaN(toYearNum) &&
+      !Number.isNaN(toMonthNum) &&
+      !Number.isNaN(toSeqNum)
+    ) {
+      const fromKeyNum = fromYearNum * 10000000 + fromMonthNum * 100000 + fromSeqNum
+      const toKeyNum = toYearNum * 10000000 + toMonthNum * 100000 + toSeqNum
+      const minKey = Math.min(fromKeyNum, toKeyNum)
+      const maxKey = Math.max(fromKeyNum, toKeyNum)
+
+      filteredEntries = filteredEntries.filter(([key]) => {
+        if (!key || key === 'NO_DO') return false
+        const parts = String(key).split('-')
+        if (parts.length !== 3) return true
+
+        let year, month, seq
+        if (parts[0].length === 4) {
+          // Format: YYYY-MM-SSSSS
+          year = parseInt(parts[0], 10)
+          month = parseInt(parts[1], 10)
+          seq = parseInt(parts[2], 10)
+        } else {
+          // Format: MM-YYYY-SSSSS
+          month = parseInt(parts[0], 10)
+          year = parseInt(parts[1], 10)
+          seq = parseInt(parts[2], 10)
+        }
+
+        if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(seq)) return true
+        const numKey = year * 10000000 + month * 100000 + seq
+        return numKey >= minKey && numKey <= maxKey
+      })
+    }
+
     let page = 0
-    for (const [, groupRows] of groups) {
+    for (const [, groupRows] of filteredEntries) {
       if (page > 0) doc.addPage()
       await renderSuratJalan(doc, groupRows)
       page++
@@ -753,7 +800,7 @@ async function renderSuratJalan(doc, groupRows) {
   const unit = base.Unit || base.SO_Unit || ''
   const unitLower = (unit || '').toLowerCase()
   const pcsPerBld = parseFloat(base.PCS_PER_BLD || 1)
-  
+
   // Fetch driver name based on truck number
   let driverName = 'SUHERMAN' // default fallback
   try {
@@ -917,7 +964,7 @@ async function renderSuratJalan(doc, groupRows) {
     const dimText = `${dimL} x ${dimW} x ${dimH}`
     const compQtyStr = `${Number(compQty)}${compUnitLower}`
     const compUnitStr = `${compBundles}BDL x ${compPcsPerBld}Pcs + ${compRemainingPcs}Pcs`
-    
+
     // Position text elements: component on left, dimensions shifted left, quantity/unit on right
     doc.text(compText, left, y)
     doc.text(dimText, left + 100, y) // Shifted left from 180 to 100

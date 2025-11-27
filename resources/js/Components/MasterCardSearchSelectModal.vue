@@ -122,21 +122,6 @@
       <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-start space-x-3 rounded-b-lg">
         <button
           type="button"
-          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-          @click="reopenOptionsModal"
-        >
-          More Options
-        </button>
-        <button
-          type="button"
-          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-          @click="zoomSelectedMc"
-          :disabled="!selectedRowMc"
-        >
-          Zoom
-        </button>
-        <button
-          type="button"
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           @click="selectMasterCard"
           :disabled="!selectedRowMc"
@@ -172,7 +157,7 @@ const props = defineProps({
   customerCode: { type: String, default: '' },
 });
 
-const emit = defineEmits(['close', 'select-mc', 'reopen-options', 'zoom-mc']);
+const emit = defineEmits(['close', 'select-mc']);
 
 const masterCards = ref([]);
 const searchTerm = ref('');
@@ -281,17 +266,6 @@ const selectMasterCard = () => {
   if (selectedRowMc.value) {
     emit('select-mc', selectedRowMc.value);
     closeModal(); // Close modal after selection
-  }
-};
-
-const reopenOptionsModal = () => {
-  emit('reopen-options');
-  closeModal();
-};
-
-const zoomSelectedMc = () => {
-  if (selectedRowMc.value) {
-    emit('zoom-mc', selectedRowMc.value);
   }
 };
 

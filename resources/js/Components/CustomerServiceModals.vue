@@ -262,9 +262,6 @@
             </div>
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
                 <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
-                    Zoom
-                </button>
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
                     Select
                 </button>
                 <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
@@ -682,9 +679,6 @@
             </div>
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
                 <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
-                    Zoom
-                </button>
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
                     Select
                 </button>
                 <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
@@ -876,8 +870,6 @@
         :customer-code="customerCodeMasterCard"
         @close="showMasterCardListModal = false"
         @select-mc="handleMasterCardSelected"
-        @reopen-options="showMasterCardSearchModal = true"
-        @zoom-mc="handleMasterCardSelected"
     />
 </template>
 

@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-    
+
     <!-- Modal -->
     <div class="relative min-h-screen flex items-center justify-center p-4">
       <div class="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
@@ -13,7 +13,7 @@
               <i class="fas fa-desktop mr-2 text-blue-600"></i>
               Customer Desktop Service - Sales Order Table
             </h3>
-            <button 
+            <button
               @click="$emit('close')"
               class="text-gray-400 hover:text-gray-600 transition-colors"
             >
@@ -37,7 +37,7 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="(order, index) in salesOrders" :key="index" 
+                  <tr v-for="(order, index) in salesOrders" :key="index"
                       :class="order.status === 'Completed' ? 'bg-blue-100' : ''"
                       class="hover:bg-gray-50 cursor-pointer"
                       @click="selectOrder(order)">
@@ -111,13 +111,7 @@
 
         <!-- Footer -->
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-          <button 
-            @click="zoomAction"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Zoom
-          </button>
-          <button 
+          <button
             @click="$emit('close')"
             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
           >
@@ -151,7 +145,7 @@ const { success, error } = useToast()
 // Search fields
 const searchFields = reactive({
   field1: '0',
-  field2: '0', 
+  field2: '0',
   field3: '0'
 })
 
@@ -210,11 +204,6 @@ const selectOrder = (order) => {
 const performSearch = () => {
   // Handle search functionality
   success('Searching...')
-}
-
-const zoomAction = () => {
-  // Handle zoom action
-  success('Zoom functionality')
 }
 
 // Initialize
