@@ -446,36 +446,43 @@ Route::get('/analysis-code/view-print', function () {
 Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.define-analysis-code');
 
          Route::get('/stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.stitch-wire.index');
+         Route::get('/stitch-wire/status', [StitchWireController::class, 'vueManageStatus'])->name('vue.stitch-wire.status');
          Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');
          // Alias for search menu
          Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');
 
          Route::get('/chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.chemical-coat.index');
+         Route::get('/chemical-coat/status', [ChemicalCoatController::class, 'vueManageStatus'])->name('vue.chemical-coat.status');
          Route::get('/chemical-coat/view-print', [ChemicalCoatController::class, 'vueViewAndPrint'])->name('vue.chemical-coat.view-print');
          // Alias for search menu
          Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');
 
          Route::get('/reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.reinforcement-tape.index');
+         Route::get('/reinforcement-tape/status', [ReinforcementTapeController::class, 'vueManageStatus'])->name('vue.reinforcement-tape.status');
          Route::get('/reinforcement-tape/view-print', [ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
          // Alias for search menu
          Route::get('/define-reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');
 
          Route::get('/bundling-string', [BundlingStringController::class, 'index'])->name('vue.bundling-string.index');
+         Route::get('/bundling-string/status', [BundlingStringController::class, 'vueManageStatus'])->name('vue.bundling-string.status');
          Route::get('/bundling-string/view-print', [BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
          // Alias for search menu
          Route::get('/define-bundling-string', [BundlingStringController::class, 'index'])->name('vue.define-bundling-string');
 
          Route::get('/wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.wrapping-material.index');
+         Route::get('/wrapping-material/status', [WrappingMaterialController::class, 'vueManageStatus'])->name('vue.wrapping-material.status');
          Route::get('/wrapping-material/view-print', [WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
          // Alias for search menu
          Route::get('/define-wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');
 
          Route::get('/glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.glueing-material.index');
+         Route::get('/glueing-material/status', [GlueingMaterialController::class, 'vueManageStatus'])->name('vue.glueing-material.status');
          Route::get('/glueing-material/view-print', [GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
          // Alias for search menu
          Route::get('/define-glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
 
          Route::get('/machine', [MachineController::class, 'index'])->name('vue.machine.index');
+         Route::get('/machine/status', [MachineController::class, 'vueManageStatus'])->name('vue.machine.status');
          Route::post('/machine', [MachineController::class, 'store'])->name('vue.machine.store');
          Route::put('/machine/{id}', [MachineController::class, 'update'])->name('vue.machine.update');
          Route::delete('/machine/{id}', [MachineController::class, 'destroy'])->name('vue.machine.destroy');

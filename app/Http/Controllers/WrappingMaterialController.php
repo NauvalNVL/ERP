@@ -14,12 +14,12 @@ class WrappingMaterialController extends Controller
     {
         try {
             $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            
+
             if ($wrappingMaterials->isEmpty()) {
                 $this->seedData();
                 $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
             }
-            
+
             return response()->json($wrappingMaterials);
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@apiIndex: ' . $e->getMessage());
@@ -59,25 +59,60 @@ class WrappingMaterialController extends Controller
         }
     }
 
+    public function vueManageStatus()
+    {
+        try {
+            $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteWrappingMaterial', [
+                'wrappingMaterials' => $wrappingMaterials,
+                'header' => 'Manage Wrapping Material Status',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in WrappingMaterialController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteWrappingMaterial', [
+                'wrappingMaterials' => [],
+                'header' => 'Manage Wrapping Material Status',
+                'error' => 'Error displaying wrapping material data',
+            ]);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'code' => 'required|unique:wrapping_materials,code|max:50',
                 'name' => 'required|max:255',
-                'description' => 'nullable|max:255'
+                'description' => 'nullable|max:255',
+                'is_active' => 'boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => $validator->errors()->first()], 422);
             }
 
-            $wrappingMaterial = WrappingMaterial::create([
+            $data = [
                 'code' => trim($request->code),
                 'name' => trim($request->name),
                 'description' => $request->description ? trim($request->description) : null,
-                'is_active' => true
-            ]);
+            ];
+
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = 'Act';
+            }
+            $data['status'] = $status;
+
+            if ($request->has('is_active')) {
+                $data['is_active'] = (bool) $request->boolean('is_active');
+            } else {
+                $data['is_active'] = $status === 'Act';
+            }
+
+            $wrappingMaterial = WrappingMaterial::create($data);
 
             return response()->json(['success' => true, 'message' => 'Wrapping material berhasil ditambahkan', 'data' => $wrappingMaterial]);
         } catch (\Exception $e) {
@@ -91,7 +126,9 @@ class WrappingMaterialController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string|max:255'
+                'description' => 'nullable|string|max:255',
+                'is_active' => 'boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -104,9 +141,22 @@ class WrappingMaterialController extends Controller
                 return response()->json(['success' => false, 'message' => 'Wrapping material tidak ditemukan'], 404);
             }
 
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = $wrappingMaterial->status ?? ($wrappingMaterial->is_active ? 'Act' : 'Obs');
+            }
+
+            if ($request->has('is_active')) {
+                $isActive = (bool) $request->boolean('is_active');
+            } else {
+                $isActive = $status === 'Act';
+            }
+
             $wrappingMaterial->update([
                 'name' => trim($request->name),
-                'description' => $request->description ? trim($request->description) : null
+                'description' => $request->description ? trim($request->description) : null,
+                'status' => $status,
+                'is_active' => $isActive,
             ]);
 
             return response()->json(['success' => true, 'message' => 'Wrapping material berhasil diperbarui', 'data' => $wrappingMaterial]);
@@ -122,8 +172,14 @@ class WrappingMaterialController extends Controller
             $wrappingMaterial = WrappingMaterial::find($id);
 
             if ($wrappingMaterial) {
-                $wrappingMaterial->delete();
-                return response()->json(['success' => true, 'message' => 'Wrapping material berhasil dihapus']);
+                $wrappingMaterial->status = 'Obs';
+                $wrappingMaterial->is_active = false;
+                $wrappingMaterial->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Wrapping material berhasil dihapus (marked as obsolete)'
+                ]);
             } else {
                 return response()->json(['success' => false, 'message' => 'Wrapping material tidak ditemukan'], 404);
             }
@@ -137,19 +193,19 @@ class WrappingMaterialController extends Controller
     {
         try {
             $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            
+
             if ($wrappingMaterials->isEmpty()) {
                 $this->seedData();
                 $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
                 'wrappingMaterials' => $wrappingMaterials,
                 'header' => 'Define Wrapping Material'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@vueIndex: ' . $e->getMessage());
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
                 'wrappingMaterials' => [],
                 'header' => 'Define Wrapping Material',
@@ -177,8 +233,8 @@ class WrappingMaterialController extends Controller
     {
         try {
             $wrappingMaterials = [
-                ['code' => '001', 'name' => 'PLASTIK', 'description' => 'Plastic Wrapping Material', 'is_active' => true],
-                ['code' => '002', 'name' => 'KERTAS', 'description' => 'Paper Wrapping Material', 'is_active' => true],
+                ['code' => '001', 'name' => 'PLASTIK', 'description' => 'Plastic Wrapping Material', 'status' => 'Act', 'is_active' => true],
+                ['code' => '002', 'name' => 'KERTAS', 'description' => 'Paper Wrapping Material', 'status' => 'Act', 'is_active' => true],
             ];
 
             foreach ($wrappingMaterials as $material) {
@@ -199,6 +255,46 @@ class WrappingMaterialController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@seed: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to seed wrapping material data'], 500);
+        }
+    }
+
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $wrappingMaterial = WrappingMaterial::where('code', $code)->first();
+
+            if (!$wrappingMaterial) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Wrapping material tidak ditemukan',
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['Act', 'Obs'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid',
+                ], 422);
+            }
+
+            $wrappingMaterial->status = $status;
+            $wrappingMaterial->is_active = $status === 'Act';
+            $wrappingMaterial->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status wrapping material berhasil diperbarui',
+                'data' => $wrappingMaterial,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in WrappingMaterialController@toggleStatus: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating wrapping material status: ' . $e->getMessage(),
+            ], 500);
         }
     }
 }

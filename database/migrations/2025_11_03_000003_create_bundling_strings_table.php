@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name', 255);
+            $table->string('status', 3)->default('Act'); // Act = Active, Obs = Obsolete
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

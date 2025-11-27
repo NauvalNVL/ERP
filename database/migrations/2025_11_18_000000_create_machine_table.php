@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('sub_process', 100)->nullable()->comment('Sub-Process (e.g., 10 - PRINTER, 20 - DIECUTTER, 30 - FINISHER)');
             $table->string('resource_type', 50)->nullable()->comment('Resource Type (I-InHouse, E-External)');
             $table->string('finisher_type', 50)->nullable()->comment('Finisher Type (X-N/Applicable, Standard, Premium)');
+            $table->string('status', 3)->default('Act')->comment('Status: Act (Active), Obs (Obsolete)');
             $table->timestamps();
         });
     }

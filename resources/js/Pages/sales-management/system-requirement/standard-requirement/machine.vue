@@ -283,7 +283,7 @@ const props = defineProps({
     }
 });
 
-const machines = ref(props.machines || []);
+const machines = ref((props.machines || []).filter(item => !item.status || item.status === 'Act'));
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -297,7 +297,8 @@ const editForm = ref({
     process: '',
     sub_process: '',
     resource_type: '',
-    finisher_type: ''
+    finisher_type: '',
+    status: 'Act'
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -319,7 +320,8 @@ const fetchMachines = async () => {
         }
 
         const data = await response.json();
-        machines.value = data.machines || [];
+        const list = data.machines || [];
+        machines.value = list.filter(item => !item.status || item.status === 'Act');
     } catch (error) {
         console.error('Error fetching machines:', error);
         showNotification('Failed to load machines data', 'error');
@@ -341,7 +343,8 @@ const createNewMachine = () => {
         process: '',
         sub_process: '',
         resource_type: '',
-        finisher_type: ''
+        finisher_type: '',
+        status: 'Act'
     };
     isCreating.value = true;
     showEditModal.value = true;
@@ -364,7 +367,8 @@ const closeEditModal = () => {
         process: '',
         sub_process: '',
         resource_type: '',
-        finisher_type: ''
+        finisher_type: '',
+        status: 'Act'
     };
 };
 

@@ -316,7 +316,9 @@ const editForm = ref({
     id: null,
     code: '',
     name: '',
-    description: ''
+    description: '',
+    status: 'Act',
+    is_active: true
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -339,13 +341,14 @@ const fetchglueingMaterials = async () => {
 
         const data = await response.json();
 
+        let list = [];
         if (Array.isArray(data)) {
-            glueingMaterials.value = data;
+            list = data;
         } else if (data.data && Array.isArray(data.data)) {
-            glueingMaterials.value = data.data;
-        } else {
-            glueingMaterials.value = [];
+            list = data.data;
         }
+
+        glueingMaterials.value = (list || []).filter(item => !item.status || item.status === 'Act');
     } catch (error) {
         console.error('Error fetching Glueing Materials:', error);
         glueingMaterials.value = [];
@@ -396,7 +399,9 @@ const createNewglueingMaterial = () => {
         id: null,
         code: '',
         name: '',
-        description: ''
+        description: '',
+        status: 'Act',
+        is_active: true
     };
     showEditModal.value = true;
 };
@@ -407,7 +412,9 @@ const closeEditModal = () => {
         id: null,
         code: '',
         name: '',
-        description: ''
+        description: '',
+        status: 'Act',
+        is_active: true
     };
     isCreating.value = false;
 };

@@ -14,6 +14,7 @@ class BundlingString extends Model
     protected $fillable = [
         'code',
         'name',
+        'status',
         'is_active'
     ];
 

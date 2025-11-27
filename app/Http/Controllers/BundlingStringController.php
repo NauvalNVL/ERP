@@ -18,12 +18,12 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            
+
             if ($bundlingStrings->isEmpty()) {
                 $this->seedData();
                 $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
             }
-            
+
             return response()->json($bundlingStrings);
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@apiIndex: ' . $e->getMessage());
@@ -86,7 +86,9 @@ class BundlingStringController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'code' => 'required|unique:bundling_strings,code|max:50',
-                'name' => 'required|max:255'
+                'name' => 'required|max:255',
+                'is_active' => 'boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -98,11 +100,24 @@ class BundlingStringController extends Controller
                 ], 422);
             }
 
-            $bundlingString = BundlingString::create([
+            $data = [
                 'code' => trim($request->code),
                 'name' => trim($request->name),
-                'is_active' => true
-            ]);
+            ];
+
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = 'Act';
+            }
+            $data['status'] = $status;
+
+            if ($request->has('is_active')) {
+                $data['is_active'] = (bool) $request->boolean('is_active');
+            } else {
+                $data['is_active'] = $status === 'Act';
+            }
+
+            $bundlingString = BundlingString::create($data);
 
             Log::info('Bundling string created successfully:', ['code' => $bundlingString->code]);
 
@@ -133,7 +148,9 @@ class BundlingStringController extends Controller
             Log::info('Request data:', $request->all());
 
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255'
+                'name' => 'required|string|max:255',
+                'is_active' => 'boolean',
+                'status' => 'nullable|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -154,8 +171,21 @@ class BundlingStringController extends Controller
                 ], 404);
             }
 
+            $status = $request->input('status');
+            if ($status === null || $status === '') {
+                $status = $bundlingString->status ?? ($bundlingString->is_active ? 'Act' : 'Obs');
+            }
+
+            if ($request->has('is_active')) {
+                $isActive = (bool) $request->boolean('is_active');
+            } else {
+                $isActive = $status === 'Act';
+            }
+
             $bundlingString->update([
-                'name' => trim($request->name)
+                'name' => trim($request->name),
+                'status' => $status,
+                'is_active' => $isActive,
             ]);
 
             Log::info('Bundling string updated successfully:', ['id' => $id]);
@@ -186,11 +216,13 @@ class BundlingStringController extends Controller
             $bundlingString = BundlingString::find($id);
 
             if ($bundlingString) {
-                $bundlingString->delete();
+                $bundlingString->status = 'Obs';
+                $bundlingString->is_active = false;
+                $bundlingString->save();
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Bundling string berhasil dihapus'
+                    'message' => 'Bundling string berhasil dihapus (marked as obsolete)'
                 ]);
             } else {
                 return response()->json([
@@ -215,24 +247,47 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            
+
             // If no data exists, seed sample data
             if ($bundlingStrings->isEmpty()) {
                 $this->seedData();
                 $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/BundlingString', [
                 'bundlingStrings' => $bundlingStrings,
                 'header' => 'Define Bundling String'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@vueIndex: ' . $e->getMessage());
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/BundlingString', [
                 'bundlingStrings' => [],
                 'header' => 'Define Bundling String',
                 'error' => 'Error displaying bundling string data'
+            ]);
+        }
+    }
+
+    /**
+     * Display the Obsolete/Unobsolete Bundling String status management page (Vue).
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteBundlingString', [
+                'bundlingStrings' => $bundlingStrings,
+                'header' => 'Manage Bundling String Status',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BundlingStringController@vueManageStatus: ' . $e->getMessage());
+
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ObsoleteUnobsoleteBundlingString', [
+                'bundlingStrings' => [],
+                'header' => 'Manage Bundling String Status',
+                'error' => 'Error displaying bundling string data',
             ]);
         }
     }
@@ -262,9 +317,9 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingStrings = [
-                ['code' => '001', 'name' => '5 MM', 'is_active' => true],
-                ['code' => '002', 'name' => '7 MM', 'is_active' => true],
-                ['code' => '003', 'name' => '10 MM', 'is_active' => true],
+                ['code' => '001', 'name' => '5 MM', 'status' => 'Act', 'is_active' => true],
+                ['code' => '002', 'name' => '7 MM', 'status' => 'Act', 'is_active' => true],
+                ['code' => '003', 'name' => '10 MM', 'status' => 'Act', 'is_active' => true],
             ];
 
             foreach ($bundlingStrings as $string) {
@@ -294,6 +349,49 @@ class BundlingStringController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to seed bundling string data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle bundling string status (Act/Obs) via API.
+     */
+    public function toggleStatus(Request $request, $code)
+    {
+        try {
+            $bundlingString = BundlingString::where('code', $code)->first();
+
+            if (!$bundlingString) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bundling string tidak ditemukan',
+                ], 404);
+            }
+
+            $status = $request->input('status');
+
+            if (!in_array($status, ['Act', 'Obs'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid',
+                ], 422);
+            }
+
+            $bundlingString->status = $status;
+            $bundlingString->is_active = $status === 'Act';
+            $bundlingString->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status bundling string berhasil diperbarui',
+                'data' => $bundlingString,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BundlingStringController@toggleStatus: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating bundling string status: ' . $e->getMessage(),
             ], 500);
         }
     }

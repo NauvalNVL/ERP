@@ -15,6 +15,7 @@ class ReinforcementTape extends Model
         'code',
         'name',
         'dry_end_code',
+        'status',
         'is_active'
     ];
 

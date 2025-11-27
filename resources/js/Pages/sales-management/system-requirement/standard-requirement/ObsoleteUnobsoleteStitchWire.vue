@@ -5,9 +5,9 @@
     <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg mb-6">
       <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
         <i class="fas fa-sync-alt mr-3"></i>
-        Manage Analysis Code Status (Obsolete/Unobsolete)
+        Manage Stitch Wire Status (Obsolete/Unobsolete)
       </h2>
-      <p class="text-emerald-100">Toggle the active status of analysis codes.</p>
+      <p class="text-emerald-100">Toggle the active status of stitch wires.</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6">
@@ -31,7 +31,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search analysis codes..."
+              placeholder="Search stitch wires..."
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50"
             />
           </div>
@@ -54,29 +54,21 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group 2</th>
               <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 w-40 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="code in filteredAnalysisCodes" :key="code.analysis_code" class="hover:bg-gray-50">
+            <tr v-for="wire in filteredStitchWires" :key="wire.code" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ code.analysis_code }}
+                {{ wire.code }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                {{ code.analysis_name }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                {{ code.analysis_group || '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                {{ code.analysis_group2 || '-' }}
+                {{ wire.name }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                 <span
-                  v-if="code.status === 'Act'"
+                  v-if="wire.status === 'Act'"
                   class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
                 >
                   <i class="fas fa-check-circle mr-1"></i> Active
@@ -90,23 +82,23 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center w-40">
                 <button
-                  @click="toggleAnalysisCodeStatus(code)"
+                  @click="toggleStitchWireStatus(wire)"
                   :disabled="isToggling"
                   :class="[
-                    code.status === 'Act'
+                    wire.status === 'Act'
                       ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                       : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center',
                   ]"
                   :style="{ minWidth: '120px' }"
                 >
-                  <i :class="[code.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                  {{ code.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
+                  <i :class="[wire.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                  {{ wire.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                 </button>
               </td>
             </tr>
-            <tr v-if="filteredAnalysisCodes.length === 0">
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">No analysis codes found.</td>
+            <tr v-if="filteredStitchWires.length === 0">
+              <td colspan="4" class="px-6 py-4 text-center text-gray-500">No stitch wires found.</td>
             </tr>
           </tbody>
         </table>
@@ -130,43 +122,42 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
-  analysisCodes: {
+  stitchWires: {
     type: Array,
     default: () => [],
   },
   header: {
     type: String,
-    default: 'Manage Analysis Code Status',
+    default: 'Manage Stitch Wire Status',
   },
 });
 
 const header = props.header;
-const analysisCodes = ref(props.analysisCodes || []);
+const stitchWires = ref(props.stitchWires || []);
 const searchQuery = ref('');
 const statusFilter = ref('all');
 const isToggling = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-const filteredAnalysisCodes = computed(() => {
-  let result = [...analysisCodes.value];
+const filteredStitchWires = computed(() => {
+  let result = [...stitchWires.value];
 
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
-    result = result.filter((code) => {
+    result = result.filter((wire) => {
       return (
-        (code.analysis_code && code.analysis_code.toLowerCase().includes(q)) ||
-        (code.analysis_name && code.analysis_name.toLowerCase().includes(q)) ||
-        (code.analysis_group && code.analysis_group.toLowerCase().includes(q)) ||
-        (code.analysis_group2 && code.analysis_group2.toLowerCase().includes(q))
+        (wire.code && wire.code.toLowerCase().includes(q)) ||
+        (wire.name && wire.name.toLowerCase().includes(q))
       );
     });
   }
 
   if (statusFilter.value !== 'all') {
     const wantActive = statusFilter.value === 'active';
-    result = result.filter((code) => (wantActive ? code.status === 'Act' : code.status === 'Obs'));
+    result = result.filter((wire) => (wantActive ? wire.status === 'Act' : wire.status === 'Obs'));
   }
 
   return result;
@@ -179,10 +170,10 @@ const showNotification = (message, type = 'success') => {
   }, 3000);
 };
 
-const toggleAnalysisCodeStatus = async (code) => {
+const toggleStitchWireStatus = async (wire) => {
   if (isToggling.value) return;
 
-  const confirmMessage = `Are you sure you want to change the status for "${code.analysis_code}"?`;
+  const confirmMessage = `Are you sure you want to change the status for "${wire.code}"?`;
   if (!confirm(confirmMessage)) return;
 
   isToggling.value = true;
@@ -193,9 +184,9 @@ const toggleAnalysisCodeStatus = async (code) => {
       throw new Error('CSRF token not found');
     }
 
-    const newStatus = code.status === 'Act' ? 'Obs' : 'Act';
+    const newStatus = wire.status === 'Act' ? 'Obs' : 'Act';
 
-    const response = await fetch(`/api/analysis-codes/${encodeURIComponent(code.analysis_code)}/status`, {
+    const response = await fetch(`/api/stitch-wires/${encodeURIComponent(wire.code)}/status`, {
       method: 'PUT',
       headers: {
         'X-CSRF-TOKEN': csrfToken,
@@ -206,7 +197,7 @@ const toggleAnalysisCodeStatus = async (code) => {
     });
 
     if (!response.ok) {
-      let msg = 'Failed to toggle analysis code status';
+      let msg = 'Failed to toggle stitch wire status';
       try {
         const data = await response.json();
         if (data && data.message) msg = data.message;
@@ -214,11 +205,11 @@ const toggleAnalysisCodeStatus = async (code) => {
       throw new Error(msg);
     }
 
-    code.status = newStatus;
+    wire.status = newStatus;
     const statusText = newStatus === 'Act' ? 'activated' : 'marked obsolete';
-    showNotification(`Analysis code "${code.analysis_code}" successfully ${statusText}`, 'success');
+    showNotification(`Stitch wire "${wire.code}" successfully ${statusText}`, 'success');
   } catch (err) {
-    console.error('Error toggling analysis code status:', err);
+    console.error('Error toggling stitch wire status:', err);
     showNotification('Error updating status: ' + err.message, 'error');
   } finally {
     isToggling.value = false;

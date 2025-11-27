@@ -18,24 +18,28 @@ class ReinforcementTapeSeeder extends Seeder
                 'code' => '001',
                 'name' => 'LAKBAN SERAT',
                 'dry_end_code' => '1',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '002',
                 'name' => 'REINFORCEMENT TAPE TYPE A',
                 'dry_end_code' => '2',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '003',
                 'name' => 'REINFORCEMENT TAPE TYPE B',
                 'dry_end_code' => '3',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '004',
                 'name' => 'REINFORCEMENT TAPE TYPE C',
                 'dry_end_code' => '4',
+                'status' => 'Act',
                 'is_active' => true,
             ],
         ];

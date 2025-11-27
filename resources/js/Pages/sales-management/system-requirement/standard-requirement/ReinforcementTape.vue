@@ -338,13 +338,14 @@ const fetchReinforcementTapes = async () => {
 
         const data = await response.json();
 
+        let list = [];
         if (Array.isArray(data)) {
-            reinforcementTapes.value = data;
+            list = data;
         } else if (data.data && Array.isArray(data.data)) {
-            reinforcementTapes.value = data.data;
-        } else {
-            reinforcementTapes.value = [];
+            list = data.data;
         }
+
+        reinforcementTapes.value = (list || []).filter(tape => !tape.status || tape.status === 'Act');
     } catch (error) {
         console.error('Error fetching reinforcement tapes:', error);
         reinforcementTapes.value = [];

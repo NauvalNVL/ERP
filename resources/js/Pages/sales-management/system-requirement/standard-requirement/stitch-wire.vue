@@ -314,15 +314,17 @@ const fetchStitchWires = async () => {
 
         const data = await response.json();
 
-        // Handle different response formats
+        // Handle different response formats and filter to only active (non-obsolete) records
+        let list = [];
         if (Array.isArray(data)) {
-            stitchWires.value = data;
+            list = data;
         } else if (data.data && Array.isArray(data.data)) {
-            stitchWires.value = data.data;
+            list = data.data;
         } else {
-            stitchWires.value = [];
             console.error('Unexpected data format:', data);
         }
+
+        stitchWires.value = (list || []).filter(sw => !sw.status || sw.status === 'Act');
     } catch (error) {
         console.error('Error fetching stitch wires:', error);
         showNotification('Failed to load stitch wires data', 'error');

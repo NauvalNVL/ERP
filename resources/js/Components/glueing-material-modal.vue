@@ -27,6 +27,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="toggleSort('code')">Code</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="toggleSort('name')">Name</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -36,9 +37,21 @@
                                 @dblclick="selectAndClose(item)">
                                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
                                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-center">
+                                    <span
+                                        :class="[
+                                            item.status === 'Obs'
+                                                ? 'bg-red-100 text-red-800'
+                                                : 'bg-emerald-100 text-emerald-800',
+                                            'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
+                                        ]"
+                                    >
+                                        {{ item.status === 'Obs' ? 'Obsolete' : 'Active' }}
+                                    </span>
+                                </td>
                             </tr>
                             <tr v-if="filteredItems.length === 0">
-                                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No data available.</td>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No data available.</td>
                             </tr>
                         </tbody>
                     </table>

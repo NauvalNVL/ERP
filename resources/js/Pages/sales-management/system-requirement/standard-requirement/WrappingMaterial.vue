@@ -324,7 +324,9 @@ const editForm = ref({
     id: null,
     code: '',
     name: '',
-    description: ''
+    description: '',
+    status: 'Act',
+    is_active: true
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -347,13 +349,14 @@ const fetchwrappingMaterials = async () => {
 
         const data = await response.json();
 
+        let list = [];
         if (Array.isArray(data)) {
-            wrappingMaterials.value = data;
+            list = data;
         } else if (data.data && Array.isArray(data.data)) {
-            wrappingMaterials.value = data.data;
-        } else {
-            wrappingMaterials.value = [];
+            list = data.data;
         }
+
+        wrappingMaterials.value = (list || []).filter(item => !item.status || item.status === 'Act');
     } catch (error) {
         console.error('Error fetching Wrapping Materials:', error);
         wrappingMaterials.value = [];

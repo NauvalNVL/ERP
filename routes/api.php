@@ -340,6 +340,7 @@ Route::post('/finishings/seed', [FinishingController::class, 'seed']);
 Route::get('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::class, 'apiIndex']);
 Route::post('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::class, 'store']);
 Route::put('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'update']);
+Route::put('/chemical-coats/{code}/status', [App\Http\Controllers\ChemicalCoatController::class, 'toggleStatus']);
 Route::delete('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'destroy']);
 Route::post('/chemical-coats/seed', [App\Http\Controllers\ChemicalCoatController::class, 'seed']);
 
@@ -347,6 +348,7 @@ Route::post('/chemical-coats/seed', [App\Http\Controllers\ChemicalCoatController
 Route::get('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'apiIndex']);
 Route::post('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'store']);
 Route::put('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'update']);
+Route::put('/stitch-wires/{code}/status', [App\Http\Controllers\StitchWireController::class, 'toggleStatus']);
 Route::delete('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'destroy']);
 Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::class, 'seed']);
 
@@ -354,6 +356,7 @@ Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::cl
 Route::get('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeController::class, 'apiIndex']);
 Route::post('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeController::class, 'store']);
 Route::put('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'update']);
+Route::put('/reinforcement-tapes/{code}/status', [App\Http\Controllers\ReinforcementTapeController::class, 'toggleStatus']);
 Route::delete('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'destroy']);
 Route::post('/reinforcement-tapes/seed', [App\Http\Controllers\ReinforcementTapeController::class, 'seed']);
 
@@ -361,6 +364,7 @@ Route::post('/reinforcement-tapes/seed', [App\Http\Controllers\ReinforcementTape
 Route::get('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'apiIndex']);
 Route::post('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'store']);
 Route::put('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'update']);
+Route::put('/bundling-strings/{code}/status', [App\Http\Controllers\BundlingStringController::class, 'toggleStatus']);
 Route::delete('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'destroy']);
 
 // Machine API routes
@@ -371,6 +375,7 @@ Route::post('/bundling-strings/seed', [App\Http\Controllers\BundlingStringContro
 Route::get('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'apiIndex']);
 Route::post('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'store']);
 Route::put('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'update']);
+Route::put('/wrapping-materials/{code}/status', [App\Http\Controllers\WrappingMaterialController::class, 'toggleStatus']);
 Route::delete('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'destroy']);
 Route::post('/wrapping-materials/seed', [App\Http\Controllers\WrappingMaterialController::class, 'seed']);
 
@@ -378,6 +383,7 @@ Route::post('/wrapping-materials/seed', [App\Http\Controllers\WrappingMaterialCo
 Route::get('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'apiIndex']);
 Route::post('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'store']);
 Route::put('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'update']);
+Route::put('/glueing-materials/{code}/status', [App\Http\Controllers\GlueingMaterialController::class, 'toggleStatus']);
 Route::delete('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'destroy']);
 Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialController::class, 'seed']);
 
@@ -385,6 +391,7 @@ Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialCont
 Route::get('/machines', [MachineController::class, 'index']);
 Route::post('/machines', [MachineController::class, 'store']);
 Route::put('/machines/{id}', [MachineController::class, 'update']);
+Route::put('/machines/{code}/status', [MachineController::class, 'toggleStatus']);
 Route::delete('/machines/{id}', [MachineController::class, 'destroy']);
 Route::post('/machines/seed', [MachineController::class, 'seed']);
 

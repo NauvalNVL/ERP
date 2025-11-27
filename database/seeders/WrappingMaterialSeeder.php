@@ -18,24 +18,28 @@ class WrappingMaterialSeeder extends Seeder
                 'code' => '001',
                 'name' => 'PLASTIK',
                 'description' => 'Plastic Wrapping Material',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '002',
                 'name' => 'KERTAS',
                 'description' => 'Paper Wrapping Material',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '003',
                 'name' => 'KARTON',
                 'description' => 'Carton Wrapping Material',
+                'status' => 'Act',
                 'is_active' => true,
             ],
             [
                 'code' => '004',
                 'name' => 'BUBBLE WRAP',
                 'description' => 'Bubble Wrap Material',
+                'status' => 'Act',
                 'is_active' => true,
             ],
         ];

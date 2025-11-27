@@ -218,6 +218,7 @@ const hasPermission = (menuKey) => {
   if (
     menuKey === 'define_machine' ||
     menuKey === 'view_print_machine' ||
+    menuKey === 'obsolete_unobsolete_machine' ||
     menuKey === 'obsolete_unobsolete_paper_quality' ||
     menuKey === 'reactive_unobsolete_user' ||
     menuKey === 'obsolete_unobsolete_sales_team' ||
@@ -236,7 +237,13 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_finishing' ||
     menuKey === 'obsolete_unobsolete_vehicle' ||
     menuKey === 'obsolete_unobsolete_vehicle_class' ||
-    menuKey === 'obsolete_unobsolete_analysis_code'
+    menuKey === 'obsolete_unobsolete_analysis_code' ||
+    menuKey === 'obsolete_unobsolete_stitch_wire' ||
+    menuKey === 'obsolete_unobsolete_chemical_coat' ||
+    menuKey === 'obsolete_unobsolete_reinforcement_tape' ||
+    menuKey === 'obsolete_unobsolete_bundling_string' ||
+    menuKey === 'obsolete_unobsolete_wrapping_material' ||
+    menuKey === 'obsolete_unobsolete_glueing_material'
   ) {
     return true;
   }
@@ -375,12 +382,19 @@ const getPermissionKeyFromTitle = (title) => {
     'Obsolete/Unobsolete Finishing': 'obsolete_unobsolete_finishing',
     'Define Analysis Code': 'define_analysis_code',
     'Define Stitch Wire': 'define_stitch_wire',
+    'Obsolete/Unobsolete Stitch Wire': 'obsolete_unobsolete_stitch_wire',
     'Define Chemical Coat': 'define_chemical_coat',
+    'Obsolete/Unobsolete Chemical Coat': 'obsolete_unobsolete_chemical_coat',
+    'Obsolete/Unobsolete Reinforcement Tape': 'obsolete_unobsolete_reinforcement_tape',
     'Define Reinforcement Tape': 'define_reinforcement_tape',
+    'Obsolete/Unobsolete Bundling String': 'obsolete_unobsolete_bundling_string',
     'Define Bundling String': 'define_bundling_string',
     'Define Wrapping Material': 'define_wrapping_material',
+    'Obsolete/Unobsolete Wrapping Material': 'obsolete_unobsolete_wrapping_material',
     'Define Glueing Material': 'define_glueing_material',
+    'Obsolete/Unobsolete Glueing Material': 'obsolete_unobsolete_glueing_material',
     'Define Machine': 'define_machine',
+    'Obsolete/Unobsolete Machine': 'obsolete_unobsolete_machine',
     'View & Print Sales Team': 'view_print_sales_team',
     'View & Print Salesperson': 'view_print_salesperson',
     'View & Print Salesperson Team': 'view_print_salesperson_team',
@@ -610,12 +624,19 @@ const salesManagementItems = [
           { title: 'Define Analysis Code', icon: 'fas fa-code-branch', route: '/analysis-code' },
           { title: 'Obsolete/Unobsolete Analysis Code', icon: 'fas fa-ban', route: '/analysis-code/status' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
+          { title: 'Obsolete/Unobsolete Stitch Wire', icon: 'fas fa-ban', route: '/stitch-wire/status' },
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
+          { title: 'Obsolete/Unobsolete Chemical Coat', icon: 'fas fa-ban', route: '/chemical-coat/status' },
           { title: 'Define Reinforcement Tape', icon: 'fas fa-tape', route: '/reinforcement-tape' },
+          { title: 'Obsolete/Unobsolete Reinforcement Tape', icon: 'fas fa-ban', route: '/reinforcement-tape/status' },
           { title: 'Define Bundling String', icon: 'fas fa-link', route: '/bundling-string' },
+          { title: 'Obsolete/Unobsolete Bundling String', icon: 'fas fa-ban', route: '/bundling-string/status' },
           { title: 'Define Wrapping Material', icon: 'fas fa-box-open', route: '/wrapping-material' },
+          { title: 'Obsolete/Unobsolete Wrapping Material', icon: 'fas fa-ban', route: '/wrapping-material/status' },
           { title: 'Define Glueing Material', icon: 'fas fa-vial', route: '/glueing-material' },
+          { title: 'Obsolete/Unobsolete Glueing Material', icon: 'fas fa-ban', route: '/glueing-material/status' },
           { title: 'Define Machine', icon: 'fas fa-cogs', route: '/machine' },
+          { title: 'Obsolete/Unobsolete Machine', icon: 'fas fa-ban', route: '/machine/status' },
           // View & Print Section
           { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },
           { title: 'View & Print Salesperson', icon: 'fas fa-print', route: '/sales-person/view-print' },

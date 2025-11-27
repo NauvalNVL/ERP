@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code', 50)->unique();
             $table->string('name', 255);
             $table->string('dry_end_code', 1)->nullable();
+            $table->string('status', 3)->default('Act');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
