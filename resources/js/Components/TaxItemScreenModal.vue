@@ -361,18 +361,27 @@ const closeModal = () => {
     emit('close');
 };
 
-watch(() => props.show, (newVal) => {
-    if (newVal && props.taxGroupCode) {
-        loadTaxTypes();
-        selectedRow.value = null;
-    }
-});
+// Reload tax items whenever the modal is opened, including after it was closed
+watch(
+    () => props.show,
+    (newVal) => {
+        if (newVal && props.taxGroupCode) {
+            loadTaxTypes();
+            selectedRow.value = null;
+        }
+    },
+    { immediate: true }
+);
 
-watch(() => props.taxGroupCode, (newVal) => {
-    if (props.show && newVal) {
-        loadTaxTypes();
+// Also reload when tax group changes while modal is visible
+watch(
+    () => props.taxGroupCode,
+    (newVal, oldVal) => {
+        if (props.show && newVal && newVal !== oldVal) {
+            loadTaxTypes();
+        }
     }
-});
+);
 </script>
 
 <style scoped>
