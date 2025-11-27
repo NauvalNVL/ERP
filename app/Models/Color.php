@@ -20,11 +20,7 @@ class Color extends Model
         'Color_Name',
         'GroupCode',
         'Group',
-        'is_active'
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean'
+        'status'
     ];
 
     /**

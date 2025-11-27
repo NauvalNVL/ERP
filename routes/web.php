@@ -420,24 +420,28 @@ Route::get('/define-paper-flute', [PaperFluteController::class, 'vueIndex'])->na
 
 Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
 Route::get('/paper-size/status', [PaperSizeController::class, 'vueManageStatus'])->name('vue.paper-size.status');
+Route::get('/paper-size/obsolete-unobsolete', [PaperSizeController::class, 'vueManageStatus'])->name('vue.paper-size.obsolete-unobsolete');
 Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
 // Alias for search menu
 Route::get('/define-paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.define-paper-size');
 
 Route::get('/color-group', [ColorGroupController::class, 'index'])->name('vue.color-group.index');
 Route::get('/color-group/status', [ColorGroupController::class, 'vueManageStatus'])->name('vue.color-group.status');
+Route::get('/color-group/obsolete-unobsolete', [ColorGroupController::class, 'vueManageStatus'])->name('vue.color-group.obsolete-unobsolete');
 Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
 // Alias for search menu
 Route::get('/define-color-group', [ColorGroupController::class, 'index'])->name('vue.define-color-group');
 
 Route::get('/color', [ColorController::class, 'vueIndex'])->name('color.index');
 Route::get('/color/status', [ColorController::class, 'vueManageStatus'])->name('color.status');
+Route::get('/color/obsolete-unobsolete', [ColorController::class, 'vueManageStatus'])->name('color.obsolete-unobsolete');
 Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('color.view-print');
 // Alias for search menu
 Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.define-color');
 
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
          Route::get('/finishing/status', [FinishingController::class, 'vueManageStatus'])->name('vue.finishing.status');
+         Route::get('/finishing/obsolete-unobsolete', [FinishingController::class, 'vueManageStatus'])->name('vue.finishing.obsolete-unobsolete');
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
          // Alias for search menu
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');

@@ -2,6 +2,7 @@
     <AppLayout :header="'Manage Color Status'">
     <Head title="Manage Color Status" />
 
+    <!-- Header Section -->
     <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg mb-6">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-sync-alt mr-3"></i> Manage Color Status (Obsolete/Unobsolete)
@@ -10,6 +11,7 @@
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6">
+        <!-- Success/Error Messages -->
         <div v-if="notification.show" 
              :class="{
                 'bg-green-100 border border-green-400 text-green-700': notification.type === 'success',
@@ -19,6 +21,7 @@
             <span class="block sm:inline">{{ notification.message }}</span>
         </div>
 
+        <!-- Search and Filter Controls -->
         <div class="mb-6 flex flex-wrap items-center gap-4">
             <div class="flex-1 min-w-[300px]">
                 <div class="relative">
@@ -38,17 +41,19 @@
             </div>
         </div>
 
+        <!-- Loading Indicator -->
         <div v-if="loading" class="my-8 flex justify-center">
             <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
+        <!-- Colors Table -->
         <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
             <table class="min-w-full divide-y divide-gray-200 bg-white">
                 <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color Code</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Name</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
@@ -59,7 +64,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ color.color_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ color.group_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="color.is_active" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="color.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
                             <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -69,14 +74,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <button @click="toggleColorStatus(color)" :disabled="isToggling"
                                 :class="[
-                                    color.is_active
+                                    color.status === 'Act'
                                         ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
                                         : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
                                     'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
                                 ]"
                                 :style="{ minWidth: '120px' }">
-                                <i :class="[color.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ color.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+                                <i :class="[color.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                {{ color.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
                             </button>
                         </td>
                     </tr>
@@ -88,6 +93,7 @@
         </div>
     </div>
 
+    <!-- Loading Overlay -->
     <div v-if="isToggling" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="bg-white p-4 rounded-lg shadow-lg text-center">
             <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
@@ -102,48 +108,69 @@ import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
+// Props from controller
 const props = defineProps({
-    colors: { type: Array, default: () => [] },
-    pagination: { type: Object, default: () => ({ currentPage: 1, perPage: 15, total: 0 }) },
-    header: { type: String, default: 'Manage Color Status' }
+    colors: {
+        type: Array,
+        default: () => []
+    },
+    pagination: {
+        type: Object,
+        default: () => ({
+            currentPage: 1,
+            perPage: 0,
+            total: 0
+        })
+    },
+    header: {
+        type: String,
+        default: 'Manage Color Status'
+    }
 });
 
+// Data
 const colors = ref(props.colors || []);
 const loading = ref(false);
 const isToggling = ref(false);
 const searchQuery = ref('');
 const statusFilter = ref('all');
-const notification = ref({ show: false, message: '', type: 'success' });
+const notification = ref({
+    show: false,
+    message: '',
+    type: 'success'
+});
 
+// Fetch colors
 const fetchColors = async () => {
     loading.value = true;
-    console.log('Fetching colors from API...');
+    
     try {
         const response = await fetch('/api/colors', {
-            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
-        console.log('Response status:', response.status);
+        
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API error:', errorText);
             throw new Error('Failed to fetch colors');
         }
+        
         const data = await response.json();
-        console.log('Received data:', data);
-        colors.value = Array.isArray(data) ? data : [];
-        console.log('Colors loaded:', colors.value.length);
+        colors.value = data;
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Error fetching colors:', error);
         showNotification('Error loading colors: ' + error.message, 'error');
-        colors.value = [];
     } finally {
         loading.value = false;
-        console.log('Loading complete, loading state:', loading.value);
     }
 };
 
+// Filter colors based on search query and status filter
 const filteredColors = computed(() => {
     let filtered = [...colors.value];
+    
+    // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(color => 
@@ -152,49 +179,92 @@ const filteredColors = computed(() => {
             (color.group_name && color.group_name.toLowerCase().includes(query))
         );
     }
+    
+    // Apply status filter
     if (statusFilter.value !== 'all') {
-        const isActive = statusFilter.value === 'active';
-        filtered = filtered.filter(color => color.is_active === isActive);
+        const isAct = statusFilter.value === 'active';
+        filtered = filtered.filter(color => 
+            isAct ? color.status === 'Act' : color.status === 'Obs'
+        );
     }
+    
     return filtered;
 });
 
+// Toggle color status
 const toggleColorStatus = async (color) => {
     if (isToggling.value) return;
-    if (!confirm(`Are you sure you want to change the status for "${color.color_name}"?`)) return;
+    
+    const confirmMessage = `Are you sure you want to change the status for "${color.color_name}"?`;
+    if (!confirm(confirmMessage)) return;
     
     isToggling.value = true;
+    
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        if (!csrfToken) throw new Error('CSRF token not found');
         
-        const response = await fetch(`/api/colors/${color.color_code}`, {
+        if (!csrfToken) {
+            throw new Error('CSRF token not found');
+        }
+        
+        const response = await fetch(`/api/colors/${color.color_code}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ is_active: !color.is_active })
+            }
         });
         
-        if (!response.ok) throw new Error('Failed to toggle color status');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Failed to toggle color status');
+        }
         
-        color.is_active = !color.is_active;
-        const statusText = color.is_active ? 'activated' : 'deactivated';
+        const result = await response.json();
+        
+        // Update the local state
+        if (result.data) {
+            const index = colors.value.findIndex(c => c.color_code === color.color_code);
+            if (index !== -1) {
+                colors.value[index] = result.data;
+                // Update the color reference to show correct status in notification
+                color.status = result.data.status;
+            }
+        } else {
+            // Fallback if no data returned
+            color.status = (color.status === 'Act') ? 'Obs' : 'Act';
+        }
+        
+        // Show success message using the updated status
+        const statusText = (color.status === 'Act') ? 'activated' : 'deactivated';
         showNotification(`Color "${color.color_name}" successfully ${statusText}`, 'success');
     } catch (error) {
+        console.error('Error toggling color status:', error);
         showNotification('Error updating status: ' + error.message, 'error');
     } finally {
         isToggling.value = false;
     }
 };
 
+// Show notification
 const showNotification = (message, type = 'success') => {
-    notification.value = { show: true, message, type };
-    setTimeout(() => { notification.value.show = false; }, 3000);
+    notification.value = {
+        show: true,
+        message,
+        type
+    };
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+        notification.value.show = false;
+    }, 3000);
 };
 
-// Data is loaded from props, no need to fetch on mount
-// onMounted(() => { fetchColors(); });
+// Load data on component mount
+onMounted(() => {
+    if (colors.value.length === 0) {
+        fetchColors();
+    }
+});
 </script>

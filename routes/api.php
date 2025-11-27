@@ -34,6 +34,7 @@ use App\Http\Controllers\DeliveryOrderController;
 use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\PaperQualityController;
+use App\Http\Controllers\PaperSizeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -123,7 +124,35 @@ Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'apiUpdate']
 Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'apiDestroy'])->where('id', '[0-9]+');
 Route::put('/paper-qualities/{id}/status', [PaperQualityController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
+// Paper Size API routes
+Route::get('/paper-sizes', [PaperSizeController::class, 'apiIndex']);
+Route::post('/paper-sizes', [PaperSizeController::class, 'apiStore']);
+Route::put('/paper-sizes/{id}', [PaperSizeController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/paper-sizes/{id}', [PaperSizeController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::put('/paper-sizes/{id}/status', [PaperSizeController::class, 'toggleStatus'])->where('id', '[0-9]+');
+
+// Color Group API routes
+Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
+Route::post('/color-groups', [ColorGroupController::class, 'store']);
+Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
+Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
+Route::put('/color-groups/{code}/status', [ColorGroupController::class, 'toggleStatus']);
+
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+
+// Color API routes
+Route::get('/colors', [ColorController::class, 'apiIndex']);
+Route::post('/colors', [ColorController::class, 'store']);
+Route::put('/colors/{color_id}', [ColorController::class, 'update']);
+Route::delete('/colors/{color_id}', [ColorController::class, 'destroy']);
+Route::put('/colors/{color_code}/status', [ColorController::class, 'toggleStatus']);
+
+// Finishing API routes
+Route::get('/finishings', [FinishingController::class, 'apiIndex']);
+Route::post('/finishings', [FinishingController::class, 'store']);
+Route::put('/finishings/{code}', [FinishingController::class, 'update']);
+Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
+Route::put('/finishings/{code}/status', [FinishingController::class, 'toggleStatus']);
 
 // Scoring Tool API routes
 Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);

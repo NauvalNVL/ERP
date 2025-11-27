@@ -218,6 +218,7 @@ class ColorSeeder extends Seeder
                     'Color_Name' => $color['color_name'],
                     'GroupCode'  => $color['color_group_id'],
                     'Group'      => $color['cg_type'] ?? null,
+                    'status'     => 'Act'
                 ]);
             }
             $this->command->info('Data warna berhasil dimasukkan ke tabel COLOR.');

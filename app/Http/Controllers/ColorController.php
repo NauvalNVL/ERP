@@ -139,7 +139,8 @@ class ColorController extends Controller
                 'Color_Code' => trim($request->color_id),
                 'Color_Name' => trim($request->color_name),
                 'GroupCode' => trim($request->color_group_id),
-                'Group' => trim($request->cg_type)
+                'Group' => trim($request->cg_type),
+                'status' => 'Act'
             ]);
             
             Log::info('Color created successfully:', ['Color_Code' => $color->Color_Code]);
@@ -239,7 +240,8 @@ class ColorController extends Controller
             if ($request->has('color_name')) $updateData['Color_Name'] = trim($request->color_name);
             if ($request->has('color_group_id')) $updateData['GroupCode'] = trim($request->color_group_id);
             if ($request->has('cg_type')) $updateData['Group'] = trim($request->cg_type);
-            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            // Status update should be done via toggleStatus
+            // if ($request->has('status')) $updateData['status'] = $request->status;
             
             $color->update($updateData);
 
@@ -252,7 +254,7 @@ class ColorController extends Controller
                 'color_group_id' => $color->GroupCode,
                 'cg_type' => $color->Group,
                 'origin' => 'ID',
-                'is_active' => $color->is_active
+                'status' => $color->status
             ];
             
             return response()->json([
@@ -401,8 +403,8 @@ class ColorController extends Controller
                     'color_name' => $color->Color_Name,
                     'color_group_id' => $color->GroupCode,
                     'cg_type' => $color->Group,
-                    'origin' => 'ID', // Default value
-                    'is_active' => $color->is_active
+                    'origin' => 'ID',
+                    'status' => $color->status
                 ];
             });
             
@@ -459,7 +461,7 @@ class ColorController extends Controller
                     'group_name' => $color->colorGroup ? $color->colorGroup->Color_Name : '',
                     'cg_type' => $color->Group,
                     'origin' => 'ID',
-                    'is_active' => $color->is_active ?? true
+                    'status' => $color->status
                 ];
             });
 
@@ -529,26 +531,25 @@ class ColorController extends Controller
             $colors = Color::whereNotNull('GroupCode')
                 ->whereRaw('GroupCode != Color_Code')
                 ->orderBy('Color_Code', 'asc')
-                ->paginate(15);
+                ->get();
 
             // Transform data
-            $colorsTransformed = $colors->getCollection()->map(function($color) {
+            $colorsTransformed = $colors->map(function($color) {
                 return [
                     'color_code' => $color->Color_Code,
                     'color_name' => $color->Color_Name,
-                    'group_name' => $color->colorGroup ? $color->colorGroup->Color_Name : '',
-                    'is_active' => $color->is_active ?? true
+                    'group_code' => $color->GroupCode,
+                    'group_name' => $color->Group, // Use the Group column which contains the group type/name
+                    'status' => $color->status
                 ];
             });
-            
-            $colors->setCollection($colorsTransformed);
 
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-color', [
-                'colors' => $colors->items(),
+                'colors' => $colorsTransformed,
                 'pagination' => [
-                    'currentPage' => $colors->currentPage(),
-                    'perPage' => $colors->perPage(),
-                    'total' => $colors->total()
+                    'currentPage' => 1,
+                    'perPage' => $colorsTransformed->count(),
+                    'total' => $colorsTransformed->count()
                 ],
                 'header' => 'Manage Color Status'
             ]);
@@ -559,12 +560,47 @@ class ColorController extends Controller
                 'colors' => [],
                 'pagination' => [
                     'currentPage' => 1,
-                    'perPage' => 15,
+                    'perPage' => 0,
                     'total' => 0
                 ],
                 'header' => 'Manage Color Status',
                 'error' => 'Error displaying colors: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    public function toggleStatus($color_code)
+    {
+        try {
+            $color = Color::where('Color_Code', $color_code)->first();
+            
+            if (!$color) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color not found'
+                ], 404);
+            }
+
+            $color->status = ($color->status === 'Act') ? 'Obs' : 'Act';
+            $color->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Color status updated successfully',
+                'data' => [
+                    'color_code' => $color->Color_Code,
+                    'color_name' => $color->Color_Name,
+                    'group_code' => $color->GroupCode,
+                    'group_name' => $color->Group,
+                    'status' => $color->status
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@toggleStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling color status: ' . $e->getMessage()
+            ], 500);
         }
     }
 

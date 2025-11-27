@@ -22,7 +22,7 @@ class FinishingSeeder extends Seeder
         foreach ($finishings as $finishing) {
             Finishing::updateOrCreate(
                 ['code' => $finishing['code']],
-                $finishing
+                array_merge($finishing, ['status' => 'Act'])
             );
         }
     }

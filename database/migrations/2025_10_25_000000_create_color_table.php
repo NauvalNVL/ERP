@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('Color_Name', 150)->nullable()->collation($collation);
             $table->string('GroupCode', 15)->nullable()->collation($collation);
             $table->string('Group', 50)->nullable()->collation($collation);
+            $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             
             // No timestamps - matching CPS database structure
         });
