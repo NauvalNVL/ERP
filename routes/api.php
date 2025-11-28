@@ -26,7 +26,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductGroupController;
 use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\WarehouseLocationController;
-use App\Http\Controllers\CustomerSalesTypeController;
+// use App\Http\Controllers\CustomerSalesTypeController; // Customer Sales Type module disabled
 use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
@@ -620,10 +620,7 @@ Route::put('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClas
 Route::put('/vehicle-classes/{vehicleClass}/status', [\App\Http\Controllers\VehicleClassController::class, 'apiUpdateStatus']);
 Route::delete('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiDestroy']);
 
-Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'apiIndex']);
-Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'apiStore']);
-Route::put('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiUpdate']);
-Route::delete('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiDestroy']);
+// Customer Sales Type API routes removed (module disabled)
 
 
 // Industry, Geo, and Salesperson API routes
