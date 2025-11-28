@@ -53,7 +53,6 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
@@ -62,7 +61,6 @@
                     <tr v-for="industry in filteredIndustries" :key="industry.code" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ industry.code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ industry.name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ industry.description || '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                             <span v-if="industry.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
@@ -71,18 +69,20 @@
                                 <i class="fas fa-times-circle mr-1"></i> Obsolete
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                            <button @click="toggleIndustryStatus(industry)" :disabled="isToggling"
-                                :class="[
-                                    industry.status === 'Act'
-                                        ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
-                                        : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
-                                    'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
-                                ]"
-                                :style="{ minWidth: '120px' }">
-                                <i :class="[industry.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ industry.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
-                            </button>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center justify-center">
+                                <button @click="toggleIndustryStatus(industry)" :disabled="isToggling"
+                                    :class="[
+                                        industry.status === 'Act'
+                                            ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
+                                            : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
+                                        'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold inline-flex items-center justify-center'
+                                    ]"
+                                    :style="{ minWidth: '120px' }">
+                                    <i :class="[industry.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                    {{ industry.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr v-if="filteredIndustries.length === 0">

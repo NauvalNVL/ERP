@@ -53,7 +53,7 @@ class FinishingController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|unique:finishings,code',
                 'description' => 'required|string|max:255',
-                'is_compute' => 'boolean',
+
             ]);
 
             if ($validator->fails()) {
@@ -66,7 +66,7 @@ class FinishingController extends Controller
             $finishing = Finishing::create([
                 'code' => $request->code,
                 'description' => $request->description,
-                'is_compute' => $request->is_compute ?? false,
+
                 'status' => 'Act'
             ]);
 
@@ -97,7 +97,7 @@ class FinishingController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'sometimes|required|string|max:10|unique:finishings,code,' . $finishing->id,
                 'description' => 'sometimes|required|string|max:255',
-                'is_compute' => 'nullable|boolean',
+
                 'is_active' => 'nullable|boolean',
             ]);
 
@@ -112,7 +112,7 @@ class FinishingController extends Controller
             $updateData = [];
             if ($request->has('code')) $updateData['code'] = $request->code;
             if ($request->has('description')) $updateData['description'] = $request->description;
-            if ($request->has('is_compute')) $updateData['is_compute'] = $request->is_compute;
+
             // Status update should be done via toggleStatus
             // if ($request->has('status')) $updateData['status'] = $request->status;
             
@@ -151,7 +151,7 @@ class FinishingController extends Controller
                     'id' => $finishing->id,
                     'code' => $finishing->code,
                     'description' => $finishing->description,
-                    'is_compute' => $finishing->is_compute,
+
                     'status' => $finishing->status
                 ];
             });
@@ -191,7 +191,7 @@ class FinishingController extends Controller
                     'id' => $finishing->id,
                     'code' => $finishing->code,
                     'description' => $finishing->description,
-                    'is_compute' => $finishing->is_compute,
+
                     'status' => $finishing->status
                 ]
             ]);
@@ -309,11 +309,11 @@ class FinishingController extends Controller
         try {
             // Default finishings
             $defaultFinishings = [
-                ['code' => 'G', 'description' => 'Glue Application', 'is_compute' => false],
-                ['code' => 'S', 'description' => 'Stitching', 'is_compute' => false],
-                ['code' => 'A', 'description' => 'Assembly', 'is_compute' => false],
-                ['code' => 'H', 'description' => 'Heat Treatment', 'is_compute' => false],
-                ['code' => 'W', 'description' => 'Wrapping', 'is_compute' => false]
+                ['code' => 'G', 'description' => 'Glue Application'],
+                ['code' => 'S', 'description' => 'Stitching'],
+                ['code' => 'A', 'description' => 'Assembly'],
+                ['code' => 'H', 'description' => 'Heat Treatment'],
+                ['code' => 'W', 'description' => 'Wrapping']
             ];
 
             foreach ($defaultFinishings as $finishing) {
@@ -322,7 +322,7 @@ class FinishingController extends Controller
                     Finishing::create([
                         'code' => $finishing['code'],
                         'description' => $finishing['description'],
-                        'is_compute' => $finishing['is_compute']
+
                     ]);
                 }
             }

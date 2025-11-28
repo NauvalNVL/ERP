@@ -414,6 +414,7 @@ Route::get('/define-paper-quality', [PaperQualityController::class, 'vueIndex'])
 
 Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
 Route::get('/paper-flute/status', [PaperFluteController::class, 'vueManageStatus'])->name('vue.paper-flute.status');
+Route::get('/paper-flute/obsolete-unobsolete', [PaperFluteController::class, 'vueManageStatus'])->name('vue.paper-flute.obsolete-unobsolete');
 Route::get('/paper-flute/view-print', [PaperFluteController::class, 'vueViewAndPrint'])->name('vue.paper-flute.view-print');
 // Alias for search menu
 Route::get('/define-paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.define-paper-flute');
@@ -921,13 +922,14 @@ Route::post('/paper-qualities', [PaperQualityController::class, 'apiStore']);
 Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'apiUpdate']);
 Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'apiDestroy']);
 
-// Paper Flute API routes
-Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
-Route::post('/paper-flutes', [PaperFluteController::class, 'store']);
-Route::put('/paper-flutes/{code}', [PaperFluteController::class, 'update']);
-Route::delete('/paper-flutes/{code}', [PaperFluteController::class, 'destroy']);
-Route::get('/paper-flutes/seeder-data', [PaperFluteController::class, 'getSeederData']);
-Route::post('/paper-flutes/seeder-data', [PaperFluteController::class, 'updateSeederData']);
+    // Paper Flute API routes
+    Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
+    Route::post('/paper-flutes', [PaperFluteController::class, 'store']);
+    Route::put('/paper-flutes/{code}', [PaperFluteController::class, 'update']);
+    Route::delete('/paper-flutes/{code}', [PaperFluteController::class, 'destroy']);
+    Route::put('/paper-flutes/{id}/status', [PaperFluteController::class, 'toggleStatus']);
+    Route::get('/paper-flutes/seeder-data', [PaperFluteController::class, 'getSeederData']);
+    Route::post('/paper-flutes/seeder-data', [PaperFluteController::class, 'updateSeederData']);
 
 // Product API routes moved to routes/api.php
 

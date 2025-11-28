@@ -12,13 +12,13 @@ class SalesTeamController extends Controller
     public function index()
     {
         try {
-            // Always load from database, ordered by code
-            $salesTeams = SalesTeam::orderBy('code')->get();
+            // Always load from database, ordered by code, filter by active status
+            $salesTeams = SalesTeam::where('status', 'Act')->orderBy('code')->get();
             
             // If no data exists, automatically seed the data
             if ($salesTeams->isEmpty()) {
                 $this->seedData();
-                $salesTeams = SalesTeam::orderBy('code')->get();
+                $salesTeams = SalesTeam::where('status', 'Act')->orderBy('code')->get();
             }
             
             // If the request wants JSON, return JSON response
@@ -59,6 +59,7 @@ class SalesTeamController extends Controller
             $salesTeam = SalesTeam::create([
                 'code' => $request->code,
                 'name' => $request->name,
+                'status' => 'Act'
             ]);
 
             return response()->json([
@@ -79,8 +80,11 @@ class SalesTeamController extends Controller
     {
         $query = $request->input('query');
         
-        $salesTeams = SalesTeam::where('code', 'LIKE', "%{$query}%")
-            ->orWhere('name', 'LIKE', "%{$query}%")
+        $salesTeams = SalesTeam::where('status', 'Act')
+            ->where(function($q) use ($query) {
+                $q->where('code', 'LIKE', "%{$query}%")
+                  ->orWhere('name', 'LIKE', "%{$query}%");
+            })
             ->get();
             
         return response()->json($salesTeams);
@@ -189,7 +193,14 @@ class SalesTeamController extends Controller
             // If page parameter is present, return paginated result? 
             // But for consistency with PaperQuality, we might just return all.
             // However, the Vue component expects an array.
-            $salesTeams = SalesTeam::orderBy('code')->get();
+            // Filter by status 'Act' unless specifically requested otherwise
+            $query = SalesTeam::orderBy('code');
+            
+            if (!request()->has('all_status')) {
+                $query->where('status', 'Act');
+            }
+            
+            $salesTeams = $query->get();
             
             // Map to match frontend expectations if needed (e.g. description vs name)
             $salesTeams->transform(function ($team) {
@@ -226,7 +237,6 @@ class SalesTeamController extends Controller
                     SalesTeam::create([
                         'code' => $team['code'],
                         'name' => $team['name'],
-                        'is_active' => true,
                         'status' => 'Act'
                     ]);
                 }
@@ -301,11 +311,16 @@ class SalesTeamController extends Controller
     {
         try {
             $salesTeam = SalesTeam::findOrFail($id);
-            $salesTeam->delete();
+            
+            // Soft delete: update status to 'Obs'
+            $salesTeam->update([
+                'status' => 'Obs',
+                'updated_at' => now()
+            ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Sales team deleted successfully'
+                'message' => 'Sales team marked as obsolete successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting sales team: ' . $e->getMessage());
