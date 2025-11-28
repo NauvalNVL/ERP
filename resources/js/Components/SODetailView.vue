@@ -10,7 +10,6 @@
             </div>
             <div>
               <h3 class="text-lg font-bold">Customer Service Dashboard</h3>
-              <div class="text-teal-100 text-xs">CPS ENTERPRISE 2020</div>
             </div>
           </div>
           <div class="flex space-x-2">
