@@ -644,6 +644,8 @@ Route::delete('/geo/{code}', [App\Http\Controllers\GeoController::class, 'destro
 Route::post('/geo/seed', [App\Http\Controllers\GeoController::class, 'seed']);
 
 Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
+Route::get('/salesperson-teams', [App\Http\Controllers\SalespersonTeamController::class, 'apiIndex']);
+Route::put('/salesperson-teams/{id}', [App\Http\Controllers\SalespersonTeamController::class, 'update']);
 
 // Customer Group API routes
 Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex'])->name('api.customer-groups.index');
