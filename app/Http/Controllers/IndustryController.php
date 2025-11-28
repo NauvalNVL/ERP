@@ -89,16 +89,18 @@ class IndustryController extends Controller
     public function destroy($code)
     {
         $industry = Industry::where('code', $code)->firstOrFail();
-        $industry->delete();
+        
+        // Mark as obsolete instead of deleting
+        $industry->update(['status' => 'Obs']);
         
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Industry deleted successfully'
+                'message' => 'Industry marked as obsolete successfully'
             ]);
         }
         
-        return redirect()->route('vue.industry.index')->with('success', 'Industry deleted successfully');
+        return redirect()->route('vue.industry.index')->with('success', 'Industry marked as obsolete successfully');
     }
 
     /**
@@ -132,7 +134,8 @@ class IndustryController extends Controller
     public function vueIndex()
     {
         try {
-            $industries = Industry::select('code', 'name')
+            $industries = Industry::select('code', 'name', 'status')
+                ->where('status', 'Act')
                 ->orderBy('code')
                 ->get();
                 
@@ -209,7 +212,9 @@ class IndustryController extends Controller
     public function apiIndex()
     {
         try {
-            $industries = Industry::orderBy('code')
+            // Only return active industries for modal display
+            $industries = Industry::where('status', 'Act')
+                ->orderBy('code')
                 ->get()
                 ->map(function ($industry) {
                     // Ensure all fields have values
