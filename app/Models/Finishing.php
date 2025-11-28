@@ -9,9 +9,9 @@ class Finishing extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code', 'description', 'is_compute', 'status'];
+    protected $fillable = ['code', 'description', 'status'];
     
     protected $casts = [
-        'is_compute' => 'boolean',
+
     ];
 }

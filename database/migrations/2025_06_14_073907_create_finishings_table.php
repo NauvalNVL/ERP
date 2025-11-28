@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 10)->unique();
             $table->string('description');
-            $table->boolean('is_compute')->default(false);
+
             $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             $table->timestamps();
         });
