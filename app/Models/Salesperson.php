@@ -39,8 +39,15 @@ class Salesperson extends Model
 
     protected $casts = [
         'TargetSales' => 'decimal:2',
-        'status' => 'string', // This will auto-trim CHAR fields
     ];
+
+    /**
+     * Get the status attribute and trim it to handle CHAR field padding
+     */
+    public function getStatusAttribute($value)
+    {
+        return $value ? trim($value) : $value;
+    }
 
     /**
      * Boot method to register model events
