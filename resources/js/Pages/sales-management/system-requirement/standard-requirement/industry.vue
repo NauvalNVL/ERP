@@ -588,7 +588,7 @@ const deleteIndustry = async () => {
         return;
     }
     
-    if (!confirm(`Are you sure you want to delete industry "${selectedIndustry.value.code}"?`)) {
+    if (!confirm(`Are you sure you want to mark industry "${selectedIndustry.value.code}" as obsolete?`)) {
         return;
     }
     
@@ -620,16 +620,20 @@ const deleteIndustry = async () => {
         // Get response data
         const result = await response.json();
         
-        // Refresh the industry list
-        await fetchIndustries();
+        // Immediately remove the obsoleted item from local array for instant UI update
+        const obsoletedCode = selectedIndustry.value.code;
+        industries.value = industries.value.filter(ind => ind.code !== obsoletedCode);
         
         // Clear selection and search
         selectedIndustry.value = null;
         industryCode.value = '';
         searchResult.value = '';
         
-        showNotification(result.message || 'Industry deleted successfully', 'success');
+        showNotification(result.message || 'Industry marked as obsolete successfully', 'success');
         closeEditModal();
+        
+        // Sync with server in background to ensure data consistency
+        fetchIndustries();
     } catch (e) {
         console.error('Error deleting industry:', e);
         showNotification(e.message || 'Error deleting industry. Please try again.', 'error');

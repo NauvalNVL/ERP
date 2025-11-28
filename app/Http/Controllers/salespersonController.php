@@ -18,13 +18,13 @@ class SalespersonController extends Controller
     public function index()
     {
         try {
-            // Always load from database, ordered by Code
-            $salespersons = Salesperson::orderBy('Code')->get();
+            // Always load from database, ordered by Code, filter by Active status
+            $salespersons = Salesperson::where('status', 'Active')->orderBy('Code')->get();
 
             // If there are no salespersons in the database, seed them
             if ($salespersons->isEmpty()) {
                 $this->seedData();
-                $salespersons = Salesperson::orderBy('Code')->get();
+                $salespersons = Salesperson::where('status', 'Active')->orderBy('Code')->get();
             }
 
             // If the request wants JSON, return JSON response
@@ -193,11 +193,15 @@ class SalespersonController extends Controller
     {
         try {
             $salesperson = Salesperson::where('Code', $code)->firstOrFail();
-            $salesperson->delete();
+            
+            // Soft delete: update status to 'Inactive'
+            $salesperson->update([
+                'status' => 'Inactive'
+            ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Salesperson deleted successfully'
+                'message' => 'Salesperson marked as inactive successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting salesperson: ' . $e->getMessage());
@@ -283,12 +287,24 @@ class SalespersonController extends Controller
     public function apiIndex()
     {
         try {
-            $salespersons = Salesperson::orderBy('Name')->get();
+            // Filter by status 'Active' unless specifically requested otherwise
+            $query = Salesperson::orderBy('Name');
+            
+            if (!request()->has('all_status')) {
+                $query->where('status', 'Active');
+            }
+            
+            $salespersons = $query->get();
 
             // Auto-seed when empty to ensure data is available for the Vue menu
             if ($salespersons->isEmpty()) {
                 $this->seedData();
-                $salespersons = Salesperson::orderBy('Name')->get();
+                // Re-fetch with same filters
+                $query = Salesperson::orderBy('Name');
+                if (!request()->has('all_status')) {
+                    $query->where('status', 'Active');
+                }
+                $salespersons = $query->get();
             }
 
             // Trim status values to handle CHAR field padding

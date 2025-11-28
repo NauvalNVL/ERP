@@ -107,6 +107,11 @@ const loading = ref(false);
 const filteredIndustries = computed(() => {
   let industries = props.industries || [];
   
+  // Filter to only show active industries (status = 'Act' or no status)
+  industries = industries.filter(industry => 
+    !industry.status || industry.status === 'Act'
+  );
+  
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     industries = industries.filter(industry =>
