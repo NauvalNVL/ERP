@@ -29,7 +29,7 @@ class SalespersonSeeder extends Seeder
             'TargetSales' => 1200000.00,
             'Internal' => 'SLS',
             'Email' => 'agung@company.com',
-            'status' => 'Active',
+            'status' => 'Inactive',
         ],
         [
             'Code' => 'S103',
@@ -49,7 +49,7 @@ class SalespersonSeeder extends Seeder
             'TargetSales' => 1100000.00,
             'Internal' => 'SLS',
             'Email' => 'elias@company.com',
-            'status' => 'Active',
+            'status' => 'Inactive',
         ],
         [
             'Code' => 'S105',

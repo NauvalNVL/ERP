@@ -291,6 +291,14 @@ class SalespersonController extends Controller
                 $salespersons = Salesperson::orderBy('Name')->get();
             }
 
+            // Trim status values to handle CHAR field padding
+            $salespersons->transform(function ($person) {
+                if ($person->status) {
+                    $person->status = trim($person->status);
+                }
+                return $person;
+            });
+
             return response()->json($salespersons);
         } catch (\Exception $e) {
             Log::error('Error in SalespersonController@apiIndex: ' . $e->getMessage());
@@ -360,8 +368,16 @@ class SalespersonController extends Controller
             $salespersons = Salesperson::orderBy('Code', 'asc')
                 ->paginate(15);
 
+            // Trim status values to handle CHAR field padding
+            $items = collect($salespersons->items())->map(function ($person) {
+                if ($person->status) {
+                    $person->status = trim($person->status);
+                }
+                return $person;
+            })->toArray();
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-salesperson', [
-                'salespersons' => $salespersons->items(),
+                'salespersons' => $items,
                 'pagination' => [
                     'currentPage' => $salespersons->currentPage(),
                     'perPage' => $salespersons->perPage(),

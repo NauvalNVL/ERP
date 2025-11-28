@@ -71,18 +71,20 @@
                                 <i class="fas fa-times-circle mr-1"></i> Obsolete
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                            <button @click="toggleSalespersonStatus(person)" :disabled="isToggling"
-                                :class="[
-                                    person.status === 'Active'
-                                        ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
-                                        : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
-                                    'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center'
-                                ]"
-                                :style="{ minWidth: '120px' }">
-                                <i :class="[person.status === 'Active' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                {{ person.status === 'Active' ? 'Mark Obsolete' : 'Mark Active' }}
-                            </button>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center justify-center">
+                                <button @click="toggleSalespersonStatus(person)" :disabled="isToggling"
+                                    :class="[
+                                        person.status === 'Active'
+                                            ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
+                                            : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
+                                        'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold inline-flex items-center justify-center'
+                                    ]"
+                                    :style="{ minWidth: '120px' }">
+                                    <i :class="[person.status === 'Active' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+                                    {{ person.status === 'Active' ? 'Mark Obsolete' : 'Mark Active' }}
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr v-if="filteredSalespersons.length === 0">
@@ -220,7 +222,8 @@ const filteredSalespersons = computed(() => {
     // Apply status filter
     if (statusFilter.value !== 'all') {
         const targetStatus = statusFilter.value === 'active' ? 'Active' : 'Inactive';
-        filtered = filtered.filter(person => person.status === targetStatus);
+        // Trim the status value to handle CHAR field padding
+        filtered = filtered.filter(person => person.status?.trim() === targetStatus);
     }
     
     return filtered;

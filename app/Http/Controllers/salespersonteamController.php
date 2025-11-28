@@ -368,14 +368,12 @@ class SalespersonTeamController extends Controller
                     'st_code',
                     'sales_team_name',
                     'sales_team_position',
-                    'status',
-                    'is_active'
+                    'status'
                 )
                 ->orderBy('s_person_code')
                 ->get()
                 ->map(function ($team) {
-                    // Ensure is_active and status have default values
-                    $team->is_active = $team->is_active ?? true;
+                    // Ensure status has default value
                     $team->status = $team->status ?? 'Act';
                     return $team;
                 });
