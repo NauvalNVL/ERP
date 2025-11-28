@@ -174,7 +174,7 @@ const fetchSalesTeams = async (page = 1) => {
     loading.value = true;
     
     try {
-        const response = await fetch(`/api/sales-teams?page=${page}`, {
+        const response = await fetch(`/api/sales-teams?page=${page}&all_status=1`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
