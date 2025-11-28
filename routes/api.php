@@ -490,6 +490,7 @@ Route::post('/so-report', [SalesOrderReportController::class, 'apiGenerateSoRepo
 
 // Customer Service API routes (Dashboard)
 Route::get('/customer-service/dashboard-data', [CustomerServiceController::class, 'apiDashboardData']);
+Route::get('/customer-service/sales-order/{soNumber}/detail', [CustomerServiceController::class, 'apiSalesOrderDetail']);
 
 // Sales Order API routes
 // Route moved to web.php for CSRF protection

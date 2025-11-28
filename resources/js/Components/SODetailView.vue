@@ -1,228 +1,261 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-full sm:max-w-4xl lg:max-w-7xl max-h-[95vh] flex flex-col">
       <!-- Header -->
-      <div class="flex justify-between items-center p-4 border-b">
-        <h3 class="text-lg font-semibold">SALES ORDER</h3>
-        <div class="flex space-x-2">
-          <button class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
-            Print
-          </button>
-          <button
-            @click="$emit('close')"
-            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-          >
-            Close
-          </button>
+      <div class="bg-teal-700 text-white p-3">
+        <div class="flex justify-between items-center mb-2">
+          <div class="flex items-center space-x-3">
+            <div class="bg-teal-600 p-2 rounded">
+              <i class="fas fa-clipboard-list text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold">Customer Service Dashboard</h3>
+              <div class="text-teal-100 text-xs">CPS ENTERPRISE 2020</div>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button
+              @click="$emit('close')"
+              class="px-3 py-1 bg-red-600 text-white  hover:bg-red-700 text-sm"
+            >
+              <i class="fas fa-times mr-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Customer Information Grid -->
+        <div class="bg-teal-600 rounded p-2">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
+            <div>
+              <div class="text-teal-200">Customer:</div>
+              <div class="font-semibold">{{ soData.order_info?.customer_code || '' }}</div>
+              <div class="font-semibold">{{ soData.order_info?.customer_name || '' }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">M/Card Seq#:</div>
+              <div class="font-semibold">{{ soData.order_info?.master_card_seq || '' }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">S/Order #:</div>
+              <div class="font-semibold text-yellow-300">{{ displaySoNumber }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">S/Order Date:</div>
+              <div class="font-semibold">{{ formatDate(soData.order_info?.so_date) }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">S/O Status:</div>
+              <div class="font-semibold text-red-300">{{ soData.order_info?.so_status || '' }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">S/O Group:</div>
+              <div class="font-semibold">{{ soData.order_info?.order_group || 'Sales' }}</div>
+              <div class="text-teal-200">S/O Type:</div>
+              <div class="font-semibold">{{ soData.order_info?.order_type || 'S1' }}</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Main Content -->
-      <div class="flex-1 overflow-auto p-4">
-        <!-- SO Header Info -->
-        <div class="grid grid-cols-4 gap-4 mb-4">
-          <div>
-            <div class="text-sm font-medium text-gray-500">SO #</div>
-            <div class="font-semibold">{{ displaySoNumber }}</div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-gray-500">Date</div>
-            <div>{{ formatDate(soData.order_info?.so_date) || 'N/A' }}</div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-gray-500">Customer</div>
-            <div class="font-semibold">{{ soData.order_info?.customer_name || 'N/A' }}</div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-gray-500">Salesperson</div>
-            <div>{{ soData.order_info?.salesperson_name || 'N/A' }}</div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-gray-500">Model</div>
-            <div>{{ soData.order_info?.model || 'N/A' }}</div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-gray-500">Order Qty</div>
-            <div>{{ formatNumber(soData.order_info?.set_quantity) || '0' }}</div>
-          </div>
-          <div class="col-span-2">
-            <div class="text-sm font-medium text-gray-500">Status</div>
-            <div>
-              <span :class="getStatusClass(soData.order_info?.so_status)">
-                {{ soData.order_info?.so_status || 'N/A' }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- CPS-style Summary Board -->
-        <div class="mb-6 border rounded-lg overflow-hidden text-xs">
-          <table class="min-w-full table-fixed">
+      <div class="flex-1 overflow-auto p-3">
+        <!-- CPS-style Comprehensive Table -->
+        <div class="border rounded overflow-hidden text-xs">
+          <table class="min-w-full border-collapse">
             <thead>
-              <tr>
-                <th class="bg-gray-800 text-white px-3 py-2 text-left w-40">Item</th>
+              <tr class="bg-gray-800 text-white">
+                <th class="border border-gray-600 px-2 py-1 text-left w-48">Item</th>
+                <th class="border border-gray-600 px-2 py-1 text-center">Main</th>
                 <th
-                  v-for="col in boardColumns"
-                  :key="col.key"
-                  class="bg-blue-900 text-white px-3 py-2 text-center"
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-600 px-2 py-1 text-center"
                 >
-                  {{ col.label }}
+                  Fit {{ index + 1 }}
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="row in boardRows"
-                :key="row.key"
-                :class="row.bg"
-              >
-                <td class="border px-3 py-2 font-semibold">
-                  {{ row.label }}
+              <!-- Product Design Section (Yellow) -->
+              <tr class="bg-yellow-200">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Product Design</td>
+                <td class="border border-gray-400 px-2 py-1 text-center">{{ mainItem.item_code || '' }}</td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-center"
+                >
+                  {{ fitting.design || fitting.fitting_code || '' }}
+                </td>
+              </tr>
+
+              <tr class="bg-yellow-100">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Part No</td>
+                <td class="border border-gray-400 px-2 py-1 text-center">{{ mainItem.description || '' }}</td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-center"
+                >
+                  {{ fitting.description || '' }}
+                </td>
+              </tr>
+
+              <tr class="bg-yellow-50">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Pcs / Unit</td>
+                <td class="border border-gray-400 px-2 py-1 text-center">
+                  {{ formatPcsUnit(mainItem.pcs, mainItem.unit) }}
                 </td>
                 <td
-                  v-for="col in boardColumns"
-                  :key="col.key"
-                  class="border px-3 py-2 text-right"
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-center"
                 >
-                  {{ getBoardCellValue(row.key, col) }}
+                  {{ formatPcsUnit(fitting.pcs, fitting.unit) }}
+                </td>
+              </tr>
+
+              <!-- Sales Order Section (Yellow) -->
+              <tr class="bg-yellow-200">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Sales Order</td>
+                <td class="border border-gray-400 px-2 py-1 text-right font-semibold">{{ formatNumber(soData.order_info?.set_quantity) }}</td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                >
+                  {{ formatNumber(fitting.order_qty) }}
+                </td>
+              </tr>
+
+              <tr class="bg-yellow-100">
+                <td class="border border-gray-400 px-2 py-1">Currency / Ex. Rate</td>
+                <td class="border border-gray-400 px-2 py-1 text-right">
+                  {{ soData.order_info?.currency || '' }}
+                  <span v-if="soData.order_info?.exchange_rate">/
+                    {{ formatBalanceNumber(soData.order_info.exchange_rate) }}
+                  </span>
+                </td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                ></td>
+              </tr>
+
+              <tr class="bg-yellow-50">
+                <td class="border border-gray-400 px-2 py-1">Unit Price / Amount</td>
+                <td class="border border-gray-400 px-2 py-1 text-right">
+                  <div>{{ formatBalanceNumber(soData.order_info?.unit_price) }}</div>
+                  <div class="text-[10px] text-gray-600">
+                    {{ formatBalanceNumber(soData.order_info?.amount) }}
+                    <span v-if="soData.order_info?.base_amount">(Base: {{ formatBalanceNumber(soData.order_info.base_amount) }})</span>
+                  </div>
+                </td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                ></td>
+              </tr>
+
+              <tr class="bg-yellow-100">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Net Delivered</td>
+                <td class="border border-gray-400 px-2 py-1 text-right font-semibold">{{ formatNumber(netDeliveredMain) }}</td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                >
+                  {{ formatNumber(getNetDeliveredForComponent(fitting.component)) }}
+                </td>
+              </tr>
+
+              <tr class="bg-yellow-50">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">SO Balance</td>
+                <td class="border border-gray-400 px-2 py-1 text-right font-semibold">{{ formatBalanceNumber(balanceMain) }}</td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                >
+                  {{ formatBalanceNumber(getBalanceForComponent(fitting)) }}
+                </td>
+              </tr>
+
+              <!-- Delivery Order Section (Cyan) -->
+              <tr class="bg-cyan-200">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Delivery Order</td>
+                <td class="border border-gray-400 px-2 py-1 text-right font-semibold">{{ formatNumber(netDeliveredMain) }}</td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                >
+                  {{ formatNumber(getNetDeliveredForComponent(fitting.component)) }}
+                </td>
+              </tr>
+
+              <tr class="bg-cyan-100">
+                <td class="border border-gray-400 px-2 py-1">Remark</td>
+                <td class="border border-gray-400 px-2 py-1 text-left text-[11px]">
+                  {{ soData.order_info?.remark || '' }}
+                </td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                ></td>
+              </tr>
+
+              <tr class="bg-cyan-50">
+                <td class="border border-gray-400 px-2 py-1">Instruction</td>
+                <td class="border border-gray-400 px-2 py-1 text-left text-[11px]">
+                  <div v-if="soData.order_info?.instruction1">{{ soData.order_info.instruction1 }}</div>
+                  <div v-if="soData.order_info?.instruction2">{{ soData.order_info.instruction2 }}</div>
+                </td>
+                <td
+                  v-for="(fitting, index) in cpsColumns"
+                  :key="index"
+                  class="border border-gray-400 px-2 py-1 text-right"
+                ></td>
+              </tr>
+
+              <tr class="bg-cyan-100">
+                <td class="border border-gray-400 px-2 py-1 font-semibold">Invoice/DHN/FZH</td>
+                <td class="border border-gray-400 px-2 py-1 text-center text-xs" colspan="100%">
+                  <span v-if="invoiceList.length > 0" class="text-blue-700">
+                    {{ invoiceList.join(', ') }}
+                  </span>
+                  <span v-else class="text-gray-400">No invoices</span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Item Details Table -->
-        <div class="mb-6">
-          <h4 class="font-medium mb-2">Item Details</h4>
-          <div class="overflow-x-auto">
-            <table class="min-w-full border">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Code</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PD</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PCS</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Qty</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Delivery</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="soData.item_details?.length">
-                  <td class="border px-4 py-2">1</td>
-                  <td class="border px-4 py-2">{{ soData.item_details[0].item_code || 'N/A' }}</td>
-                  <td class="border px-4 py-2">{{ soData.item_details[0].description || 'N/A' }}</td>
-                  <td class="border px-4 py-2">{{ soData.item_details[0].pd || 'N/A' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(soData.item_details[0].pcs) || '0' }}</td>
-                  <td class="border px-4 py-2">{{ soData.item_details[0].unit || 'N/A' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(soData.item_details[0].order_qty) || '0' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(soData.item_details[0].net_delivery) || '0' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(soData.item_details[0].balance) || '0' }}</td>
-                </tr>
-                <tr v-else>
-                  <td colspan="9" class="border px-4 py-2 text-center text-gray-500">No item details available</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Fittings Table -->
-        <div class="mb-6">
-          <h4 class="font-medium mb-2">Fittings</h4>
-          <div class="overflow-x-auto">
-            <table class="min-w-full border">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fitting Code</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Design</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PCS</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Qty</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Delivery</th>
-                  <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="(fitting, index) in soData.fittings" :key="fitting.fitting_code">
-                  <td class="border px-4 py-2">{{ index + 1 }}</td>
-                  <td class="border px-4 py-2">{{ fitting.fitting_code || 'N/A' }}</td>
-                  <td class="border px-4 py-2">{{ fitting.description || 'N/A' }}</td>
-                  <td class="border px-4 py-2">{{ fitting.design || 'N/A' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(fitting.pcs) || '0' }}</td>
-                  <td class="border px-4 py-2">{{ fitting.unit || 'N/A' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(fitting.order_qty) || '0' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(fitting.net_delivery) || '0' }}</td>
-                  <td class="border px-4 py-2 text-right">{{ formatNumber(fitting.balance) || '0' }}</td>
-                </tr>
-                <tr v-if="!soData.fittings?.length">
-                  <td colspan="9" class="border px-4 py-2 text-center text-gray-500">No fittings available</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Additional Information -->
-        <div class="grid grid-cols-3 gap-6">
-          <div>
-            <h4 class="font-medium mb-2">Customer Information</h4>
-            <div class="bg-gray-50 p-3 rounded border">
-              <div class="whitespace-pre-line">{{ soData.order_info?.customer_address || 'N/A' }}</div>
-              <div class="mt-2">
-                <div class="font-medium">Customer PO #:</div>
-                <div>{{ soData.order_info?.customer_po_number || 'N/A' }}</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h4 class="font-medium mb-2">Remarks</h4>
-            <div class="bg-gray-50 p-3 rounded border h-full">
-              {{ soData.order_info?.remark || 'No remarks' }}
-            </div>
-          </div>
-
-          <div>
-            <h4 class="font-medium mb-2">Instructions</h4>
-            <div class="bg-gray-50 p-3 rounded border h-full">
-              <div class="mb-2">{{ soData.order_info?.instruction1 || 'No instructions' }}</div>
-              <div>{{ soData.order_info?.instruction2 || '' }}</div>
-            </div>
-          </div>
+        <!-- Warehouse Management Label -->
+        <div class="mt-2 text-xs text-gray-600 flex items-center">
+          <i class="fas fa-warehouse mr-2"></i>
+          WAREHOUSE MANAGEMENT
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="p-4 border-t flex justify-between items-center bg-gray-50">
-        <div class="text-sm text-gray-500">
-          Last updated: {{ formatDateTime(new Date()) }}
-        </div>
-        <div class="flex space-x-2">
-          <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
-            <i class="fas fa-print mr-1"></i> Print
-          </button>
-          <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
-            <i class="fas fa-envelope mr-1"></i> Email
-          </button>
-          <button
-            @click="$emit('close')"
-            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-          >
-            <i class="fas fa-times mr-1"></i> Close
-          </button>
-        </div>
+      <div class="bg-gray-100 border-t border-gray-300 p-2 flex justify-end">
+        <button
+          @click="$emit('close')"
+          class="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm transition-colors"
+        >
+          <i class="fas fa-times mr-1"></i> Close
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed } from 'vue';
+import { defineProps, defineEmits, computed, onMounted } from 'vue';
 
 const props = defineProps({
   soData: {
@@ -231,107 +264,88 @@ const props = defineProps({
     default: () => ({
       order_info: {},
       item_details: [],
-      fittings: []
+      fittings: [],
+      delivery_orders: [],
+      delivery_order_summary: {},
+      invoices: [],
+      invoice_summary: {},
+      net_delivered: 0,
+      balance: 0
     })
   }
 });
 
 const emit = defineEmits(['close']);
 
+// Debug logging
+onMounted(() => {
+  console.log('CPS SODetailView mounted with data:', props.soData);
+});
+
 const displaySoNumber = computed(() => {
-  const info = (props.soData && props.soData.order_info) ? props.soData.order_info : {};
-  if (info.so_number) {
-    return info.so_number;
-  }
-  if (props.soData && props.soData.so_number) {
-    return props.soData.so_number;
-  }
-  return 'N/A';
+  return props.soData?.order_info?.so_number || props.soData?.so_number || '';
 });
 
 const mainItem = computed(() => {
-  const d = props.soData ? props.soData.item_details : null;
-  if (!d) return {};
-  if (Array.isArray(d)) {
-    return d[0] || {};
-  }
-  return d;
+  const item = props.soData?.item_details?.[0] || {};
+  return {
+    item_code: item.item_code || props.soData?.order_info?.model || '',
+    description: item.description || props.soData?.order_info?.model || '',
+    pcs: item.pcs || props.soData?.order_info?.set_quantity || 0,
+    unit: item.unit || 'PCS',
+    order_qty: item.order_qty || props.soData?.order_info?.set_quantity || 0
+  };
 });
 
-const fittingItems = computed(() => {
-  const list = props.soData ? props.soData.fittings : [];
-  if (!Array.isArray(list)) return [];
-  return list;
+const cpsColumns = computed(() => {
+  const fittings = props.soData?.fittings || [];
+  const columns = [];
+
+  // Selalu siapkan 9 kolom fitting (Fit1..Fit9) seperti CPS.
+  // Jika data fitting kurang dari 9, kolom sisanya akan kosong.
+  for (let i = 0; i < 9; i++) {
+    columns.push(fittings[i] || {});
+  }
+
+  return columns;
 });
 
-const boardColumns = computed(() => {
-  const cols = [
-    { key: 'main', label: 'Main', source: 'main' },
-  ];
-
-  fittingItems.value.forEach((fit, index) => {
-    if (index < 4) {
-      cols.push({
-        key: `fit${index + 1}`,
-        label: `Fit ${index + 1}`,
-        source: 'fit',
-        index,
-      });
-    }
-  });
-
-  return cols;
+const netDeliveredMain = computed(() => {
+  const doSummary = props.soData?.delivery_order_summary || {};
+  return doSummary['Main'] || doSummary['main'] || props.soData?.net_delivered || 0;
 });
 
-const boardRows = [
-  { key: 'pd', label: 'Product Design', bg: 'bg-yellow-200' },
-  { key: 'pcs', label: 'PCS', bg: 'bg-yellow-100' },
-  { key: 'unit', label: 'Unit', bg: 'bg-yellow-50' },
-  { key: 'order_qty', label: 'Order', bg: 'bg-yellow-200' },
-  { key: 'net_delivery', label: 'Net Delivery', bg: 'bg-yellow-100' },
-  { key: 'balance', label: 'SO Balance', bg: 'bg-yellow-200' },
-];
+const balanceMain = computed(() => {
+  const orderQty = parseFloat(props.soData?.order_info?.set_quantity || 0);
+  const delivered = parseFloat(netDeliveredMain.value || 0);
+  return orderQty - delivered;
+});
 
-const getBoardCellValue = (rowKey, col) => {
-  const item = col.source === 'main'
-    ? (mainItem.value || {})
-    : ((fittingItems.value[col.index] || {}));
+const invoiceList = computed(() => {
+  const summary = props.soData?.invoice_summary || {};
+  return summary.invoice_list || [];
+});
 
-  if (!item) return '';
+const getNetDeliveredForComponent = (component) => {
+  if (!component) return 0;
+  const doSummary = props.soData?.delivery_order_summary || {};
+  return doSummary[component] || 0;
+};
 
-  if (rowKey === 'pd') {
-    return item.pd || item.design || '';
-  }
-  if (rowKey === 'pcs') {
-    if (item.pcs === '' || item.pcs === null || item.pcs === undefined) return '';
-    return formatNumber(item.pcs);
-  }
-  if (rowKey === 'unit') {
-    return item.unit || '';
-  }
-  if (rowKey === 'order_qty') {
-    if (item.order_qty === '' || item.order_qty === null || item.order_qty === undefined) return '';
-    return formatNumber(item.order_qty);
-  }
-  if (rowKey === 'net_delivery') {
-    if (item.net_delivery === '' || item.net_delivery === null || item.net_delivery === undefined) return '';
-    return formatNumber(item.net_delivery);
-  }
-  if (rowKey === 'balance') {
-    if (item.balance === '' || item.balance === null || item.balance === undefined) return '';
-    return formatNumber(item.balance);
-  }
-
-  return '';
+const getBalanceForComponent = (fitting) => {
+  const orderQty = parseFloat(fitting.order_qty || 0);
+  const delivered = parseFloat(getNetDeliveredForComponent(fitting.component) || 0);
+  return orderQty - delivered;
 };
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
+  if (!dateString) return '';
   try {
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString('en-GB', {
       day: '2-digit',
-      month: 'short',
+      month: '2-digit',
       year: 'numeric'
     });
   } catch (e) {
@@ -339,35 +353,53 @@ const formatDate = (dateString) => {
   }
 };
 
-const formatDateTime = (date) => {
-  if (!date) return '';
-  return date.toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
+const formatNumber = (num) => {
+  if (num === null || num === undefined || num === '') return '';
+  try {
+    const number = parseFloat(num);
+    if (isNaN(number)) return num;
+    if (number === 0) return '';
+    return number.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+  } catch (e) {
+    return num;
+  }
 };
 
-const formatNumber = (value) => {
-  if (value === null || value === undefined) return '0';
-  return new Intl.NumberFormat('id-ID').format(Number(value));
+// Formatter khusus untuk SO Balance: tetap menampilkan nilai 0 dari database
+const formatBalanceNumber = (num) => {
+  if (num === null || num === undefined || num === '') return '';
+  try {
+    const number = parseFloat(num);
+    if (isNaN(number)) return num;
+    return number.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+  } catch (e) {
+    return num;
+  }
 };
 
-const getStatusClass = (status) => {
-  const statusMap = {
-    'Outstanding': 'bg-yellow-100 text-yellow-800',
-    'Partial': 'bg-blue-100 text-blue-800',
-    'Completed': 'bg-green-100 text-green-800',
-    'Closed': 'bg-gray-100 text-gray-800',
-    'Cancelled': 'bg-red-100 text-red-800'
-  };
-  return `px-2 py-1 rounded text-xs font-medium ${statusMap[status] || 'bg-gray-100 text-gray-800'}`;
+const formatPcsUnit = (pcs, unit) => {
+  const p = formatNumber(pcs);
+  const u = unit || '';
+  if (!p && !u) return '';
+  if (!p) return u;
+  if (!u) return p + ' Pcs';
+  return `${p} / ${u}`;
 };
 </script>
 
 <style scoped>
-/* Add any custom styles here */
+/* Custom table styling */
+table {
+  font-size: 11px;
+}
+
+th {
+  font-weight: 600;
+}
 </style>

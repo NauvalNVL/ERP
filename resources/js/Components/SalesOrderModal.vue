@@ -8,7 +8,7 @@
                     <h3 class="text-2xl font-bold text-white">
                         Sales Order Table [Sorted by S/Order#]
                     </h3>
-                    <button 
+                    <button
                         class="p-2 ml-auto bg-transparent border-0 text-white hover:text-gray-200 transition-colors duration-200 text-3xl leading-none font-semibold outline-none focus:outline-none"
                         @click="$emit('close')"
                     >
@@ -17,7 +17,7 @@
                         </span>
                     </button>
                 </div>
-                
+
                 <!-- Modal body -->
                 <div class="relative p-6 flex-auto max-h-[80vh] overflow-y-auto custom-scrollbar">
                     <!-- Search Section -->
@@ -49,8 +49,8 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="order in filteredSalesOrders" :key="order.so_number" 
-                                    @click="selectSalesOrder(order)" 
+                                <tr v-for="order in filteredSalesOrders" :key="order.so_number"
+                                    @click="selectSalesOrder(order)"
                                     class="hover:bg-blue-50 cursor-pointer transition-colors duration-150"
                                     :class="{ 'bg-blue-200': selectedOrder?.so_number === order.so_number }">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.so_number }}</td>
@@ -138,7 +138,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="(item, index) in orderItems" :key="index" 
+                                    <tr v-for="(item, index) in orderItems" :key="index"
                                         class="hover:bg-blue-50 cursor-pointer transition-colors duration-150"
                                         :class="{ 'bg-blue-200': selectedItemIndex === index }"
                                         @click="selectItem(index)">
@@ -159,31 +159,31 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Modal footer -->
                 <div class="flex items-center justify-end p-6 bg-gray-50 border-t border-solid border-gray-200 rounded-b-xl">
-                    <button 
+                    <button
                         class="text-gray-700 bg-gray-200 hover:bg-gray-300 font-bold uppercase px-6 py-2 text-sm rounded-lg shadow hover:shadow-md outline-none focus:outline-none mr-3 transition-all duration-150"
                         type="button"
                         @click="$emit('close')"
                     >
                         Exit
                     </button>
-                    <button 
+                    <button
                         class="bg-blue-500 text-white hover:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded-lg shadow hover:shadow-lg outline-none focus:outline-none mr-3 transition-all duration-150"
                         type="button"
                         @click="$emit('sort-by-so')"
                     >
                         Sort by SO#
                     </button>
-                    <button 
+                    <button
                         class="bg-blue-500 text-white hover:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded-lg shadow hover:shadow-lg outline-none focus:outline-none mr-3 transition-all duration-150"
                         type="button"
                         @click="$emit('sort-by-customer')"
                     >
                         Sort by Customer
                     </button>
-                    <button 
+                    <button
                         v-if="selectedOrder"
                         class="bg-green-500 text-white hover:bg-green-600 font-bold uppercase text-sm px-6 py-3 rounded-lg shadow hover:shadow-lg outline-none focus:outline-none transition-all duration-150"
                         type="button"
@@ -226,7 +226,7 @@ const searchQuery = ref('');
 
 const orderItems = computed(() => {
     if (!selectedOrder.value) return [];
-    
+
     // Return default item details for now
     return [
         { item: 'PD', main: selectedOrder.value.p_design || 'OF-SF' },
@@ -243,8 +243,8 @@ const filteredSalesOrders = computed(() => {
         return props.salesOrders;
     }
     const query = searchQuery.value.toLowerCase();
-    return props.salesOrders.filter(order => 
-        order.so_number.toLowerCase().includes(query) || 
+    return props.salesOrders.filter(order =>
+        order.so_number.toLowerCase().includes(query) ||
         order.customer_name.toLowerCase().includes(query) ||
         order.customer_po.toLowerCase().includes(query)
     );
@@ -264,7 +264,7 @@ const performSearch = () => {
     const query = [searchFields.value.field1, searchFields.value.field2, searchFields.value.field3]
         .filter(field => field.trim() !== '')
         .join('-');
-    
+
     searchQuery.value = query;
 };
 

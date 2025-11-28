@@ -110,7 +110,13 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="order in filteredSalesOrders" :key="order.so_number" @dblclick="selectSalesOrder(order)" class="hover:bg-blue-50 cursor-pointer" :class="{'bg-blue-100': selectedSalesOrder && selectedSalesOrder.so_number === order.so_number}">
+                            <tr
+                                v-for="order in filteredSalesOrders"
+                                :key="order.so_number"
+                                @click="selectSalesOrder(order)"
+                                class="hover:bg-blue-50 cursor-pointer"
+                                :class="{'bg-blue-100': selectedSalesOrder && selectedSalesOrder.so_number === order.so_number}"
+                            >
                                 <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.so_number }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customer_po_number }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customer_code }}</td>
@@ -151,8 +157,18 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Salesperson:</label>
                             <div class="flex items-center">
-                                <input type="text" class="form-input mt-1 block w-20 bg-gray-100" :value="selectedSalesOrder ? selectedSalesOrder.salesperson_code : ''" readonly>
-                                <input type="text" class="form-input mt-1 ml-2 block w-full bg-gray-100" value="" readonly>
+                                <input
+                                    type="text"
+                                    class="form-input mt-1 block w-20 bg-gray-100"
+                                    :value="selectedSalesOrder ? selectedSalesOrder.salesperson_code : ''"
+                                    readonly
+                                >
+                                <input
+                                    type="text"
+                                    class="form-input mt-1 ml-2 block w-full bg-gray-100"
+                                    :value="selectedSalesOrder ? selectedSalesOrder.salesperson_name : ''"
+                                    readonly
+                                >
                             </div>
                         </div>
                         <div>
@@ -261,7 +277,7 @@
                 </div>
             </div>
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button @click="performSearch" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
+                <button @click="confirmSalesOrderSelection" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow">
                     Select
                 </button>
                 <button @click="closeAllModals" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow">
@@ -1092,10 +1108,16 @@ const fetchSalesOrders = async (extraParams = {}) => {
 
         const response = await axios.get('/api/sales-orders', { params });
         const payload = response.data;
-        const data = Array.isArray(payload) ? payload : (payload.data || []);
+        const rawData = Array.isArray(payload) ? payload : (payload.data || []);
 
-        salesOrders.value = data;
-        filteredSalesOrders.value = data;
+        // Normalisasi field supaya punya salesperson_name jika tersedia di backend
+        const mapped = rawData.map(order => ({
+            ...order,
+            salesperson_name: order.salesperson_name || order.Salesperson_Name || order.SALESPERSON_NAME || ''
+        }));
+
+        salesOrders.value = mapped;
+        filteredSalesOrders.value = mapped;
     } catch (error) {
         console.error('Error fetching sales orders:', error);
         salesOrders.value = [];
@@ -1143,6 +1165,7 @@ const fetchSalesOrderDetail = async (soNumber) => {
                 order_group: order_info.order_group ?? selectedSalesOrder.value?.order_group ?? '',
                 order_type: order_info.order_type ?? selectedSalesOrder.value?.order_type ?? '',
                 salesperson_code: order_info.salesperson_code ?? selectedSalesOrder.value?.salesperson_code ?? '',
+                salesperson_name: order_info.salesperson_name ?? selectedSalesOrder.value?.salesperson_name ?? '',
             };
         }
 
@@ -1180,6 +1203,36 @@ const getFittingField = (index, field) => {
     if (field === 'pcs') return fit.pcs ?? '';
     if (field === 'unit') return fit.unit ?? '';
     return '';
+};
+
+// Khusus Customer Service Sales Order Table: konfirmasi pilihan dan langsung
+// memanggil API detail Customer Service, lalu emit ke parent agar membuka
+// tampilan CPS (SODetailView).
+const confirmSalesOrderSelection = async () => {
+    if (!selectedSalesOrder.value || !selectedSalesOrder.value.so_number) {
+        alert('Please select a Sales Order first');
+        return;
+    }
+
+    const soNumber = selectedSalesOrder.value.so_number;
+
+    try {
+        emit('loading', true);
+
+        const response = await axios.get(`/api/customer-service/sales-order/${encodeURIComponent(soNumber)}/detail`);
+
+        if (response.data?.success && response.data.data) {
+            emit('so-selected', response.data.data);
+            closeAllModals();
+        } else {
+            alert('Failed to load Sales Order details');
+        }
+    } catch (error) {
+        console.error('Error in confirmSalesOrderSelection:', error);
+        alert('Error loading Sales Order details');
+    } finally {
+        emit('loading', false);
+    }
 };
 
 const openMasterCardSearchModal = () => {
@@ -1498,8 +1551,7 @@ const performSearch = async () => {
                 // Show loading state if needed
                 emit('loading', true);
 
-                // Fetch SO details
-                const response = await axios.get(`/api/sales-order/${encodeURIComponent(soNumber)}/detail`);
+                const response = await axios.get(`/api/customer-service/sales-order/${encodeURIComponent(soNumber)}/detail`);
 
                 if (response.data?.success && response.data.data) {
                     // Emit event to parent to show SO details

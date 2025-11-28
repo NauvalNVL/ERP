@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closeModal"></div>
-    
+
     <!-- Modal Container -->
     <div class="flex min-h-full items-center justify-center p-4">
       <div class="relative w-full max-w-7xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden">
@@ -96,7 +96,7 @@
                   <div class="flex items-center justify-between">
                     <span class="text-xs text-yellow-700 w-24 flex-shrink-0 font-medium">To Delivery Set:</span>
                     <div class="flex items-center space-x-1">
-                      <input 
+                      <input
                         v-model="orderDetail.toDeliverySet"
                         type="text"
                         class="w-16 px-2 py-1 text-xs border-2 border-yellow-400 rounded focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white"
@@ -198,7 +198,7 @@
                       <input v-model="item.maxDO" type="text" class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-transparent hover:bg-gray-50 text-right">
                     </td>
                     <td class="px-2 py-1.5 text-right border-r border-gray-200 bg-yellow-50">
-                      <input 
+                      <input
                         v-model="item.toDeliver"
                         type="text"
                         class="w-full px-1 py-0.5 text-xs border-0 focus:ring-0 bg-yellow-50 hover:bg-yellow-100 text-right font-medium"
@@ -256,20 +256,20 @@
             Fill delivery quantities and click Save Changes to continue
           </div>
           <div class="flex items-center space-x-3">
-            <button 
+            <button
               @click="closeModal"
               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             >
               <i class="fas fa-times mr-2"></i>
               Cancel
             </button>
-            <button 
+            <button
               @click="handleSave"
               :disabled="isToDeliverySetRequired"
               :class="[
                 'px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 transition-all',
-                isToDeliverySetRequired 
-                  ? 'text-gray-400 bg-gray-300 cursor-not-allowed' 
+                isToDeliverySetRequired
+                  ? 'text-gray-400 bg-gray-300 cursor-not-allowed'
                   : 'text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500 shadow-lg hover:shadow-xl'
               ]"
             >
@@ -282,7 +282,7 @@
     </div>
 
     <!-- Packing Details Modal -->
-    <PackingDetailsModal 
+    <PackingDetailsModal
       :is-open="showPackingDetailsModal"
       :sales-order-detail-data="currentDetailData"
       @close="showPackingDetailsModal = false"
@@ -396,13 +396,13 @@ const handleDeliverySetChange = () => {
 const handleSave = () => {
   // Validasi: Cek apakah To Delivery Set sudah diisi
   const toDeliverySetValue = parseFloat(orderDetail.toDeliverySet) || 0
-  
+
   // Validasi: Cek apakah ada item yang memiliki To Deliver
   const hasToDeliverItems = itemRows.value.some(item => {
     const toDeliverValue = parseFloat(item.toDeliver) || 0
     return toDeliverValue > 0
   })
-  
+
   // Validasi: Harus ada To Delivery Set atau To Deliver yang diisi
   if (toDeliverySetValue <= 0 && !hasToDeliverItems) {
     error('Please fill in "To Delivery Set" or at least one "To Deliver" quantity before proceeding')
@@ -414,15 +414,15 @@ const handleSave = () => {
     error('To Delivery Set cannot exceed Balance')
     return
   }
-  
+
   const data = {
     orderDetail,
     itemRows: itemRows.value
   }
-  
+
   // Store current data for packing details modal
   currentDetailData.value = data
-  
+
   // Open Packing Details Modal
   showPackingDetailsModal.value = true
   success('Opening Packing Details Screen')
@@ -434,7 +434,7 @@ const handlePackingDetailsSave = (packingData) => {
     salesOrderDetail: currentDetailData.value,
     packingDetails: packingData
   }
-  
+
   emit('save', completeData)
   showPackingDetailsModal.value = false
   success('Packing details saved successfully')
@@ -446,7 +446,7 @@ const handleSaveDeliveryOrder = (packingData) => {
     salesOrderDetail: currentDetailData.value,
     packingDetails: packingData
   }
-  
+
   emit('save-delivery-order', completeData)
   showPackingDetailsModal.value = false
   success('Delivery order will be saved')
@@ -470,7 +470,7 @@ const isToDeliverySetRequired = computed(() => {
     const toDeliverValue = parseFloat(item.toDeliver) || 0
     return toDeliverValue > 0
   })
-  
+
   // Required jika tidak ada yang diisi
   return toDeliverySetValue <= 0 && !hasToDeliverItems
 })
@@ -495,12 +495,12 @@ const isToDeliverySetExceed = computed(() => {
 watch(() => orderDetail.toDeliverySet, (newValue, oldValue) => {
   // Skip jika perubahan berasal dari watchEffect
   if (isUpdatingFromDeliverySet.value) return
-  
+
   const deliverySetValue = parseFloat(newValue) || 0
-  
+
   // Flag untuk mencegah infinite loop
   isUpdatingFromDeliverySet.value = true
-  
+
   // Update setiap komponen berdasarkan pcs-nya
   itemRows.value.forEach(item => {
     // Hanya update komponen yang memiliki pDesign (komponen aktif)
@@ -513,7 +513,7 @@ watch(() => orderDetail.toDeliverySet, (newValue, oldValue) => {
       item.toDeliver = ''
     }
   })
-  
+
   // Reset flag setelah update selesai
   setTimeout(() => {
     isUpdatingFromDeliverySet.value = false
@@ -530,10 +530,10 @@ watchEffect(() => {
     if (mainItem) {
       const mainToDeliver = parseFloat(mainItem.toDeliver) || 0
       const mainPcs = parseFloat(mainItem.pcs) || 1
-      
+
       // To Delivery Set = Main To Deliver / Main Pcs
       const calculatedDeliverySet = mainPcs > 0 ? mainToDeliver / mainPcs : 0
-      
+
       // Update To Delivery Set jika berbeda (dengan toleransi untuk floating point)
       const currentDeliverySet = parseFloat(orderDetail.toDeliverySet) || 0
       if (Math.abs(calculatedDeliverySet - currentDeliverySet) > 0.01) {
@@ -607,8 +607,8 @@ async function hydrateFromSalesOrderData() {
                 const orderQty = Number((row.order || '0').toString().replace(/,/g, '')) || 0
                 const netDel = Number((row.delivery || '0').toString().replace(/,/g, '')) || 0
                 const bal = orderQty - netDel
-                row.balance = fitting.balance !== undefined && fitting.balance !== null && fitting.balance !== '' 
-                  ? fitting.balance 
+                row.balance = fitting.balance !== undefined && fitting.balance !== null && fitting.balance !== ''
+                  ? fitting.balance
                   : (Number.isFinite(bal) ? bal.toString() : row.order)
                 // Keep these empty for now
                 row.reject = ''

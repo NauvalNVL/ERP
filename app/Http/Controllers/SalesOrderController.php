@@ -2081,9 +2081,16 @@ class SalesOrderController extends Controller
             // Format order information
             $salespersonName = '';
             if ($salesperson) {
-                // Try uppercase NAME field first (legacy)
-                $salespersonName = $salesperson->NAME ?? $salesperson->name ?? $salesOrder->SLM ?? '';
+                // Beberapa database menggunakan kolom 'Name' (huruf N kapital)
+                // sementara lainnya memakai 'NAME' atau 'name'. Coba semua variasi
+                // sebelum fallback ke kode SLM.
+                $salespersonName = $salesperson->Name
+                    ?? $salesperson->NAME
+                    ?? $salesperson->name
+                    ?? $salesOrder->SLM
+                    ?? '';
             } else {
+                // Jika tabel salesperson tidak bisa diakses, gunakan kode saja
                 $salespersonName = $salesOrder->SLM ?? '';
             }
 
