@@ -999,20 +999,56 @@ const selectedCustomerAccount = ref(null);
 const currentCustomerCodeTarget = ref(null); // To know which input to populate
 
 const closeAllModals = () => {
-    showInitialSalesOrderModal.value = false;
-    showOptionsModal.value = false;
-    showSalesOrderSearchModal.value = false;
-    showMasterCardSearchModal.value = false;
-    showPurchaseOrderRefSearchModal.value = false;
-    showCustomerAccountSearchModal.value = false; // Close new modal
-    showInitialDeliveryOrderModal.value = false; // New: Close initial Delivery Order modal
-    showDeliveryOrderTableModal.value = false; // New: Close Delivery Order Table modal
-    showInitialInvoiceModal.value = false; // New: Close initial Invoice modal
-    showInvoiceTableModal.value = false; // New: Close Invoice Table modal
-    selectedCustomerAccount.value = null; // Clear selected customer
-    customerSearchQuery.value = ''; // Clear search query
-    filteredCustomerAccounts.value = []; // Clear filtered results
-    showMasterCardListModal.value = false;
+    const modalRefs = [
+        showInitialSalesOrderModal,
+        showOptionsModal,
+        showSalesOrderSearchModal,
+        showMasterCardSearchModal,
+        showPurchaseOrderRefSearchModal,
+        showCustomerAccountSearchModal,
+        showInitialDeliveryOrderModal,
+        showDeliveryOrderTableModal,
+        showInitialInvoiceModal,
+        showInvoiceTableModal,
+        showMasterCardListModal,
+    ];
+
+    modalRefs.forEach(modal => {
+        try {
+            if (modal && typeof modal.value !== 'undefined') {
+                modal.value = false;
+            }
+        } catch (e) {
+            console.warn('Error closing modal:', e);
+        }
+    });
+
+    const resetStates = [
+        { ref: selectedSalesOrder, value: null },
+        { ref: selectedCustomerAccount, value: null },
+        { ref: currentCustomerCodeTarget, value: null },
+        { ref: customerSearchQuery, value: '' },
+        { ref: filteredCustomerAccounts, value: [] },
+        { ref: masterCardSearch, value: '' },
+        { ref: purchaseOrderRefSearch, value: '' },
+        { ref: salesOrderSearch, value: { month: '', year: '', sequence: '' } }
+    ];
+
+    resetStates.forEach(({ ref, value }) => {
+        try {
+            if (ref && typeof ref.value !== 'undefined') {
+                if (Array.isArray(ref.value)) {
+                    ref.value = [];
+                } else if (typeof value === 'object' && value !== null) {
+                    ref.value = value;
+                } else {
+                    ref.value = value;
+                }
+            }
+        } catch (e) {
+            console.warn('Error resetting state:', e);
+        }
+    });
 };
 
 const openInitialSalesOrderModal = () => {
@@ -1437,11 +1473,110 @@ const confirmCustomerSelection = () => {
     }
 };
 
-const performSearch = () => {
-    // This will be generalized later. For now, it's just a placeholder.
-    console.log('Performing search...');
-    closeAllModals();
-    // emit('searchPerformed'); // If the parent needs to know a search was done
+const performSearch = async () => {
+    // Handle different modals
+    try {
+        // 1. Handle initial "Search by Sales Order" dialog (OK button)
+        if (showInitialSalesOrderModal.value) {
+            // Validate inputs
+            if (!salesOrderParts.value.part1 || !salesOrderParts.value.part2 || !salesOrderParts.value.part3) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Format SO number (MM-YYYY-SSSSS)
+            const soNumber = [
+                String(salesOrderParts.value.part1).padStart(2, '0'),
+                String(salesOrderParts.value.part2).padStart(4, '0'),
+                String(salesOrderParts.value.part3).padStart(5, '0')
+            ].join('-');
+
+            // Close all modals first
+            closeAllModals();
+
+            try {
+                // Show loading state if needed
+                emit('loading', true);
+
+                // Fetch SO details
+                const response = await axios.get(`/api/sales-order/${encodeURIComponent(soNumber)}/detail`);
+
+                if (response.data?.success && response.data.data) {
+                    // Emit event to parent to show SO details
+                    emit('so-selected', response.data.data);
+                } else {
+                    // Show error message and reopen search dialog
+                    alert('Sales Order not found');
+                    showInitialSalesOrderModal.value = true;
+                }
+            } catch (error) {
+                console.error('Error fetching SO details:', error);
+                let errorMessage = 'Failed to load Sales Order details';
+
+                if (error.response) {
+                    // Server responded with error status
+                    errorMessage = error.response.data?.message || errorMessage;
+                } else if (error.request) {
+                    // No response received
+                    errorMessage = 'No response from server. Please check your connection.';
+                }
+
+                alert(errorMessage);
+                showInitialSalesOrderModal.value = true;
+            } finally {
+                emit('loading', false);
+            }
+            return;
+        }
+
+        // 2. Handle "Select" in Sales Order Table modal
+        if (showSalesOrderSearchModal.value) {
+            if (selectedSalesOrder.value?.so_number) {
+                const soNum = selectedSalesOrder.value.so_number;
+                const segments = soNum.split('-');
+
+                if (segments.length >= 3) {
+                    // Update the search fields with selected SO
+                    salesOrderParts.value = {
+                        part1: segments[0] || '0',
+                        part2: segments[1] || '0',
+                        part3: String(parseInt(segments[2] || '0') || 0).padStart(5, '0'),
+                        part4: 'mm-yyyy-ccccc',
+                    };
+
+                    // Close table and show initial search with pre-filled values
+                    closeAllModals();
+                    showInitialSalesOrderModal.value = true;
+                } else {
+                    alert('Invalid Sales Order number format');
+                }
+            } else {
+                alert('Please select a Sales Order');
+            }
+            return;
+        }
+
+        // Default: close all modals for other cases
+        closeAllModals();
+    } catch (error) {
+        console.error('Error in performSearch:', error);
+        closeAllModals();
+    }
+};
+
+// New function to open Sales Order Table from table icon
+const openSalesOrderTable = async () => {
+    try {
+        closeAllModals();
+        showSalesOrderSearchModal.value = true;
+        await fetchSalesOrders({
+            month: salesOrderParts.value.part1,
+            year: salesOrderParts.value.part2,
+            sequence: salesOrderParts.value.part3
+        });
+    } catch (error) {
+        console.error('Error opening sales order table:', error);
+    }
 };
 
 const retrySearch = () => {
@@ -1515,8 +1650,8 @@ const handleOptionSelection = () => {
     }
 };
 
-// Declare emits so Vue recognizes listeners passed from parent (e.g. @show-notification)
-const emit = defineEmits(['customerSelected', 'showNotification']);
+// Declare emits so Vue recognizes listeners passed from parent (e.g. @show-notification, @so-selected)
+const emit = defineEmits(['customerSelected', 'showNotification', 'so-selected', 'loading']);
 
 defineExpose({
     openInitialSalesOrderModal,

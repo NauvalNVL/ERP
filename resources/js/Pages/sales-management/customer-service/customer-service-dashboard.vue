@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <button @click="modalsRef.openInitialSalesOrderModal()" class="dashboard-button">
+                        <button @click="openSearchBySalesOrder" class="dashboard-button">
                             Search by Sales Order
                         </button>
                         <button @click="modalsRef.openMasterCardSearchDirectlyModal()" class="dashboard-button">
@@ -99,7 +99,18 @@
         </div>
 
         <!-- Modals Component -->
-        <CustomerServiceModals ref="modalsRef" @show-notification="showNotification" />
+        <CustomerServiceModals
+            ref="modalsRef"
+            @show-notification="showNotification"
+            @so-selected="handleSalesOrderSelected"
+        />
+
+        <!-- Sales Order Detail View (CPS-style detail after Search by Sales Order OK) -->
+        <SODetailView
+            v-if="showSODetail && selectedSOData"
+            :so-data="selectedSOData"
+            @close="showSODetail = false"
+        />
 
         <!-- General Notification Toast -->
         <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
@@ -127,17 +138,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineAsyncComponent } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
-
-const CustomerServiceModals = defineAsyncComponent(() => import('@/Components/CustomerServiceModals.vue'));
+import SODetailView from '@/Components/SODetailView.vue';
+import CustomerServiceModals from '@/Components/CustomerServiceModals.vue';
 
 const dashboardData = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const modalsRef = ref(null); // Ref to access methods from the child component
+
+// State for Sales Order detail view (result of Search by Sales Order flow)
+const showSODetail = ref(false);
+const selectedSOData = ref(null);
 
 const notification = ref({
     show: false,
@@ -173,6 +188,21 @@ const showNotification = (message, type) => {
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);
+};
+
+// Handler for SO detail selected from CustomerServiceModals (OK on Search by Sales Order)
+const handleSalesOrderSelected = (soData) => {
+    selectedSOData.value = soData;
+    showSODetail.value = true;
+};
+
+// Wrapper agar tombol di dashboard selalu aman memanggil modal Search by Sales Order
+const openSearchBySalesOrder = () => {
+    if (modalsRef.value && typeof modalsRef.value.openInitialSalesOrderModal === 'function') {
+        modalsRef.value.openInitialSalesOrderModal();
+    } else {
+        console.warn('CustomerServiceModals ref not ready or method openInitialSalesOrderModal not found');
+    }
 };
 </script>
 
