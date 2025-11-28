@@ -467,8 +467,27 @@ const onSalespersonTeamSelected = (team) => {
     searchQuery.value = team.s_person_code;
     showModal.value = false;
     
-    // Data is now displayed in the text box, no need to open edit modal
-    // User can manually click Edit button if they want to modify the data
+    // Automatically open the edit modal for the selected row
+    isCreating.value = false;
+    editForm.value = {
+        id: team.id,
+        s_person_code: team.s_person_code,
+        salesperson_name: team.salesperson_name,
+        sales_team_id: '',
+        st_code: team.st_code,
+        sales_team_name: team.sales_team_name,
+        sales_team_position: team.sales_team_position || 'E-Executive',
+        status: team.status || 'Active'
+    };
+    
+    // Find the sales_team_id from salesTeams
+    const salesTeam = salesTeams.value.find(t => t.code === team.st_code);
+    if (salesTeam) {
+        editForm.value.sales_team_id = salesTeam.id;
+    }
+    
+    console.log('Selected team for editing:', editForm.value);
+    showEditModal.value = true;
 };
 
 const onSalespersonTeamUpdated = async (updatedTeam) => {

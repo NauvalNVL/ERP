@@ -33,6 +33,7 @@ class SalespersonTeamController extends Controller
                     'sales_team_name',
                     'sales_team_position'
                 )
+                ->where('status', 'Act')
                 ->orderBy('s_person_code')
                 ->get();
 
@@ -48,6 +49,7 @@ class SalespersonTeamController extends Controller
                         'sales_team_name',
                         'sales_team_position'
                     )
+                    ->where('status', 'Act')
                     ->orderBy('s_person_code')
                     ->get();
             }
@@ -238,19 +240,24 @@ class SalespersonTeamController extends Controller
     public function destroy($id)
     {
         try {
-            // Delete salesperson team record from the correct table
-            $deleted = DB::table('salesperson_teams')->where('id', $id)->delete();
+            // Soft delete: update status to 'Obs'
+            $updated = DB::table('salesperson_teams')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'Obs',
+                    'updated_at' => now()
+                ]);
 
-            if (!$deleted) {
+            if (!$updated) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Salesperson team not found or could not be deleted'
+                    'message' => 'Salesperson team not found or could not be updated'
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Salesperson team deleted successfully'
+                'message' => 'Salesperson team marked as obsolete successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting salesperson team: ' . $e->getMessage());
@@ -360,7 +367,8 @@ class SalespersonTeamController extends Controller
     public function apiIndex()
     {
         try {
-            $salespersonTeams = DB::table('salesperson_teams')
+            // Filter by status 'Act' unless specifically requested otherwise
+            $query = DB::table('salesperson_teams')
                 ->select(
                     'id',
                     's_person_code',
@@ -370,8 +378,13 @@ class SalespersonTeamController extends Controller
                     'sales_team_position',
                     'status'
                 )
-                ->orderBy('s_person_code')
-                ->get()
+                ->orderBy('s_person_code');
+            
+            if (!request()->has('all_status')) {
+                $query->where('status', 'Act');
+            }
+            
+            $salespersonTeams = $query->get()
                 ->map(function ($team) {
                     // Ensure status has default value
                     $team->status = $team->status ?? 'Act';
