@@ -30,15 +30,26 @@ class DashboardController extends Controller
         ];
 
         // Sales Orders: gunakan tabel legacy CPS 'SO' (bukan tabel Laravel 'sales_orders')
+        // Hitung hanya dokumen utama dengan menghitung SO_Num yang unik (Main + Fit share the same SO_Num)
         $salesOrdersCount = Schema::hasTable('SO')
-            ? DB::table('SO')->count()
+            ? DB::table('SO')->distinct()->count('SO_Num')
+            : 0;
+
+        // Delivery Orders: hitung hanya DO_Num yang unik (setiap DO bisa punya beberapa baris komponen)
+        $deliveryOrdersCount = Schema::hasTable('DO')
+            ? DB::table('DO')->distinct()->count('DO_Num')
+            : 0;
+
+        // Invoices: hitung hanya IV_NUM yang unik (satu dokumen invoice, beberapa baris komponen)
+        $invoiceCount = Schema::hasTable('INV')
+            ? DB::table('INV')->distinct()->count('IV_NUM')
             : 0;
 
         $businessStats = [
             'customers' => Customer::count(),
-            'invoices' => Invoice::count(),
+            'invoices' => $invoiceCount,
             'salesOrders' => $salesOrdersCount,
-            'deliveryOrders' => DeliveryOrder::count(),
+            'deliveryOrders' => $deliveryOrdersCount,
         ];
 
         $recentIndustries = Industry::orderByDesc('code')
@@ -63,7 +74,11 @@ class DashboardController extends Controller
             $year = (int) $date->format('Y');
             $month = (int) $date->format('m');
 
-            $invoiceCount = Invoice::forPeriod($year, $month)->count();
+            // Hitung invoice per bulan berdasarkan jumlah dokumen (IV_NUM) yang unik,
+            // bukan jumlah baris komponen (Main + Fit) di tabel INV
+            $invoiceCount = Invoice::forPeriod($year, $month)
+                ->distinct()
+                ->count('IV_NUM');
 
             $invoiceTrendLabels[] = $date->format('M Y');
             $invoiceTrendValues[] = $invoiceCount;
