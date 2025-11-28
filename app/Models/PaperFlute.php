@@ -27,7 +27,7 @@ class PaperFlute extends Model
         '_2L',      // [2L] in database
         'Height',
         'Starch',
-        'is_active',
+        'status',
     ];
 
     protected $casts = [
@@ -39,6 +39,5 @@ class PaperFlute extends Model
         '_2L' => 'float',
         'Height' => 'float',
         'Starch' => 'float',
-        'is_active' => 'boolean',
     ];
 }

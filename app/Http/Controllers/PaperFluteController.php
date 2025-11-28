@@ -75,6 +75,7 @@ class PaperFluteController extends Controller
 
             $data = $request->all();
             $data['No'] = PaperFlute::max('No') + 1;
+            $data['status'] = 'Act'; // Set default status to Active
             
             $paperFlute = PaperFlute::create($data);
 
@@ -131,7 +132,7 @@ class PaperFluteController extends Controller
                 '_2L' => 'nullable|numeric|min:0',
                 'Height' => 'nullable|numeric|min:0',
                 'Starch' => 'nullable|numeric|min:0',
-                'is_active' => 'nullable|boolean',
+                'status' => 'nullable|string|in:Act,Obs',
             ]);
 
             if ($validator->fails()) {
@@ -212,31 +213,55 @@ class PaperFluteController extends Controller
     }
 
     /**
-     * Remove the specified paper flute from storage.
+     * Remove the specified paper flute from storage (soft delete).
      */
     public function destroy($flute)
     {
         try {
             $paperFlute = PaperFlute::where('Flute', $flute)->firstOrFail();
             
-            // Store information before deletion for the response
-            $fluteInfo = [
-                'Flute' => $paperFlute->Flute,
-                'Descr' => $paperFlute->Descr
-            ];
-            
-            $paperFlute->delete();
+            // Soft delete by changing status to Obsolete
+            $paperFlute->status = 'Obs';
+            $paperFlute->save();
             
             return response()->json([
                 'success' => true,
-                'message' => 'Paper flute berhasil dihapus.',
-                'data' => $fluteInfo
+                'message' => 'Paper flute berhasil diubah menjadi obsolete.',
+                'data' => $paperFlute
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting paper flute: ' . $e->getMessage());
+            Log::error('Error changing paper flute status: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting paper flute: ' . $e->getMessage()
+                'message' => 'Error changing paper flute status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle the status of a paper flute between Active and Obsolete.
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            $paperFlute = PaperFlute::where('No', $id)->firstOrFail();
+            
+            // Toggle status
+            $paperFlute->status = ($paperFlute->status === 'Act') ? 'Obs' : 'Act';
+            $paperFlute->save();
+            
+            $statusText = ($paperFlute->status === 'Act') ? 'activated' : 'deactivated';
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Paper flute {$paperFlute->Flute} successfully {$statusText}.",
+                'data' => $paperFlute
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error toggling paper flute status: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error toggling paper flute status: ' . $e->getMessage()
             ], 500);
         }
     }

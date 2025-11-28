@@ -28,6 +28,9 @@ return new class extends Migration
             $table->float('Height')->nullable();
             $table->float('Starch')->nullable();
             
+            // Status column for soft delete (Act = Active, Obs = Obsolete)
+            $table->string('status', 3)->default('Act')->collation($collation);
+            
             // No timestamps - matching CPS database structure
         });
     }
