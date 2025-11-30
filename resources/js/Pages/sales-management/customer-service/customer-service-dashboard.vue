@@ -33,9 +33,6 @@
                         <button @click="modalsRef.openInitialInvoiceModal()" class="dashboard-button">
                             Search by Invoice
                         </button>
-                        <button @click="openCustomerDesktopService" class="dashboard-button bg-purple-500 hover:bg-purple-600">
-                            Customer Desktop Service
-                        </button>
                     </div>
 
                     <div v-if="loading" class="mt-8 bg-yellow-100 p-4 rounded-lg text-yellow-800 flex items-center space-x-3">
@@ -101,12 +98,6 @@
             </div>
         </div>
 
-        <!-- Customer Desktop Service Modal -->
-        <CustomerServiceDashboardModal
-            v-if="showCustomerDesktopModal"
-            @close="showCustomerDesktopModal = false"
-        />
-
         <!-- Modals Component -->
         <CustomerServiceModals
             ref="modalsRef"
@@ -153,7 +144,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import SODetailView from '@/Components/SODetailView.vue';
 import CustomerServiceModals from '@/Components/CustomerServiceModals.vue';
-import CustomerServiceDashboardModal from '@/Components/CustomerServiceDashboardModal.vue';
 
 const dashboardData = ref(null);
 const loading = ref(true);
@@ -163,9 +153,6 @@ const modalsRef = ref(null); // Ref to access methods from the child component
 // State for Sales Order detail view (result of Search by Sales Order flow)
 const showSODetail = ref(false);
 const selectedSOData = ref(null);
-
-// State for Customer Desktop Service modal
-const showCustomerDesktopModal = ref(false);
 
 const notification = ref({
     show: false,
@@ -216,11 +203,6 @@ const openSearchBySalesOrder = () => {
     } else {
         console.warn('CustomerServiceModals ref not ready or method openInitialSalesOrderModal not found');
     }
-};
-
-// Handler untuk Customer Desktop Service modal
-const openCustomerDesktopService = () => {
-    showCustomerDesktopModal.value = true;
 };
 </script>
 

@@ -22,7 +22,7 @@
           </div>
         </div>
 
-        <!-- Customer Information Grid -->
+        <!-- Customer / Sales Order Information Grid -->
         <div class="bg-teal-600 rounded p-2">
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
             <div>
@@ -51,6 +51,43 @@
               <div class="font-semibold">{{ soData.order_info?.order_group || 'Sales' }}</div>
               <div class="text-teal-200">S/O Type:</div>
               <div class="font-semibold">{{ soData.order_info?.order_type || 'S1' }}</div>
+            </div>
+          </div>
+
+          <!-- Delivery Order header info (visible when coming from Search by Delivery Order) -->
+          <div
+            v-if="soData.selected_delivery_order"
+            class="mt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 text-[11px]"
+          >
+            <div>
+              <div class="text-teal-200">D/Order#:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.do_number || '' }}</div>
+              <div class="text-teal-200">D/O Date:</div>
+              <div class="font-semibold">{{ formatDate(soData.selected_delivery_order.do_date) }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">Vehicle#:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.vehicle_no || '' }}</div>
+              <div class="text-teal-200">Vehicle Class:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.vehicle_class || '' }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">Salesperson:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.salesperson_code || '' }}</div>
+              <div class="text-teal-200">C/Ticket#:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.cticket_no || '' }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">Order Mode:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.order_mode || '' }}</div>
+              <div class="text-teal-200">Sales Type:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.sales_type || '' }}</div>
+            </div>
+            <div>
+              <div class="text-teal-200">On-Hold:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.on_hold || '' }}</div>
+              <div class="text-teal-200">Status:</div>
+              <div class="font-semibold">{{ soData.selected_delivery_order.status || '' }}</div>
             </div>
           </div>
         </div>
