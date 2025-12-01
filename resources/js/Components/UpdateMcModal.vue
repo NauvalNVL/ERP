@@ -546,7 +546,7 @@
                                     <input type="text" v-model="partNo" class="w-40 px-2 py-1 border border-gray-400 text-xs">
                                 </div>
                                 <div class="flex items-center">
-                                    <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium" @click="showMoreDescriptionModal = true">Description</button>
+                                    <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium" @click="openMoreDescriptionModal">Description</button>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
@@ -1127,7 +1127,7 @@
     <MoreDescriptionModal
         :show="showMoreDescriptionModal"
         :value="moreDescriptions"
-        @update:value="(v) => { moreDescriptions.value = Array.isArray(v) ? v.slice(0, 5) : []; }"
+        @update:value="onMoreDescriptionSave"
         @close="showMoreDescriptionModal = false"
     />
     <WrappingMaterialModal
@@ -1711,6 +1711,27 @@ const showMoreDescriptionModal = ref(false);
 let moreDescriptions = ref([]);
 const showSpecialInstructionsModal = ref(false);
 const specialInstructions = ref(['', '', '', '']);
+
+const openMoreDescriptionModal = () => {
+    try {
+        console.debug('[UpdateMcModal] Opening MoreDescriptionModal, current moreDescriptions:', JSON.parse(JSON.stringify(moreDescriptions.value)));
+    } catch (e) {
+        console.debug('[UpdateMcModal] Opening MoreDescriptionModal');
+    }
+    showMoreDescriptionModal.value = true;
+};
+
+const onMoreDescriptionSave = (rows) => {
+    const normalized = Array.isArray(rows)
+        ? rows.slice(0, 5).map((v) => (v ?? '') + '')
+        : ['', '', '', '', ''];
+    try {
+        console.debug('[UpdateMcModal] MoreDescription saved:', JSON.parse(JSON.stringify(normalized)));
+    } catch (e) {
+        console.debug('[UpdateMcModal] MoreDescription saved');
+    }
+    moreDescriptions.value = normalized;
+};
 
 // Additional PD state bindings
 const partNo = ref('');

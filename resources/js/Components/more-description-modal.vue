@@ -48,17 +48,32 @@ const emit = defineEmits(['close', 'update:value']);
 
 const rows = ref(Array.from({ length: 5 }, () => ''));
 
-watch(() => props.show, (val) => {
-    if (val) {
-        const incoming = Array.isArray(props.value) ? props.value : [];
+watch(
+    () => props.value,
+    (val) => {
+        const incoming = Array.isArray(val) ? val : [];
         rows.value = Array.from({ length: 5 }, (_, i) => incoming[i] || '');
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.show,
+    (val) => {
+        if (val) {
+            const incoming = Array.isArray(props.value) ? props.value : [];
+            rows.value = Array.from({ length: 5 }, (_, i) => incoming[i] || '');
+        }
     }
-});
+);
 
 const save = () => {
-    emit('update:value', rows.value);
-    emit('close');
+	try {
+		console.debug('[MoreDescriptionModal] save rows:', JSON.parse(JSON.stringify(rows.value)));
+	} catch (e) {
+		console.debug('[MoreDescriptionModal] save clicked');
+	}
+	emit('update:value', rows.value);
+	emit('close');
 };
 </script>
-
-
