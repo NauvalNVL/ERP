@@ -75,6 +75,13 @@ return new class extends Migration
             $table->string('DO_Remark2', 250)->nullable()->collation($collation);
             $table->string('Cancelled_Reason', 250)->nullable()->collation($collation);
         });
+
+        // Relasi DO ke master vehicle berdasarkan nomor kendaraan
+        Schema::table('DO', function (Blueprint $table) {
+            $table->foreign('DO_VHC_Num')
+                  ->references('VEHICLE_NO')
+                  ->on('vehicle');
+        });
     }
 
     /**
@@ -82,6 +89,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('DO', function (Blueprint $table) {
+            $table->dropForeign(['DO_VHC_Num']);
+        });
+
         Schema::dropIfExists('do');
     }
 };

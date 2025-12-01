@@ -120,4 +120,9 @@ class PaperSize extends Model
         $inch = $inches ?? $this->inches;
         return self::convertToMillimeters($inch);
     }
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'PAPER_SIZE', 'millimeter');
+    }
 }

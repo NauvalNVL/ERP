@@ -27,7 +27,7 @@ class CustomerSalesTaxIndex extends Model
      */
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customer_code', 'code');
+        return $this->belongsTo(Customer::class, 'customer_code', 'CODE');
     }
 
     /**

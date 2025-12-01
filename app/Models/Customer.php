@@ -50,4 +50,54 @@ class Customer extends Model
     {
         return $this->hasMany(MasterCard::class, 'customer_code', 'CODE');
     }
+
+    public function salesTaxIndices()
+    {
+        return $this->hasMany(CustomerSalesTaxIndex::class, 'customer_code', 'CODE');
+    }
+
+    public function taxProductTieups()
+    {
+        return $this->hasMany(CustomerTaxProductTieup::class, 'customer_code', 'CODE');
+    }
+
+    public function salesperson()
+    {
+        return $this->belongsTo(Salesperson::class, 'SLM', 'Code');
+    }
+
+    public function industry()
+    {
+        return $this->belongsTo(Industry::class, 'IND', 'code');
+    }
+
+    public function geo()
+    {
+        return $this->belongsTo(Geo::class, 'AREA', 'CODE');
+    }
+
+    public function custGroup()
+    {
+        return $this->belongsTo(CustGroup::class, 'GROUP_', 'Group_ID');
+    }
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'AC_NUM', 'CODE');
+    }
+
+    public function salesOrders()
+    {
+        return $this->hasMany(SalesOrder::class, 'customer_code', 'CODE');
+    }
+
+    public function deliveryOrders()
+    {
+        return $this->hasMany(DeliveryOrder::class, 'AC_Num', 'CODE');
+    }
+
+	public function invoices()
+	{
+		return $this->hasMany(Invoice::class, 'AC_NUM', 'CODE');
+	}
 }

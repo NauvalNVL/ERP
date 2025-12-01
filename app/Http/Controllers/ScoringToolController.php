@@ -519,10 +519,7 @@ class ScoringToolController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:10|unique:scoring_tools',
                 'name' => 'required|string|max:100',
-                'scores' => 'required|numeric|min:0',
-                'gap' => 'required|numeric|min:0',
-                'specification' => 'nullable|string|max:255',
-                'description' => 'nullable|string',
+                'scorer_gap' => 'required|numeric|min:0',
                 'status' => 'nullable|string|in:Act,Obs',
             ]);
 
@@ -536,10 +533,7 @@ class ScoringToolController extends Controller
             $scoringTool = ScoringTool::create([
                 'code' => strtoupper($request->code),
                 'name' => $request->name,
-                'scores' => $request->scores,
-                'gap' => $request->gap,
-                'specification' => $request->specification,
-                'description' => $request->description,
+                'scorer_gap' => $request->scorer_gap,
                 'status' => $request->status ?? 'Act',
             ]);
             

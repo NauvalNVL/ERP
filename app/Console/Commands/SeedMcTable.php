@@ -27,17 +27,17 @@ class SeedMcTable extends Command
     public function handle()
     {
         $this->info('Starting MC table seeding...');
-        
+
         try {
             $seeder = new McTableSeeder();
             $seeder->run();
-            
+
             $this->info('MC table seeding completed successfully!');
         } catch (\Exception $e) {
             $this->error('Error seeding MC table: ' . $e->getMessage());
             return 1;
         }
-        
+
         return 0;
     }
 }

@@ -40,4 +40,9 @@ class PaperFlute extends Model
         'Height' => 'float',
         'Starch' => 'float',
     ];
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'FLUTE', 'Flute');
+    }
 }

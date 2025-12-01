@@ -19,6 +19,12 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
+        Schema::table('MC', function (Blueprint $table) {
+            $table->foreign('SWIRE')
+                  ->references('code')
+                  ->on('stitch_wires');
+        });
     }
 
     /**
@@ -26,6 +32,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('MC', function (Blueprint $table) {
+            $table->dropForeign(['SWIRE']);
+        });
         Schema::dropIfExists('stitch_wires');
     }
 };

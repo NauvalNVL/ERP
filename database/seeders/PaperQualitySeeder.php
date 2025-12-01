@@ -84,8 +84,8 @@ class PaperQualitySeeder extends Seeder
             $createEntry('BMKA125', 'BMKA125', 0.1250, null, null, 'KK125', 'Act'),
         ];
         
-        // Empty the table first
-        DB::table('paper_qualities')->truncate();
+        // Empty the table first (use delete to respect SQL Server foreign key constraints)
+        DB::table('paper_qualities')->delete();
         
         // Insert the data
         DB::table('paper_qualities')->insert($paperQualities);

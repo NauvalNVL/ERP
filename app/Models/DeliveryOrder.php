@@ -34,4 +34,24 @@ class DeliveryOrder extends Model
         'Total_DO_Net_KG' => 'decimal:2',
         'DODateSK' => 'integer',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'AC_Num', 'CODE');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'DO_VHC_Num', 'VEHICLE_NO');
+    }
+
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class, 'SO_Num', 'so_number');
+    }
+
+    public function mc()
+    {
+        return $this->belongsTo(Mc::class, 'MCS_Num', 'MCS_Num');
+    }
 }

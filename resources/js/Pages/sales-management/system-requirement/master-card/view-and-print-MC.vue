@@ -36,7 +36,7 @@
                       <span>Print List</span>
                     </div>
                   </button>
-                  <Link href="/sales-management/system-requirement/master-card/obsolate-reactive-mc" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
+                  <Link href="/sales-management/system-requirement/master-card/obsolete-reactive-mc" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
                     <span class="absolute inset-0 bg-white opacity-10 transform scale-x-0 origin-left transition-transform hover:scale-x-100"></span>
                     <div class="relative z-10 flex items-center">
                       <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 transition-transform transform group-hover:rotate-12 shadow-inner">
@@ -367,7 +367,7 @@ const currentDate = new Date().toLocaleString();
 const fetchMasterCards = async () => {
   loading.value = true;
   try {
-    const response = await fetch('/api/obsolate-reactive-mc', {
+    const response = await fetch('/api/obsolete-reactive-mc', {
       headers: {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
@@ -379,7 +379,22 @@ const fetchMasterCards = async () => {
     }
     
     const data = await response.json();
-    masterCards.value = data;
+
+    if (Array.isArray(data)) {
+      masterCards.value = data.map((item) => ({
+        id: item.MCS_Num,
+        mc_seq: item.MCS_Num,
+        mc_model: item.MODEL,
+        customer_name: item.AC_NAME || item.AC_NUM,
+        description: item.P_DESIGN || '',
+        status: (item.STS || '').toLowerCase(),
+        // Use last status-change time from MC_UPDATE_LOG if available
+        updated_at: item.last_updated_at || item.updated_at || null,
+      }));
+    } else {
+      masterCards.value = [];
+      console.error('Unexpected master card data format:', data);
+    }
   } catch (error) {
     console.error('Error fetching master cards:', error);
   } finally {

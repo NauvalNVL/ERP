@@ -109,6 +109,16 @@ class SalesOrder extends Model
     {
         return $this->deliverySchedules()->exists();
     }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_code', 'CODE');
+    }
+
+    public function mc()
+    {
+        return $this->belongsTo(Mc::class, 'master_card_seq', 'MCS_Num');
+    }
 }
 
 

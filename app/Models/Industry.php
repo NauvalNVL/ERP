@@ -18,4 +18,9 @@ class Industry extends Model
     protected $fillable = ['code', 'name', 'status'];
 
     // No casts needed for status as it's a string
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'IND', 'code');
+    }
 }

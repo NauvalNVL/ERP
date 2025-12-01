@@ -49,4 +49,9 @@ class VehicleClass extends Model
               ->orWhere('DESCRIPTION', 'like', "%{$search}%");
         });
     }
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class, 'VEHICLE_CLASS', 'VEHICLE_CLASS_CODE');
+    }
 }

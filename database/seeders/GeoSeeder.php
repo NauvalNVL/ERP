@@ -247,6 +247,62 @@ class GeoSeeder extends Seeder
                 'town_section' => 'TANGERANG SELATAN',
                 'area' => 'BTNW'
             ],
+            [
+                'code' => 'B140',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNW'
+            ],
+            [
+                'code' => 'B150',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNS'
+            ],
+            [
+                'code' => 'B160',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNE'
+            ],
+            [
+                'code' => 'B170',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNW'
+            ],
+            [
+                'code' => 'B180',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNS'
+            ],
+            [
+                'code' => 'B190',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNE'
+            ],
+            [
+                'code' => 'B200',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'TANGERANG',
+                'area' => 'BTNS'
+            ],
         ];
 
         foreach ($geoData as $data) {

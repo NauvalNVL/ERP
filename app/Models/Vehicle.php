@@ -67,4 +67,9 @@ class Vehicle extends Model
         
         return $companies[$this->VEHICLE_COMPANY] ?? $this->VEHICLE_COMPANY;
     }
+
+    public function deliveryOrders()
+    {
+        return $this->hasMany(DeliveryOrder::class, 'DO_VHC_Num', 'VEHICLE_NO');
+    }
 }

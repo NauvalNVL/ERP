@@ -20,6 +20,12 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
+        Schema::table('MC', function (Blueprint $table) {
+            $table->foreign('GLUEING')
+                  ->references('code')
+                  ->on('glueing_materials');
+        });
     }
 
     /**
@@ -27,6 +33,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('MC', function (Blueprint $table) {
+            $table->dropForeign(['GLUEING']);
+        });
         Schema::dropIfExists('glueing_materials');
     }
 };

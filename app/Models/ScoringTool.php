@@ -23,4 +23,9 @@ class ScoringTool extends Model
     
     // Disable timestamps
     public $timestamps = false;
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'S_TOOL', 'code');
+    }
 }

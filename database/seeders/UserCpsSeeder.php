@@ -49,7 +49,8 @@ class UserCpsSeeder extends Seeder
             'password' => 'password123',
             'status' => 'A',
             'password_expiry_date' => 30,
-            'amend_expired_password' => 'No'
+            'amend_expired_password' => 'No',
+            'salesperson_code' => 'S101',
         ]);
 
         // Create full permissions for sample user

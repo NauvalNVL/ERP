@@ -155,6 +155,7 @@ Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
 Route::put('/finishings/{code}/status', [FinishingController::class, 'toggleStatus']);
 
 // Scoring Tool API routes
+Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);
 Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
 Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update'])->where('id', '[0-9]+');
 Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy'])->where('id', '[0-9]+');

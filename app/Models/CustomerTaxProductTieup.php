@@ -32,6 +32,14 @@ class CustomerTaxProductTieup extends Model
     }
 
     /**
+     * Get the customer for this tie-up.
+     */
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_code', 'CODE');
+    }
+
+    /**
      * Get the product group.
      */
     public function productGroup()

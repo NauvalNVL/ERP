@@ -87,7 +87,7 @@ return new class extends Migration
             $table->decimal('TOTAL_IV_NET_KG', 18, 4)->nullable();
 
             // Taxes and remarks
-            $table->string('IV_TAX_CODE', 50)->nullable();
+            $table->string('IV_TAX_CODE', 20)->nullable();
             $table->decimal('IV_TAX_PERCENT', 5, 2)->nullable();
             $table->string('IV_REMARK', 50)->nullable();
             $table->string('CANCELLED_REASON_1', 100)->nullable();

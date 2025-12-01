@@ -15,12 +15,19 @@ return new class extends Migration
             $collation = 'SQL_Latin1_General_CP1_CI_AS';
 
             // Color_Code as primary key - matching CPS database structure
-            $table->string('Color_Code', 15)->primary()->collation($collation);
-            $table->string('Color_Name', 150)->nullable()->collation($collation);
-            $table->string('GroupCode', 15)->nullable()->collation($collation);
-            $table->string('Group', 50)->nullable()->collation($collation);
+            $table->string('Color_Code', 15)->unique();
+            $table->string('Color_Name', 150)->nullable();
+            $table->string('GroupCode', 15)->nullable();
+            $table->string('Group', 50)->nullable();
             $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
-            
+
+
+            // Add foreign key constraint
+            $table->foreign('GroupCode')
+                ->references('CG')
+                ->on('COLOR_GROUP')
+                ->onDelete('set null');
+
             // No timestamps - matching CPS database structure
         });
     }
@@ -32,4 +39,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('COLOR');
     }
-}; 
+};

@@ -68,4 +68,9 @@ class TaxType extends Model
     {
         return $this->belongsTo(TaxGroup::class, 'tax_group_code', 'code');
     }
+
+	public function invoices()
+	{
+		return $this->hasMany(Invoice::class, 'IV_TAX_CODE', 'code');
+	}
 }

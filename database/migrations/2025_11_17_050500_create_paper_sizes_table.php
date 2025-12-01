@@ -22,6 +22,13 @@ return new class extends Migration
                 $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             });
         }
+
+        // Relasi ke MC: MC.PAPER_SIZE menyimpan nilai millimeter dari paper_sizes
+        Schema::table('MC', function (Blueprint $table) {
+            $table->foreign('PAPER_SIZE')
+                  ->references('millimeter')
+                  ->on('paper_sizes');
+        });
     }
 
     /**
@@ -29,6 +36,9 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::table('MC', function (Blueprint $table) {
+            $table->dropForeign(['PAPER_SIZE']);
+        });
         Schema::dropIfExists('paper_sizes');
     }
 };
