@@ -30,7 +30,7 @@
                                     <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                         <i class="fas fa-ruler-combined"></i>
                                     </span>
-                                <input type="text" v-model="searchQuery" 
+                                <input type="text" v-model="searchQuery"
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
@@ -191,10 +191,10 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Size in Millimeters (MM):</label>
-                            <input 
-                                type="number" 
-                                v-model="form.millimeter" 
-                                step="0.01" 
+                            <input
+                                type="number"
+                                v-model="form.millimeter"
+                                step="0.01"
                                 min="0.01"
                                 @input="updateInches"
                                 class="block w-full rounded-md border-gray-300 shadow-sm"
@@ -202,10 +202,10 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Size in Inches:</label>
-                            <input 
-                                type="number" 
-                                v-model="form.inches" 
-                                step="0.01" 
+                            <input
+                                type="number"
+                                v-model="form.inches"
+                                step="0.01"
                                 min="0.01"
                                 @input="updateMillimeters"
                                 class="block w-full rounded-md border-gray-300 shadow-sm"
@@ -243,7 +243,7 @@
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
          :class="{
@@ -327,11 +327,11 @@ const updateMillimeters = () => {
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
     if (newQuery && paperSizes.value.length > 0) {
-        const foundSize = paperSizes.value.find(size => 
+        const foundSize = paperSizes.value.find(size =>
             String(size.id).includes(newQuery) ||
             String(size.millimeter).includes(newQuery)
         );
-        
+
         if (foundSize) {
             selectSize(foundSize);
         }
@@ -342,13 +342,13 @@ const fetchPaperSizes = async () => {
     loading.value = true;
     try {
         const response = await fetch('/api/paper-sizes');
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
-        
+
         if (Array.isArray(data)) {
             paperSizes.value = data;
         } else {
@@ -372,7 +372,7 @@ onMounted(() => {
 const onPaperSizeSelected = (size) => {
     selectSize(size);
     showModal.value = false;
-    
+
     // Automatically open the edit modal for the selected row
     editSelectedSize();
 };
@@ -429,7 +429,7 @@ const savePaperSize = async () => {
         // Different API call for create vs update
         let url = isCreating.value ? '/api/paper-sizes' : `/api/paper-sizes/${form.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -439,17 +439,17 @@ const savePaperSize = async () => {
             },
             body: JSON.stringify(form.value)
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error saving paper size');
         }
-        
+
         const result = await response.json();
-        
+
         // Update the local data
         await fetchPaperSizes();
-        
+
         // Show success notification
         if (isCreating.value) {
             showNotification('Paper size created successfully', 'success');
@@ -463,7 +463,7 @@ const savePaperSize = async () => {
         } else {
             showNotification('Paper size updated successfully', 'success');
         }
-        
+
         // Close the edit modal
         closeEditModal();
     } catch (e) {
@@ -479,39 +479,45 @@ const deletePaperSize = async () => {
         showNotification('No paper size selected', 'error');
         return;
     }
-    
+
     if (!confirm(`Are you sure you want to delete paper size "${sizeDisplay.value}"?`)) {
         return;
     }
-    
+
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        
-        const response = await fetch(`/api/paper-sizes/${selectedSize.value.id}`, {
-            method: 'DELETE',
+
+        const response = await fetch(`/api/paper-sizes/${selectedSize.value.id}/status`, {
+            method: 'PUT',
             headers: {
+                'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ status: 'Obs' }),
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting paper size');
+            throw new Error(errorData.message || 'Error updating paper size status');
         }
-        
-        // Remove from local array
-        paperSizes.value = paperSizes.value.filter(s => s.id !== selectedSize.value.id);
-        
-        // Reset selection and form
-        selectedSize.value = null;
-        searchQuery.value = '';
+
+        // Refresh data so status is up to date
+        await fetchPaperSizes();
+
+        const updated = paperSizes.value.find(s => s.id === selectedSize.value.id);
+        if (updated) {
+            selectedSize.value = updated;
+        } else {
+            selectedSize.value = null;
+            searchQuery.value = '';
+        }
+
         closeEditModal();
-        
-        showNotification('Paper size deleted successfully', 'success');
+        showNotification('Paper size marked as obsolete successfully', 'success');
     } catch (e) {
-        console.error('Error deleting paper size:', e);
+        console.error('Error updating paper size status:', e);
         showNotification('Error: ' + e.message, 'error');
     } finally {
         saving.value = false;
@@ -524,7 +530,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     };
-    
+
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);

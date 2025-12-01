@@ -18,31 +18,31 @@ class PaperSizeController extends Controller
             // Jika request adalah AJAX, kembalikan data dalam format JSON
             if (request()->ajax() || request()->wantsJson()) {
                 $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
-                
+
                 if ($paperSizes->isEmpty()) {
                     $this->seedData();
                     $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
                 }
-                
+
                 return response()->json($paperSizes);
             }
-            
+
             $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
-            
+
             // If there are no paper sizes in the database, seed them
             if ($paperSizes->isEmpty()) {
                 $this->seedData();
                 $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSizes'));
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@index: ' . $e->getMessage());
-            
+
             if (request()->ajax() || request()->wantsJson()) {
                 return response()->json(['error' => 'Failed to load paper size data'], 500);
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', ['paperSizes' => collect([])])
                 ->with('error', 'Terjadi kesalahan saat memuat data');
         }
@@ -67,7 +67,7 @@ class PaperSizeController extends Controller
 
             // Hitung inches secara manual untuk memastikan data konsisten
             $inches = PaperSize::convertToInches($validated['millimeter']);
-            
+
             PaperSize::create([
                 'millimeter' => $validated['millimeter'],
                 'inches' => $inches,
@@ -89,7 +89,7 @@ class PaperSizeController extends Controller
         try {
             $paperSize = PaperSize::findOrFail($id);
             $paperSizes = PaperSize::orderBy('size', 'asc')->get();
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSize', 'paperSizes'));
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@edit: ' . $e->getMessage());
@@ -102,7 +102,7 @@ class PaperSizeController extends Controller
     {
         try {
             $paperSize = PaperSize::findOrFail($id);
-            
+
             $validated = $request->validate([
                 'millimeter' => [
                     'required',
@@ -119,7 +119,7 @@ class PaperSizeController extends Controller
 
             // Hitung inches secara manual untuk memastikan data konsisten
             $inches = PaperSize::convertToInches($validated['millimeter']);
-            
+
             $paperSize->update([
                 'millimeter' => $validated['millimeter'],
                 'inches' => $inches,
@@ -141,7 +141,7 @@ class PaperSizeController extends Controller
         try {
             $paperSize = PaperSize::findOrFail($id);
             $paperSize->delete();
-            
+
             return redirect()->route('paper-size.index')
                 ->with('success', 'Ukuran kertas berhasil dihapus');
         } catch (\Exception $e) {
@@ -151,31 +151,39 @@ class PaperSizeController extends Controller
         }
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(Request $request, $id)
     {
         try {
             $paperSize = PaperSize::find($id);
-            
+
             if (!$paperSize) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Paper size not found'
+                    'message' => 'Paper size not found',
                 ], 404);
             }
 
-            $paperSize->status = ($paperSize->status === 'Act') ? 'Obs' : 'Act';
+            $requestedStatus = $request->input('status');
+
+            if ($requestedStatus && in_array($requestedStatus, ['Act', 'Obs'], true)) {
+                $paperSize->status = $requestedStatus;
+            } else {
+                $paperSize->status = ($paperSize->status === 'Act') ? 'Obs' : 'Act';
+            }
+
             $paperSize->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Paper size status updated successfully',
-                'data' => $paperSize
+                'data' => $paperSize,
             ]);
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@toggleStatus: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error toggling paper size status: ' . $e->getMessage()
+                'message' => 'Error toggling paper size status: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -188,10 +196,10 @@ class PaperSizeController extends Controller
     public function viewAndPrint()
     {
         // Ambil semua data paper size, urutkan berdasarkan size
-        $paperSizes = PaperSize::orderBy('size')->get(); 
-        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpapersize', compact('paperSizes')); 
+        $paperSizes = PaperSize::orderBy('size')->get();
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpapersize', compact('paperSizes'));
     }
-    
+
     /**
      * Display a listing of the resource using Vue.
      *
@@ -202,16 +210,18 @@ class PaperSizeController extends Controller
         try {
             // Ambil data paper size
             $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
-            
+
             // Konversi data untuk format yang benar di frontend
-            $formattedPaperSizes = $paperSizes->map(function($size) {
+            $formattedPaperSizes = $paperSizes->map(function ($size) {
                 return [
                     'id' => $size->id,
                     'millimeter' => $size->millimeter,
-                    'inches' => $size->inches
+                    'inches' => $size->inches,
+                    'status' => $size->status,
+                    'is_active' => $size->is_active,
                 ];
             });
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/paper-size', [
                 'header' => 'Paper Size Management',
                 'initialPaperSizes' => $formattedPaperSizes
@@ -287,7 +297,7 @@ class PaperSizeController extends Controller
             return response()->json(['error' => 'Failed to load paper size data'], 500);
         }
     }
-    
+
     /**
      * Update the paper size via API.
      *
@@ -299,7 +309,7 @@ class PaperSizeController extends Controller
     {
         try {
             $paperSize = PaperSize::findOrFail($id);
-            
+
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'millimeter' => [
                     'nullable',
@@ -317,13 +327,13 @@ class PaperSizeController extends Controller
                     'message' => $validator->errors()->first()
                 ], 422);
             }
-            
+
             $updateData = [];
             if ($request->has('millimeter')) $updateData['millimeter'] = $request->millimeter;
             if ($request->has('inches')) $updateData['inches'] = $request->inches;
             // Status update should be done via toggleStatus, but if provided here, handle it
             // if ($request->has('status')) $updateData['status'] = $request->status;
-            
+
             $paperSize->update($updateData);
 
             return response()->json([
@@ -339,7 +349,7 @@ class PaperSizeController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Store a new paper size via API.
      *
@@ -360,7 +370,7 @@ class PaperSizeController extends Controller
                     'message' => $validator->errors()->first()
                 ], 422);
             }
-            
+
             $paperSize = PaperSize::create([
                 'millimeter' => $request->millimeter,
                 'inches' => $request->inches,
@@ -380,7 +390,7 @@ class PaperSizeController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Delete a paper size via API.
      *
@@ -391,16 +401,16 @@ class PaperSizeController extends Controller
     {
         try {
             $paperSize = PaperSize::findOrFail($id);
-            
+
             // Store info before deletion for the response
             $sizeInfo = [
                 'id' => $paperSize->id,
                 'millimeter' => $paperSize->millimeter,
                 'inches' => $paperSize->inches
             ];
-            
+
             $paperSize->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Paper size deleted successfully',
