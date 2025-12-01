@@ -15,10 +15,15 @@ class VehicleClass extends Model
         'NO_',
         'VEHICLE_CLASS_CODE',
         'DESCRIPTION',
+        'STANDART_CLASS_CODE',
+        'VOLUME_M3',
+        'CAPACITY_WGT_MT',
         'STATUS'
     ];
 
     protected $casts = [
+        'VOLUME_M3' => 'float',
+        'CAPACITY_WGT_MT' => 'float',
     ];
 
     // Scope for active vehicle classes

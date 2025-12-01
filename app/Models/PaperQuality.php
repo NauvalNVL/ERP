@@ -10,7 +10,7 @@ class PaperQuality extends Model
     use HasFactory;
 
     protected $table = 'paper_qualities';
-    
+
     protected $fillable = [
         'paper_quality',
         'paper_name',
@@ -19,13 +19,6 @@ class PaperQuality extends Model
         'wet_end_code',
         'decc_code',
         'status',
-        'flute',
-        'db',
-        'b',
-        'il',
-        'a_c_e',
-        '2l',
-        '2l',
         'created_by',
         'updated_by'
     ];

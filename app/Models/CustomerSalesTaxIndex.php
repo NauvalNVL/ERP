@@ -37,14 +37,4 @@ class CustomerSalesTaxIndex extends Model
     {
         return $this->belongsTo(TaxGroup::class, 'tax_group_code', 'code');
     }
-
-    /**
-     * Get the product tie-ups for this tax index.
-     */
-    public function productTieups()
-    {
-        return CustomerTaxProductTieup::where('customer_code', $this->customer_code)
-            ->where('index_number', $this->index_number)
-            ->get();
-    }
 }

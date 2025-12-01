@@ -20,12 +20,6 @@ return new class extends Migration
             $table->string('wet_end_code', 10)->nullable()->comment('Wet-End Code');
             $table->string('decc_code', 10)->nullable()->comment('DECC Code');
             $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
-            $table->string('flute', 5)->nullable()->comment('Flute');
-            $table->string('db', 5)->nullable()->comment('DB');
-            $table->string('b', 5)->nullable()->comment('B');
-            $table->string('il', 5)->nullable()->comment('IL');
-            $table->string('a_c_e', 5)->nullable()->comment('A/C/E');
-            $table->string('2l', 5)->nullable()->comment('2L');
             $table->string('created_by')->default('system');
             $table->string('updated_by')->default('system');
             $table->timestamps();

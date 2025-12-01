@@ -12,8 +12,8 @@
             </div>
           </div>
           <div class="flex items-center space-x-2">
-            <button 
-              @click="refreshPage" 
+            <button
+              @click="refreshPage"
               class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
               title="Refresh (F5)"
             >
@@ -35,17 +35,17 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="currentPeriod.month" 
-                      type="number" 
-                      min="1" 
+                    <input
+                      v-model="currentPeriod.month"
+                      type="number"
+                      min="1"
                       max="12"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
-                    <input 
-                      v-model="currentPeriod.year" 
+                    <input
+                      v-model="currentPeriod.year"
                       type="number"
                       class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
@@ -66,16 +66,16 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Sales Order#:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="searchForm.soNumber" 
-                      type="text" 
+                    <input
+                      v-model="searchForm.soNumber"
+                      type="text"
                       placeholder="Enter SO Number"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       @keyup.enter="searchSalesOrder"
                       readonly
                     >
-                    <button 
-                      @click="openSalesOrderTableModal" 
+                    <button
+                      @click="openSalesOrderTableModal"
                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                       title="Search SO"
                     >
@@ -91,7 +91,7 @@
         <!-- Sales Order Details -->
         <div v-if="selectedSO" class="bg-gray-50 rounded-lg p-6 mb-6">
           <h3 class="text-sm font-medium text-gray-700 mb-4">Sales Order Amendment</h3>
-          
+
           <!-- Detailed Form Layout matching the image -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Left Column -->
@@ -100,9 +100,9 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
-                  <input 
-                    :value="currentPeriod.month + '/' + currentPeriod.year" 
-                    type="text" 
+                  <input
+                    :value="currentPeriod.month + '/' + currentPeriod.year"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -113,18 +113,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Sales Order#:</label>
-                  <input 
-                    v-model="selectedSO.soNumber" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.soNumber"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Seq:</label>
-                  <input 
-                    v-model="selectedSO.seq" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.seq"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -134,9 +134,9 @@
               <!-- Customer -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Customer:</label>
-                <input 
-                  v-model="selectedSO.customerName" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.customerName"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -145,9 +145,9 @@
               <!-- M/Card Seq# -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">M/Card Seq#:</label>
-                <input 
-                  v-model="selectedSO.mcardSeq" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.mcardSeq"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -156,9 +156,9 @@
               <!-- Order Mode -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-                <input 
-                  v-model="selectedSO.orderMode" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.orderMode"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -168,18 +168,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
-                  <input 
-                    v-model="selectedSO.salesperson" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.salesperson"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Name:</label>
-                  <input 
-                    v-model="selectedSO.salespersonName" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.salespersonName"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -190,18 +190,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Product:</label>
-                  <input 
-                    v-model="selectedSO.product" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.product"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Description:</label>
-                  <input 
-                    v-model="selectedSO.productDescription" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.productDescription"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -212,9 +212,9 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">A/C Currency:</label>
-                  <input 
-                    v-model="selectedSO.currency" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.currency"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -225,53 +225,30 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Rate:</label>
-                  <input 
-                    v-model="selectedSO.exchangeRate" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.exchangeRate"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Method:</label>
-                  <input 
-                    v-model="selectedSO.exchangeMethod" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.exchangeMethod"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
               </div>
-
-              <!-- Analysis Code -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Analysis Code:</label>
-                  <input 
-                    v-model="selectedSO.analysisCode" 
-                    type="text" 
-                    class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-blue-100"
-                    readonly
-                  >
-                </div>
-                <div class="flex items-end">
-                  <button 
-                    @click="openAnalysisCodeModal" 
-                    class="px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                    title="Search Analysis Code"
-                  >
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-              </div>
-
               <!-- Order Status -->
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Status:</label>
-                  <input 
-                    v-model="selectedSO.orderStatus" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.orderStatus"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -284,9 +261,9 @@
               <!-- Cust P/Order# -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Cust P/Order#:</label>
-                <input 
-                  v-model="selectedSO.customerPO" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.customerPO"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -296,17 +273,17 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">P/Order Date:</label>
-                  <input 
-                    v-model="selectedSO.porderDate" 
-                    type="date" 
+                  <input
+                    v-model="selectedSO.porderDate"
+                    type="date"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Mon:</label>
-                  <input 
-                    v-model="selectedSO.month" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.month"
+                    type="text"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                 </div>
@@ -316,9 +293,9 @@
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Set Quantity:</label>
                 <div class="flex items-center space-x-2">
-                  <input 
-                    v-model="selectedSO.setQuantity" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.setQuantity"
+                    type="text"
                     class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                   <span class="text-xs text-gray-500">Leave blank for loose item order</span>
@@ -338,8 +315,8 @@
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
-                  <select 
-                    v-model="selectedSO.orderType" 
+                  <select
+                    v-model="selectedSO.orderType"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     <option value="S1">S1-Sales (SO-Cust-Ener-FG-DU-IV)</option>
@@ -350,9 +327,9 @@
               <!-- Lot Number -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Lot Number:</label>
-                <input 
-                  v-model="selectedSO.lotNumber" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.lotNumber"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
               </div>
@@ -371,9 +348,9 @@
               <!-- Remark -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Remark:</label>
-                <input 
-                  v-model="selectedSO.remark" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.remark"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
               </div>
@@ -381,18 +358,18 @@
               <!-- Instructions -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Instruction1:</label>
-                <input 
-                  v-model="selectedSO.instruction1" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.instruction1"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
               </div>
 
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Instruction2:</label>
-                <input 
-                  v-model="selectedSO.instruction2" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.instruction2"
+                  type="text"
                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Enter instruction 2..."
                 >
@@ -400,15 +377,15 @@
 
               <!-- Amendment Buttons -->
               <div class="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
-                <button 
-                  @click="clearSelection" 
+                <button
+                  @click="clearSelection"
                   class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
                 >
                   <i class="fas fa-times mr-1"></i>
                   Clear
                 </button>
-                <button 
-                  @click="openProductDesignScreen" 
+                <button
+                  @click="openProductDesignScreen"
                   class="px-4 py-2 bg-orange-600 text-white text-sm rounded hover:bg-orange-700 transition-colors"
                 >
                   <i class="fas fa-cogs mr-1"></i>
@@ -430,7 +407,7 @@
     </div>
 
     <!-- Sales Order Table Modal -->
-    <SalesOrderTableModal 
+    <SalesOrderTableModal
       :is-open="showSalesOrderTableModal"
       :customer-data="{ code: 'ALL' }"
       @close="showSalesOrderTableModal = false"
@@ -438,7 +415,7 @@
     />
 
     <!-- Product Design Screen Modal -->
-    <ProductDesignScreenModal 
+    <ProductDesignScreenModal
       :show="showProductDesignModal"
       :initial-quantity="selectedSO ? Number(selectedSO.setQuantity) : 0"
       :master-card="selectedSO ? { model: selectedSO.product } : null"
@@ -447,11 +424,11 @@
     />
 
     <!-- Delivery Location Modal -->
-    <DeliveryLocationModal 
+    <DeliveryLocationModal
       :show="showDeliveryLocationModal"
-      :customer="selectedSO ? { 
-        customer_code: selectedSO.customerCode, 
-        customer_name: selectedSO.customerName 
+      :customer="selectedSO ? {
+        customer_code: selectedSO.customerCode,
+        customer_name: selectedSO.customerName
       } : null"
       :order-details="selectedSO && selectedSO._originalData ? {
         deliveryLocation: {
@@ -477,7 +454,7 @@
     />
 
     <!-- Delivery Schedule Modal -->
-    <DeliveryScheduleModal 
+    <DeliveryScheduleModal
       :show="showDeliveryScheduleModal"
       :order-details="selectedSO ? {
         so_number: selectedSO.soNumber,
@@ -489,63 +466,6 @@
       @close="showDeliveryScheduleModal = false"
       @save="handleDeliveryScheduleSave"
     />
-
-    <!-- Analysis Code Modal -->
-    <div v-if="showAnalysisCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[80vh] overflow-hidden">
-        <!-- Modal Header -->
-        <div class="bg-blue-600 text-white px-6 py-3 flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Analysis Code Table</h3>
-          <button @click="closeAnalysisCodeModal" class="text-white hover:text-gray-200">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
-
-        <!-- Modal Content -->
-        <div class="p-6">
-          <!-- Analysis Code Table -->
-          <div class="overflow-x-auto mb-4">
-            <table class="w-full border-collapse border border-gray-300 text-sm">
-              <thead>
-                <tr class="bg-blue-100">
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">CODE</th>
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">NAME</th>
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP</th>
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP2</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(code, index) in analysisCodeList" :key="index" 
-                    :class="selectedAnalysisCodeIndex === index ? 'bg-blue-200' : 'hover:bg-gray-50'"
-                    @click="selectAnalysisCodeRow(index)"
-                    class="cursor-pointer">
-                  <td class="border border-gray-300 px-3 py-2">{{ code.code }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ code.name }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ code.group }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ code.group2 }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3">
-          <button 
-            @click="selectAnalysisCode" 
-            class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-          >
-            Select
-          </button>
-          <button 
-            @click="closeAnalysisCodeModal" 
-            class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
-          >
-            Exit
-          </button>
-        </div>
-      </div>
-    </div>
   </AppLayout>
 </template>
 
@@ -587,10 +507,7 @@ export default {
             showProductDesignModal: false,
             showDeliveryLocationModal: false,
             showDeliveryScheduleModal: false,
-            selectedRowIndex: -1,
-            showAnalysisCodeModal: false,
-            selectedAnalysisCodeIndex: -1,
-            analysisCodeList: []
+            selectedRowIndex: -1
         }
     },
     methods: {
@@ -609,12 +526,12 @@ export default {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
                         const data = result.data;
-                        
+
                         // Map API data to form fields
                         this.selectedSO = {
                             // Basic SO info
@@ -624,24 +541,23 @@ export default {
                             customerName: data.order_info.customer_name || selectedOrder.customerName,
                             mcardSeq: data.master_card_seq || selectedOrder.mcsNumber,
                             orderMode: data.order_info.order_mode || 'D-Order by Customer + Delivery & Invoice to Customer',
-                            
+
                             // Salesperson info
                             salesperson: data.order_info.salesperson_code || '',
                             salespersonName: data.order_info.salesperson_name || '',
-                            
+
                             // Product info
                             product: data.item_details.pd || '',
                             productDescription: data.order_info.model || '',
-                            
+
                             // Currency info - use data from API
                             currency: data.order_info.currency || 'IDR',
                             exchangeRate: data.order_info.exchange_rate || 1,
                             exchangeMethod: 'N/A',
-                            
+
                             // Analysis and status
-                            analysisCode: data.order_info.analysis_code || 'AMND',
                             orderStatus: data.order_info.so_status || 'Outstanding',
-                            
+
                             // Editable fields - use data from API
                             customerPO: data.order_info.customer_po_number || selectedOrder.customerPo,
                             porderDate: data.order_info.po_date || '',
@@ -654,16 +570,16 @@ export default {
                             remark: data.order_info.remark || '',
                             instruction1: data.order_info.instruction1 || '',
                             instruction2: data.order_info.instruction2 || '',
-                            
+
                             // Additional info
                             soDate: data.order_info.so_date || new Date().toLocaleDateString(),
                             status: data.order_info.so_status || 'Active',
                             totalAmount: 0,
-                            
+
                             // Store original data for update
                             _originalData: data
                         };
-                        
+
                         this.searchForm.soNumber = selectedOrder.soNumber;
                         this.searchPerformed = true;
                         this.showSalesOrderTableModal = false;
@@ -704,21 +620,21 @@ export default {
         async handleDeliveryScheduleSave(scheduleData) {
             try {
                 console.log('handleDeliveryScheduleSave called with data:', scheduleData);
-                
+
                 // Validate required data
                 if (!scheduleData.entries || !Array.isArray(scheduleData.entries)) {
                     console.error('Validation failed: entries missing or not array');
                     alert('Delivery schedule entries are required');
                     return;
                 }
-                
+
                 const soNumber = this.selectedSO.soNumber;
-                
+
                 if (!soNumber) {
                     alert('Sales Order number is required');
                     return;
                 }
-                
+
                 // First, update the SO with amended data
                 const updateData = {
                     so_number: soNumber,
@@ -731,10 +647,9 @@ export default {
                     // sales_tax: this.selectedSO.salesTax ? 'Y' : 'N',
                     remark: this.selectedSO.remark,
                     instruction1: this.selectedSO.instruction1,
-                    instruction2: this.selectedSO.instruction2,
-                    analysis_code: this.selectedSO.analysisCode
+                    instruction2: this.selectedSO.instruction2
                 };
-                
+
                 const updateResponse = await fetch(`/api/sales-order/${soNumber}/update`, {
                     method: 'PUT',
                     headers: {
@@ -743,25 +658,25 @@ export default {
                     },
                     body: JSON.stringify(updateData)
                 });
-                
+
                 if (!updateResponse.ok) {
                     const errorText = await updateResponse.text();
                     throw new Error(`Failed to update SO: ${errorText}`);
                 }
-                
+
                 const updateResult = await updateResponse.json();
                 if (!updateResult.success) {
                     throw new Error(updateResult.message || 'Failed to update SO');
                 }
-                
+
                 console.log('SO updated successfully, now saving delivery schedule...');
-                
+
                 // Now save the delivery schedule
                 const scheduleRequestData = {
                     so_number: soNumber,
                     entries: scheduleData.entries
                 };
-                
+
                 const scheduleResponse = await fetch('/api/sales-order/delivery-schedule', {
                     method: 'POST',
                     headers: {
@@ -773,14 +688,14 @@ export default {
                     credentials: 'same-origin',
                     body: JSON.stringify(scheduleRequestData)
                 });
-                
+
                 if (!scheduleResponse.ok) {
                     const errorText = await scheduleResponse.text();
                     throw new Error(`Failed to save delivery schedule (${scheduleResponse.status}): ${errorText.slice(0, 120)}`);
                 }
-                
+
                 const scheduleResult = await scheduleResponse.json();
-                
+
                 if (scheduleResult.success) {
                     console.log('Delivery schedule saved successfully');
                     alert('Sales Order amendments and delivery schedule saved successfully!');
@@ -794,64 +709,6 @@ export default {
                 alert('Error saving amendments: ' + (error.message || 'Unknown error'));
             }
         },
-
-        async openAnalysisCodeModal() {
-            this.selectedAnalysisCodeIndex = -1;
-
-            try {
-                const response = await fetch('/api/analysis-codes', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const allCodes = Array.isArray(data)
-                        ? data
-                        : (Array.isArray(data.data) ? data.data : []);
-
-                    this.analysisCodeList = allCodes
-                        .filter(code => code.analysis_group === 'SO' && code.analysis_group2 === 'AM')
-                        .map(code => ({
-                            code: code.analysis_code,
-                            name: code.analysis_name,
-                            group: code.analysis_group,
-                            group2: code.analysis_group2,
-                        }));
-                } else {
-                    console.error('Failed to fetch analysis codes for Amend SO');
-                }
-            } catch (error) {
-                console.error('Error fetching analysis codes for Amend SO:', error);
-            }
-
-            this.showAnalysisCodeModal = true;
-        },
-
-        closeAnalysisCodeModal() {
-            this.showAnalysisCodeModal = false;
-            this.selectedAnalysisCodeIndex = -1;
-        },
-
-        selectAnalysisCodeRow(index) {
-            this.selectedAnalysisCodeIndex = index;
-        },
-
-        selectAnalysisCode() {
-            if (this.selectedAnalysisCodeIndex >= 0) {
-                const selectedCode = this.analysisCodeList[this.selectedAnalysisCodeIndex];
-                if (this.selectedSO) {
-                    this.selectedSO.analysisCode = selectedCode.code;
-                }
-                this.closeAnalysisCodeModal();
-            } else {
-                alert('Please select an analysis code from the list.');
-            }
-        },
-
         async searchSalesOrder() {
             if (!this.searchForm.soNumber.trim()) {
                 alert('Please enter a Sales Order number.');
@@ -867,7 +724,7 @@ export default {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     this.selectedSO = data.data || null;

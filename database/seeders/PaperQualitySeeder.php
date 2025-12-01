@@ -16,9 +16,9 @@ class PaperQualitySeeder extends Seeder
     public function run()
     {
         $now = Carbon::now();
-        
+
         // Helper function to create paper quality entries
-        $createEntry = function($paper_quality, $paper_name, $weight_kg_m, $commercial_code = null, $wet_end_code = null, $decc_code = null, $status = 'Act', $flute = null, $db = null, $b = null, $il = null, $a_c_e = null, $two_l = null) use ($now) {
+        $createEntry = function($paper_quality, $paper_name, $weight_kg_m, $commercial_code = null, $wet_end_code = null, $decc_code = null, $status = 'Act') use ($now) {
             return [
                 'paper_quality' => $paper_quality,
                 'paper_name' => $paper_name,
@@ -27,20 +27,13 @@ class PaperQualitySeeder extends Seeder
                 'wet_end_code' => $wet_end_code,
                 'decc_code' => $decc_code,
                 'status' => $status,
-                'flute' => $flute,
-                'db' => $db,
-                'b' => $b,
-                'il' => $il,
-                'a_c_e' => $a_c_e,
-                '2l' => $two_l,
                 'created_by' => 'system',
                 'updated_by' => 'system',
-                'created_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
         };
-        
+
         $paperQualities = [
             // Data based on the image
             $createEntry('AGBK125', 'AGBK125', 0.1250, null, null, '1BL25', 'Act'),
@@ -83,10 +76,10 @@ class PaperQualitySeeder extends Seeder
             $createEntry('BMBK275', 'BMBK275', 0.2750, null, null, 'KB275', 'Act'),
             $createEntry('BMKA125', 'BMKA125', 0.1250, null, null, 'KK125', 'Act'),
         ];
-        
+
         // Empty the table first (use delete to respect SQL Server foreign key constraints)
         DB::table('paper_qualities')->delete();
-        
+
         // Insert the data
         DB::table('paper_qualities')->insert($paperQualities);
     }

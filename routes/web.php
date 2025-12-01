@@ -9,9 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SalesTeamController;
 use App\Http\Controllers\SalespersonController;
-use App\Http\Controllers\SalespersonTeamController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\GeoController;
 use App\Http\Controllers\ProductGroupController;
@@ -22,7 +20,6 @@ use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
-use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
@@ -345,25 +342,12 @@ Route::get('/customer-service/production-monitoring-board', function () {
 return Inertia::render('sales-management/customer-service/production-monitoring-board');
 })->name('vue.customer-service.production-monitoring-board');
 
-// Standard Requirement Routes
-Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
-Route::get('/sales-team/status', [SalesTeamController::class, 'vueManageStatus'])->name('vue.sales-team.status');
-Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
-// Alias for search menu
-Route::get('/define-sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.define-sales-team');
-
 Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
 Route::get('/sales-person/status', [SalespersonController::class, 'vueManageStatus'])->name('vue.sales-person.status');
 Route::get('/sales-person/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person.view-print');
 // Alias for search menu
 Route::get('/define-salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.define-salesperson');
 Route::get('/view-print-salesperson', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.view-print-salesperson');
-
-Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
-Route::get('/sales-person-team/status', [SalespersonTeamController::class, 'vueManageStatus'])->name('vue.sales-person-team.status');
-Route::get('/sales-person-team/view-print', [SalespersonTeamController::class, 'vueViewAndPrint'])->name('vue.sales-person-team.view-print');
-// Alias for search menu
-Route::get('/define-salesperson-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.define-salesperson-team');
 
 Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
 Route::get('/industry/status', [IndustryController::class, 'vueManageStatus'])->name('vue.industry.status');
@@ -446,14 +430,6 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
          // Alias for search menu
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
-
-Route::get('/analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.analysis-code.index');
-Route::get('/analysis-code/status', [AnalysisCodeController::class, 'vueManageStatus'])->name('vue.analysis-code.status');
-Route::get('/analysis-code/view-print', function () {
-    return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-analysis-code');
-})->name('vue.analysis-code.view-print');
-// Alias for search menu
-Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.define-analysis-code');
 
          Route::get('/stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.stitch-wire.index');
          Route::get('/stitch-wire/status', [StitchWireController::class, 'vueManageStatus'])->name('vue.stitch-wire.status');
@@ -947,7 +923,6 @@ Route::put('/paper-sizes/{id}', [PaperSizeController::class, 'apiUpdate']);
 Route::delete('/paper-sizes/{id}', [PaperSizeController::class, 'apiDestroy']);
 
 Route::get('/product-groups', [ProductGroupController::class, 'index']);
-Route::get('/sales-teams', [SalesTeamController::class, 'apiIndex']);
 Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);
 
 // API Routes for Vue Components
@@ -982,19 +957,6 @@ Route::put('/product-groups/{id}', [ProductGroupController::class, 'apiUpdate'])
 Route::delete('/product-groups/{id}', [ProductGroupController::class, 'apiDestroy']);
 Route::put('/product-groups/{id}/status', [ProductGroupController::class, 'toggleStatus']);
 Route::post('/product-groups/seed', [ProductGroupController::class, 'apiSeed']);
-
-// Salesperson Team API routes
-Route::get('/salesperson-teams', [SalespersonTeamController::class, 'apiIndex']);
-Route::post('/salesperson-teams', [SalespersonTeamController::class, 'apiStore']);
-Route::put('/salesperson-teams/{id}', [SalespersonTeamController::class, 'update']);
-Route::delete('/salesperson-teams/{id}', [SalespersonTeamController::class, 'destroy']);
-Route::post('/salesperson-teams/seed', [SalespersonTeamController::class, 'apiSeed']);
-
-// Sales Team API routes
-Route::post('/sales-teams', [SalesTeamController::class, 'store']);
-Route::put('/sales-teams/{id}', [SalesTeamController::class, 'update']);
-Route::delete('/sales-teams/{id}', [SalesTeamController::class, 'destroy']);
-Route::post('/sales-teams/seed', [SalesTeamController::class, 'seed']);
 
     // Scoring Tool API routes
     Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
@@ -1155,7 +1117,6 @@ Route::get('/menu-routes', function () {
     return response()->json($routes);
 });
 
-Route::resource('sales-person-teams', SalespersonTeamController::class);
 Route::resource('update-customer-accounts', UpdateCustomerAccountController::class);
 
 // Close authenticated routes group

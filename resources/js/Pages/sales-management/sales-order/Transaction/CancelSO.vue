@@ -12,8 +12,8 @@
             </div>
           </div>
           <div class="flex items-center space-x-2">
-            <button 
-              @click="refreshPage" 
+            <button
+              @click="refreshPage"
               class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
               title="Refresh (F5)"
             >
@@ -35,17 +35,17 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="currentPeriod.month" 
-                      type="number" 
-                      min="1" 
+                    <input
+                      v-model="currentPeriod.month"
+                      type="number"
+                      min="1"
                       max="12"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
-                    <input 
-                      v-model="currentPeriod.year" 
+                    <input
+                      v-model="currentPeriod.year"
                       type="number"
                       class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
@@ -66,15 +66,15 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Sales Order#:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="searchForm.soNumber" 
-                      type="text" 
+                    <input
+                      v-model="searchForm.soNumber"
+                      type="text"
                       placeholder="Enter SO Number"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       @keyup.enter="searchSalesOrder"
                     >
-                    <button 
-                      @click="openSalesOrderModal" 
+                    <button
+                      @click="openSalesOrderModal"
                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                       title="Search SO"
                     >
@@ -90,7 +90,7 @@
         <!-- Sales Order Details -->
         <div v-if="selectedSO" class="bg-gray-50 rounded-lg p-6 mb-6">
           <h3 class="text-sm font-medium text-gray-700 mb-4">Sales Order Details</h3>
-          
+
           <!-- Form Layout matching the image -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Left Column -->
@@ -100,14 +100,14 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="currentPeriod.month" 
-                      type="number" 
+                    <input
+                      v-model="currentPeriod.month"
+                      type="number"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                     >
-                    <input 
-                      v-model="currentPeriod.year" 
+                    <input
+                      v-model="currentPeriod.year"
                       type="number"
                       class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
@@ -121,18 +121,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Sales Order#:</label>
-                  <input 
-                    v-model="selectedSO.soNumber" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.soNumber"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Seq:</label>
-                  <input 
-                    v-model="selectedSO.seq" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.seq"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -142,9 +142,9 @@
               <!-- Customer -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Customer:</label>
-                <input 
-                  v-model="selectedSO.customerName" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.customerName"
+                  type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -154,18 +154,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">M/Card Seq#:</label>
-                  <input 
-                    v-model="selectedSO.mcardSeq" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.mcardSeq"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Sheet Breadth:</label>
-                  <input 
-                    v-model="selectedSO.sheetBreadth" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.sheetBreadth"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -175,9 +175,9 @@
               <!-- Order Mode -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-                <input 
-                  v-model="selectedSO.orderMode" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.orderMode"
+                  type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -187,18 +187,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
-                  <input 
-                    v-model="selectedSO.salesperson" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.salesperson"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Name:</label>
-                  <input 
-                    v-model="selectedSO.salespersonName" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.salespersonName"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -209,18 +209,18 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Product:</label>
-                  <input 
-                    v-model="selectedSO.product" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.product"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Description:</label>
-                  <input 
-                    v-model="selectedSO.productDescription" 
-                    type="text" 
+                  <input
+                    v-model="selectedSO.productDescription"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -230,9 +230,9 @@
               <!-- Order Status -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Status:</label>
-                <input 
-                  v-model="selectedSO.orderStatus" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.orderStatus"
+                  type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -241,9 +241,9 @@
               <!-- Cust P/Order# -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Cust P/Order#:</label>
-                <input 
-                  v-model="selectedSO.customerPO" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.customerPO"
+                  type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
@@ -252,34 +252,12 @@
               <!-- P/Order Date -->
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">P/Order Date:</label>
-                <input 
-                  v-model="selectedSO.porderDate" 
-                  type="text" 
+                <input
+                  v-model="selectedSO.porderDate"
+                  type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                   readonly
                 >
-              </div>
-
-              <!-- Analysis Code -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Analysis Code:</label>
-                  <input 
-                    v-model="selectedSO.analysisCode" 
-                    type="text" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-blue-100"
-                    readonly
-                  >
-                </div>
-                <div class="flex items-end">
-                  <button 
-                    @click="openAnalysisCodeModal" 
-                    class="px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                    title="Search Analysis Code"
-                  >
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -291,9 +269,9 @@
                 <!-- Cancel Date -->
                 <div class="mb-4">
                   <label class="block text-xs font-medium text-gray-600 mb-1">Cancel Date:</label>
-                  <input 
-                    v-model="cancelDate" 
-                    type="date" 
+                  <input
+                    v-model="cancelDate"
+                    type="date"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   >
                 </div>
@@ -301,9 +279,9 @@
                 <!-- Cancelled By -->
                 <div class="mb-4">
                   <label class="block text-xs font-medium text-gray-600 mb-1">Cancelled By:</label>
-                  <input 
-                    v-model="cancelledBy" 
-                    type="text" 
+                  <input
+                    v-model="cancelledBy"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100"
                     readonly
                   >
@@ -319,15 +297,15 @@
 
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-end space-x-3 mt-6">
-                  <button 
-                    @click="clearSelection" 
+                  <button
+                    @click="clearSelection"
                     class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
                   >
                     <i class="fas fa-times mr-1"></i>
                     Clear
                   </button>
-                  <button 
-                    @click="cancelSalesOrder" 
+                  <button
+                    @click="cancelSalesOrder"
                     class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
                     :disabled="selectedSO.status === 'Cancelled'"
                   >
@@ -351,69 +329,12 @@
     </div>
 
     <!-- Sales Order Table Modal -->
-    <SalesOrderTableModal 
+    <SalesOrderTableModal
       :is-open="showSalesOrderTableModal"
       :customer-data="{ code: 'ALL' }"
       @close="showSalesOrderTableModal = false"
       @select="handleSalesOrderSelect"
     />
-
-    <!-- Analysis Code Modal -->
-    <div v-if="showAnalysisCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[80vh] overflow-hidden">
-        <!-- Modal Header -->
-        <div class="bg-blue-600 text-white px-6 py-3 flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Analysis Code Table</h3>
-          <button @click="closeAnalysisCodeModal" class="text-white hover:text-gray-200">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
-
-        <!-- Modal Content -->
-        <div class="p-6">
-          <!-- Analysis Code Table -->
-          <div class="overflow-x-auto mb-4">
-            <table class="w-full border-collapse border border-gray-300 text-sm">
-              <thead>
-                <tr class="bg-blue-100">
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">CODE</th>
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">NAME</th>
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP</th>
-                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP2</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(code, index) in analysisCodeList" :key="index" 
-                    :class="selectedAnalysisCodeIndex === index ? 'bg-blue-200' : 'hover:bg-gray-50'"
-                    @click="selectAnalysisCodeRow(index)"
-                    class="cursor-pointer">
-                  <td class="border border-gray-300 px-3 py-2">{{ code.code }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ code.name }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ code.group }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ code.group2 }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3">
-          <button 
-            @click="selectAnalysisCode" 
-            class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-          >
-            Select
-          </button>
-          <button 
-            @click="closeAnalysisCodeModal" 
-            class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
-          >
-            Exit
-          </button>
-        </div>
-      </div>
-    </div>
   </AppLayout>
 </template>
 
@@ -442,9 +363,6 @@ export default {
             searchPerformed: false,
             showSalesOrderTableModal: false,
             selectedRowIndex: -1,
-            showAnalysisCodeModal: false,
-            selectedAnalysisCodeIndex: -1,
-            analysisCodeList: [],
             salesOrderList: [
                 {
                     id: 1,
@@ -644,12 +562,12 @@ export default {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
                         const data = result.data;
-                        
+
                         // Map API data to form fields
                         this.selectedSO = {
                             // Basic SO info
@@ -659,27 +577,26 @@ export default {
                             customerName: data.order_info.customer_name || selectedOrder.customerName,
                             mcardSeq: data.master_card_seq || selectedOrder.mcsNumber,
                             orderMode: data.order_info.order_mode || 'D-Order by Customer + Delivery & Invoice to Customer',
-                            
+
                             // Salesperson info
                             salesperson: data.order_info.salesperson_code || '',
                             salespersonName: data.order_info.salesperson_name || '',
-                            
+
                             // Product info
                             product: data.item_details.pd || '',
                             productDescription: data.order_info.model || '',
-                            
+
                             // Status and dates
                             orderStatus: data.order_info.so_status || 'Outstanding',
                             customerPO: data.order_info.customer_po_number || selectedOrder.customerPo,
                             porderDate: data.order_info.po_date || '',
-                            analysisCode: data.order_info.analysis_code || 'CANC',
                             soDate: data.order_info.so_date || new Date().toLocaleDateString(),
                             status: data.order_info.so_status || 'Active',
-                            
+
                             // Store original data
                             _originalData: data
                         };
-                        
+
                         this.searchForm.soNumber = selectedOrder.soNumber;
                         this.searchPerformed = true;
                         this.showSalesOrderTableModal = false;
@@ -694,64 +611,6 @@ export default {
                 alert('Error loading sales order details');
             }
         },
-
-        async openAnalysisCodeModal() {
-            this.selectedAnalysisCodeIndex = -1;
-
-            try {
-                const response = await fetch('/api/analysis-codes', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const allCodes = Array.isArray(data)
-                        ? data
-                        : (Array.isArray(data.data) ? data.data : []);
-
-                    this.analysisCodeList = allCodes
-                        .filter(code => code.analysis_group === 'SO' && code.analysis_group2 === 'CL')
-                        .map(code => ({
-                            code: code.analysis_code,
-                            name: code.analysis_name,
-                            group: code.analysis_group,
-                            group2: code.analysis_group2,
-                        }));
-                } else {
-                    console.error('Failed to fetch analysis codes for Cancel SO');
-                }
-            } catch (error) {
-                console.error('Error fetching analysis codes for Cancel SO:', error);
-            }
-
-            this.showAnalysisCodeModal = true;
-        },
-
-        closeAnalysisCodeModal() {
-            this.showAnalysisCodeModal = false;
-            this.selectedAnalysisCodeIndex = -1;
-        },
-
-        selectAnalysisCodeRow(index) {
-            this.selectedAnalysisCodeIndex = index;
-        },
-
-        selectAnalysisCode() {
-            if (this.selectedAnalysisCodeIndex >= 0) {
-                const selectedCode = this.analysisCodeList[this.selectedAnalysisCodeIndex];
-                if (this.selectedSO) {
-                    this.selectedSO.analysisCode = selectedCode.code;
-                }
-                this.closeAnalysisCodeModal();
-            } else {
-                alert('Please select an analysis code from the list.');
-            }
-        },
-
         async searchSalesOrder() {
             if (!this.searchForm.soNumber.trim()) {
                 alert('Please enter a Sales Order number.');
@@ -767,7 +626,7 @@ export default {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     this.selectedSO = data.data || null;
@@ -810,11 +669,10 @@ export default {
                         body: JSON.stringify({
                             cancel_reason: '',
                             cancel_date: this.cancelDate,
-                            cancelled_by: this.cancelledBy,
-                            analysis_code: this.selectedSO.analysisCode
+                            cancelled_by: this.cancelledBy
                         })
                     });
-                    
+
                     if (response.ok) {
                         const result = await response.json();
                         if (result.success) {

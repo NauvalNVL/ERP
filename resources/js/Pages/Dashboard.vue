@@ -17,30 +17,11 @@
         </div>
 
         <!-- ERP Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <!-- Sales Teams -->
-            <div
-                class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
-                style="animation-delay: 100ms;"
-            >
-                <div class="p-6 flex items-center">
-                    <div class="rounded-full bg-blue-500 p-3 mr-4">
-                        <i class="fas fa-users-cog text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Sales Teams</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ dashboardStats.salesTeams || 0 }}</p>
-                        <p class="text-sm text-blue-600 flex items-center">
-                            <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Active teams</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <!-- Product Groups -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
-                style="animation-delay: 200ms;"
+                style="animation-delay: 100ms;"
             >
                 <div class="p-6 flex items-center">
                     <div class="rounded-full bg-green-500 p-3 mr-4">
@@ -59,7 +40,7 @@
             <!-- Machines -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
-                style="animation-delay: 300ms;"
+                style="animation-delay: 200ms;"
             >
                 <div class="p-6 flex items-center">
                     <div class="rounded-full bg-purple-500 p-3 mr-4">
@@ -78,7 +59,7 @@
             <!-- Paper Qualities -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
-                style="animation-delay: 400ms;"
+                style="animation-delay: 300ms;"
             >
                 <div class="p-6 flex items-center">
                     <div class="rounded-full bg-orange-500 p-3 mr-4">
@@ -114,13 +95,13 @@
                     ERP Module Access
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a href="/sales-team" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                    <a href="/product-group" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                         <div class="p-2 bg-blue-500 rounded-full mr-3">
                             <i class="fas fa-clipboard-list text-white text-sm"></i>
                         </div>
                         <div>
                             <p class="font-medium text-blue-900">Standard Requirement</p>
-                            <p class="text-xs text-blue-700">Manage sales teams, products, machines</p>
+                            <p class="text-xs text-blue-700">Manage product groups, products, machines</p>
                         </div>
                     </a>
                     <a href="/customer-group" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
@@ -313,17 +294,6 @@
                     Quick Actions - ERP Modules
                 </h4>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <a
-                        href="/sales-team"
-                        class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-300"
-                    >
-                        <div class="bg-blue-100 p-3 rounded-full mb-2">
-                            <i class="fas fa-users-cog text-blue-500 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >Define Sales Team</span
-                        >
-                    </a>
                     <a
                         href="/product-group"
                         class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-300"

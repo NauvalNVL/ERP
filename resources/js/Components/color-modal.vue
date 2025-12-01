@@ -29,8 +29,7 @@
             <thead class="bg-gray-50 sticky top-0">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('color_id')">Color#</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('color_name')">Color Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('origin')">Origin</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('color_name')">Color Name</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('color_group_id')">CG#</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('cg_type')">CG Type</th>
               </tr>
@@ -42,14 +41,13 @@
                 @dblclick="selectAndClose(color)">
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ color.color_id }}</td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ color.color_name }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ color.origin }}</td>
                 <td class="px-6 py-3 whitespace-nowrap">
                   <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">{{ color.color_group_id }}</span>
                 </td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ color.cg_type }}</td>
               </tr>
               <tr v-if="filteredColors.length === 0">
-                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No color data available.</td>
+                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No color data available.</td>
               </tr>
             </tbody>
           </table>
@@ -109,12 +107,11 @@ const filteredColors = computed(() => {
     colors = colors.filter(color =>
       color.color_id.toLowerCase().includes(q) ||
       color.color_name.toLowerCase().includes(q) ||
-      color.origin.toLowerCase().includes(q) ||
       color.color_group_id.toLowerCase().includes(q) ||
       (color.cg_type && color.cg_type.toLowerCase().includes(q))
     );
   }
-  
+
   // Apply sorting
   return [...colors].sort((a, b) => {
     if (sortKey.value === 'color_id') {
@@ -122,7 +119,7 @@ const filteredColors = computed(() => {
       if (a.color_id > b.color_id) return sortAsc.value ? 1 : -1;
       return 0;
     }
-    
+
     if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
     if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
     return 0;
@@ -156,11 +153,11 @@ function sortTable(key) {
 function sortByCGAndColor() {
   sortKey.value = 'color_group_id';
   sortAsc.value = true;
-  
+
   filteredColors.value.sort((a, b) => {
     if (a.color_group_id < b.color_group_id) return -1;
     if (a.color_group_id > b.color_group_id) return 1;
-    
+
     // If color groups are the same, sort by color_id
     if (a.color_id < b.color_id) return -1;
     if (a.color_id > b.color_id) return 1;
@@ -172,14 +169,14 @@ function sortByCGAndColor() {
 function sortByCGTypeAndColor() {
   sortKey.value = 'cg_type';
   sortAsc.value = true;
-  
+
   filteredColors.value.sort((a, b) => {
     const typeA = a.cg_type || '';
     const typeB = b.cg_type || '';
-    
+
     if (typeA < typeB) return -1;
     if (typeA > typeB) return 1;
-    
+
     // If CG types are the same, sort by color_id
     if (a.color_id < b.color_id) return -1;
     if (a.color_id > b.color_id) return 1;
@@ -192,7 +189,7 @@ watch(() => props.show, (val) => {
   if (val) {
     selectedColor.value = null;
     searchQuery.value = '';
-    
+
     // Emit event to parent component to refresh colors data
     emit('refresh');
   }

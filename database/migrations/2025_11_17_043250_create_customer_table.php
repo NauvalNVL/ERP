@@ -70,12 +70,6 @@ return new class extends Migration
                   ->on('CUSTOMER');
         });
 
-        Schema::table('customer_tax_product_tieups', function (Blueprint $table) {
-            $table->foreign('customer_code')
-                  ->references('CODE')
-                  ->on('CUSTOMER');
-        });
-
         // Link legacy SO, DO, MC, and INV tables to CUSTOMER by account number
         if (Schema::hasTable('so')) {
             Schema::table('so', function (Blueprint $table) {
@@ -132,10 +126,6 @@ return new class extends Migration
         }
 
         Schema::table('customer_sales_tax_indices', function (Blueprint $table) {
-            $table->dropForeign(['customer_code']);
-        });
-
-        Schema::table('customer_tax_product_tieups', function (Blueprint $table) {
             $table->dropForeign(['customer_code']);
         });
 

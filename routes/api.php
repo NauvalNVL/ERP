@@ -13,7 +13,6 @@ use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ColorController;
-use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
 use App\Http\Controllers\BundlingStringController;
@@ -194,14 +193,6 @@ Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
 Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
 Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
 
-// Analysis Code API routes
-Route::get('/analysis-codes', [AnalysisCodeController::class, 'apiIndex']);
-Route::get('/analysis-codes/{code}', [AnalysisCodeController::class, 'show']);
-Route::post('/analysis-codes', [AnalysisCodeController::class, 'store']);
-Route::put('/analysis-codes/{code}', [AnalysisCodeController::class, 'update']);
-Route::delete('/analysis-codes/{code}', [AnalysisCodeController::class, 'destroy']);
-Route::put('/analysis-codes/{code}/status', [AnalysisCodeController::class, 'toggleStatus']);
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();
 });
@@ -273,8 +264,6 @@ Route::get('/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Contr
 Route::post('/customer-tax-indices', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'store']);
 Route::delete('/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'destroy']);
 Route::put('/customer-tax-indices/{customerCode}/{indexNumber}/status', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'toggleStatus']);
-Route::get('/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getProductTieups']);
-Route::post('/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'saveProductTieups']);
 
 // Amend Invoice endpoints - Wildcard routes MUST be last
 Route::get('/test-inv-data', function() {
@@ -643,8 +632,6 @@ Route::delete('/geo/{code}', [App\Http\Controllers\GeoController::class, 'destro
 Route::post('/geo/seed', [App\Http\Controllers\GeoController::class, 'seed']);
 
 Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
-Route::get('/salesperson-teams', [App\Http\Controllers\SalespersonTeamController::class, 'apiIndex']);
-Route::put('/salesperson-teams/{id}', [App\Http\Controllers\SalespersonTeamController::class, 'update']);
 
 // Customer Group API routes
 Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex'])->name('api.customer-groups.index');

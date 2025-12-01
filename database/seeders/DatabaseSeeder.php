@@ -12,10 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            AnalysisCodesTableSeeder::class,
-
             // Master data that CUSTOMER depends on
-            SalesTeamSeeder::class,
             SalespersonSeeder::class,
             IndustrySeeder::class,
             GeoSeeder::class,
@@ -32,7 +29,6 @@ class DatabaseSeeder extends Seeder
             ChemicalCoatSeeder::class,
             PaperFluteSeeder::class,
             ProductSeeder::class,
-            SalespersonTeamSeeder::class,
             ScoringToolSeeder::class,
             PaperQualitySeeder::class,
             PaperSizeSeeder::class,

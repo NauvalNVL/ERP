@@ -51,13 +51,6 @@ class PaperQualityController extends Controller
                 'commercial_code' => 'nullable|string|max:10',
                 'wet_end_code' => 'nullable|string|max:10',
                 'decc_code' => 'nullable|string|max:10',
-                'status' => 'nullable|string|max:3',
-                'flute' => 'nullable|string|max:5',
-                'db' => 'nullable|string|max:5',
-                'b' => 'nullable|string|max:5',
-                'il' => 'nullable|string|max:5',
-                'a_c_e' => 'nullable|string|max:5',
-                '2l' => 'nullable|string|max:5',
                 'status' => 'nullable|string|in:Act,Obs'
             ], [
                 'paper_quality.required' => 'Kode kualitas kertas harus diisi',
@@ -80,14 +73,6 @@ class PaperQualityController extends Controller
                 'wet_end_code' => $validated['wet_end_code'] ?? null,
                 'decc_code' => $validated['decc_code'] ?? null,
                 'status' => $validated['status'],
-                'flute' => $validated['flute'] ?? null,
-                'db' => $validated['db'] ?? null,
-                'b' => $validated['b'] ?? null,
-                'il' => $validated['il'] ?? null,
-                'a_c_e' => $validated['a_c_e'] ?? null,
-                '2l' => $validated['2l'] ?? null,
-                'a_c_e' => $validated['a_c_e'] ?? null,
-                '2l' => $validated['2l'] ?? null,
                 'created_by' => $createdBy,
                 'updated_by' => $createdBy
             ]);
@@ -133,13 +118,6 @@ class PaperQualityController extends Controller
                 'commercial_code' => 'nullable|string|max:10',
                 'wet_end_code' => 'nullable|string|max:10',
                 'decc_code' => 'nullable|string|max:10',
-                'status' => 'nullable|string|max:3',
-                'flute' => 'nullable|string|max:5',
-                'db' => 'nullable|string|max:5',
-                'b' => 'nullable|string|max:5',
-                'il' => 'nullable|string|max:5',
-                'a_c_e' => 'nullable|string|max:5',
-                '2l' => 'nullable|string|max:5',
                 'status' => 'nullable|string|in:Act,Obs'
             ], [
                 'paper_quality.required' => 'Kode kualitas kertas harus diisi',
@@ -162,14 +140,6 @@ class PaperQualityController extends Controller
                 'wet_end_code' => $validated['wet_end_code'] ?? null,
                 'decc_code' => $validated['decc_code'] ?? null,
                 'status' => $validated['status'],
-                'flute' => $validated['flute'] ?? null,
-                'db' => $validated['db'] ?? null,
-                'b' => $validated['b'] ?? null,
-                'il' => $validated['il'] ?? null,
-                'a_c_e' => $validated['a_c_e'] ?? null,
-                '2l' => $validated['2l'] ?? null,
-                'a_c_e' => $validated['a_c_e'] ?? null,
-                '2l' => $validated['2l'] ?? null,
                 'updated_by' => $updatedBy
             ]);
 
@@ -203,7 +173,7 @@ class PaperQualityController extends Controller
         try {
             // Try to find by ID first
             $paperQuality = PaperQuality::find($id);
-            
+
             // If not found, try by code (if applicable, though ID is safer)
             if (!$paperQuality) {
                  $paperQuality = PaperQuality::where('paper_quality', $id)->first();

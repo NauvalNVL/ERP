@@ -307,7 +307,6 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Sales Configuration': 'define_sales_configuration',
 
     // Sales Management - Standard Requirement
-    'Define Sales Team': 'define_sales_team',
     'Define Salesperson': 'define_salesperson',
     'Define Salesperson Team': 'define_salesperson_team',
     'Define Industry': 'define_industry',
@@ -323,8 +322,6 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Color Group': 'define_color_group',
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
-    'Define Analysis Code': 'define_analysis_code',
-    'Obsolete/Unobsolete Analysis Code': 'obsolete_unobsolete_analysis_code',
 
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
@@ -353,12 +350,8 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print MC by Machine': 'view_print_mc_by_machine',
 
     // Sales Management - Standard Requirement
-    'Define Sales Team': 'define_sales_team',
-    'Obsolete/Unobsolete Sales Team': 'obsolete_unobsolete_sales_team',
     'Obsolete/Unobsolete Salesperson': 'obsolete_unobsolete_salesperson',
     'Define Salesperson': 'define_salesperson',
-    'Define Salesperson Team': 'define_salesperson_team',
-    'Obsolete/Unobsolete Salesperson Team': 'obsolete_unobsolete_salesperson_team',
     'Define Industry': 'define_industry',
     'Obsolete/Unobsolete Industry': 'obsolete_unobsolete_industry',
     'Define Geo': 'define_geo',
@@ -383,7 +376,6 @@ const getPermissionKeyFromTitle = (title) => {
     'Obsolete/Unobsolete Color': 'obsolete_unobsolete_color',
     'Define Finishing': 'define_finishing',
     'Obsolete/Unobsolete Finishing': 'obsolete_unobsolete_finishing',
-    'Define Analysis Code': 'define_analysis_code',
     'Define Stitch Wire': 'define_stitch_wire',
     'Obsolete/Unobsolete Stitch Wire': 'obsolete_unobsolete_stitch_wire',
     'Define Chemical Coat': 'define_chemical_coat',
@@ -398,9 +390,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Obsolete/Unobsolete Glueing Material': 'obsolete_unobsolete_glueing_material',
     'Define Machine': 'define_machine',
     'Obsolete/Unobsolete Machine': 'obsolete_unobsolete_machine',
-    'View & Print Sales Team': 'view_print_sales_team',
     'View & Print Salesperson': 'view_print_salesperson',
-    'View & Print Salesperson Team': 'view_print_salesperson_team',
     'View & Print Industry': 'view_print_industry',
     'View & Print Geo': 'view_print_geo',
     'View & Print Product Group': 'view_print_product_group',
@@ -597,12 +587,9 @@ const salesManagementItems = [
         title: 'Standard Requirement',
         icon: 'fas fa-clipboard-check',
         children: [
-          { title: 'Define Sales Team', icon: 'fas fa-users-cog', route: '/sales-team' },
-          { title: 'Obsolete/Unobsolete Sales Team', icon: 'fas fa-ban', route: '/sales-team/status' },
+
           { title: 'Define Salesperson', icon: 'fas fa-user-tie', route: '/sales-person' },
           { title: 'Obsolete/Unobsolete Salesperson', icon: 'fas fa-ban', route: '/sales-person/status' },
-          { title: 'Define Salesperson Team', icon: 'fas fa-user-friends', route: '/sales-person-team' },
-          { title: 'Obsolete/Unobsolete Salesperson Team', icon: 'fas fa-ban', route: '/sales-person-team/status' },
           { title: 'Define Industry', icon: 'fas fa-industry', route: '/industry' },
           { title: 'Obsolete/Unobsolete Industry', icon: 'fas fa-ban', route: '/industry/status' },
           { title: 'Define Geo', icon: 'fas fa-globe', route: '/geo' },
@@ -627,8 +614,6 @@ const salesManagementItems = [
           { title: 'Obsolete/Unobsolete Color', icon: 'fas fa-ban', route: '/color/status' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
           { title: 'Obsolete/Unobsolete Finishing', icon: 'fas fa-ban', route: '/finishing/status' },
-          { title: 'Define Analysis Code', icon: 'fas fa-code-branch', route: '/analysis-code' },
-          { title: 'Obsolete/Unobsolete Analysis Code', icon: 'fas fa-ban', route: '/analysis-code/status' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
           { title: 'Obsolete/Unobsolete Stitch Wire', icon: 'fas fa-ban', route: '/stitch-wire/status' },
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
@@ -644,9 +629,7 @@ const salesManagementItems = [
           { title: 'Define Machine', icon: 'fas fa-cogs', route: '/machine' },
           { title: 'Obsolete/Unobsolete Machine', icon: 'fas fa-ban', route: '/machine/status' },
           // View & Print Section
-          { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },
           { title: 'View & Print Salesperson', icon: 'fas fa-print', route: '/sales-person/view-print' },
-          { title: 'View & Print Salesperson Team', icon: 'fas fa-print', route: '/sales-person-team/view-print' },
           { title: 'View & Print Industry', icon: 'fas fa-print', route: '/industry/view-print' },
           { title: 'View & Print Geo', icon: 'fas fa-print', route: '/geo/view-print' },
           { title: 'View & Print Product Group', icon: 'fas fa-print', route: '/product-group/view-print' },
@@ -658,7 +641,6 @@ const salesManagementItems = [
           { title: 'View & Print Scoring Tool', icon: 'fas fa-print', route: '/scoring-tool/view-print' },
           { title: 'View & Print Color Group', icon: 'fas fa-print', route: '/color-group/view-print' },
           { title: 'View & Print Color', icon: 'fas fa-print', route: '/color/view-print' },
-          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/analysis-code/view-print' },
           { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/finishing/view-print' },
           { title: 'View & Print Stitch Wire', icon: 'fas fa-print', route: '/stitch-wire/view-print' },
           { title: 'View & Print Chemical Coat', icon: 'fas fa-print', route: '/chemical-coat/view-print' },

@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Models\SalesTeam;
 use App\Models\ProductGroup;
 use App\Models\Machine;
 use App\Models\PaperQuality;
@@ -22,7 +21,6 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'salesTeams' => SalesTeam::count(),
             'productGroups' => ProductGroup::count(),
             'machines' => Machine::count(),
             'paperQualities' => PaperQuality::count(),
@@ -57,9 +55,8 @@ class DashboardController extends Controller
             ->get(['code', 'name', 'status']);
 
         $chartData = [
-            'labels' => ['Sales Teams', 'Product Groups', 'Machines', 'Paper Qualities'],
+            'labels' => ['Product Groups', 'Machines', 'Paper Qualities'],
             'data' => [
-                $stats['salesTeams'],
                 $stats['productGroups'],
                 $stats['machines'],
                 $stats['paperQualities'],

@@ -216,15 +216,6 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Origin:</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </span>
-                                <input v-model="editForm.origin" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
-                            </div>
-                        </div>
-                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Color Group:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
@@ -431,7 +422,6 @@ const sortAsc = ref(true);
 const editForm = ref({
     color_id: '',
     color_name: '',
-    origin: '',
     color_group_id: '',
     cg_type: 'X-Flexo'
 });
@@ -615,7 +605,6 @@ const createNewColor = () => {
     editForm.value = {
         color_id: '',
         color_name: '',
-        origin: '',
         color_group_id: '',
         cg_type: 'X-Flexo'
     };
@@ -627,7 +616,6 @@ const closeEditModal = () => {
     editForm.value = {
         color_id: '',
         color_name: '',
-        origin: '',
         color_group_id: '',
         cg_type: 'X-Flexo'
     };
@@ -790,8 +778,7 @@ const filteredColors = computed(() => {
         color.color_id.toLowerCase().includes(query) ||
         color.color_name.toLowerCase().includes(query) ||
         color.color_group_id.toLowerCase().includes(query) ||
-        (color.cg_type && color.cg_type.toLowerCase().includes(query)) ||
-        (color.origin && color.origin.toLowerCase().includes(query))
+        (color.cg_type && color.cg_type.toLowerCase().includes(query))
     );
 });
 

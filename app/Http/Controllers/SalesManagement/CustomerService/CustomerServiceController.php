@@ -178,7 +178,6 @@ class CustomerServiceController extends Controller
                 'delivery_address_1' => $so['DELIVERY_ADD_1'] ?? null,
                 'delivery_address_2' => $so['DELIVERY_ADD_2'] ?? null,
                 'lot_number' => $so['LOT_NUM'] ?? null,
-                'analysis_code' => $so['ANALYSIS_CODE'] ?? null,
                 // harga & nilai
                 'unit_price' => $so['UNIT_PRICE'] ?? null,
                 'amount' => $so['AMOUNT'] ?? null,
@@ -427,7 +426,6 @@ class CustomerServiceController extends Controller
                 'delivery_address_1' => $soInfo->delivery_address_1 ?? '',
                 'delivery_address_2' => $soInfo->delivery_address_2 ?? '',
                 'lot_number' => $soInfo->lot_number ?? '',
-                'analysis_code' => $soInfo->analysis_code ?? '',
                 'unit_price' => $soInfo->unit_price ?? 0,
                 'amount' => $soInfo->amount ?? 0,
                 'base_amount' => $soInfo->base_amount ?? 0,

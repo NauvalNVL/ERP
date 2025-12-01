@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Invoice;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerSalesTaxIndex;
-use App\Models\CustomerTaxProductTieup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -231,76 +230,6 @@ class CustomerSalesTaxIndexController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update tax index status: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Get product tieups for a specific tax index.
-     */
-    public function getProductTieups($customerCode, $indexNumber)
-    {
-        try {
-            $tieups = CustomerTaxProductTieup::where('customer_code', $customerCode)
-                ->where('index_number', $indexNumber)
-                ->with('productGroup')
-                ->get();
-
-            return response()->json([
-                'success' => true,
-                'data' => $tieups
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load product tieups: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Save product tieups for a tax index.
-     */
-    public function saveProductTieups(Request $request, $customerCode, $indexNumber)
-    {
-        $validator = Validator::make($request->all(), [
-            'tieups' => 'required|array',
-            'tieups.*.product_group_code' => 'required|string|exists:product_groups,product_group_id',
-            'tieups.*.tie_up_enabled' => 'required|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        try {
-            // Delete existing tieups
-            CustomerTaxProductTieup::where('customer_code', $customerCode)
-                ->where('index_number', $indexNumber)
-                ->delete();
-
-            // Insert new tieups
-            foreach ($request->tieups as $tieup) {
-                CustomerTaxProductTieup::create([
-                    'customer_code' => $customerCode,
-                    'index_number' => $indexNumber,
-                    'product_group_code' => $tieup['product_group_code'],
-                    'tie_up_enabled' => $tieup['tie_up_enabled']
-                ]);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product tieups saved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save product tieups: ' . $e->getMessage()
             ], 500);
         }
     }

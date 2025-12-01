@@ -2129,7 +2129,6 @@ class SalesOrderController extends Controller
                 'instruction1' => $salesOrder->SO_INSTRUCTION_1 ?? '',
                 'instruction2' => $salesOrder->SO_INSTRUCTION_2 ?? '',
                 'set_quantity' => $salesOrder->SO_QTY ?? '',
-                'analysis_code' => $salesOrder->ANALYSIS_CODE ?? '',
                 // Delivery location fields
                 'delivery_code' => $salesOrder->D_LOC_Num ?? '',
                 'delivery_to' => $salesOrder->DELIVERY_TO ?? '',
@@ -2357,7 +2356,6 @@ class SalesOrderController extends Controller
                 'remark' => 'nullable|string',
                 'instruction1' => 'nullable|string',
                 'instruction2' => 'nullable|string',
-                'analysis_code' => 'nullable|string',
                 'delivery_location' => 'nullable|array',
             ]);
 
@@ -2588,7 +2586,6 @@ class SalesOrderController extends Controller
                 'cancel_reason' => 'required|string',
                 'cancel_date' => 'nullable|string',
                 'cancelled_by' => 'nullable|string',
-                'analysis_code' => 'nullable|string',
             ]);
 
             // Check if SO exists
@@ -2613,12 +2610,11 @@ class SalesOrderController extends Controller
             $nowWib = $this->getNowWib();
             $currentUserId = $this->getCurrentUserId();
 
-            // Prepare cancel reason text with date, user info, and analysis code
+            // Prepare cancel reason text with date, user info, and reason only
             $cancelInfo = sprintf(
-                "CANCELLED on %s by %s\nAnalysis Code: %s\nReason: %s",
+                "CANCELLED on %s by %s\nReason: %s",
                 $validated['cancel_date'] ?? $nowWib->format('Y-m-d'),
                 $currentUserId,
-                $validated['analysis_code'] ?? 'CANC',
                 $validated['cancel_reason']
             );
 

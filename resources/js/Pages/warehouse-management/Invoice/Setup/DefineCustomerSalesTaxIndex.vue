@@ -172,17 +172,6 @@
                                     </p>
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="flex gap-4 pt-4">
-                                    <button
-                                        type="button"
-                                        @click="openProductTieUpModal"
-                                        class="secondary-button flex-1"
-                                    >
-                                        <i class="fas fa-link mr-2"></i>
-                                        Define Product Group Tie-Up
-                                    </button>
-                                </div>
 
                                 <!-- Save/Cancel Buttons -->
                                 <div class="flex justify-between items-center pt-6 border-t border-gray-200">
@@ -243,10 +232,6 @@
                                 <div class="flex items-start">
                                     <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
                                     <span>Choose applicable tax group</span>
-                                </div>
-                                <div class="flex items-start">
-                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                    <span>Define product group tie-ups</span>
                                 </div>
                                 <div class="flex items-start">
                                     <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
@@ -336,14 +321,6 @@
             @select="selectIndex"
         />
 
-        <!-- Product Group Tie-Up Modal -->
-        <ProductGroupTieUpModal
-            :show="showProductTieUpModal"
-            :customer-code="form.customer_code"
-            :index-number="form.index_number"
-            @close="showProductTieUpModal = false"
-            @saved="handleProductTieUpSaved"
-        />
     </AppLayout>
 </template>
 
@@ -353,7 +330,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 import TaxGroupModal from '@/Components/TaxGroupModal.vue';
 import CustomerSalesTaxorSalesTaxExemptionTable from '@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue';
-import ProductGroupTieUpModal from '@/Components/ProductGroupTieUpModal.vue';
 import axios from 'axios';
 
 // Record modes
@@ -375,7 +351,6 @@ const selectedTaxGroup = ref(null);
 const showCustomerModal = ref(false);
 const showTaxGroupModal = ref(false);
 const showIndexTableModal = ref(false);
-const showProductTieUpModal = ref(false);
 
 // Customer data
 const customers = ref([]);
@@ -475,20 +450,6 @@ const selectTaxGroup = (taxGroup) => {
     form.value.tax_group_code = taxGroup.code;
     selectedTaxGroup.value = taxGroup;
     showTaxGroupModal.value = false;
-};
-
-// Open product tie-up modal
-const openProductTieUpModal = () => {
-    if (!form.value.customer_code || !form.value.index_number) {
-        alert('Please save the tax index first before defining product tie-ups.');
-        return;
-    }
-    showProductTieUpModal.value = true;
-};
-
-// Handle product tie-up saved
-const handleProductTieUpSaved = () => {
-    console.log('Product tie-ups saved successfully');
 };
 
 // Handle save
