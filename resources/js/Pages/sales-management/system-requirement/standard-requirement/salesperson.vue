@@ -196,9 +196,34 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Group:</label>
-                            <select v-model="editForm.grup" @change="onSalesTeamChange" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                                <option v-for="team in salesTeams" :key="team.code" :value="team.name">{{ team.name }}</option>
-                            </select>
+                            <div class="relative">
+                                <button
+                                    type="button"
+                                    @click="showGroupDropdown = !showGroupDropdown"
+                                    class="w-full flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-left"
+                                >
+                                    <span class="truncate">
+                                        {{ editForm.grup || 'Select group' }}
+                                    </span>
+                                    <i class="fas fa-chevron-down text-gray-400 text-xs ml-2"></i>
+                                </button>
+
+                                <div
+                                    v-if="showGroupDropdown"
+                                    class="absolute z-20 mt-1 w-full max-h-48 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg"
+                                >
+                                    <ul class="py-1 text-sm text-gray-700">
+                                        <li
+                                            v-for="team in salesTeams"
+                                            :key="team.code"
+                                            @click="selectGroupOption(team)"
+                                            class="px-3 py-2 hover:bg-emerald-50 cursor-pointer flex justify-between"
+                                        >
+                                            <span>{{ team.code }}-{{ team.name }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Code Group:</label>
@@ -285,7 +310,11 @@ const props = defineProps({
 });
 
 const salespersons = ref([]);
-const salesTeams = ref([]);
+const salesTeams = ref([
+    { code: '01', name: 'MBI' },
+    { code: '02', name: 'MMI' },
+    { code: '03', name: 'KIM' },
+]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -303,6 +332,7 @@ const editForm = ref({
     email: '',
     status: 'Active'
 });
+const showGroupDropdown = ref(false);
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
@@ -359,35 +389,17 @@ const fetchSalespersons = async () => {
     }
 };
 
+// Static sales team options for Group dropdown in Create/Edit Salesperson modal
+// Format: code = team code, name = team name shown in dropdown label
+// Example label in dropdown: 01-MBI, 02-MMI, 03-KIM
+
 const fetchSalesTeams = async () => {
-    try {
-        const res = await fetch('/api/sales-teams', {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
-
-        if (!res.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await res.json();
-        console.log('Fetched sales teams data:', data);
-
-        if (Array.isArray(data)) {
-            salesTeams.value = data;
-        } else if (data.data && Array.isArray(data.data)) {
-            salesTeams.value = data.data;
-        } else {
-            salesTeams.value = [];
-            console.error('Unexpected data format:', data);
-        }
-    } catch (e) {
-        console.error('Error fetching sales teams:', e);
-        salesTeams.value = [];
-    }
+    // Static configuration – no remote fetch required
+    salesTeams.value = [
+        { code: '01', name: 'MBI' },
+        { code: '02', name: 'MMI' },
+        { code: '03', name: 'KIM' },
+    ];
 };
 
 const onSalesTeamChange = () => {
@@ -399,10 +411,20 @@ const onSalesTeamChange = () => {
     }
 };
 
+const selectGroupOption = (team) => {
+    // Set display value to name only (MBI/MMI/KIM)
+    editForm.value.grup = team.name;
+    // Set Code Group textbox to code (01/02/03)
+    editForm.value.code_grup = team.code;
+    // Close dropdown
+    showGroupDropdown.value = false;
+};
+
 
 
 onMounted(async () => {
-    await Promise.all([fetchSalespersons(), fetchSalesTeams()]);
+    await fetchSalespersons();
+    await fetchSalesTeams();
 });
 
 // Watch for changes in search query to filter the data
