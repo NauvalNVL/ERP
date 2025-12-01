@@ -30,4 +30,9 @@ class ReinforcementTape extends Model
     {
         return $query->where('is_active', true);
     }
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'TAPE', 'code');
+    }
 }

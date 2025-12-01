@@ -38,6 +38,11 @@ class Invoice extends Model
         return $this->belongsTo(\App\Models\UserCps::class, 'PT_UID', 'userID');
     }
 
+	public function taxType()
+	{
+		return $this->belongsTo(TaxType::class, 'IV_TAX_CODE', 'code');
+	}
+
     // Scope for filtering by period
     public function scopeForPeriod($query, $year, $month)
     {

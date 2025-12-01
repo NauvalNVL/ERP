@@ -25,6 +25,10 @@ return new class extends Migration
             // Indexes for faster queries
             $table->index('customer_code');
             $table->index('tax_group_code');
+
+            $table->foreign('tax_group_code')
+                ->references('code')
+                ->on('tax_groups');
         });
     }
 

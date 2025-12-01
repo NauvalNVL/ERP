@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('customer_code', 50);
             $table->integer('index_number');
-            $table->string('product_group_code', 20);
+            $table->string('product_group_code', 50);
             $table->boolean('tie_up_enabled')->default(false);
             $table->timestamps();
 
@@ -25,6 +25,10 @@ return new class extends Migration
             // Indexes
             $table->index(['customer_code', 'index_number']);
             $table->index('product_group_code');
+
+            $table->foreign('product_group_code')
+                ->references('product_group_id')
+                ->on('product_groups');
         });
     }
 

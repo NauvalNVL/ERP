@@ -14,4 +14,9 @@ class Finishing extends Model
     protected $casts = [
 
     ];
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'FSH', 'code');
+    }
 }

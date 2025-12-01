@@ -19,12 +19,12 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             $table->timestamps();
-            
+
             // Add foreign key constraint
             $table->foreign('product_group_id')
-                  ->references('product_group_id')
-                  ->on('product_groups')
-                  ->onDelete('set null');
+                ->references('product_group_id')
+                ->on('product_groups')
+                ->onDelete('set null');
         });
     }
 

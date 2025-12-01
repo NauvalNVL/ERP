@@ -339,4 +339,14 @@ class Salesperson extends Model
             Log::error('Error syncing salesperson_teams: ' . $e->getMessage());
         }
     }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'SLM', 'Code');
+    }
+
+    public function users()
+    {
+        return $this->hasMany(UserCps::class, 'SM', 'Code');
+    }
 }

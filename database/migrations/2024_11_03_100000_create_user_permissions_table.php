@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id'); // References userID from usercps table
+            $table->string('user_id', 50); // References userID from usercps table
             $table->string('menu_key'); // Unique identifier for each menu item
             $table->string('menu_name'); // Human readable menu name
             $table->string('menu_route')->nullable(); // Route path for the menu
@@ -29,6 +29,14 @@ return new class extends Migration
 
             // Note: Foreign key constraint removed due to usercps table structure
         });
+
+        if (Schema::hasTable('usercps')) {
+            Schema::table('user_permissions', function (Blueprint $table) {
+                $table->foreign('user_id')
+                      ->references('userID')
+                      ->on('usercps');
+            });
+        }
     }
 
     /**
@@ -36,6 +44,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('user_permissions')) {
+            Schema::table('user_permissions', function (Blueprint $table) {
+                $table->dropForeign(['user_id']);
+            });
+        }
+
         Schema::dropIfExists('user_permissions');
     }
 };

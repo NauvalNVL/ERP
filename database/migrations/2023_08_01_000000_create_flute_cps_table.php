@@ -16,7 +16,7 @@ return new class extends Migration
 
             // No as primary key (numeric 18,0 in SQL Server)
             $table->decimal('No', 18, 0)->primary();
-            $table->string('Flute', 25)->collation($collation);
+            $table->string('Flute', 25)->collation($collation)->unique();
             $table->string('Descr', 100)->nullable()->collation($collation);
             
             // All numeric fields as float (matching SQL Server float type)

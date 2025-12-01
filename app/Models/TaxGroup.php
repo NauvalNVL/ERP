@@ -73,4 +73,9 @@ class TaxGroup extends Model
     {
         return $this->hasMany(TaxGroupItem::class, 'tax_group_code', 'code');
     }
+
+    public function customerSalesTaxIndices()
+    {
+        return $this->hasMany(CustomerSalesTaxIndex::class, 'tax_group_code', 'code');
+    }
 }

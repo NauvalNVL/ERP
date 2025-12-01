@@ -1903,8 +1903,27 @@ class UpdateMcController extends Controller
     public function obsoleteReactiveApiIndex()
     {
         $masterCards = DB::table('MC')
-            ->select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
-            ->orderBy('MCS_Num')
+            ->leftJoin('MC_UPDATE_LOG', 'MC.MCS_Num', '=', 'MC_UPDATE_LOG.MCS_Num')
+            ->select(
+                'MC.MCS_Num',
+                'MC.AC_NUM',
+                'MC.AC_NAME',
+                'MC.MODEL',
+                'MC.STS',
+                'MC.COMP',
+                'MC.P_DESIGN',
+                DB::raw('MAX(MC_UPDATE_LOG.created_at) as last_updated_at')
+            )
+            ->groupBy(
+                'MC.MCS_Num',
+                'MC.AC_NUM',
+                'MC.AC_NAME',
+                'MC.MODEL',
+                'MC.STS',
+                'MC.COMP',
+                'MC.P_DESIGN'
+            )
+            ->orderBy('MC.MCS_Num')
             ->get();
 
         return response()->json($masterCards);

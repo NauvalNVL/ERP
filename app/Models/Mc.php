@@ -97,6 +97,71 @@ class Mc extends Model
         'MC_MORE_DESCRIPTION_1', 'MC_MORE_DESCRIPTION_2', 'MC_MORE_DESCRIPTION_3',
         'MC_MORE_DESCRIPTION_4', 'MC_MORE_DESCRIPTION_5',
     ];
+
+    public function fluteCps()
+    {
+        return $this->belongsTo(PaperFlute::class, 'FLUTE', 'Flute');
+    }
+
+    public function chemicalCoat()
+    {
+        return $this->belongsTo(ChemicalCoat::class, 'COAT', 'code');
+    }
+
+    public function wrappingMaterial()
+    {
+        return $this->belongsTo(WrappingMaterial::class, 'WRAPPING', 'code');
+    }
+
+    public function reinforcementTape()
+    {
+        return $this->belongsTo(ReinforcementTape::class, 'TAPE', 'code');
+    }
+
+    public function finishing()
+    {
+        return $this->belongsTo(Finishing::class, 'FSH', 'code');
+    }
+
+    public function glueingMaterial()
+    {
+        return $this->belongsTo(GlueingMaterial::class, 'GLUEING', 'code');
+    }
+
+    public function scoringTool()
+    {
+        return $this->belongsTo(ScoringTool::class, 'S_TOOL', 'code');
+    }
+
+    public function stitchWire()
+    {
+        return $this->belongsTo(StitchWire::class, 'SWIRE', 'code');
+    }
+
+    public function bundlingString()
+    {
+        return $this->belongsTo(BundlingString::class, 'STRING_TYPE', 'code');
+    }
+
+    public function productDesign()
+    {
+        return $this->belongsTo(ProductDesign::class, 'P_DESIGN', 'pd_code');
+    }
+
+    public function paperSize()
+    {
+        return $this->belongsTo(PaperSize::class, 'PAPER_SIZE', 'millimeter');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'AC_NUM', 'CODE');
+    }
+
+    public function salesOrders()
+    {
+        return $this->hasMany(SalesOrder::class, 'master_card_seq', 'MCS_Num');
+    }
 }
 
 

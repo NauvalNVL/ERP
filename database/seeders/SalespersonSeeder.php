@@ -61,6 +61,56 @@ class SalespersonSeeder extends Seeder
             'Email' => 'febby@company.com',
             'status' => 'Active',
         ],
+        [
+            'Code' => 'S111',
+            'Name' => 'SLM 111',
+            'Grup' => 'MBI',
+            'CodeGrup' => 'MBI006',
+            'TargetSales' => 1300000.00,
+            'Internal' => 'SLS',
+            'Email' => 'slm111@company.com',
+            'status' => 'Active',
+        ],
+        [
+            'Code' => 'S118',
+            'Name' => 'SLM 118',
+            'Grup' => 'MBI',
+            'CodeGrup' => 'MBI007',
+            'TargetSales' => 1400000.00,
+            'Internal' => 'SLS',
+            'Email' => 'slm118@company.com',
+            'status' => 'Active',
+        ],
+        [
+            'Code' => 'S140',
+            'Name' => 'SLM 140',
+            'Grup' => 'MBI',
+            'CodeGrup' => 'MBI008',
+            'TargetSales' => 1500000.00,
+            'Internal' => 'SLS',
+            'Email' => 'slm140@company.com',
+            'status' => 'Active',
+        ],
+        [
+            'Code' => 'S142',
+            'Name' => 'SLM 142',
+            'Grup' => 'MBI',
+            'CodeGrup' => 'MBI009',
+            'TargetSales' => 1600000.00,
+            'Internal' => 'SLS',
+            'Email' => 'slm142@company.com',
+            'status' => 'Active',
+        ],
+        [
+            'Code' => 'S143',
+            'Name' => 'SLM 143',
+            'Grup' => 'MBI',
+            'CodeGrup' => 'MBI010',
+            'TargetSales' => 1700000.00,
+            'Internal' => 'SLS',
+            'Email' => 'slm143@company.com',
+            'status' => 'Active',
+        ],
     ];
 
     /**
@@ -68,8 +118,8 @@ class SalespersonSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear the table before seeding
-        DB::table('salesperson')->truncate();
+        // Clear the table before seeding (cannot TRUNCATE because of FK references)
+        DB::table('salesperson')->delete();
 
         // Insert data without timestamps (table doesn't have timestamp columns)
         DB::table('salesperson')->insert($this->salespersons);

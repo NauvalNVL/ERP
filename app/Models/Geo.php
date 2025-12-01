@@ -99,4 +99,9 @@ class Geo extends Model
     {
         $this->attributes['STATUS'] = $value;
     }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'AREA', 'CODE');
+    }
 }

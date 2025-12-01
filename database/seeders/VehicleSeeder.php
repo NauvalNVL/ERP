@@ -111,7 +111,7 @@ class VehicleSeeder extends Seeder
                 'NO_' => '007',
                 'VEHICLE_NO' => '33333',
                 'VEHICLE_STATUS' => 'A',
-                'VEHICLE_CLASS' => 'DE',
+                'VEHICLE_CLASS' => 'DB',
                 'VEHICLE_DESCRIPTION' => 'Test Vehicle',
                 'VEHICLE_COMPANY' => 'KIM',
                 'COMPANY' => 'KIM',

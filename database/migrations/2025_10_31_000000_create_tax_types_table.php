@@ -21,6 +21,15 @@ return new class extends Migration
             $table->char('status', 1)->default('A');
             $table->timestamps();
         });
+
+		// Link invoice tax code to tax_types
+		if (Schema::hasTable('INV')) {
+			Schema::table('INV', function (Blueprint $table) {
+				$table->foreign('IV_TAX_CODE')
+				      ->references('code')
+				      ->on('tax_types');
+			});
+		}
     }
 
     /**
@@ -28,6 +37,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+		if (Schema::hasTable('INV')) {
+			Schema::table('INV', function (Blueprint $table) {
+				$table->dropForeign(['IV_TAX_CODE']);
+			});
+		}
+
         Schema::dropIfExists('tax_types');
     }
 };

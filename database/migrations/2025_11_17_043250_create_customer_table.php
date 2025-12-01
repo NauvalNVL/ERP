@@ -31,14 +31,73 @@ return new class extends Migration
                 $table->string('TYPE', 50)->nullable()->collation($collation);
                 $table->string('CURRENCY', 50)->nullable()->collation($collation);
                 $table->string('SLM', 50)->nullable()->collation($collation);
-                $table->string('AREA', 50)->nullable()->collation($collation);
-                $table->string('IND', 50)->nullable()->collation($collation);
-                $table->string('GROUP_', 50)->nullable()->collation($collation);
+                $table->string('AREA', 10)->nullable()->collation($collation);
+                $table->string('IND', 5)->nullable()->collation($collation);
+                $table->string('GROUP_', 12)->nullable()->collation($collation);
                 $table->string('NPWP', 50)->nullable()->collation($collation);
                 $table->string('CUST_TYPE', 50)->nullable()->collation($collation);
 
                 // Set primary key
                 $table->primary('CODE');
+            });
+        }
+
+        if (Schema::hasTable('INV')) {
+            Schema::table('INV', function (Blueprint $table) {
+                $table->foreign('AC_NUM')
+                      ->references('CODE')
+                      ->on('CUSTOMER');
+            });
+        }
+
+        Schema::table('CUSTOMER', function (Blueprint $table) {
+            $table->foreign('SLM')
+                  ->references('Code')
+                  ->on('salesperson');
+
+            $table->foreign('IND')
+                  ->references('code')
+                  ->on('industry');
+
+            $table->foreign('AREA')
+                  ->references('CODE')
+                  ->on('GEO');
+        });
+
+        Schema::table('customer_sales_tax_indices', function (Blueprint $table) {
+            $table->foreign('customer_code')
+                  ->references('CODE')
+                  ->on('CUSTOMER');
+        });
+
+        Schema::table('customer_tax_product_tieups', function (Blueprint $table) {
+            $table->foreign('customer_code')
+                  ->references('CODE')
+                  ->on('CUSTOMER');
+        });
+
+        // Link legacy SO, DO, MC, and INV tables to CUSTOMER by account number
+        if (Schema::hasTable('so')) {
+            Schema::table('so', function (Blueprint $table) {
+                $table->foreign('AC_Num')
+                      ->references('CODE')
+                      ->on('CUSTOMER');
+            });
+        }
+
+        if (Schema::hasTable('DO')) {
+            Schema::table('DO', function (Blueprint $table) {
+                $table->foreign('AC_Num')
+                      ->references('CODE')
+                      ->on('CUSTOMER');
+            });
+        }
+
+        if (Schema::hasTable('MC')) {
+            Schema::table('MC', function (Blueprint $table) {
+                $table->foreign('AC_NUM')
+                      ->references('CODE')
+                      ->on('CUSTOMER');
             });
         }
     }
@@ -48,6 +107,44 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('so')) {
+            Schema::table('so', function (Blueprint $table) {
+                $table->dropForeign(['AC_Num']);
+            });
+        }
+
+        if (Schema::hasTable('DO')) {
+            Schema::table('DO', function (Blueprint $table) {
+                $table->dropForeign(['AC_Num']);
+            });
+        }
+
+        if (Schema::hasTable('MC')) {
+            Schema::table('MC', function (Blueprint $table) {
+                $table->dropForeign(['AC_NUM']);
+            });
+        }
+
+        if (Schema::hasTable('INV')) {
+            Schema::table('INV', function (Blueprint $table) {
+                $table->dropForeign(['AC_NUM']);
+            });
+        }
+
+        Schema::table('customer_sales_tax_indices', function (Blueprint $table) {
+            $table->dropForeign(['customer_code']);
+        });
+
+        Schema::table('customer_tax_product_tieups', function (Blueprint $table) {
+            $table->dropForeign(['customer_code']);
+        });
+
+        Schema::table('CUSTOMER', function (Blueprint $table) {
+            $table->dropForeign(['SLM']);
+            $table->dropForeign(['IND']);
+            $table->dropForeign(['AREA']);
+        });
+
         Schema::dropIfExists('CUSTOMER');
     }
 };

@@ -20,17 +20,17 @@ return new class extends Migration
 			$table->string('P_DESIGN', 50)->nullable();
 			$table->string('MCS_Num', 50)->nullable();
 			$table->string('MODEL', 250)->nullable();
-			$table->string('FLUTE', 50)->nullable();
-			$table->string('SO_PQ1', 50)->nullable();
-			$table->string('SO_PQ2', 50)->nullable();
-			$table->string('SO_PQ3', 50)->nullable();
-			$table->string('SO_PQ4', 50)->nullable();
-			$table->string('SO_PQ5', 50)->nullable();
-			$table->string('WO_PQ1', 50)->nullable();
-			$table->string('WO_PQ2', 50)->nullable();
-			$table->string('WO_PQ3', 50)->nullable();
-			$table->string('WO_PQ4', 50)->nullable();
-			$table->string('WO_PQ5', 50)->nullable();
+			$table->string('FLUTE', 25)->nullable();
+			$table->string('SO_PQ1', 10)->nullable();
+			$table->string('SO_PQ2', 10)->nullable();
+			$table->string('SO_PQ3', 10)->nullable();
+			$table->string('SO_PQ4', 10)->nullable();
+			$table->string('SO_PQ5', 10)->nullable();
+			$table->string('WO_PQ1', 10)->nullable();
+			$table->string('WO_PQ2', 10)->nullable();
+			$table->string('WO_PQ3', 10)->nullable();
+			$table->string('WO_PQ4', 10)->nullable();
+			$table->string('WO_PQ5', 10)->nullable();
 			$table->decimal('INT_LENGTH', 18, 0)->nullable();
 			$table->decimal('INT_WIDTH', 18, 0)->nullable();
 			$table->decimal('INT_HEIGHT', 18, 0)->nullable();
@@ -39,12 +39,12 @@ return new class extends Migration
 			$table->decimal('EXT_HEIGHT', 18, 0)->nullable();
 			$table->decimal('SHEET_LENGTH', 18, 0)->nullable();
 			$table->decimal('SHEET_WIDTH', 18, 0)->nullable();
-			$table->decimal('PAPER_SIZE', 18, 0)->nullable();
+			$table->decimal('PAPER_SIZE', 10, 2)->nullable();
 			$table->decimal('CORR_OUT', 18, 0)->nullable();
 			$table->decimal('SLIT_OUT', 18, 0)->nullable();
 			$table->decimal('DIE_OUT', 18, 0)->nullable();
 			$table->decimal('JOIN_', 18, 0)->nullable();
-			$table->string('S_TOOL', 50)->nullable();
+			$table->string('S_TOOL', 10)->nullable();
 			$table->decimal('NEST_SLOT', 18, 0)->nullable();
 			$table->decimal('CREASE', 18, 0)->nullable();
 			$table->string('COAT', 50)->nullable();
@@ -87,7 +87,7 @@ return new class extends Migration
 			$table->decimal('DC_SHT_W', 18, 0)->nullable();
 			$table->decimal('DC_MOULD_L', 18, 0)->nullable();
 			$table->decimal('DC_MOULD_W', 18, 0)->nullable();
-			$table->string('FSH', 50)->nullable();
+			$table->string('FSH', 10)->nullable();
 			$table->decimal('SWIRE_PCS', 18, 0)->nullable();
 			$table->string('SWIRE', 50)->nullable();
 			$table->string('GLUEING', 50)->nullable();
@@ -156,6 +156,24 @@ return new class extends Migration
 			$table->string('MC_MORE_DESCRIPTION_5', 250)->nullable();
 			$table->decimal('TOTAL_COLOR', 18, 0)->nullable();
 		});
+
+		Schema::table('MC', function (Blueprint $table) {
+			$table->foreign('FLUTE')
+				->references('Flute')
+				->on('Flute_CPS');
+
+			$table->foreign('FSH')
+				->references('code')
+				->on('finishings');
+
+			$table->foreign('S_TOOL')
+				->references('code')
+				->on('scoring_tools');
+
+			$table->foreign('P_DESIGN')
+				->references('pd_code')
+				->on('product_designs');
+		});
 	}
 
 	/**
@@ -166,5 +184,3 @@ return new class extends Migration
 		Schema::dropIfExists('MC');
 	}
 };
-
-

@@ -15,11 +15,11 @@ return new class extends Migration
             $collation = 'SQL_Latin1_General_CP1_CI_AS';
 
             // CG as primary key - matching CPS database structure
-            $table->string('CG', 15)->primary()->collation($collation);
-            $table->string('CG_Name', 150)->nullable()->collation($collation);
-            $table->string('CG_Type', 50)->nullable()->collation($collation);
+            $table->string('CG', 15)->unique();
+            $table->string('CG_Name', 150);
+            $table->string('CG_Type', 50);
             $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
-            
+
             // No timestamps - matching CPS database structure
         });
     }

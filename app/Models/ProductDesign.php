@@ -37,4 +37,9 @@ class ProductDesign extends Model
     {
         return $this->belongsTo(Product::class, 'product', 'product_code');
     }
-} 
+
+    public function mcs()
+    {
+        return $this->hasMany(Mc::class, 'P_DESIGN', 'pd_code');
+    }
+}

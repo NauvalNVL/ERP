@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('product_designs', function (Blueprint $table) {
             $table->id();
-            $table->string('pd_code')->unique();
+            $table->string('pd_code', 50)->nullable()->unique();
             $table->string('pd_name');
             $table->string('pd_alt_name')->nullable();
             $table->string('pd_design_type');
             $table->string('idc');
-            $table->string('product');
+            $table->string('product', 50)->nullable();
             $table->string('joint')->default('No');
             $table->string('joint_to_print')->default('No');
             $table->string('pcs_to_joint')->default('No');
@@ -26,6 +26,11 @@ return new class extends Migration
             $table->string('input_weight');
             $table->string('status', 3)->default('Act')->comment('Status (Act/Obs)');
             $table->timestamps();
+
+            $table->foreign('product')
+                ->references('product_code')
+                ->on('products')
+                ->onDelete('set null');
         });
     }
 
@@ -33,4 +38,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('product_designs');
     }
-}; 
+};

@@ -25,4 +25,9 @@ class ProductGroup extends Model
     protected $casts = [
         //
     ];
+
+    public function customerTaxProductTieups()
+    {
+        return $this->hasMany(CustomerTaxProductTieup::class, 'product_group_code', 'product_group_id');
+    }
 }

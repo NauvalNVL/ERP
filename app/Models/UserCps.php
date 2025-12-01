@@ -201,7 +201,7 @@ class UserCps extends Authenticatable
             'AC' => $data['access_customer_acct'] ?? 'N',
             'MC' => $data['amend_mc'] ?? 'N',
             'MC_PRICE' => $data['amend_mc_price'] ?? 'N',
-            'SM' => $data['salesperson_code'] ?? '',
+            'SM' => $data['salesperson_code'] ?? null,
             'PASS' => bcrypt($data['password'] ?? 'temporary_password'),
             // Price & cost visibility flags
             'PRICE' => $data['rc_rt_price'] ?? 'N',
@@ -237,6 +237,11 @@ class UserCps extends Authenticatable
     public function permissions()
     {
         return $this->hasMany(UserPermission::class, 'user_id', 'userID');
+    }
+
+    public function salesperson()
+    {
+        return $this->belongsTo(Salesperson::class, 'SM', 'Code');
     }
 
     /**

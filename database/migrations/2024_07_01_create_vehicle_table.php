@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('vehicle', function (Blueprint $table) {
             $table->id();
             $table->string('NO_', 50);
-            $table->string('VEHICLE_NO', 50);
+            $table->string('VEHICLE_NO', 50)->unique();
             $table->string('VEHICLE_STATUS', 50);
-            $table->string('VEHICLE_CLASS', 50);
+            $table->string('VEHICLE_CLASS', 50)->nullable();
             $table->string('VEHICLE_DESCRIPTION', 50);
             $table->string('VEHICLE_COMPANY', 50);
             $table->string('COMPANY', 50);
@@ -37,4 +37,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('vehicle');
     }
-}; 
+};
