@@ -84,10 +84,19 @@ const sortAsc = ref(true);
 const filteredItems = computed(() => {
     const q = searchQuery.value.toLowerCase();
     let list = props.items || [];
-    if (q) list = list.filter(it => (it.code||'').toLowerCase().includes(q) || (it.name||'').toLowerCase().includes(q));
-    return [...list].sort((a,b)=>{
-        const va=(a[sortKey.value]||'').toString().toLowerCase();
-        const vb=(b[sortKey.value]||'').toString().toLowerCase();
+
+    list = list.filter(it => !it.status || it.status === 'Act');
+
+    if (q) {
+        list = list.filter(it =>
+            (it.code || '').toLowerCase().includes(q) ||
+            (it.name || '').toLowerCase().includes(q)
+        );
+    }
+
+    return [...list].sort((a, b) => {
+        const va = (a[sortKey.value] || '').toString().toLowerCase();
+        const vb = (b[sortKey.value] || '').toString().toLowerCase();
         return sortAsc.value ? va.localeCompare(vb) : vb.localeCompare(va);
     });
 });

@@ -95,11 +95,11 @@ const sortKey = ref('millimeter');
 const sortAsc = ref(true);
 
 const defaultPaperSizes = [
-  { id: 1, millimeter: '210.00', inches: '8.27', description: 'A4 Paper Size' },
-  { id: 2, millimeter: '297.00', inches: '11.69', description: 'A4 Paper Size' },
-  { id: 3, millimeter: '148.00', inches: '5.83', description: 'A5 Paper Size' },
-  { id: 4, millimeter: '105.00', inches: '4.13', description: 'A6 Paper Size' },
-  { id: 5, millimeter: '74.00', inches: '2.91', description: 'A7 Paper Size' }
+  { id: 1, millimeter: '210.00', inches: '8.27', description: 'A4 Paper Size', status: 'Act' },
+  { id: 2, millimeter: '297.00', inches: '11.69', description: 'A4 Paper Size', status: 'Act' },
+  { id: 3, millimeter: '148.00', inches: '5.83', description: 'A5 Paper Size', status: 'Act' },
+  { id: 4, millimeter: '105.00', inches: '4.13', description: 'A6 Paper Size', status: 'Act' },
+  { id: 5, millimeter: '74.00', inches: '2.91', description: 'A7 Paper Size', status: 'Act' }
 ];
 
 // Compute filtered sizes based on search query
@@ -107,6 +107,10 @@ const filteredSizes = computed(() => {
   let sizes = (Array.isArray(props.paperSizes) && props.paperSizes.length > 0)
     ? props.paperSizes
     : defaultPaperSizes;
+
+  // Hide obsolete sizes from selection (only show Act or missing status)
+  sizes = sizes.filter(size => !size.status || size.status === 'Act');
+
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     sizes = sizes.filter(size =>

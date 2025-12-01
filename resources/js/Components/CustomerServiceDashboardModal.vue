@@ -82,7 +82,12 @@
             </div>
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">Order Mode:</label>
-              <input v-model="orderDetails.orderMode" type="text" class="w-full px-3 py-2 border border-gray-400 rounded text-sm" readonly>
+              <div class="flex items-center space-x-4">
+                <label class="flex items-center">
+                  <input v-model="orderDetails.orderMode" type="radio" value="0-Order by Customer + Deliver & Invoice to Customer" class="mr-2">
+                  <span class="text-sm">D-Order by Customer + Deliver & Invoice to Customer</span>
+                </label>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Customer's Agent:</label>
@@ -100,11 +105,43 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Location:</label>
                 <div class="flex space-x-2">
                   <input v-model="orderDetails.deliveryLocation" type="text" class="flex-1 px-3 py-2 border border-gray-400 rounded text-sm">
-                  <button class="px-3 py-2 bg-gray-200 border border-gray-400 text-sm hover:bg-gray-300 transition-colors">
+                  <button @click="copyCustomerAddress" class="px-3 py-2 bg-gray-200 border border-gray-400 text-sm hover:bg-gray-300 transition-colors">
                     Same
                   </button>
                 </div>
               </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Salesperson:</label>
+              <input v-model="orderDetails.salesperson" type="text" class="w-full px-3 py-2 border border-gray-400 rounded text-sm">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">CR/Ticket#:</label>
+              <input v-model="orderDetails.crTicket" type="text" class="w-full px-3 py-2 border border-gray-400 rounded text-sm">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">On Hold:</label>
+              <select v-model="orderDetails.onHold" class="w-full px-3 py-2 border border-gray-400 rounded text-sm">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Sales Type:</label>
+              <select v-model="orderDetails.salesType" class="w-full px-3 py-2 border border-gray-400 rounded text-sm">
+                <option value="">Select...</option>
+                <option value="Regular">Regular</option>
+                <option value="Sample">Sample</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">D/O Instruction 1:</label>
+              <input v-model="orderDetails.doInstruction1" type="text" class="w-full px-3 py-2 border border-gray-400 rounded text-sm">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">D/O Instruction 2:</label>
+              <input v-model="orderDetails.doInstruction2" type="text" class="w-full px-3 py-2 border border-gray-400 rounded text-sm">
             </div>
           </div>
         </div>
@@ -126,6 +163,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
+import axios from 'axios'
 
 const props = defineProps({
   show: {
@@ -151,36 +189,23 @@ const searchFields = reactive({
 
 // Order details form
 const orderDetails = reactive({
-  customer: '000211-08',
-  model: 'BOX BASO 4.5 KG',
+  customer: '',
+  model: '',
   orderMode: '0-Order by Customer + Deliver & Invoice to Customer',
   customerAgent1: '',
   customerAgent2: '',
   soLot: '',
-  deliveryLocation: ''
+  deliveryLocation: '',
+  salesperson: '',
+  crTicket: '',
+  onHold: 'No',
+  salesType: '',
+  doInstruction1: '',
+  doInstruction2: ''
 })
 
 // Sales orders data
-const salesOrders = ref([
-  {
-    orderNumber: '05-2019-00640',
-    masterCardSeq: '160913B',
-    customerPORef: '7',
-    status: 'Completed'
-  },
-  {
-    orderNumber: '05-2019-00586',
-    masterCardSeq: '160913B',
-    customerPORef: '7',
-    status: 'Cancelled'
-  },
-  {
-    orderNumber: '01-2019-00824',
-    masterCardSeq: '160913B',
-    customerPORef: '',
-    status: 'Closed'
-  }
-])
+const salesOrders = ref([])
 
 // Methods
 const getStatusClass = (status) => {
@@ -196,18 +221,98 @@ const getStatusClass = (status) => {
   }
 }
 
-const selectOrder = (order) => {
-  // Handle order selection
-  success(`Selected order: ${order.orderNumber}`)
+const fetchSalesOrders = async () => {
+  try {
+    const response = await axios.get('/api/sales-orders')
+    if (response.data && response.data.data) {
+      salesOrders.value = response.data.data.map(so => ({
+        orderNumber: so.so_number || so.SO_Num || 'N/A',
+        masterCardSeq: so.master_card_seq || so.MCS_Num || 'N/A',
+        customerPORef: so.customer_po_ref || so.Cust_PO || 'N/A',
+        status: so.status || so.STS || 'Unknown'
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching sales orders:', error)
+    // Fallback to empty array
+    salesOrders.value = []
+  }
+}
+
+const selectOrder = async (order) => {
+  try {
+    // Fetch detailed order information
+    const response = await axios.get(`/api/sales-order/${order.orderNumber}/detail`)
+    if (response.data && response.data.data) {
+      const data = response.data.data
+
+      // Populate order details form
+      orderDetails.customer = data.order_info?.customer_code || 'N/A'
+      orderDetails.model = data.order_info?.model || 'N/A'
+      orderDetails.salesperson = data.order_info?.salesperson_name || ''
+      orderDetails.orderMode = '0-Order by Customer + Deliver & Invoice to Customer' // Default value
+
+      // Clear other fields for user input
+      orderDetails.customerAgent1 = ''
+      orderDetails.customerAgent2 = ''
+      orderDetails.soLot = ''
+      orderDetails.deliveryLocation = ''
+      orderDetails.crTicket = ''
+      orderDetails.onHold = 'No'
+      orderDetails.salesType = ''
+      orderDetails.doInstruction1 = ''
+      orderDetails.doInstruction2 = ''
+
+      success(`Order ${order.orderNumber} loaded successfully`)
+    } else {
+      error('Failed to load order details')
+    }
+  } catch (error) {
+    console.error('Error fetching order details:', error)
+    error('Failed to load order details')
+  }
 }
 
 const performSearch = () => {
-  // Handle search functionality
-  success('Searching...')
+  // Build search number from fields
+  const searchNumber = `${searchFields.field1}-${searchFields.field2}-${searchFields.field3}`
+
+  // Filter sales orders based on search number
+  if (searchNumber && searchNumber !== '0-0-0') {
+    const filteredOrders = salesOrders.value.filter(order =>
+      order.orderNumber.includes(searchNumber)
+    )
+
+    if (filteredOrders.length > 0) {
+      success(`Found ${filteredOrders.length} matching orders`)
+      // Update the displayed orders
+      salesOrders.value = filteredOrders
+    } else {
+      error('No matching orders found')
+      // Reload all orders
+      fetchSalesOrders()
+    }
+  } else {
+    // Reload all orders if search is empty
+    fetchSalesOrders()
+  }
+}
+
+const copyCustomerAddress = () => {
+  // Copy customer address to delivery location
+  if (orderDetails.customer) {
+    orderDetails.deliveryLocation = orderDetails.customer
+    success('Customer address copied to delivery location')
+  } else {
+    error('No customer selected')
+  }
 }
 
 // Initialize
 onMounted(() => {
+  // Load sales orders data
+  fetchSalesOrders()
+
   // Load data based on SO number if provided
   if (props.soNumber) {
     // Filter or highlight the specific SO number

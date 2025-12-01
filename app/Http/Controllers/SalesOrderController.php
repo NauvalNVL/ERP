@@ -1684,6 +1684,12 @@ class SalesOrderController extends Controller
                 Log::info('Filtering by SO number:', ['so_number' => $request->so_number]);
             }
 
+            // Filter by Master Card sequence (MCS_Num) - used by Search by Master Card flows
+            if ($request->has('master_card_seq') && !empty($request->master_card_seq)) {
+                $query->where('MCS_Num', $request->master_card_seq);
+                Log::info('Filtering by master_card_seq:', ['master_card_seq' => $request->master_card_seq]);
+            }
+
             // Filter by SO number range - Support both old and new format
             if ($request->has('from_so') && $request->has('to_so')) {
                 $fromSO = $request->input('from_so');
@@ -2081,9 +2087,16 @@ class SalesOrderController extends Controller
             // Format order information
             $salespersonName = '';
             if ($salesperson) {
-                // Try uppercase NAME field first (legacy)
-                $salespersonName = $salesperson->NAME ?? $salesperson->name ?? $salesOrder->SLM ?? '';
+                // Beberapa database menggunakan kolom 'Name' (huruf N kapital)
+                // sementara lainnya memakai 'NAME' atau 'name'. Coba semua variasi
+                // sebelum fallback ke kode SLM.
+                $salespersonName = $salesperson->Name
+                    ?? $salesperson->NAME
+                    ?? $salesperson->name
+                    ?? $salesOrder->SLM
+                    ?? '';
             } else {
+                // Jika tabel salesperson tidak bisa diakses, gunakan kode saja
                 $salespersonName = $salesOrder->SLM ?? '';
             }
 
