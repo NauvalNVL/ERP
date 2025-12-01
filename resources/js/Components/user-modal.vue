@@ -36,7 +36,6 @@
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('code')">Code</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer" @click="sortTable('name')">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('signon')">Signon</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -46,17 +45,9 @@
                 @dblclick="selectAndClose(user)">
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ user.code }}</td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ user.name }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span :class="[
-                    'px-2 py-1 text-xs font-medium rounded-full', 
-                    user.signon === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  ]">
-                    {{ user.signon }}
-                  </span>
-                </td>
               </tr>
               <tr v-if="filteredUsers.length === 0">
-                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No user data available.</td>
+                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No user data available.</td>
               </tr>
             </tbody>
           </table>

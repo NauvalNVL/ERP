@@ -1485,29 +1485,39 @@ class InvoiceController extends Controller
     {
         $year = $request->input('year', now()->format('Y'));
         $month = $request->input('month', now()->format('m'));
-        $customerCode = $request->input('customer_code');
+
+        $invoiceFrom = trim((string) $request->input('invoice_from'));
+        $invoiceTo = trim((string) $request->input('invoice_to'));
 
         $query = DB::table('INV')
-            ->select([
-                'IV_NUM as invoice_number',
-                'IV_DMY as invoice_date',
-                'AC_NUM as customer_code',
-                'AC_NAME as customer_name',
-                'IV_TRAN_AMT as amount',
-                'IV_TAX_CODE as tax_code',
-                'IV_TAX_PERCENT as tax_percent',
-                'IV_STS as status',
-                'NW_UID as created_by',
-                'NW_DATE as created_date',
-            ])
+            ->where('ITEM', 1)
             ->where('YYYY', $year)
-            ->where('MM', $month);
+            ->where('MM', str_pad($month, 2, '0', STR_PAD_LEFT));
 
-        if ($customerCode) {
-            $query->where('AC_NUM', $customerCode);
+        if ($invoiceFrom !== '' && $invoiceTo !== '') {
+            $query->whereBetween('IV_NUM', [$invoiceFrom, $invoiceTo]);
+        } elseif ($invoiceFrom !== '') {
+            $query->where('IV_NUM', '>=', $invoiceFrom);
+        } elseif ($invoiceTo !== '') {
+            $query->where('IV_NUM', '<=', $invoiceTo);
         }
 
-        $invoices = $query->orderBy('IV_NUM', 'desc')->get();
+        $select = [
+            'IV_NUM as invoice_number',
+            'IV_DMY as invoice_date',
+            'AC_NUM as customer_code',
+            'AC_NAME as customer_name',
+            'IV_TRAN_AMT as amount',
+            'IV_TAX_CODE as tax_code',
+            'IV_TAX_PERCENT as tax_percent',
+            'IV_STS as status',
+            'NW_UID as created_by',
+            'NW_DATE as created_date',
+        ];
+
+        $invoices = $query->select($select)
+            ->orderBy('IV_NUM', 'desc')
+            ->get();
 
         return response()->json($invoices);
     }

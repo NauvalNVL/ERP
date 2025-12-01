@@ -802,6 +802,11 @@ return Inertia::render('warehouse-management/Invoice/IVProcessing/PrepareInvoice
 ]);
 })->name('vue.warehouse-management.invoice.iv-processing.prepare-by-do-open-period');
 
+// Warehouse Management - Invoice - IV Processing - View & Print Invoice Log
+Route::get('/warehouse-management/invoice/iv-processing/view-print-invoice-log', function () {
+return Inertia::render('warehouse-management/Invoice/IVProcessing/InvoiceLog');
+})->name('vue.warehouse-management.invoice.iv-processing.view-print-invoice-log');
+
 // Backward-compatibility alias (old menu path)
 Route::get('/warehouse-management/invoice/iv-processing/prepare-do-current', function () {
 return redirect()->route('vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period');
