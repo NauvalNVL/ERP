@@ -12,6 +12,9 @@ class UserCpsSeeder extends Seeder
     public function run()
     {
         // Data super admin
+        // Hapus dulu semua permission yang terkait sebelum hapus user
+        UserPermission::where('user_id', 'ADMIN001')->delete();
+
         $existingAdmin = UserCps::where('userID', 'ADMIN001')->first();
         if ($existingAdmin) {
             $existingAdmin->delete();
@@ -34,6 +37,9 @@ class UserCpsSeeder extends Seeder
         UserPermission::createDefaultPermissions('ADMIN001');
 
         // Data sample user
+        // Hapus dulu semua permission yang terkait sebelum hapus user
+        UserPermission::where('user_id', 'USER001')->delete();
+
         $existingUser = UserCps::where('userID', 'USER001')->first();
         if ($existingUser) {
             $existingUser->delete();
