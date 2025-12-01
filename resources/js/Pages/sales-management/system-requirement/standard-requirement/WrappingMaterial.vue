@@ -174,7 +174,7 @@
         :show="showModal"
         :items="wrappingMaterials"
         @close="showModal = false"
-        @select="onwrappingMaterialSelected"
+        @select="onWrappingMaterialSelected"
     />
 
     <!-- Edit Modal -->
@@ -331,11 +331,11 @@ const editForm = ref({
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-// Fetch Wrapping Materials from API
-const fetchwrappingMaterials = async () => {
-    loading.value = true;
-    try {
-        const response = await fetch('/api/wrapping-materials', {
+    // Fetch Wrapping Materials from API
+    const fetchWrappingMaterials = async () => {
+        loading.value = true;
+        try {
+            const response = await fetch('/api/wrapping-materials', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -366,7 +366,7 @@ const fetchwrappingMaterials = async () => {
 };
 
 onMounted(() => {
-    fetchwrappingMaterials();
+    fetchWrappingMaterials();
 });
 
 // Watch for changes in search query to filter the data
@@ -386,11 +386,11 @@ watch(searchQuery, (newQuery) => {
 // Watch for modal opening to refresh data
 watch(showModal, (isOpen) => {
     if (isOpen) {
-        fetchwrappingMaterials();
+        fetchWrappingMaterials();
     }
 });
 
-const onwrappingMaterialSelected = (string) => {
+const onWrappingMaterialSelected = (string) => {
     selectedRow.value = string;
     searchQuery.value = string.code;
     showModal.value = false;
@@ -401,7 +401,7 @@ const onwrappingMaterialSelected = (string) => {
     showEditModal.value = true;
 };
 
-const createNewwrappingMaterial = () => {
+const createNewWrappingMaterial = () => {
     isCreating.value = true;
     editForm.value = {
         id: null,
@@ -460,7 +460,7 @@ const savewrappingMaterialChanges = async () => {
             throw new Error(errorData.message || 'Error saving Wrapping Material');
         }
 
-        await fetchwrappingMaterials();
+        await fetchWrappingMaterials();
 
         if (isCreating.value) {
             showNotification('Wrapping Material created successfully', 'success');
@@ -506,7 +506,7 @@ const deletewrappingMaterial = async (id) => {
         }
 
         showNotification('Wrapping Material deleted successfully!', 'success');
-        await fetchwrappingMaterials();
+        await fetchWrappingMaterials();
 
         if (selectedRow.value && selectedRow.value.id === id) {
             selectedRow.value = null;
