@@ -1,142 +1,142 @@
 <template>
     <AppLayout header="Copy & Paste User Access Permission">
         <Head title="Copy & Paste User Access" />
-        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
             <div class="max-w-5xl w-full mx-auto relative z-0">
                 <!-- Header Card -->
-                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
-                        <div class="flex items-center justify-center">
-                            <div class="bg-white/20 rounded-full p-4 mr-4">
-                                <CopyIcon class="h-8 w-8 text-white" />
-                            </div>
-                            <div class="text-center">
-                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Copy & Paste Permissions</h1>
-                                <p class="text-blue-100">Transfer user access permissions between users</p>
-                            </div>
+                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                            <CopyIcon class="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">Copy &amp; Paste Permissions</h1>
+                            <p class="text-xs sm:text-sm text-blue-100">Transfer user access permissions between users</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Main Form -->
-                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 560px; contain: content;">
-                    <div class="p-4 md:p-8 space-y-6 md:space-y-8">
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4" style="content-visibility:auto; contain-intrinsic-size: 1px 560px; contain: content;">
+                    <div class="px-4 py-4 sm:px-6 sm:py-5 space-y-5">
                         <!-- Copy from User ID Section -->
-                        <div class="bg-white/80 rounded-xl p-4 md:p-6 border border-white/20">
-                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 rounded-lg mb-6">
-                                <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 rounded-full p-2 mr-3">
-                                        <UserIcon class="h-6 w-6 text-white" />
-                                    </div>
-                                    Source User (Copy From)
-                                </h3>
-                                <p class="text-blue-100 text-sm mt-1">Select user to copy permissions from</p>
-                            </div>
-                            <div class="flex flex-col lg:flex-row gap-6">
-                                <div class="flex-1">
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
-                                            <IdentificationIcon class="h-5 w-5 text-white" />
-                                        </div>
-                                        User ID
-                                    </label>
-                                    <input 
-                                        v-model="form.copyFromUserId" 
-                                        type="text"
-                                        class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                        placeholder="Enter source User ID..."
-                                        @keyup.enter="searchCopyFromUser"
-                                    >
+                        <div class="border border-gray-200 rounded-lg p-4 sm:p-5 bg-white">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-50">
+                                            <UserIcon class="h-4 w-4 text-blue-600" />
+                                        </span>
+                                        <span>Source User (Copy From)</span>
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1">Select the user whose permissions you want to copy.</p>
                                 </div>
-                                <div class="flex items-end">
+                            </div>
+                            <div class="mt-2 flex-1">
+                                <label for="copyFromUserId" class="block text-xs font-medium text-gray-700">
+                                    User ID
+                                </label>
+                                <div class="mt-1 flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <div class="relative flex-1">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <IdentificationIcon class="h-4 w-4 text-gray-400" />
+                                        </div>
+                                        <input 
+                                            id="copyFromUserId"
+                                            v-model="form.copyFromUserId" 
+                                            type="text"
+                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            placeholder="Enter source User ID..."
+                                            @keyup.enter="searchCopyFromUser"
+                                        >
+                                    </div>
                                     <button 
                                         @click="searchCopyFromUser"
-                                        class="inline-flex items-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                        class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                         :disabled="!form.copyFromUserId"
                                     >
-                                        <SearchIcon class="h-6 w-6 mr-3" />
-                                        Search User
+                                        <SearchIcon class="h-4 w-4 mr-2" />
+                                        <span>Search User</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Display Copy From User Info -->
-                        <div v-if="copyFromUser" class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:to-indigo-600 p-4 md:p-6 rounded-xl shadow animate-fadeIn">
-                            <div class="flex items-center">
-                                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
-                                    {{ ((copyFromUser.official_name || copyFromUser.user_id || '').charAt(0) || '').toUpperCase() }}
-                                </div>
-                                <div class="text-white">
-                                    <h4 class="text-lg font-semibold">{{ copyFromUser.official_name || copyFromUser.user_id }}</h4>
-                                    <p class="text-blue-100">{{ copyFromUser.user_id }} • {{ copyFromUser.official_title || 'No Title' }}</p>
-                                    <p class="text-xs text-blue-200 mt-1">✓ Source user selected</p>
-                                </div>
+                        <div v-if="copyFromUser" class="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center text-white font-semibold text-sm">
+                                {{ ((copyFromUser.official_name || copyFromUser.user_id || '').charAt(0) || '').toUpperCase() }}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-blue-900 truncate">{{ copyFromUser.official_name || copyFromUser.user_id }}</p>
+                                <p class="text-xs text-blue-800 truncate">{{ copyFromUser.user_id }} • {{ copyFromUser.official_title || 'No Title' }}</p>
+                                <p class="text-[11px] text-blue-700 mt-0.5">Source user selected</p>
                             </div>
                         </div>
 
                         <!-- Paste to User ID Section -->
-                        <div class="bg-white/80 rounded-xl p-4 md:p-6 border border-white/20">
-                            <div class="bg-green-500 md:bg-gradient-to-r md:from-green-500 md:to-emerald-500 p-4 rounded-lg mb-6">
-                                <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 rounded-full p-2 mr-3">
-                                        <UserIcon class="h-6 w-6 text-white" />
-                                    </div>
-                                    Target User (Paste To)
-                                </h3>
-                                <p class="text-green-100 text-sm mt-1">Select user to paste permissions to</p>
-                            </div>
-                            <div class="flex flex-col lg:flex-row gap-6">
-                                <div class="flex-1">
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                        <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-2 mr-3">
-                                            <IdentificationIcon class="h-5 w-5 text-white" />
-                                        </div>
-                                        User ID
-                                    </label>
-                                    <input 
-                                        v-model="form.pasteToUserId" 
-                                        type="text"
-                                        class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                        placeholder="Enter target User ID..."
-                                        @keyup.enter="searchPasteToUser"
-                                    >
+                        <div class="border border-gray-200 rounded-lg p-4 sm:p-5 bg-white">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50">
+                                            <UserIcon class="h-4 w-4 text-emerald-600" />
+                                        </span>
+                                        <span>Target User (Paste To)</span>
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1">Select the user who will receive the copied permissions.</p>
                                 </div>
-                                <div class="flex items-end">
+                            </div>
+                            <div class="mt-2 flex-1">
+                                <label for="pasteToUserId" class="block text-xs font-medium text-gray-700">
+                                    User ID
+                                </label>
+                                <div class="mt-1 flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <div class="relative flex-1">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <IdentificationIcon class="h-4 w-4 text-gray-400" />
+                                        </div>
+                                        <input 
+                                            id="pasteToUserId"
+                                            v-model="form.pasteToUserId" 
+                                            type="text"
+                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            placeholder="Enter target User ID..."
+                                            @keyup.enter="searchPasteToUser"
+                                        >
+                                    </div>
                                     <button 
                                         @click="searchPasteToUser"
-                                        class="inline-flex items-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                        class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                         :disabled="!form.pasteToUserId"
                                     >
-                                        <SearchIcon class="h-6 w-6 mr-3" />
-                                        Search User
+                                        <SearchIcon class="h-4 w-4 mr-2" />
+                                        <span>Search User</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Display Paste To User Info -->
-                        <div v-if="pasteToUser" class="bg-indigo-600 md:bg-gradient-to-r md:from-indigo-600 md:to-purple-600 p-4 md:p-6 rounded-xl shadow animate-fadeIn">
-                            <div class="flex items-center">
-                                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
-                                    {{ ((pasteToUser.official_name || pasteToUser.user_id || '').charAt(0) || '').toUpperCase() }}
-                                </div>
-                                <div class="text-white">
-                                    <h4 class="text-lg font-semibold">{{ pasteToUser.official_name || pasteToUser.user_id }}</h4>
-                                    <p class="text-indigo-100">{{ pasteToUser.user_id }} • {{ pasteToUser.official_title || 'No Title' }}</p>
-                                    <p class="text-xs text-indigo-200 mt-1">✓ Target user selected</p>
-                                </div>
+                        <div v-if="pasteToUser" class="rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3 flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-indigo-500/80 flex items-center justify-center text-white font-semibold text-sm">
+                                {{ ((pasteToUser.official_name || pasteToUser.user_id || '').charAt(0) || '').toUpperCase() }}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-indigo-900 truncate">{{ pasteToUser.official_name || pasteToUser.user_id }}</p>
+                                <p class="text-xs text-indigo-800 truncate">{{ pasteToUser.user_id }} • {{ pasteToUser.official_title || 'No Title' }}</p>
+                                <p class="text-[11px] text-indigo-700 mt-0.5">Target user selected</p>
                             </div>
                         </div>
 
                         <!-- Confirm to Paste Button -->
-                        <div class="flex justify-center pt-8 border-t border-gray-200">
+                        <div class="flex justify-center pt-5 border-t border-gray-200">
                             <button 
                                 @click="confirmPaste"
-                                class="inline-flex items-center px-8 py-4 md:px-12 md:py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg md:text-xl font-bold rounded-2xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                class="inline-flex items-center px-6 py-2.5 md:px-8 md:py-3 bg-emerald-600 text-white text-sm md:text-base font-medium rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="!copyFromUser || !pasteToUser || isProcessing"
                             >
-                                <CheckIcon class="h-7 w-7 mr-4" />
+                                <CheckIcon class="h-5 w-5 mr-2" />
                                 {{ isProcessing ? 'Processing...' : 'Confirm Copy & Paste' }}
                             </button>
                         </div>
@@ -144,63 +144,52 @@
                 </div>
 
                 <!-- Success/Error Messages -->
-                <div v-if="message" class="mb-8">
-                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 border-l-4 border-green-700 p-6 rounded-xl shadow-lg animate-fadeIn" v-if="messageType === 'success'">
+                <div v-if="message" class="mb-4">
+                    <div
+                        v-if="messageType === 'success'"
+                        class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-green-500 rounded-full p-2 mr-4">
-                                <CheckCircleIcon class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Success!</h3>
-                                <p class="text-white">{{ message }}</p>
-                            </div>
+                            <CheckCircleIcon class="h-5 w-5 text-green-500 mr-2" />
+                            <p class="text-sm font-medium">{{ message }}</p>
                         </div>
                     </div>
-                    <div class="bg-gradient-to-r from-red-500 to-pink-500 border-l-4 border-red-600 p-6 rounded-xl shadow-lg animate-fadeIn" v-else>
+                    <div
+                        v-else
+                        class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-red-500 rounded-full p-2 mr-4">
-                                <ExclamationCircleIcon class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Error!</h3>
-                                <p class="text-white">{{ message }}</p>
-                            </div>
+                            <ExclamationCircleIcon class="h-5 w-5 text-red-500 mr-2" />
+                            <p class="text-sm font-medium">{{ message }}</p>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="$page.props.flash.success" class="mb-8">
-                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 border-l-4 border-green-700 p-6 rounded-xl shadow-lg">
+                <div v-if="$page.props.flash.success" class="mb-4">
+                    <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-sm">
                         <div class="flex items-center">
-                            <div class="bg-green-500 rounded-full p-2 mr-4">
-                                <CheckCircleIcon class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Success!</h3>
-                                <p class="text-white">{{ $page.props.flash.success }}</p>
-                            </div>
+                            <CheckCircleIcon class="h-5 w-5 text-green-500 mr-2" />
+                            <p class="text-sm font-medium">{{ $page.props.flash.success }}</p>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="$page.props.flash.error" class="mb-8">
-                    <div class="bg-gradient-to-r from-red-500 to-pink-500 border-l-4 border-red-600 p-6 rounded-xl shadow-lg">
+                <div v-if="$page.props.flash.error" class="mb-4">
+                    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-sm">
                         <div class="flex items-center">
-                            <div class="bg-red-500 rounded-full p-2 mr-4">
-                                <ExclamationCircleIcon class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Error!</h3>
-                                <p class="text-white">{{ $page.props.flash.error }}</p>
-                            </div>
+                            <ExclamationCircleIcon class="h-5 w-5 text-red-500 mr-2" />
+                            <p class="text-sm font-medium">{{ $page.props.flash.error }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Back to User List -->
-                <div class="text-center">
-                    <Link href="/user" class="inline-flex items-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
-                        <ArrowLeftIcon class="h-6 w-6 mr-3" />
+                <div class="text-center mt-4">
+                    <Link
+                        href="/user"
+                        class="inline-flex items-center px-4 py-2 md:px-5 md:py-2.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    >
+                        <ArrowLeftIcon class="h-5 w-5 mr-2" />
                         Back to User List
                     </Link>
                 </div>

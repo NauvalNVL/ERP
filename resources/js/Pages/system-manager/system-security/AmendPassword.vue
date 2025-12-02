@@ -1,151 +1,205 @@
 <template>
     <AppLayout header="Amend User Password">
         <Head title="Amend User Password" />
-        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden no-overscroll gutter-stable">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden no-overscroll gutter-stable">
             <div class="max-w-4xl mx-auto relative z-0">
                 <!-- Header Card -->
-                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-6">
-                        <div class="flex items-center justify-center">
-                            <div class="bg-white/20 rounded-full p-3 md:p-4 mr-3 md:mr-4">
-                                <KeyIcon class="h-8 w-8 text-white" />
-                            </div>
-                            <div class="text-center">
-                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">Password Management</h1>
-                                <p class="text-blue-100">Update user password securely</p>
-                            </div>
+                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                            <KeyIcon class="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">Password Management</h1>
+                            <p class="text-xs sm:text-sm text-blue-100">Update user password securely</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Main Content -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-                    <!-- Search Section -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 280px; contain: content;">
-                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
-                                <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <SearchIcon class="h-6 w-6 mr-3" />
-                                    Find User
-                                </h3>
-                                <p class="text-blue-100 text-sm mt-1">Search by User ID</p>
-                            </div>
-                            <div class="p-4 md:p-6">
-                                <form @submit.prevent="searchUser" class="space-y-4">
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <SearchIcon class="h-5 w-5 text-gray-400" />
+                <div class="space-y-4 md:space-y-6 lg:space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
+                        <!-- Search Section -->
+                        <div>
+                            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col" style="content-visibility:auto; contain-intrinsic-size: 1px 280px; contain: content;">
+                                <div class="px-4 py-3 sm:px-6 border-b border-blue-700 bg-blue-600 text-white">
+                                    <h3 class="text-sm font-semibold flex items-center gap-2">
+                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-500">
+                                            <SearchIcon class="h-4 w-4 text-white" />
+                                        </span>
+                                        <span>Find User</span>
+                                    </h3>
+                                    <p class="text-xs text-blue-100 mt-1">Search by User ID</p>
+                                </div>
+                                <div class="p-4 sm:p-6 flex-1 flex flex-col justify-between">
+                                    <form @submit.prevent="searchUser" class="space-y-3">
+                                        <div class="relative">
+                                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                <SearchIcon class="h-4 w-4 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                v-model="search_user_id"
+                                                id="search_user_id"
+                                                class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                placeholder="Enter User ID..."
+                                                required
+                                            >
                                         </div>
-                                        <input type="text" v-model="search_user_id" id="search_user_id" 
-                                            class="block w-full pl-12 pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-gray-50 hover:bg-white"
-                                            placeholder="Enter User ID..." required>
-                                    </div>
-                                    <button type="submit" 
-                                        class="w-full flex items-center justify-center px-5 py-3 md:px-6 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
-                                        <SearchIcon class="h-5 w-5 mr-2" />
-                                        Search User
-                                    </button>
-                                </form>
+                                        <button
+                                            type="submit"
+                                            class="w-full inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                                        >
+                                            <SearchIcon class="h-4 w-4 mr-2" />
+                                            Search User
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Guide Section -->
+                        <div>
+                            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col">
+                                <div class="px-4 py-3 sm:px-6 border-b border-gray-200 bg-yellow-300">
+                                    <h3 class="text-sm font-semibold text-gray-900">User Guide</h3>
+                                    <p class="text-xs text-gray-500 mt-1">Quick guide to use the password change screen.</p>
+                                </div>
+                                <div class="p-4 sm:p-6 text-sm text-gray-700 space-y-2 flex-1">
+                                    <p class="leading-relaxed">
+                                        1. Enter the <span class="font-semibold">User ID</span> in the <span class="font-semibold">Find User</span> box and click <span class="font-semibold">Search User</span>.
+                                    </p>
+                                    <p class="leading-relaxed">
+                                        2. If the user is found, their information and the <span class="font-semibold">Update Password</span> form will appear below.
+                                    </p>
+                                    <p class="leading-relaxed">
+                                        3. Type and confirm the new password (minimum 8 characters), then click <span class="font-semibold">Update Password</span>.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Password Update Section -->
-                    <div class="lg:col-span-2">
+                    <div>
                         <!-- Feedback Messages -->
-                        <div class="space-y-4 mb-6 no-anchor">
-                            <div v-if="message" class="transform transition-all duration-500 animate-slideIn" :class="messageClass">
-                                <div class="flex items-center p-4 rounded-xl shadow-lg">
+                        <div class="space-y-3 mb-4 no-anchor">
+                            <div v-if="message" :class="messageClass">
+                                <div class="flex items-center px-4 py-3 rounded-lg shadow-sm">
                                     <div class="flex-shrink-0">
-                                        <component :is="messageIcon" class="h-6 w-6" :class="messageTextColor" />
+                                        <component :is="messageIcon" class="h-5 w-5" :class="messageTextColor" />
                                     </div>
-                                    <div class="ml-4">
-                                        <p class="font-semibold" :class="messageTextColor">{{ message }}</p>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium" :class="messageTextColor">{{ message }}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="$page.props.flash.success" class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 text-green-800 p-4 rounded-xl shadow-lg animate-slideIn">
+                            <div
+                                v-if="$page.props.flash.success"
+                                class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-sm"
+                            >
                                 <div class="flex items-center">
-                                    <CheckCircleIcon class="h-6 w-6 text-green-500 mr-3" />
-                                    <span class="font-semibold">{{ $page.props.flash.success }}</span>
+                                    <CheckCircleIcon class="h-5 w-5 text-green-500 mr-2" />
+                                    <span class="text-sm font-medium">{{ $page.props.flash.success }}</span>
                                 </div>
                             </div>
-                            <div v-if="$page.props.flash.error" class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 text-red-800 p-4 rounded-xl shadow-lg animate-slideIn">
+                            <div
+                                v-if="$page.props.flash.error"
+                                class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-sm"
+                            >
                                 <div class="flex items-center">
-                                    <ExclamationCircleIcon class="h-6 w-6 text-red-500 mr-3" />
-                                    <span class="font-semibold">{{ $page.props.flash.error }}</span>
+                                    <ExclamationCircleIcon class="h-5 w-5 text-red-500 mr-2" />
+                                    <span class="text-sm font-medium">{{ $page.props.flash.error }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Update Password Form -->
-                        <div v-if="foundUser" class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 360px; contain: content;">
-                            <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-6">
-                                <div class="flex items-center">
-                                    <div class="bg-white/20 rounded-full p-2 md:p-3 mr-3 md:mr-4">
-                                        <UserCircleIcon class="h-8 w-8 text-white" />
+                        <div v-if="foundUser" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 360px; contain: content;">
+                            <div class="bg-blue-600 px-4 py-3 sm:px-6 border-b border-blue-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <UserCircleIcon class="h-5 w-5 text-white" />
                                     </div>
                                     <div>
-                                        <h3 class="text-lg md:text-xl font-semibold text-white">
+                                        <h3 class="text-sm sm:text-base font-semibold text-white">
                                             {{ foundUser.official_name }}
                                         </h3>
-                                        <p class="text-purple-100">User ID: {{ foundUser.user_id }}</p>
+                                        <p class="text-xs text-blue-100">User ID: {{ foundUser.user_id }}</p>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <form @submit.prevent="updatePassword" class="p-4 md:p-8 space-y-6">
+
+                            <form @submit.prevent="updatePassword" class="p-4 sm:p-6 space-y-5">
 
                                 <input type="hidden" v-model="form.user_id">
                                 
                                 <!-- New Password -->
                                 <div class="space-y-4">
                                     <div>
-                                        <label for="new_password" class="flex items-center text-base md:text-lg font-semibold text-gray-800 mb-3">
-                                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-2 mr-3">
-                                                <LockClosedIcon class="h-5 w-5 text-white" />
-                                            </div>
-                                            New Password
+                                        <label for="new_password" class="flex items-center text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 mr-2">
+                                                <LockClosedIcon class="h-4 w-4 text-indigo-600" />
+                                            </span>
+                                            <span>New Password</span>
                                         </label>
                                         <div class="relative">
-                                            <input :type="showPassword ? 'text' : 'password'" v-model="form.new_password" id="new_password"
-                                                class="block w-full px-4 py-3 md:px-6 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 text-gray-900 pr-12 bg-gray-50 hover:bg-white text-base md:text-lg"
+                                            <input
+                                                :type="showPassword ? 'text' : 'password'"
+                                                v-model="form.new_password"
+                                                id="new_password"
+                                                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 placeholder="Enter at least 8 characters"
                                                 required
-                                                minlength="8">
-                                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                                                <button @click="showPassword = !showPassword" type="button" class="text-gray-400 hover:text-purple-500 transition-colors duration-200" :aria-label="showPassword ? 'Hide password' : 'Show password'">
-                                                    <EyeIcon v-if="!showPassword" class="h-6 w-6" />
-                                                    <EyeOffIcon v-else class="h-6 w-6" />
+                                                minlength="8"
+                                            >
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                                <button
+                                                    @click="showPassword = !showPassword"
+                                                    type="button"
+                                                    class="text-gray-400 hover:text-indigo-600 transition-colors duration-150"
+                                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                                >
+                                                    <EyeIcon v-if="!showPassword" class="h-5 w-5" />
+                                                    <EyeOffIcon v-else class="h-5 w-5" />
                                                 </button>
                                             </div>
                                         </div>
-                                        <div v-if="form.new_password" class="mt-4">
-                                            <div class="h-3 rounded-full bg-gray-200 overflow-hidden">
-                                                <div class="h-3 rounded-full transition-all duration-500 ease-out" :class="passwordStrength.color" :style="{ width: passwordStrength.width }"></div>
+                                        <div v-if="form.new_password" class="mt-3">
+                                            <div class="h-2 rounded-full bg-gray-200 overflow-hidden">
+                                                <div class="h-2 rounded-full transition-all duration-500 ease-out" :class="passwordStrength.color" :style="{ width: passwordStrength.width }"></div>
                                             </div>
-                                            <p class="text-sm mt-2 font-medium" :class="passwordStrength.textColor">Password Strength: {{ passwordStrength.label }}</p>
+                                            <p class="text-xs mt-2 font-medium" :class="passwordStrength.textColor">Password Strength: {{ passwordStrength.label }}</p>
                                         </div>
                                     </div>
 
                                     <!-- Confirm New Password -->
                                     <div>
-                                        <label for="new_password_confirmation" class="flex items-center text-base md:text-lg font-semibold text-gray-800 mb-3">
-                                            <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-2 mr-3">
-                                                <LockClosedIcon class="h-5 w-5 text-white" />
-                                            </div>
-                                            Confirm New Password
+                                        <label for="new_password_confirmation" class="flex items-center text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 mr-2">
+                                                <LockClosedIcon class="h-4 w-4 text-indigo-600" />
+                                            </span>
+                                            <span>Confirm New Password</span>
                                         </label>
                                         <div class="relative">
-                                            <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.new_password_confirmation" id="new_password_confirmation"
-                                                class="block w-full px-4 py-3 md:px-6 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 text-gray-900 pr-12 bg-gray-50 hover:bg-white text-base md:text-lg"
+                                            <input
+                                                :type="showConfirmPassword ? 'text' : 'password'"
+                                                v-model="form.new_password_confirmation"
+                                                id="new_password_confirmation"
+                                                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 placeholder="Re-type the password"
                                                 required
-                                                minlength="8">
-                                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                                                <button @click="showConfirmPassword = !showConfirmPassword" type="button" class="text-gray-400 hover:text-pink-500 transition-colors duration-200" :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'">
-                                                    <EyeIcon v-if="!showConfirmPassword" class="h-6 w-6" />
-                                                    <EyeOffIcon v-else class="h-6 w-6" />
+                                                minlength="8"
+                                            >
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                                <button
+                                                    @click="showConfirmPassword = !showConfirmPassword"
+                                                    type="button"
+                                                    class="text-gray-400 hover:text-indigo-600 transition-colors duration-150"
+                                                    :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                                                >
+                                                    <EyeIcon v-if="!showConfirmPassword" class="h-5 w-5" />
+                                                    <EyeOffIcon v-else class="h-5 w-5" />
                                                 </button>
                                             </div>
                                         </div>
@@ -164,15 +218,20 @@
                                 </div>
 
                                 <!-- Action Buttons -->
-                                <div class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-gray-200">
-                                    <Link href="/user" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-3 sm:px-8 sm:py-4 border-2 border-gray-300 text-base sm:text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
-                                        <ArrowLeftIcon class="h-6 w-6 mr-3" />
+                                <div class="flex flex-col sm:flex-row gap-3 pt-5 border-t border-gray-200">
+                                    <Link
+                                        href="/user"
+                                        class="flex-1 sm:flex-none inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                    >
+                                        <ArrowLeftIcon class="h-5 w-5 mr-2" />
                                         Back to Users
                                     </Link>
-                                    <button type="submit" 
+                                    <button
+                                        type="submit"
                                         :disabled="!form.new_password || !form.new_password_confirmation || form.new_password !== form.new_password_confirmation"
-                                        class="flex-1 inline-flex items-center justify-center px-5 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-base sm:text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
-                                        <RefreshIcon class="h-6 w-6 mr-3" />
+                                        class="flex-1 inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <RefreshIcon class="h-5 w-5 mr-2" />
                                         Update Password
                                     </button>
                                 </div>
