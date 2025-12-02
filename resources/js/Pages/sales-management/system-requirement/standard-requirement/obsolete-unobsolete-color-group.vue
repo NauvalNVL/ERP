@@ -142,12 +142,12 @@ const notification = ref({
     type: 'success'
 });
 
-// Fetch color groups
+// Fetch color groups (including all statuses for obsolete/unobsolete page)
 const fetchColorGroups = async () => {
     loading.value = true;
     
     try {
-        const response = await fetch('/api/color-groups', {
+        const response = await fetch('/api/color-groups?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -263,10 +263,8 @@ const showNotification = (message, type = 'success') => {
     }, 3000);
 };
 
-// Load data on component mount
+// Load data on component mount - always refresh from API so newly obsoleted/activated groups appear
 onMounted(() => {
-    if (colorGroups.value.length === 0) {
-        fetchColorGroups();
-    }
+    fetchColorGroups();
 });
 </script>

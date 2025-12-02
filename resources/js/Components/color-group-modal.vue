@@ -51,21 +51,30 @@ const sortKey = ref('cg');
 const sortAsc = ref(true);
 
 const filteredColorGroups = computed(() => {
-  let groups = props.colorGroups;
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
-    groups = groups.filter(g =>
-      g.cg.toLowerCase().includes(q) ||
-      g.cg_name.toLowerCase().includes(q) ||
-      g.cg_type.toLowerCase().includes(q)
-    );
-  }
-  // Sort
-  return [...groups].sort((a, b) => {
-    if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
-    if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
-    return 0;
-  });
+	let groups = props.colorGroups;
+
+	if (!Array.isArray(groups)) {
+		console.error('ColorGroupModal - colorGroups is not an array:', groups);
+		return [];
+	}
+
+	// Only show active color groups (hide obsolete ones)
+	groups = groups.filter(g => !g.status || g.status === 'Act');
+
+	if (searchQuery.value) {
+		const q = searchQuery.value.toLowerCase();
+		groups = groups.filter(g =>
+			g.cg.toLowerCase().includes(q) ||
+			g.cg_name.toLowerCase().includes(q) ||
+			g.cg_type.toLowerCase().includes(q)
+		);
+	}
+	// Sort
+	return [...groups].sort((a, b) => {
+		if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
+		if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
+		return 0;
+	});
 });
 
 function selectRow(group) {

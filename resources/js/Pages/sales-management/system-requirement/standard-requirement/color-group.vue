@@ -235,8 +235,8 @@
                     </div>
                     
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteColorGroup" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteColorGroup" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -530,50 +530,52 @@ const saveColorGroup = async () => {
     }
 };
 
-const deleteColorGroup = async () => {
-    if (!selectedGroup.value) {
-        showNotification('No color group selected', 'error');
-        return;
-    }
-    
-    if (!confirm(`Are you sure you want to delete color group "${selectedGroup.value.cg}"?`)) {
-        return;
-    }
-    
-    saving.value = true;
-    try {
-        const csrfToken = getCsrfToken();
-        
-        const response = await fetch(`/api/color-groups/${selectedGroup.value.cg}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin' // Include cookies in the request
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting color group');
-        }
-        
-        // Remove from local array
-        colorGroups.value = colorGroups.value.filter(g => g.cg !== selectedGroup.value.cg);
-        
-        // Reset selection and form
-        selectedGroup.value = null;
-                searchQuery.value = '';
-        closeEditModal();
-            
-            showNotification('Color group deleted successfully', 'success');
-    } catch (e) {
-        console.error('Error deleting color group:', e);
-        showNotification('Error: ' + e.message, 'error');
-    } finally {
-    saving.value = false;
-    }
+const obsoleteColorGroup = async () => {
+	if (!selectedGroup.value) {
+		showNotification('No color group selected', 'error');
+		return;
+	}
+
+	if (!confirm(`Are you sure you want to obsolete color group "${selectedGroup.value.cg}"? This will hide it from selection.`)) {
+		return;
+	}
+
+	saving.value = true;
+	try {
+		const csrfToken = getCsrfToken();
+
+		const response = await fetch(`/api/color-groups/${selectedGroup.value.cg}/status`, {
+			method: 'PUT',
+			headers: {
+				'X-CSRF-TOKEN': csrfToken,
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
+			credentials: 'same-origin'
+		});
+
+		const result = await response.json();
+
+		if (!response.ok || !result.success) {
+			throw new Error(result.message || 'Error obsoleting color group');
+		}
+
+		// Remove from local array since obsolete groups should not appear in Define Color Group
+		colorGroups.value = colorGroups.value.filter(g => g.cg !== selectedGroup.value.cg);
+
+		const code = selectedGroup.value.cg;
+		selectedGroup.value = null;
+		searchQuery.value = '';
+		closeEditModal();
+
+		showNotification(`Color group "${code}" has been marked as obsolete successfully.`, 'success');
+	} catch (e) {
+		console.error('Error obsoleting color group:', e);
+		showNotification('Error: ' + e.message, 'error');
+	} finally {
+		saving.value = false;
+	}
 };
 
 const showNotification = (message, type = 'success') => {

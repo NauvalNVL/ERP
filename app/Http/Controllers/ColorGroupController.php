@@ -326,11 +326,20 @@ class ColorGroupController extends Controller
 
     /**
      * API endpoint to get color groups
+     * By default returns only active groups (status = 'Act').
+     * Use ?all_status=1 to retrieve all groups including obsolete ones.
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $colorGroups = ColorGroup::orderBy('CG', 'asc')->get();
+            $query = ColorGroup::orderBy('CG', 'asc');
+
+            // Only return active color groups unless explicitly asked for all statuses
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+
+            $colorGroups = $query->get();
             
             // Transform data
             $colorGroupsTransformed = $colorGroups->map(function($group) {
