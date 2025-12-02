@@ -176,7 +176,10 @@ class GeoController extends Controller
     public function vueIndex()
     {
         try {
-            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            $geos = Geo::where('STATUS', 'Act')
+                ->orderBy('country')
+                ->orderBy('state')
+                ->get();
 
             Log::info('GeoController@vueIndex: Passing ' . $geos->count() . ' geo records to view');
 

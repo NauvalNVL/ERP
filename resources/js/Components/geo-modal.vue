@@ -123,6 +123,9 @@ const filteredGeos = computed(() => {
     return [];
   }
   
+  // Only show active geos (hide obsolete ones)
+  geos = geos.filter(geo => !geo.status || geo.status === 'Act');
+  
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     geos = geos.filter(geo =>
