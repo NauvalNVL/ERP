@@ -227,8 +227,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteGeo" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteGeo" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -609,8 +609,8 @@ const saveGeoData = async () => {
     }
 };
 
-const deleteGeo = async () => {
-    if (!confirm(`Are you sure you want to delete geo "${editForm.value.code}"?`)) {
+const obsoleteGeo = async () => {
+    if (!confirm(`Are you sure you want to obsolete geo "${editForm.value.code}"? This will mark it as inactive and it will no longer appear in selection lists.`)) {
         return;
     }
     
@@ -622,18 +622,23 @@ const deleteGeo = async () => {
             throw new Error('CSRF token not found');
         }
         
+        // Update status to 'Obs' (Obsolete) instead of deleting
         const response = await fetch(`/api/geo/${editForm.value.code}`, {
-            method: 'DELETE',
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: 'Obs'
+            })
         });
         
         const result = await response.json();
         
         if (result.success) {
-            // Remove the item from the local array
+            // Remove the item from the local array (since obsoleted items shouldn't appear)
             geos.value = geos.value.filter(geo => geo.code !== editForm.value.code);
             
             if (selectedGeo.value && selectedGeo.value.code === editForm.value.code) {
@@ -646,13 +651,13 @@ const deleteGeo = async () => {
             closeEditModal();
             showReviewModal.value = false;
             
-            showNotification('Geo data deleted successfully', 'success');
+            showNotification(`Geo "${editForm.value.code}" has been obsoleted successfully. Use Obsolete/Unobsolete Geo menu to reactivate.`, 'success');
         } else {
-            showNotification('Error deleting geo data: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Error obsoleting geo data: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting geo data:', e);
-        showNotification('Error deleting geo data. Please try again.', 'error');
+        console.error('Error obsoleting geo data:', e);
+        showNotification('Error obsoleting geo data. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

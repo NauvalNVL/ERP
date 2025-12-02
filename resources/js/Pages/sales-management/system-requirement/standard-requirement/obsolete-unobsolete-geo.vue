@@ -187,7 +187,7 @@ const notification = ref({
     type: 'success'
 });
 
-// Fetch geos with pagination (all_status=1 to include obsolete records)
+// Fetch geos with pagination (including all statuses for obsolete/unobsolete page)
 const fetchGeos = async (page = 1) => {
     loading.value = true;
     
