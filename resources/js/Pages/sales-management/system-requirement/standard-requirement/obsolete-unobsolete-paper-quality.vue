@@ -282,10 +282,8 @@ const showNotification = (message, type = 'success') => {
     }, 3000);
 };
 
-// Load data on component mount
+// Load data on component mount - always refresh from API so newly obsoleted/activated records appear
 onMounted(() => {
-    if (paperQualities.value.length === 0) {
-        fetchPaperQualities();
-    }
+    fetchPaperQualities();
 });
 </script>
