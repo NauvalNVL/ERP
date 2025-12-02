@@ -13,13 +13,22 @@ class ProductGroupController extends Controller
     public function index(Request $request)
     {
         try {
-            // Always load from database, ordered by product_group_id
-            $productGroups = ProductGroup::orderBy('product_group_id')->get();
+            // Build query ordered by product_group_id
+            $query = ProductGroup::orderBy('product_group_id');
+            
+            // Only filter by active status if all_status is not requested (for API)
+            if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
+                if (!$request->has('all_status') || !$request->all_status) {
+                    $query->where('status', 'Act');
+                }
+            }
+            
+            $productGroups = $query->get();
             
             // If there are no product groups in the database, seed them
-            if ($productGroups->isEmpty()) {
+            if ($productGroups->isEmpty() && !$request->has('all_status')) {
                 $this->seedData();
-                $productGroups = ProductGroup::orderBy('product_group_id')->get();
+                $productGroups = ProductGroup::where('status', 'Act')->orderBy('product_group_id')->get();
             }
             
             // If the request wants JSON, return JSON response
