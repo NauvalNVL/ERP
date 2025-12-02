@@ -237,8 +237,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deletePaperQuality" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoletePaperQuality" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -471,13 +471,13 @@ const saveChanges = async () => {
     }
 };
 
-const deletePaperQuality = async () => {
+const obsoletePaperQuality = async () => {
     if (!selectedQuality.value) {
         showNotification('No paper quality selected', 'error');
         return;
     }
 
-    if (!confirm(`Are you sure you want to delete paper quality "${selectedQuality.value.paper_quality}"?`)) {
+    if (!confirm(`Are you sure you want to obsolete paper quality "${selectedQuality.value.paper_quality}"? This will hide it from paper quality selection.`)) {
         return;
     }
 
@@ -485,30 +485,33 @@ const deletePaperQuality = async () => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-        const response = await fetch(`/api/paper-qualities/${selectedQuality.value.id}`, {
-            method: 'DELETE',
+        const response = await fetch(`/api/paper-qualities/${selectedQuality.value.id}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting paper quality');
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Error obsoleting paper quality');
         }
 
-        // Remove from local array
+        // Remove from local array (since it's now obsolete)
         paperQualities.value = paperQualities.value.filter(q => q.id !== selectedQuality.value.id);
 
         // Reset selection and form
+        const qualityCode = selectedQuality.value.paper_quality;
         selectedQuality.value = null;
         searchQuery.value = '';
         closeEditModal();
 
-        showNotification('Paper quality deleted successfully', 'success');
+        showNotification(`Paper quality "${qualityCode}" has been obsoleted successfully.`, 'success');
     } catch (e) {
-        console.error('Error deleting paper quality:', e);
+        console.error('Error obsoleting paper quality:', e);
         showNotification('Error: ' + e.message, 'error');
     } finally {
         saving.value = false;
