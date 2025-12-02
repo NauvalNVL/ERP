@@ -631,7 +631,16 @@ Route::put('/geo/{code}', [App\Http\Controllers\GeoController::class, 'update'])
 Route::delete('/geo/{code}', [App\Http\Controllers\GeoController::class, 'destroy']);
 Route::post('/geo/seed', [App\Http\Controllers\GeoController::class, 'seed']);
 
+// Salesperson API routes
+// Public routes (read-only)
 Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
+
+// Protected routes (write operations - require authentication via web session)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post('/salespersons', [App\Http\Controllers\SalespersonController::class, 'store']);
+    Route::post('/salespersons/update/{code}', [App\Http\Controllers\SalespersonController::class, 'update']);
+    Route::post('/salespersons/delete/{code}', [App\Http\Controllers\SalespersonController::class, 'destroy']);
+});
 
 // Customer Group API routes
 Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex'])->name('api.customer-groups.index');

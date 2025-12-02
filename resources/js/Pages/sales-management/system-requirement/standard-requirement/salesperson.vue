@@ -358,7 +358,7 @@ const getCsrfToken = () => {
 const fetchSalespersons = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/salesperson', {
+        const res = await fetch('/api/salespersons', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -522,62 +522,85 @@ const saveSalespersonChanges = async () => {
         let url = '';
 
         if (isCreating.value) {
-            url = '/api/salesperson/store'; // Create path
+            url = '/api/salespersons'; // Create path
         } else {
             // Use the code as identifier, not the ID
-            url = `/api/salesperson/update/${editForm.value.code}`;
+            url = `/api/salespersons/update/${editForm.value.code}`;
         }
 
         console.log('Saving salesperson with data:', editForm.value);
         console.log('Using URL:', url);
+        console.log('CSRF Token:', csrfToken ? 'present' : 'missing');
 
-        // Create form data for submission
-        const formData = new FormData();
-        formData.append('code', editForm.value.code);
-        formData.append('name', editForm.value.name);
-        formData.append('grup', editForm.value.grup || '');
-        formData.append('code_grup', editForm.value.code_grup || '');
-        formData.append('target_sales', editForm.value.target_sales || 0);
-        formData.append('internal', editForm.value.internal || '');
-        formData.append('email', editForm.value.email || '');
-        formData.append('status', editForm.value.status || 'Active');
+        // Create JSON body for submission (more reliable than FormData)
+        const requestBody = {
+            code: editForm.value.code,
+            name: editForm.value.name,
+            grup: editForm.value.grup || '',
+            code_grup: editForm.value.code_grup || '',
+            target_sales: editForm.value.target_sales || 0,
+            internal: editForm.value.internal || '',
+            email: editForm.value.email || '',
+            status: editForm.value.status || 'Active'
+        };
 
-        console.log('Form data values:');
-        for (const pair of formData.entries()) {
-            console.log(`${pair[0]}: ${pair[1]}`);
-        }
+        console.log('Request body:', requestBody);
 
         const response = await fetch(url, {
             method: 'POST', // Always use POST since our route is defined as POST
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: formData,
+            body: JSON.stringify(requestBody),
             credentials: 'same-origin'
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error saving salesperson');
-        }
+        console.log('Response status:', response.status);
 
         const result = await response.json();
+        console.log('Response result:', result);
+
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP Error: ${response.status}`);
+        }
 
         if (result.success) {
-            // Update the local data with the changes or add new item
+            // Gunakan data yang dikembalikan API sebagai sumber kebenaran
+            const savedPerson = result.data || {
+                code: editForm.value.code,
+                name: editForm.value.name,
+                grup: editForm.value.grup,
+                code_grup: editForm.value.code_grup,
+                target_sales: editForm.value.target_sales,
+                internal: editForm.value.internal,
+                email: editForm.value.email,
+                status: editForm.value.status,
+            };
+
+            // Update array lokal supaya modal langsung merefleksikan perubahan
+            const idx = salespersons.value.findIndex(p => p.code === savedPerson.code);
+
             if (isCreating.value) {
+                if (idx === -1) {
+                    salespersons.value.push(savedPerson);
+                } else {
+                    salespersons.value[idx] = savedPerson;
+                }
                 showNotification('Salesperson created successfully', 'success');
             } else {
-                if (selectedRow.value) {
-                    selectedRow.value.name = editForm.value.name;
+                if (idx !== -1) {
+                    salespersons.value[idx] = savedPerson;
                 }
                 showNotification('Salesperson updated successfully', 'success');
             }
 
-            // Refresh the full data list to ensure we're in sync with the database
+            // Refetch from server to ensure sync with database
+            console.log('Refetching salespersons from server...');
             await fetchSalespersons();
+            console.log('Refetch complete. Total salespersons:', salespersons.value.length);
             closeEditModal();
         } else {
             showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
@@ -606,7 +629,7 @@ const deleteSalesperson = async (id) => {
         // Create form data - no need for method spoofing now
         const formData = new FormData();
 
-        const response = await fetch(`/api/salesperson/delete/${code}`, {
+        const response = await fetch(`/api/salespersons/delete/${code}`, {
             method: 'POST', // Use POST since our route is defined as POST
             headers: {
                 'X-CSRF-TOKEN': csrfToken,

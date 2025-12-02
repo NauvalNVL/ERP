@@ -56,6 +56,12 @@ class SalespersonController extends Controller
     public function store(Request $request)
     {
         try {
+            Log::info('Salesperson store request received', [
+                'code' => $request->code,
+                'name' => $request->name,
+                'all_data' => $request->all()
+            ]);
+
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:50|unique:salesperson,Code',
                 'name' => 'required|string|max:50',
@@ -71,6 +77,11 @@ class SalespersonController extends Controller
                 $errors = $validator->errors();
                 $message = $errors->first();
 
+                Log::warning('Salesperson validation failed', [
+                    'errors' => $errors->toArray(),
+                    'request_data' => $request->all()
+                ]);
+
                 // If code already exists, suggest next available code
                 if ($errors->has('code') && strpos($message, 'already been taken') !== false) {
                     $suggestedCode = $this->getNextAvailableCode($request->code);
@@ -85,19 +96,31 @@ class SalespersonController extends Controller
 
             DB::beginTransaction();
 
-            // Create salesperson using direct column mapping
-            $salesperson = new Salesperson();
-            $salesperson->Code = $request->code;
-            $salesperson->Name = $request->name;
-            $salesperson->Grup = $request->grup;
-            $salesperson->CodeGrup = $request->code_grup;
-            $salesperson->TargetSales = $request->target_sales ?? 0;
-            $salesperson->Internal = $request->internal;
-            $salesperson->Email = $request->email;
-            $salesperson->status = $request->status ?? 'Active';
-            $salesperson->save();
+            // Create salesperson using direct DB insert to avoid model event issues
+            $insertData = [
+                'Code' => $request->code,
+                'Name' => $request->name,
+                'Grup' => $request->grup,
+                'CodeGrup' => $request->code_grup,
+                'TargetSales' => $request->target_sales ?? 0,
+                'Internal' => $request->internal,
+                'Email' => $request->email,
+                'status' => $request->status ?? 'Active',
+            ];
+
+            Log::info('Inserting salesperson data', $insertData);
+
+            DB::table('salesperson')->insert($insertData);
 
             DB::commit();
+
+            // Fetch the created salesperson for response
+            $salesperson = Salesperson::where('Code', $request->code)->first();
+
+            Log::info('Salesperson created successfully', [
+                'code' => $request->code,
+                'fetched_data' => $salesperson ? $salesperson->toArray() : null
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -106,7 +129,10 @@ class SalespersonController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating salesperson: ' . $e->getMessage());
+            Log::error('Error creating salesperson: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
 
             return response()->json([
                 'success' => false,
@@ -124,7 +150,19 @@ class SalespersonController extends Controller
     public function update(Request $request, $code)
     {
         try {
-            $salesperson = Salesperson::where('Code', $code)->firstOrFail();
+            Log::info('Salesperson update request received', [
+                'code' => $code,
+                'all_data' => $request->all()
+            ]);
+
+            // Check if salesperson exists
+            $exists = DB::table('salesperson')->where('Code', $code)->exists();
+            if (!$exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Salesperson not found'
+                ], 404);
+            }
 
             $validator = Validator::make($request->all(), [
                 'name' => 'nullable|string|max:50',
@@ -138,42 +176,54 @@ class SalespersonController extends Controller
             ]);
 
             if ($validator->fails()) {
+                Log::warning('Salesperson update validation failed', [
+                    'errors' => $validator->errors()->toArray()
+                ]);
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
                 ], 422);
             }
 
-            // Update using direct column mapping
+            // Build update data array
+            $updateData = [];
             if ($request->has('name')) {
-                $salesperson->Name = $request->name;
+                $updateData['Name'] = $request->name;
             }
             if ($request->has('grup')) {
-                $salesperson->Grup = $request->grup;
+                $updateData['Grup'] = $request->grup;
             }
             if ($request->has('code_grup')) {
-                $salesperson->CodeGrup = $request->code_grup;
+                $updateData['CodeGrup'] = $request->code_grup;
             }
             if ($request->has('target_sales')) {
-                $salesperson->TargetSales = $request->target_sales ?? 0;
+                $updateData['TargetSales'] = $request->target_sales ?? 0;
             }
             if ($request->has('internal')) {
-                $salesperson->Internal = $request->internal;
+                $updateData['Internal'] = $request->internal;
             }
             if ($request->has('email')) {
-                $salesperson->Email = $request->email;
+                $updateData['Email'] = $request->email;
             }
             if ($request->has('status')) {
-                $salesperson->status = $request->status ?? 'Active';
+                $updateData['status'] = $request->status ?? 'Active';
             }
-            if ($request->has('is_active')) {
-                $salesperson->is_active = $request->is_active;
-            }
-            
-            $salesperson->save();
+
+            Log::info('Updating salesperson data', [
+                'code' => $code,
+                'update_data' => $updateData
+            ]);
+
+            // Use direct DB update to avoid model event issues
+            DB::table('salesperson')->where('Code', $code)->update($updateData);
 
             // Get the updated data
             $updatedPerson = Salesperson::where('Code', $code)->first();
+
+            Log::info('Salesperson updated successfully', [
+                'code' => $code,
+                'updated_data' => $updatedPerson ? $updatedPerson->toArray() : null
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -181,7 +231,9 @@ class SalespersonController extends Controller
                 'data' => $updatedPerson
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating salesperson: ' . $e->getMessage());
+            Log::error('Error updating salesperson: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating salesperson: ' . $e->getMessage()
@@ -291,10 +343,16 @@ class SalespersonController extends Controller
             $query = Salesperson::orderBy('Name');
             
             if (!request()->has('all_status')) {
-                $query->where('status', 'Active');
+                // Use LIKE to handle CHAR field padding (e.g., 'Active    ')
+                $query->where('status', 'LIKE', 'Active%');
             }
             
             $salespersons = $query->get();
+
+            Log::info('Salesperson apiIndex fetched', [
+                'count' => $salespersons->count(),
+                'filter_active_only' => !request()->has('all_status')
+            ]);
 
             // Auto-seed when empty to ensure data is available for the Vue menu
             if ($salespersons->isEmpty()) {
@@ -302,7 +360,7 @@ class SalespersonController extends Controller
                 // Re-fetch with same filters
                 $query = Salesperson::orderBy('Name');
                 if (!request()->has('all_status')) {
-                    $query->where('status', 'Active');
+                    $query->where('status', 'LIKE', 'Active%');
                 }
                 $salespersons = $query->get();
             }
