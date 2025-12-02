@@ -192,8 +192,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteScoringTool(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteScoringTool(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -419,8 +419,8 @@ const saveScoringToolChanges = async () => {
     }
 };
 
-const deleteScoringTool = async (id) => {
-    if (!confirm(`Are you sure you want to delete this scoring tool?`)) {
+const obsoleteScoringTool = async (id) => {
+    if (!confirm(`Are you sure you want to obsolete this scoring tool? This will hide it from scoring tool selection.`)) {
         return;
     }
     
@@ -429,46 +429,38 @@ const deleteScoringTool = async (id) => {
         return;
     }
     
-    console.log('Deleting scoring tool with ID:', id);
-    
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        // Use the code field as a fallback if id is not a number
-        const identifier = isNaN(parseInt(id)) ? editForm.value.code : id;
-        console.log('Using identifier for deletion:', identifier);
-        
-        const response = await fetch(`/api/scoring-tools/${identifier}`, {
-            method: 'DELETE',
+        const response = await fetch(`/api/scoring-tools/${id}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
         
         const result = await response.json();
-        console.log('Delete API response:', result);
         
         if (result.success) {
-            // Remove the item from the local array
-            scoringTools.value = scoringTools.value.filter(tool => 
-                tool.id !== id && tool.code !== identifier
-            );
+            // Remove from the local array (since it's now obsolete)
+            scoringTools.value = scoringTools.value.filter(tool => tool.id !== id);
             
-            if (selectedRow.value && (selectedRow.value.id === id || selectedRow.value.code === identifier)) {
+            if (selectedRow.value && selectedRow.value.id === id) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
             
             closeEditModal();
-            showNotification('Scoring tool deleted successfully', 'success');
+            showNotification(`Scoring tool "${editForm.value.code}" has been obsoleted successfully.`, 'success');
         } else {
-            showNotification('Error deleting scoring tool: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Error obsoleting scoring tool: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting scoring tool:', e);
-        showNotification('Error deleting scoring tool. Please try again.', 'error');
+        console.error('Error obsoleting scoring tool:', e);
+        showNotification('Error obsoleting scoring tool. Please try again.', 'error');
     } finally {
         saving.value = false;
     }
