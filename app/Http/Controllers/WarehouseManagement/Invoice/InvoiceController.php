@@ -845,7 +845,7 @@ class InvoiceController extends Controller
                 Log::info('ℹ️ No tax information provided (tax-free invoice)');
             }
 
-            // Get existing invoice count for auto-numbering
+            // Get existing invoice count for auto-numbering (per period)
             /** @var int $existingCount */
             $existingCount = (int) DB::table('INV')
                 ->where('YYYY', $yyyy)
@@ -855,10 +855,11 @@ class InvoiceController extends Controller
             /** @var int $seq */
             $seq = $existingCount + 1;
 
-            // Invoice number generator function (CPS format)
+            // Invoice number generator function (CPS-like format: MM-YYYY-SEQ)
             /** @var \Closure(int): string $generateNumber */
             $generateNumber = function (int $seq) use ($yyyy, $mm): string {
-                return sprintf('IV-%s%s-%04d', $yyyy, $mm, $seq);
+                // Example: 11-2025-00001
+                return sprintf('%s-%s-%05d', $mm, $yyyy, $seq);
             };
 
             /** @var array<int, array<string, mixed>> $created */
