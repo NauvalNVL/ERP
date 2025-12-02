@@ -101,6 +101,20 @@ class UpdateCustomerAccountController extends Controller
                 });
             }
 
+            // Optional: filter by status (Active / Inactive/Obsolete)
+            if ($request->has('status')) {
+                $status = strtolower($request->input('status'));
+
+                $query->where(function ($q) use ($status) {
+                    if ($status === 'active') {
+                        $q->whereIn('AC_STS', ['A', 'Active', ''])
+                          ->orWhereNull('AC_STS');
+                    } elseif (in_array($status, ['inactive', 'obsolete'])) {
+                        $q->whereIn('AC_STS', ['I', 'Inactive', 'Obsolete']);
+                    }
+                });
+            }
+
             // Apply sort order
             if ($request->has('sort_by')) {
                 $sortBy = $request->input('sort_by');

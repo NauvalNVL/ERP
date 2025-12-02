@@ -76,9 +76,13 @@
           </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
               <tr v-for="account in filteredAccounts" :key="account.customer_code"
-                :class="['hover:bg-blue-50 cursor-pointer transition-colors', selectedAccount && selectedAccount.customer_code === account.customer_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
-                @click="selectAccount(account)"
-                @dblclick="selectAndClose(account)">
+                :class="[
+                  'transition-colors',
+                  isAccountSelectable(account) ? 'hover:bg-blue-50 cursor-pointer' : 'bg-gray-50 text-gray-400 cursor-not-allowed',
+                  selectedAccount && selectedAccount.customer_code === account.customer_code ? 'bg-blue-100 border-l-4 border-blue-500' : ''
+                ]"
+                @click="onRowClick(account)"
+                @dblclick="onRowDblClick(account)">
                 <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 whitespace-nowrap font-medium text-gray-900 text-xs">{{ account.customer_code }}</td>
                 <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 whitespace-nowrap text-gray-700 text-xs">
                   <div class="max-w-[200px] sm:max-w-none truncate" :title="account.customer_name">{{ account.customer_name }}</div>
@@ -131,7 +135,12 @@
           <button type="button" @click="sortTable('customer_name')" class="py-1.5 sm:py-2 px-2 sm:px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all">
             <i class="fas fa-sort mr-1"></i><span class="hidden lg:inline">Sort </span>Name
           </button>
-          <button type="button" @click="selectAndClose(selectedAccount)" :disabled="!selectedAccount" class="py-1.5 sm:py-2 px-2 sm:px-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all">
+          <button
+            type="button"
+            @click="selectAndClose(selectedAccount)"
+            :disabled="!selectedAccount || !isAccountSelectable(selectedAccount)"
+            class="py-1.5 sm:py-2 px-2 sm:px-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
+          >
             <i class="fas fa-check mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="py-1.5 sm:py-2 px-2 sm:px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all">
@@ -254,15 +263,30 @@ export default {
       return filtered
     })
 
+    const isAccountSelectable = (account) => {
+      return account && (account.status === 'A' || account.status === 'Active' || account.status === undefined || account.status === '')
+    }
+
     const selectAccount = (account) => {
+      if (!isAccountSelectable(account)) {
+        return
+      }
       selectedAccount.value = account
     }
     
     const selectAndClose = (account) => {
-      if (account) {
+      if (account && isAccountSelectable(account)) {
         emit('select', account)
         emit('close')
       }
+    }
+
+    const onRowClick = (account) => {
+      selectAccount(account)
+    }
+
+    const onRowDblClick = (account) => {
+      selectAndClose(account)
     }
     
     const sortTable = (key) => {
@@ -324,8 +348,11 @@ export default {
       searchQuery,
       sortKey,
       sortAsc,
+      isAccountSelectable,
       selectAccount,
       selectAndClose,
+      onRowClick,
+      onRowDblClick,
       sortTable,
       handleSelect,
       fetchCustomerAccounts

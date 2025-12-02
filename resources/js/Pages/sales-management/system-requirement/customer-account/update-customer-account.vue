@@ -1272,7 +1272,7 @@ const showNotification = (message, type = 'success') => {
 // Load customer accounts
 const loadCustomerAccounts = async () => {
     try {
-        const response = await axios.get('/api/customers-with-status')
+        const response = await axios.get('/api/customers-with-status?status=active')
 
         if (response.data && response.data.data) {
             customers.value = response.data.data
