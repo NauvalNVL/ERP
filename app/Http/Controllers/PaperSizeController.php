@@ -287,10 +287,17 @@ class PaperSizeController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
+            $query = PaperSize::orderBy('millimeter', 'asc');
+            
+            // Filter by active status by default, unless all_status=1 is passed
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+            
+            $paperSizes = $query->get();
             return response()->json($paperSizes);
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@apiIndex: ' . $e->getMessage());
