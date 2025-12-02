@@ -526,7 +526,7 @@ const saveIndustryChanges = async () => {
         
         const formData = new FormData();
         formData.append('code', editForm.value.code.toUpperCase());
-        formData.append('name', editForm.value.name.toUpperCase());
+        formData.append('name', editForm.value.name);
         
         if (!isCreating.value) {
             formData.append('_method', 'PUT');

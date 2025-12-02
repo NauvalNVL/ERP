@@ -35,7 +35,7 @@ class IndustryController extends Controller
 
         $industry = Industry::create([
             'code' => strtoupper($request->code),
-            'name' => strtoupper($request->name),
+            'name' => $request->name,
         ]);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -66,7 +66,7 @@ class IndustryController extends Controller
 
         $updateData = [];
         if ($request->has('name')) {
-            $updateData['name'] = strtoupper($request->name);
+            $updateData['name'] = $request->name;
         }
 
         if ($request->has('status')) {
