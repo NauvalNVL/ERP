@@ -68,6 +68,15 @@
             <i class="fas fa-search" />
             <span>View Log</span>
           </button>
+          <button
+            type="button"
+            class="px-4 py-2 rounded bg-emerald-600 text-white text-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            :disabled="loading || invoices.length === 0 || isPrinting"
+            @click="printLog"
+          >
+            <i class="fas fa-print" />
+            <span>Print</span>
+          </button>
           <button type="button" class="px-4 py-2 rounded bg-gray-100 text-gray-800 text-sm" @click="clearFilters">
             Clear
           </button>
@@ -165,7 +174,9 @@
             </div>
             <div>
               <div class="text-[11px] font-semibold text-gray-500">Salesperson</div>
-              <div class="text-gray-900">{{ selectedInvoice.salesperson || '-' }}</div>
+              <div class="text-gray-900">
+                {{ formatSalesperson(selectedInvoice.salesperson) || '-' }}
+              </div>
             </div>
           </div>
 
@@ -247,10 +258,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import InvoiceTableModal from '@/Components/InvoiceTableModal.vue';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const now = new Date();
 const period = ref({
@@ -267,6 +280,10 @@ const loading = ref(false);
 const errorMessage = ref('');
 
 const selectedInvoice = ref(null);
+
+const salespersonMap = ref({});
+
+const isPrinting = ref(false);
 
 const showInvoiceTable = ref(false);
 
@@ -286,6 +303,30 @@ const statusChipClass = (value) => {
       return 'bg-rose-100 text-rose-800 border border-rose-300';
     default:
       return 'bg-sky-100 text-sky-800 border border-sky-300';
+  }
+};
+
+const loadSalespersons = async () => {
+  try {
+    const res = await axios.get('/api/salespersons');
+    const list = Array.isArray(res.data)
+      ? res.data
+      : Array.isArray(res.data?.data)
+        ? res.data.data
+        : [];
+
+    const map = {};
+    list.forEach((sp) => {
+      const code = (sp.code || sp.Code || '').trim();
+      const name = sp.name || sp.Name || '';
+      if (code) {
+        map[code] = name;
+      }
+    });
+
+    salespersonMap.value = map;
+  } catch (e) {
+    console.error('Error loading salespersons for invoice log:', e);
   }
 };
 
@@ -368,5 +409,247 @@ const formatAuditDateTime = (date, time) => {
   if (!date) return '';
   return time ? `${date} ${time}` : date;
 };
+
+const formatSalesperson = (code) => {
+  if (!code) return '';
+  const trimmed = String(code).trim();
+  const name = salespersonMap.value[trimmed];
+  if (name) {
+    return `${trimmed}  ${name}`;
+  }
+  return trimmed;
+};
+
+const printLog = async () => {
+  if (!invoices.value.length) {
+    errorMessage.value = 'No data to print. Please View Log first.';
+    return;
+  }
+
+  isPrinting.value = true;
+
+  try {
+    const sorted = [...invoices.value].sort((a, b) =>
+      String(a.invoice_number || '').localeCompare(String(b.invoice_number || ''))
+    );
+
+    const fromNo = (invoiceFrom.value && invoiceFrom.value.trim()) || sorted[0]?.invoice_number || '';
+    const toNo = (invoiceTo.value && invoiceTo.value.trim()) || sorted[sorted.length - 1]?.invoice_number || '';
+
+    let headerCurrency = 'IDR';
+    let headerExRate = '1.000000';
+    const firstNo = sorted[0]?.invoice_number;
+    if (firstNo) {
+      try {
+        const hdrRes = await axios.get(`/api/invoices/${encodeURIComponent(firstNo)}`);
+        if (hdrRes.data) {
+          if (hdrRes.data.currency) {
+            headerCurrency = hdrRes.data.currency;
+          }
+          if (hdrRes.data.exchange_rate !== undefined && hdrRes.data.exchange_rate !== null) {
+            const ex = Number(hdrRes.data.exchange_rate);
+            if (!Number.isNaN(ex)) {
+              headerExRate = ex.toFixed(6);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error loading header invoice for log print:', e);
+      }
+    }
+
+    const prepared = sorted.map((row, index) => {
+      const gross = Number(row.amount || 0);
+      const taxPercent = Number(row.tax_percent || 0);
+      const taxAmt = gross * (taxPercent / 100);
+      const net = gross + taxAmt;
+      return {
+        index: index + 1,
+        invoice_number: row.invoice_number || '',
+        invoice_date: row.invoice_date || '',
+        customer_code: row.customer_code || '',
+        customer_name: row.customer_name || '',
+        tax_code: row.tax_code || '',
+        tax_percent: taxPercent,
+        gross,
+        taxAmt,
+        net,
+        status: row.status || '',
+      };
+    });
+
+    let totalGross = 0;
+    let totalTax = 0;
+    let totalNet = 0;
+    let activeIv = 0;
+    let cancelledIv = 0;
+    let unpostIv = 0;
+    let postedIv = 0;
+
+    prepared.forEach((row) => {
+      totalGross += row.gross;
+      totalTax += row.taxAmt;
+      totalNet += row.net;
+
+      if (row.status === 'Cancelled') {
+        cancelledIv += row.gross;
+      } else {
+        activeIv += row.gross;
+        if (row.status === 'Posted') {
+          postedIv += row.gross;
+        } else {
+          unpostIv += row.gross;
+        }
+      }
+    });
+
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'A4' });
+
+    doc.setFontSize(14);
+    doc.setTextColor(37, 99, 235);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PT. Multibox Indah ()', 14, 12);
+
+    doc.setFontSize(9);
+    doc.setTextColor(75, 85, 99);
+    doc.setFont('helvetica', 'normal');
+    doc.text('REPORT TITLE : INVOICE LOG [SIMPLE LIST]', 14, 18);
+
+    if (fromNo && toNo) {
+      doc.text(`INVOICE NO.  : ${fromNo} TO ${toNo}   INVOICES GROUP : ** ALL **`, 14, 23);
+    }
+
+    doc.setTextColor(55, 65, 81);
+    doc.text(`DATE : ${today.value}`, 200, 12, { align: 'right' });
+
+    doc.setFontSize(8);
+    doc.text(`CURRENCY : ${headerCurrency}`, 14, 29);
+    doc.text(`EX. RATE : ${headerExRate}`, 80, 29);
+
+    const head = [[
+      'NO.',
+      'INVOICE#',
+      'INV DATE',
+      'AC#',
+      'AC NAME',
+      'TAX CODE',
+      'TAX%',
+      'INVOICE NET AMT',
+      'LOCAL GROSS AMT',
+    ]];
+
+    const body = prepared.map((row) => [
+      row.index,
+      row.invoice_number,
+      row.invoice_date,
+      row.customer_code,
+      row.customer_name,
+      row.tax_code,
+      row.tax_percent ? row.tax_percent.toFixed(2) : '',
+      formatCurrency(row.net),
+      formatCurrency(row.gross),
+    ]);
+
+    autoTable(doc, {
+      head,
+      body,
+      startY: 34,
+      theme: 'grid',
+      margin: { top: 34, left: 12, right: 12 },
+      styles: {
+        fontSize: 7,
+        textColor: [31, 41, 55],
+        cellPadding: 1,
+        overflow: 'linebreak',
+      },
+      headStyles: {
+        fillColor: [37, 99, 235],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        halign: 'left',
+      },
+      bodyStyles: {
+        halign: 'left',
+      },
+      alternateRowStyles: {
+        fillColor: [239, 246, 255],
+      },
+      columnStyles: {
+        0: { halign: 'right' },
+        6: { halign: 'right' },
+        7: { halign: 'right' },
+        8: { halign: 'right' },
+      },
+    });
+
+    let y = doc.lastAutoTable.finalY || 34;
+    y += 6;
+
+    doc.setFontSize(8);
+
+    // Right summary block (TOTAL GROSS/TAX/NET)
+    const rightLabelX = 140;
+    const rightColonX = 178;
+    const rightValueX = 200;
+
+    doc.text('TOTAL GROSS', rightLabelX, y);
+    doc.text(':', rightColonX, y);
+    doc.text(formatCurrency(totalGross), rightValueX, y, { align: 'right' });
+
+    doc.text('TOTAL TAX', rightLabelX, y + 4);
+    doc.text(':', rightColonX, y + 4);
+    doc.text(formatCurrency(totalTax), rightValueX, y + 4, { align: 'right' });
+
+    doc.text('TOTAL NET', rightLabelX, y + 8);
+    doc.text(':', rightColonX, y + 8);
+    doc.text(formatCurrency(totalNet), rightValueX, y + 8, { align: 'right' });
+
+    // Left summary block (ACTIVE IV etc.)
+    y += 16;
+
+    const leftLabelX = 14;
+    const leftColonX = 56;
+    const leftValueX = 80;
+
+    doc.text('ACTIVE IV', leftLabelX, y);
+    doc.text(':', leftColonX, y);
+    doc.text(formatCurrency(activeIv), leftValueX, y, { align: 'right' });
+
+    doc.text('CANCELLED IV', leftLabelX, y + 4);
+    doc.text(':', leftColonX, y + 4);
+    doc.text(formatCurrency(cancelledIv), leftValueX, y + 4, { align: 'right' });
+
+    doc.text('NOT POSTED IV', leftLabelX, y + 8);
+    doc.text(':', leftColonX, y + 8);
+    doc.text(formatCurrency(0), leftValueX, y + 8, { align: 'right' });
+
+    doc.text('UNPOST IV', leftLabelX, y + 12);
+    doc.text(':', leftColonX, y + 12);
+    doc.text(formatCurrency(unpostIv), leftValueX, y + 12, { align: 'right' });
+
+    doc.text('POSTED IV', leftLabelX, y + 16);
+    doc.text(':', leftColonX, y + 16);
+    doc.text(formatCurrency(postedIv), leftValueX, y + 16, { align: 'right' });
+
+    doc.text('CANCELLED POSTED IV', leftLabelX, y + 20);
+    doc.text(':', leftColonX, y + 20);
+    doc.text(formatCurrency(0), leftValueX, y + 20, { align: 'right' });
+
+    doc.text('POSTING IV', leftLabelX, y + 24);
+    doc.text(':', leftColonX, y + 24);
+    doc.text(formatCurrency(0), leftValueX, y + 24, { align: 'right' });
+
+    doc.save(`InvoiceLog_${period.value.year}${period.value.month}_${fromNo || 'ALL'}_${toNo || 'ALL'}.pdf`);
+  } catch (e) {
+    console.error('Error printing invoice log:', e);
+    errorMessage.value = 'Failed to generate invoice log print';
+  } finally {
+    isPrinting.value = false;
+  }
+};
+
+onMounted(() => {
+  loadSalespersons();
+});
 </script>
 
