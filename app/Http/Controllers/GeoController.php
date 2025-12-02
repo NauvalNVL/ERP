@@ -170,15 +170,20 @@ class GeoController extends Controller
 
     /**
      * Display the Vue index page for geo management
+     * Only shows active (non-obsolete) geo records
      *
      * @return \Inertia\Response
      */
     public function vueIndex()
     {
         try {
-            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            // Only get active geos (STATUS = 'Act')
+            $geos = Geo::where('STATUS', 'Act')
+                ->orderBy('country')
+                ->orderBy('state')
+                ->get();
 
-            Log::info('GeoController@vueIndex: Passing ' . $geos->count() . ' geo records to view');
+            Log::info('GeoController@vueIndex: Passing ' . $geos->count() . ' active geo records to view');
 
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
                 'geos' => $geos,
@@ -197,12 +202,14 @@ class GeoController extends Controller
 
     /**
      * Display the Vue version of geo status management page
+     * Returns ALL geo records (including obsolete) for status management
      *
      * @return \Inertia\Response
      */
     public function vueManageStatus()
     {
         try {
+            // Get ALL geos including obsolete for status management
             $geos = Geo::orderBy('CODE', 'asc')->paginate(15);
 
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-geo', [
@@ -249,13 +256,23 @@ class GeoController extends Controller
 
     /**
      * API endpoint to get geos in JSON format.
+     * By default, only returns active (Act) records.
+     * Pass ?all_status=1 to get all records including obsolete ones.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            $query = Geo::orderBy('country')->orderBy('state');
+            
+            // Only filter by status if all_status parameter is not set
+            if (!$request->has('all_status') || $request->get('all_status') != '1') {
+                $query->where('STATUS', 'Act');
+            }
+            
+            $geos = $query->get();
 
             Log::info('GeoController@apiIndex: Returning ' . $geos->count() . ' geo records');
 
