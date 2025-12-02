@@ -187,12 +187,12 @@ const notification = ref({
     type: 'success'
 });
 
-// Fetch geos with pagination
+// Fetch geos with pagination (all_status=1 to include obsolete records)
 const fetchGeos = async (page = 1) => {
     loading.value = true;
     
     try {
-        const response = await fetch(`/api/geo?page=${page}`, {
+        const response = await fetch(`/api/geo?page=${page}&all_status=1`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
