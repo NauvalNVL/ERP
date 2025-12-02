@@ -254,8 +254,8 @@
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:justify-between gap-3 mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteFlute(editForm.Flute)" class="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteFlute(editForm.No)" class="w-full sm:w-auto px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                            <i class="fas fa-archive mr-2"></i>Mark as Obsolete
                         </button>
                         <div v-else></div>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -483,8 +483,8 @@ const saveFluteChanges = async () => {
     }
 };
 
-const deleteFlute = async (flute) => {
-    if (!confirm(`Are you sure you want to delete paper flute "${flute}"?`)) {
+const obsoleteFlute = async (id) => {
+    if (!confirm(`Are you sure you want to obsolete paper flute "${editForm.value.Flute}"? This will hide it from paper flute selection.`)) {
         return;
     }
     
@@ -492,32 +492,35 @@ const deleteFlute = async (flute) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/api/paper-flutes/${flute}`, {
-            method: 'DELETE',
+        const response = await fetch(`/api/paper-flutes/${id}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
         
-        if (response.ok) {
-            // Remove the item from the local array
-            flutes.value = flutes.value.filter(f => f.Flute !== flute);
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            // Remove from the local array (since it's now obsolete)
+            const fluteCode = editForm.value.Flute;
+            flutes.value = flutes.value.filter(f => f.No !== id);
             
-            if (selectedRow.value && selectedRow.value.Flute === flute) {
+            if (selectedRow.value && selectedRow.value.No === id) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
             
             closeEditModal();
-            showNotification('Paper flute deleted successfully', 'success');
+            showNotification(`Paper flute "${fluteCode}" has been obsoleted successfully.`, 'success');
         } else {
-            const result = await response.json();
-            showNotification('Error deleting paper flute: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Error obsoleting paper flute: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting paper flute:', e);
-        showNotification('Error deleting paper flute. Please try again.', 'error');
+        console.error('Error obsoleting paper flute:', e);
+        showNotification('Error obsoleting paper flute. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

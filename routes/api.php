@@ -138,6 +138,10 @@ Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
 Route::put('/color-groups/{code}/status', [ColorGroupController::class, 'toggleStatus']);
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+Route::post('/paper-flutes', [PaperFluteController::class, 'store']);
+Route::put('/paper-flutes/{flute}', [PaperFluteController::class, 'update']);
+Route::delete('/paper-flutes/{flute}', [PaperFluteController::class, 'destroy']);
+Route::put('/paper-flutes/{id}/status', [PaperFluteController::class, 'toggleStatus'])->where('id', '[0-9]+');
 
 // Color API routes
 Route::get('/colors', [ColorController::class, 'apiIndex']);
