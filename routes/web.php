@@ -501,20 +501,12 @@ return Inertia::render('sales-management/system-requirement/customer-account/upd
 Route::post('/update-customer-account', [UpdateCustomerAccountController::class, 'store'])->name('update-customer-account.store');
 
 Route::get('/update-customer-account/view-print', function () {
-return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-account');
+    return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-account');
 })->name('vue.update-customer-account.view-print');
-
-Route::get('/obsolete-reactive-customer-account', function () {
-return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-ac');
-})->name('vue.obsolete-reactive-customer-account.index');
-
-Route::get('/obsolete-reactive-customer-account/view-print', function () {
-return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-nonactive-customer');
-})->name('vue.obsolete-reactive-customer-account.view-print');
 
 Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
 Route::get('/customer-alternate-address/view-print', function () {
-return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');
+    return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');
 })->name('vue.customer-alternate-address.view-print');
 
 // Customer Sales Type routes removed (module disabled)

@@ -663,7 +663,6 @@ const salesManagementItems = [
           { title: 'View & Print Customer Group', icon: 'fas fa-list', route: '/customer-group/view-print' },
           { title: 'View & Print Customer Account', icon: 'fas fa-list', route: '/update-customer-account/view-print' },
           { title: 'View & Print Customer Alternate Address', icon: 'fas fa-list', route: '/customer-alternate-address/view-print' },
-          { title: 'View & Print Non-Active Customer', icon: 'fas fa-list', route: '/obsolete-reactive-customer-account/view-print' },
 
         ]
       },
