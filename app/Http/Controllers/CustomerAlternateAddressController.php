@@ -44,17 +44,52 @@ class CustomerAlternateAddressController extends Controller
         try {
             $addresses = CustomerAlternateAddress::with('customerAccount')->orderBy('customer_code')->get();
 
-            // Map data to include customer_name and status from related CustomerAccount
+            // Map data to include customer_name from alternate-address row and status from related CUSTOMER row
             $formattedAddresses = $addresses->map(function ($address) {
+                $customer = $address->customerAccount; // Related Customer model (CUSTOMER table)
+
+                // Customer name: use bill_to_name from customer_alternate_addresses first,
+                // fallback ke CUSTOMER.NAME jika bill_to_name kosong, lalu N/A jika tetap tidak ada.
+                if (!empty($address->bill_to_name)) {
+                    $customerName = (string) $address->bill_to_name;
+                } elseif ($customer && isset($customer->NAME)) {
+                    $customerName = (string) $customer->NAME;
+                } else {
+                    $customerName = 'N/A';
+                }
+
+                // Status from CUSTOMER.AC_STS (A=Active, others=Obsolete), fallback N/A
+                $statusLabel = 'N/A';
+                if ($customer && isset($customer->AC_STS)) {
+                    $code = (string) $customer->AC_STS;
+                    if (strtoupper($code) === 'A') {
+                        $statusLabel = 'Active';
+                    } elseif (strtoupper($code) === 'O') {
+                        $statusLabel = 'Obsolete';
+                    } else {
+                        $statusLabel = $code; // show raw code if unexpected
+                    }
+                }
+
                 return [
                     'id' => $address->id,
                     'customer_code' => $address->customer_code,
                     'delivery_code' => $address->delivery_code,
-                    'customer_name' => $address->customerAccount ? $address->customerAccount->customer_name : 'N/A',
-                    'address' => $address->ship_to_address,
-                    'city' => $address->town,
-                    'phone' => $address->tel_no,
-                    'status' => $address->customerAccount ? $address->customerAccount->status : 'N/A',
+                    'country' => $address->country,
+                    'state' => $address->state,
+                    'town' => $address->town,
+                    'town_section' => $address->town_section,
+                    'bill_to_name' => $address->bill_to_name,
+                    'bill_to_address' => $address->bill_to_address,
+                    'ship_to_name' => $address->ship_to_name,
+                    'ship_to_address' => $address->ship_to_address,
+                    'contact_person' => $address->contact_person,
+                    'tel_no' => $address->tel_no,
+                    'fax_no' => $address->fax_no,
+                    'email' => $address->email,
+                    // Backwards-compatible alias
+                    'customer_name' => $customerName,
+                    'status' => $statusLabel,
                 ];
             });
 
