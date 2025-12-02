@@ -308,10 +308,17 @@ class PaperQualityController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
+            $query = PaperQuality::orderBy('paper_quality', 'asc');
+            
+            // Filter by active status by default, unless all_status=1 is passed
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+            
+            $paperQualities = $query->get();
             return response()->json($paperQualities);
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@apiIndex: ' . $e->getMessage());
