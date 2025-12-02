@@ -743,6 +743,13 @@ const sortColumn = ref("customer_code");
 const sortDirection = ref("asc");
 const currentDate = new Date().toLocaleString();
 
+// Helper to derive Short Name from Customer Name (max 12 characters)
+const getShortName = (name) => {
+    if (!name) return "";
+    const str = String(name).trim();
+    return str.length <= 12 ? str : str.slice(0, 12);
+};
+
 // Fetch customer accounts from API
 const fetchCustomerAccounts = async () => {
     loading.value = true;
@@ -765,10 +772,15 @@ const fetchCustomerAccounts = async () => {
         const accountsData = data.data || data;
 
         if (Array.isArray(accountsData)) {
-            customerAccounts.value = accountsData.map((account) => ({
-                ...account,
-                status: account.status || "Active", // Default to Active if status is missing
-            }));
+            customerAccounts.value = accountsData.map((account) => {
+                const customerName = account.customer_name || "";
+                return {
+                    ...account,
+                    // Short Name always derived from customer_name, max 12 chars
+                    short_name: getShortName(customerName),
+                    status: account.status || "Active", // Default to Active if status is missing
+                };
+            });
         } else {
             console.error(
                 "Expected array but received:",
