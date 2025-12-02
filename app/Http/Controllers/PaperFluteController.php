@@ -111,8 +111,9 @@ class PaperFluteController extends Controller
     {
         try {
             // Try to find by No (primary key) first, then by Flute
-            $paperFlute = PaperFlute::where('No', $flute)->first();
-            if (!$paperFlute) {
+            if (is_numeric($flute)) {
+                $paperFlute = PaperFlute::where('No', $flute)->first();
+            } else {
                 $paperFlute = PaperFlute::where('Flute', $flute)->first();
             }
             
@@ -312,14 +313,14 @@ class PaperFluteController extends Controller
     public function vueManageStatus()
     {
         try {
-            $paperFlutes = PaperFlute::orderBy('Flute', 'asc')->paginate(15);
+            $paperFlutes = PaperFlute::orderBy('Flute', 'asc')->get();
 
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-flute', [
-                'paperFlutes' => $paperFlutes->items(),
+                'paperFlutes' => $paperFlutes,
                 'pagination' => [
-                    'currentPage' => $paperFlutes->currentPage(),
-                    'perPage' => $paperFlutes->perPage(),
-                    'total' => $paperFlutes->total()
+                    'currentPage' => 1,
+                    'perPage' => $paperFlutes->count(),
+                    'total' => $paperFlutes->count()
                 ],
                 'header' => 'Manage Paper Flute Status'
             ]);
@@ -359,10 +360,17 @@ class PaperFluteController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $paperFlutes = PaperFlute::orderBy('Flute')->get();
+            $query = PaperFlute::orderBy('Flute');
+            
+            // Filter by active status by default, unless all_status=1 is passed
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+            
+            $paperFlutes = $query->get();
             return response()->json($paperFlutes);
         } catch (\Exception $e) {
             Log::error('Error fetching paper flutes for API: ' . $e->getMessage());

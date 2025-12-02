@@ -94,6 +94,10 @@ const sortAsc = ref(true);
 // Compute filtered flutes based on search query
 const filteredFlutes = computed(() => {
   let flutes = props.flutes;
+  
+  // Filter out obsolete flutes (only show active ones)
+  flutes = flutes.filter(f => f.status === 'Act' || f.status === 'Active');
+  
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     flutes = flutes.filter(f =>
