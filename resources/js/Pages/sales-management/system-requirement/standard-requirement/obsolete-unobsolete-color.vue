@@ -59,8 +59,8 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="color in filteredColors" :key="color.color_code" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ color.color_code }}</td>
+                    <tr v-for="color in filteredColors" :key="color.color_id" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ color.color_id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ color.color_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ color.group_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
@@ -142,12 +142,12 @@ const notification = ref({
     type: 'success'
 });
 
-// Fetch colors
+// Fetch colors (including all statuses for obsolete/unobsolete page)
 const fetchColors = async () => {
     loading.value = true;
     
     try {
-        const response = await fetch('/api/colors', {
+        const response = await fetch('/api/colors?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -176,7 +176,7 @@ const filteredColors = computed(() => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(color => 
-            (color.color_code && color.color_code.toLowerCase().includes(query)) || 
+            (color.color_id && color.color_id.toLowerCase().includes(query)) || 
             (color.color_name && color.color_name.toLowerCase().includes(query)) ||
             (color.group_name && color.group_name.toLowerCase().includes(query))
         );
@@ -209,7 +209,7 @@ const toggleColorStatus = async (color) => {
             throw new Error('CSRF token not found');
         }
         
-        const response = await fetch(`/api/colors/${color.color_code}/status`, {
+        const response = await fetch(`/api/colors/${color.color_id}/status`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -227,7 +227,7 @@ const toggleColorStatus = async (color) => {
         
         // Update the local state
         if (result.data) {
-            const index = colors.value.findIndex(c => c.color_code === color.color_code);
+            const index = colors.value.findIndex(c => c.color_id === color.color_id);
             if (index !== -1) {
                 colors.value[index] = result.data;
                 // Update the color reference to show correct status in notification
