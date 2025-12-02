@@ -196,8 +196,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteGroup(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteGroup(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -457,8 +457,8 @@ const saveGroupChanges = async () => {
     }
 };
 
-const deleteGroup = async (id) => {
-    if (!confirm(`Are you sure you want to delete this product group?`)) {
+const obsoleteGroup = async (id) => {
+    if (!confirm(`Are you sure you want to obsolete this product group? This will mark it as inactive and it will no longer appear in selection lists.`)) {
         return;
     }
     
@@ -466,18 +466,20 @@ const deleteGroup = async (id) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/api/product-groups/${id}`, {
-            method: 'DELETE',
+        // Update status to 'Obs' (Obsolete) instead of deleting
+        const response = await fetch(`/api/product-groups/${id}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
         
         const result = await response.json();
         
         if (result.success) {
-            // Remove the item from the local array
+            // Remove the item from the local array (since obsoleted items shouldn't appear)
             productGroups.value = productGroups.value.filter(group => group.id !== id);
             
             if (selectedRow.value && selectedRow.value.id === id) {
@@ -486,13 +488,13 @@ const deleteGroup = async (id) => {
             }
             
             closeEditModal();
-            showNotification('Product group deleted successfully', 'success');
+            showNotification(`Product group "${editForm.value.code}" has been obsoleted successfully. Use Obsolete/Unobsolete Product Group menu to reactivate.`, 'success');
         } else {
-            showNotification('Error deleting product group: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Error obsoleting product group: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting product group:', e);
-        showNotification('Error deleting product group. Please try again.', 'error');
+        console.error('Error obsoleting product group:', e);
+        showNotification('Error obsoleting product group. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

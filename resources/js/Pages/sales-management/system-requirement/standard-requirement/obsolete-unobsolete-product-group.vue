@@ -169,12 +169,12 @@ const notification = ref({
     type: 'success'
 });
 
-// Fetch product groups with pagination
+// Fetch product groups with pagination (including all statuses for obsolete/unobsolete page)
 const fetchProductGroups = async (page = 1) => {
     loading.value = true;
     
     try {
-        const response = await fetch(`/api/product-groups?page=${page}`, {
+        const response = await fetch(`/api/product-groups?page=${page}&all_status=1`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
