@@ -144,7 +144,7 @@
                 <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Product Design' : 'Edit Product Design' }}</h3>
             </div>
             <div class="flex space-x-2">
-                <button type="button" @click="view = 'list'" class="text-white hover:text-gray-200 p-1 ml-2">
+                <button type="button" @click="closeForm" class="text-white hover:text-gray-200 p-1 ml-2">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -228,11 +228,8 @@
                                 <div class="w-1/3">
                                     <label class="text-sm font-medium text-gray-700">IDC:</label>
                                 </div>
-                                <div class="w-2/3 flex">
-                                    <input v-model="editForm.idc" type="text" class="w-full border-gray-300 rounded-l-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                    <button type="button" class="px-3 py-2 bg-blue-500 text-white rounded-r-md border border-blue-600">
-                                        <i class="fas fa-search"></i>
-                                    </button>
+                                <div class="w-2/3">
+                                    <input v-model="editForm.idc" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                 </div>
                             </div>
                             <div class="flex items-center mt-1">
@@ -343,15 +340,12 @@
                                     <div class="w-1/3">
                                         <label class="text-sm font-medium text-gray-700">Flute Style:</label>
                                     </div>
-                                    <div class="w-2/3 flex items-center">
+                                    <div class="w-2/3">
                                         <select v-model="editForm.flute_style" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                             <option value="Blank N/A">Blank N/A</option>
                                             <option value="N-Normal">N-Normal</option>
                                             <option value="R-Reverse/Rotate">R-Reverse/Rotate</option>
                                         </select>
-                                        <button type="button" class="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md border border-blue-600 text-sm">
-                                            View Flute Style
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -405,8 +399,8 @@
                     <button type="submit" :disabled="saving" class="px-5 py-2 bg-emerald-500 text-white rounded border border-emerald-600 hover:bg-emerald-600 flex items-center font-medium" :class="{'opacity-50 cursor-not-allowed': saving}">
                         <i class="fas fa-save mr-2"></i>{{ saving ? 'Saving...' : 'Save' }}
                     </button>
-                    <button v-if="!isCreating" :disabled="saving" type="button" @click="deleteDesign(editForm.pd_code)" class="px-5 py-2 bg-red-500 text-white rounded border border-red-600 hover:bg-red-600 flex items-center font-medium" :class="{'opacity-50 cursor-not-allowed': saving}">
-                        <i class="fas fa-trash-alt mr-2"></i>Delete
+                    <button v-if="!isCreating" :disabled="saving" type="button" @click="obsoleteDesign(editForm.pd_code)" class="px-5 py-2 bg-orange-500 text-white rounded border border-orange-600 hover:bg-orange-600 flex items-center font-medium" :class="{'opacity-50 cursor-not-allowed': saving}">
+                        <i class="fas fa-ban mr-2"></i>Obsolete
                     </button>
                 </div>
             </form>
@@ -465,6 +459,7 @@ const sortAsc = ref(true);
 
 const showProductModal = ref(false);
 const editForm = ref({
+    id: null,
     pd_code: '',
     pd_name: '',
     pd_alt_name: '',
@@ -552,6 +547,7 @@ function selectAndClose(design) {
 function editDesign(design) {
     isCreating.value = false;
     editForm.value = {
+        id: design.id,
         pd_code: design.pd_code,
         pd_name: design.pd_name,
         pd_alt_name: design.pd_alt_name || '',
@@ -573,6 +569,7 @@ function editDesign(design) {
 function createNewDesign() {
     isCreating.value = true;
     editForm.value = {
+        id: null,
         pd_code: '',
         pd_name: '',
         pd_alt_name: '',
@@ -589,6 +586,16 @@ function createNewDesign() {
         input_weight: 'Yes'
     };
     view.value = 'form';
+}
+
+function closeForm() {
+    // If creating new design, close the modal entirely
+    // If editing, go back to the list view
+    if (isCreating.value) {
+        emit('close');
+    } else {
+        view.value = 'list';
+    }
 }
 
 async function saveDesignChanges() {
@@ -613,6 +620,7 @@ async function saveDesignChanges() {
 
         if (!res.ok) {
             const errorData = await res.json();
+            console.error('API Error Response:', errorData);
             throw new Error(errorData.message || 'Failed to save product design');
         }
 
@@ -621,14 +629,14 @@ async function saveDesignChanges() {
         emit('close');
     } catch (e) {
         console.error('Error saving product design:', e);
-        // You might want to show an error notification here
+        alert('Error: ' + e.message);
     } finally {
         saving.value = false;
     }
 }
 
-async function deleteDesign(pdCode) {
-    if (!confirm(`Are you sure you want to delete product design "${pdCode}"?`)) {
+async function obsoleteDesign(pdCode) {
+    if (!confirm(`Are you sure you want to obsolete product design "${pdCode}"? This will hide it from product design selection.`)) {
         return;
     }
 
@@ -636,24 +644,28 @@ async function deleteDesign(pdCode) {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        const response = await fetch(`/api/product-designs/${pdCode}`, {
-            method: 'DELETE',
+        const response = await fetch(`/api/product-designs/${editForm.value.id}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
 
-        if (response.ok) {
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
             emit('data-changed');
             view.value = 'list';
             emit('close');
+            alert(`Product design "${pdCode}" has been obsoleted successfully.`);
         } else {
-            const result = await response.json();
-            throw new Error(result.message || 'Unknown error');
+            throw new Error(result.message || 'Failed to obsolete product design');
         }
     } catch (e) {
-        console.error('Error deleting product design:', e);
+        console.error('Error obsoleting product design:', e);
+        alert('Error: ' + e.message);
     } finally {
         saving.value = false;
     }
