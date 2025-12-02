@@ -356,8 +356,8 @@
             <!-- Sticky Footer with Buttons -->
             <div class="border-t border-gray-200 bg-gray-50 px-6 py-4 rounded-b-lg">
                 <div class="flex justify-between items-center">
-                    <button type="button" v-if="!isCreating" @click="deleteProduct(editForm.id)" class="px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-sm flex items-center">
-                        <i class="fas fa-trash-alt mr-2"></i>Delete Product
+                    <button type="button" v-if="!isCreating" @click="obsoleteProduct(editForm.id)" class="px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors shadow-sm flex items-center">
+                        <i class="fas fa-ban mr-2"></i>Obsolete Product
                     </button>
                     <div v-else></div>
                     <div class="flex space-x-3">
@@ -760,8 +760,8 @@ const saveProductChanges = async () => {
     }
 };
 
-const deleteProduct = async (productId) => {
-    if (!confirm(`Are you sure you want to delete this product?`)) {
+const obsoleteProduct = async (productId) => {
+    if (!confirm(`Are you sure you want to obsolete this product? This will mark it as inactive and it will no longer appear in selection lists.`)) {
         return;
     }
     
@@ -769,31 +769,31 @@ const deleteProduct = async (productId) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        // Find the product in our local array to get its product_code
-        const productToDelete = products.value.find(p => p.id === productId);
-        if (!productToDelete) {
+        // Find the product in our local array
+        const productToObsolete = products.value.find(p => p.id === productId);
+        if (!productToObsolete) {
             showNotification('Product not found in local data', 'error');
             saving.value = false;
             return;
         }
         
-        const productCode = productToDelete.product_code;
-        console.log('Deleting product with ID:', productId, 'and code:', productCode);
+        console.log('Obsoleting product with ID:', productId);
         
-        // Use product_code in the API endpoint instead of id
-        const response = await fetch(`/api/products/${productCode}`, {
-            method: 'DELETE',
+        // Use the status toggle API endpoint
+        const response = await fetch(`/api/products/${productId}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
         
         const result = await response.json();
-        console.log('Delete API response:', result);
+        console.log('Obsolete API response:', result);
         
         if (result.success) {
-            // Remove the item from the local array
+            // Remove the item from the local array (since obsoleted items shouldn't appear)
             products.value = products.value.filter(product => product.id !== productId);
             
             if (selectedRow.value && selectedRow.value.id === productId) {
@@ -802,13 +802,13 @@ const deleteProduct = async (productId) => {
             }
             
             closeEditModal();
-            showNotification('Product deleted successfully', 'success');
+            showNotification(`Product "${editForm.value.product_code}" has been obsoleted successfully. Use Obsolete/Unobsolete Product menu to reactivate.`, 'success');
         } else {
-            showNotification('Error deleting product: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Error obsoleting product: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting product:', e);
-        showNotification('Error deleting product. Please try again.', 'error');
+        console.error('Error obsoleting product:', e);
+        showNotification('Error obsoleting product. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

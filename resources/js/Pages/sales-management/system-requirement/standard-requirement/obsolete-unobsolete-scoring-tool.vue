@@ -93,35 +93,6 @@
                 </tbody>
             </table>
         </div>
-
-        <!-- Pagination Controls -->
-        <div v-if="pagination.total > pagination.perPage" class="flex items-center justify-between mt-6">
-            <div class="flex-1 flex justify-between items-center">
-                <button 
-                    @click="changePage(pagination.currentPage - 1)" 
-                    :disabled="pagination.currentPage === 1"
-                    :class="[
-                        pagination.currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700',
-                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
-                    ]">
-                    Previous
-                </button>
-                
-                <span class="text-sm text-gray-700">
-                    Page {{ pagination.currentPage }} of {{ Math.ceil(pagination.total / pagination.perPage) }}
-                </span>
-                
-                <button 
-                    @click="changePage(pagination.currentPage + 1)" 
-                    :disabled="pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage)"
-                    :class="[
-                        pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700',
-                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
-                    ]">
-                    Next
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- Loading Overlay -->
@@ -176,7 +147,7 @@ const fetchScoringTools = async (page = 1) => {
     loading.value = true;
     
     try {
-        const response = await fetch(`/api/scoring-tools?page=${page}`, {
+        const response = await fetch(`/api/scoring-tools?page=${page}&all_status=1`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -275,15 +246,6 @@ const toggleScoringToolStatus = async (tool) => {
     } finally {
         isToggling.value = false;
     }
-};
-
-// Change page
-const changePage = (page) => {
-    if (page < 1 || page > Math.ceil(pagination.value.total / pagination.value.perPage)) {
-        return;
-    }
-    
-    fetchScoringTools(page);
 };
 
 // Show notification

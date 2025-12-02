@@ -101,7 +101,6 @@ class ScoringToolController extends Controller
             'code' => 'nullable|string|max:10|unique:scoring_tools,code,' . $id,
             'name' => 'nullable|string|max:100',
             'scorer_gap' => 'nullable|numeric|min:0',
-            'scorer_gap' => 'nullable|numeric|min:0',
             'status' => 'nullable|string|in:Act,Obs',
         ]);
 
@@ -400,10 +399,17 @@ class ScoringToolController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $scoringTools = ScoringTool::orderBy('code')->get();
+            $query = ScoringTool::orderBy('code');
+            
+            // Filter by active status by default, unless all_status=1 is passed
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+            
+            $scoringTools = $query->get();
             return response()->json($scoringTools);
         } catch (\Exception $e) {
             Log::error('Error in ScoringToolController@apiIndex: ' . $e->getMessage());

@@ -22,7 +22,7 @@ class ProductDesignController extends Controller
     {
         try {
             if ($request->ajax() || $request->wantsJson()) {
-                return $this->getDesignsJson();
+                return $this->getDesignsJson($request);
             }
 
             $productDesigns = ProductDesign::paginate(10);
@@ -312,13 +312,14 @@ class ProductDesignController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getDesignsJson()
+    public function getDesignsJson(Request $request)
     {
         try {
-            $designs = ProductDesign::select(
+            $query = ProductDesign::select(
                 'id',
                 'pd_code',
                 'pd_name',
+                'pd_alt_name',
                 'pd_design_type',
                 'idc',
                 'product',
@@ -330,8 +331,15 @@ class ProductDesignController extends Controller
                 'flute_style',
                 'print_flute',
                 'input_weight',
-                'status',
-            )->get();
+                'status'
+            );
+            
+            // Filter by active status by default, unless all_status=1 is passed
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+            
+            $designs = $query->orderBy('pd_code')->get();
             
             return response()->json($designs);
         } catch (\Exception $e) {
@@ -418,7 +426,7 @@ class ProductDesignController extends Controller
             'pd_name' => 'sometimes|string|max:255',
             'pd_alt_name' => 'nullable|string|max:255',
             'pd_design_type' => 'sometimes|string|max:255',
-            'product' => 'sometimes|string|max:255',
+            'product' => 'sometimes|nullable|string|max:255',
             'idc' => 'nullable|string|max:100',
             'joint' => 'nullable|string|max:100',
             'joint_to_print' => 'nullable|string|max:100',
@@ -430,14 +438,19 @@ class ProductDesignController extends Controller
             'input_weight' => 'nullable|string|max:100',
             'status' => 'nullable|string|in:Act,Obs',
         ]);
+        
+        Log::info('ProductDesign apiUpdate request for id: ' . $id, ['data' => $request->all()]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
         try {
-            // Try to find by id first, then by pd_code
-            $productDesign = ProductDesign::where('id', $id)->first();
+            // Try to find by numeric id first (if $id is numeric), then by pd_code
+            $productDesign = null;
+            if (is_numeric($id)) {
+                $productDesign = ProductDesign::where('id', $id)->first();
+            }
             if (!$productDesign) {
                 $productDesign = ProductDesign::where('pd_code', $id)->first();
             }
@@ -454,6 +467,9 @@ class ProductDesignController extends Controller
             if ($request->has('pd_name')) {
                 $updateData['pd_name'] = $request->pd_name;
             }
+            if ($request->has('pd_alt_name')) {
+                $updateData['pd_alt_name'] = $request->pd_alt_name;
+            }
             if ($request->has('pd_design_type')) {
                 $updateData['pd_design_type'] = $request->pd_design_type;
             }
@@ -461,7 +477,8 @@ class ProductDesignController extends Controller
                 $updateData['idc'] = $request->idc;
             }
             if ($request->has('product')) {
-                $updateData['product'] = $request->product;
+                // Handle empty string as null for foreign key constraint
+                $updateData['product'] = $request->product === '' ? null : $request->product;
             }
             if ($request->has('joint')) {
                 $updateData['joint'] = $request->joint;
@@ -498,8 +515,11 @@ class ProductDesignController extends Controller
 
             return response()->json(['success' => true, 'data' => $productDesign]);
         } catch (\Exception $e) {
-            Log::error('Error in ProductDesignController@apiUpdate: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to update product design'], 500);
+            Log::error('Error in ProductDesignController@apiUpdate: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Failed to update product design: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -512,7 +532,14 @@ class ProductDesignController extends Controller
     public function apiDestroy($id)
     {
         try {
-            $productDesign = ProductDesign::where('pd_code', $id)->first();
+            // Find by numeric id first (if $id is numeric), then by pd_code
+            $productDesign = null;
+            if (is_numeric($id)) {
+                $productDesign = ProductDesign::where('id', $id)->first();
+            }
+            if (!$productDesign) {
+                $productDesign = ProductDesign::where('pd_code', $id)->first();
+            }
             
             if (!$productDesign) {
                 return response()->json([
@@ -545,8 +572,17 @@ class ProductDesignController extends Controller
     public function toggleStatus($id)
     {
         try {
-            // Find by id column
-            $productDesign = ProductDesign::where('id', $id)->firstOrFail();
+            // Find by numeric id first (if $id is numeric), then by pd_code
+            $productDesign = null;
+            if (is_numeric($id)) {
+                $productDesign = ProductDesign::where('id', $id)->first();
+            }
+            if (!$productDesign) {
+                $productDesign = ProductDesign::where('pd_code', $id)->first();
+            }
+            if (!$productDesign) {
+                throw new \Exception('Product design not found');
+            }
             // Toggle status between 'Act' and 'Obs'
             $productDesign->status = ($productDesign->status === 'Act') ? 'Obs' : 'Act';
             $productDesign->save();

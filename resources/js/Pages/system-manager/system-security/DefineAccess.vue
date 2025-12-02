@@ -1,123 +1,125 @@
 <template>
     <AppLayout header="Define User Access Permission">
         <Head title="Define User Access Permission" />
-        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
             <div class="max-w-6xl w-full mx-auto relative z-0">
                 <!-- Header Card -->
-                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
-                        <div class="flex items-center justify-center">
-                            <div class="bg-white/20 rounded-full p-4 mr-4">
-                                <ShieldCheckIcon class="h-8 w-8 text-white" />
-                            </div>
-                            <div class="text-center">
-                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">User Access Permission</h1>
-                                <p class="text-blue-100">Define and manage user permissions for system access</p>
-                            </div>
+                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                            <ShieldCheckIcon class="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">User Access Permission</h1>
+                            <p class="text-xs sm:text-sm text-blue-100">Define and manage user permissions for system access</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Search User Section -->
-                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8">
-                    <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
-                        <h2 class="text-xl font-semibold text-white flex items-center">
-                            <div class="bg-white/20 rounded-full p-2 mr-3">
-                                <UserIcon class="h-6 w-6 text-white" />
-                            </div>
-                            Find User
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4">
+                    <div class="px-4 py-3 sm:px-6 border-b border-blue-700 bg-blue-600 text-white">
+                        <h2 class="text-sm font-semibold flex items-center gap-2">
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-500">
+                                <UserIcon class="h-4 w-4 text-white" />
+                            </span>
+                            <span>Find User</span>
                         </h2>
-                        <p class="text-blue-100 text-sm mt-1">Search for user to define permissions</p>
+                        <p class="text-xs text-blue-100 mt-1">Search for a user to define permissions.</p>
                     </div>
-                    <div class="p-4 md:p-8">
-                        <form @submit.prevent="searchUser" class="flex flex-col lg:flex-row gap-4 md:gap-6">
+                    <div class="px-4 py-3 sm:px-6 sm:py-4">
+                        <form @submit.prevent="searchUser" class="space-y-2">
                             <div class="flex-1">
-                                <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                    <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-2 mr-3">
-                                        <IdentificationIcon class="h-5 w-5 text-white" />
-                                    </div>
+                                <label for="search_user_id" class="block text-sm sm:text-base font-semibold text-gray-800">
                                     User ID
                                 </label>
-                                <input type="text" 
-                                       v-model="searchForm.user_id" 
-                                       class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                       placeholder="Enter User ID (e.g., ADMIN001, USER001)..."
-                                       required>
-                            </div>
-                            <div class="flex items-end">
-                                <button type="submit" 
+                                <div class="mt-1 flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <div class="relative flex-1">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <IdentificationIcon class="h-4 w-4 text-gray-400" />
+                                        </div>
+                                        <input
+                                            id="search_user_id"
+                                            type="text"
+                                            v-model="searchForm.user_id"
+                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            placeholder="Enter User ID (e.g. ADMIN001, USER001)"
+                                            required
+                                        >
+                                    </div>
+                                    <button
+                                        type="submit"
                                         :disabled="isSearching"
-                                        class="inline-flex items-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
-                                    <SearchIcon class="h-6 w-6 mr-3" />
-                                    {{ isSearching ? 'Searching...' : 'Search User' }}
-                                </button>
+                                        class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <SearchIcon class="h-4 w-4 mr-2" />
+                                        <span>{{ isSearching ? 'Searching...' : 'Search User' }}</span>
+                                    </button>
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    The user's current permissions will load automatically after a successful search.
+                                </p>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <!-- Search Results -->
-                <div v-if="searchMessage" class="mb-8">
-                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 border-l-4 border-green-700 p-6 rounded-xl shadow-lg animate-fadeIn" v-if="searchMessageType === 'success'">
+                <div v-if="searchMessage" class="mb-4">
+                    <div
+                        v-if="searchMessageType === 'success'"
+                        class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-green-500 rounded-full p-2 mr-4">
-                                <component :is="searchMessageIcon" class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Success!</h3>
-                                <p class="text-white">{{ searchMessage }}</p>
-                            </div>
+                            <component :is="searchMessageIcon" class="h-5 w-5 text-green-500 mr-2" />
+                            <p class="text-sm font-medium">{{ searchMessage }}</p>
                         </div>
                     </div>
-                    <div class="bg-gradient-to-r from-yellow-500 to-orange-500 border-l-4 border-yellow-600 p-6 rounded-xl shadow-lg animate-fadeIn" v-else-if="searchMessageType === 'warning'">
+                    <div
+                        v-else-if="searchMessageType === 'warning'"
+                        class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-yellow-500 rounded-full p-2 mr-4">
-                                <component :is="searchMessageIcon" class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Warning!</h3>
-                                <p class="text-white">{{ searchMessage }}</p>
-                            </div>
+                            <component :is="searchMessageIcon" class="h-5 w-5 text-yellow-500 mr-2" />
+                            <p class="text-sm font-medium">{{ searchMessage }}</p>
                         </div>
                     </div>
-                    <div class="bg-gradient-to-r from-red-500 to-pink-500 border-l-4 border-red-600 p-6 rounded-xl shadow-lg animate-fadeIn" v-else>
+                    <div
+                        v-else
+                        class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-red-500 rounded-full p-2 mr-4">
-                                <component :is="searchMessageIcon" class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-lg text-white">Error!</h3>
-                                <p class="text-white">{{ searchMessage }}</p>
-                            </div>
+                            <component :is="searchMessageIcon" class="h-5 w-5 text-red-500 mr-2" />
+                            <p class="text-sm font-medium">{{ searchMessage }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- User Permission Form -->
-                <div v-if="foundUser" class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden">
+                <div v-if="foundUser" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                     <!-- User Info Header -->
-                    <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-8">
+                    <div class="bg-blue-600 px-4 py-3 sm:px-6 md:py-4 border-b border-blue-700">
                         <div class="flex flex-col lg:flex-row items-center justify-between">
                             <div class="flex items-center mb-4 lg:mb-0">
-                                <div class="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-2xl mr-4 md:mr-6">
+                                <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-500/80 rounded-full flex items-center justify-center text-white font-bold text-2xl mr-4 md:mr-6">
                                     {{ foundUser.official_name.charAt(0).toUpperCase() }}
                                 </div>
                                 <div class="text-center lg:text-left">
-                                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">{{ foundUser.official_name }}</h3>
-                                    <p class="text-purple-100">{{ foundUser.user_id }} • {{ foundUser.official_title || 'No Title' }}</p>
-                                    <p class="text-sm text-purple-200 mt-2">
-                                        Status: 
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" :class="foundUser.status === 'A' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'">
+                                    <h3 class="text-lg md:text-xl font-bold text-white mb-1">{{ foundUser.official_name }}</h3>
+                                    <p class="text-xs text-blue-100">{{ foundUser.user_id }} • {{ foundUser.official_title || 'No Title' }}</p>
+                                    <p class="text-xs text-blue-100 mt-2">
+                                        Status:
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" :class="foundUser.status === 'A' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'">
                                             {{ foundUser.status === 'A' ? 'Active' : 'Inactive' }}
                                         </span>
                                     </p>
                                 </div>
                             </div>
                             <div class="text-center lg:text-right">
-                                <div class="bg-white/20 rounded-xl p-4">
-                                    <p class="text-sm text-purple-200 mb-1">Total Permissions</p>
-                                    <p class="text-4xl font-bold text-white">{{ selectedPermissionsCount }}</p>
-                                    <p class="text-xs text-purple-300">of {{ totalPermissionsCount }}</p>
+                                <div class="bg-blue-500/70 rounded-xl px-4 py-3">
+                                    <p class="text-xs text-blue-100 mb-1">Total Permissions</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-white">{{ selectedPermissionsCount }}</p>
+                                    <p class="text-[11px] text-blue-100">of {{ totalPermissionsCount }}</p>
                                 </div>
                             </div>
                         </div>

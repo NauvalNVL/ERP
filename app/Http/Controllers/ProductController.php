@@ -232,13 +232,16 @@ class ProductController extends Controller
 
     /**
      * Get products as JSON
+     * By default, only returns active products (status = 'Act')
+     * Use ?all_status=1 to get all products including obsolete ones
      * 
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getProductsJson()
+    public function getProductsJson(Request $request)
     {
         try {
-            $products = Product::select(
+            $query = Product::select(
                     'id',
                     'product_code',
                     'description',
@@ -249,8 +252,14 @@ class ProductController extends Controller
                     'created_at',
                     'updated_at'
                 )
-                ->orderBy('product_code')
-                ->get();
+                ->orderBy('product_code');
+            
+            // Only filter by active status if all_status is not requested
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+            
+            $products = $query->get();
             
             // Transform data to match Vue component expectations
             $transformedProducts = $products->map(function($product) {
@@ -263,10 +272,11 @@ class ProductController extends Controller
                     'category_id' => $product->category,
                     'category_code' => $product->category,
                     'unit' => $product->unit ?? '',
-                'product_group_id' => $product->product_group_id,
-                'status' => $product->status,
-                'created_at' => $product->created_at ? $product->created_at->toISOString() : null,
-                'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null
+                    'product_group_id' => $product->product_group_id ?? '',
+                    'status' => $product->status,
+                    'is_active' => $product->status === 'Act', // Convert status to boolean for Vue component
+                    'created_at' => $product->created_at ? $product->created_at->toISOString() : null,
+                    'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null
                 ];
             });
             
@@ -314,10 +324,13 @@ class ProductController extends Controller
                 'product_code' => $product->product_code,
                 'name' => $product->description,
                 'description' => $product->description,
+                'category' => $product->category,
                 'category_id' => $product->category,
                 'category_code' => $product->category,
                 'unit' => $product->unit ?? '',
-                'product_group_id' => $product->product_group_id
+                'product_group_id' => $product->product_group_id ?? '',
+                'status' => $product->status,
+                'is_active' => $product->status === 'Act'
             ];
 
             return response()->json([
@@ -406,12 +419,13 @@ class ProductController extends Controller
                 'product_code' => $product->product_code,
                 'name' => $product->description,
                 'description' => $product->description,
+                'category' => $product->category,
                 'category_id' => $product->category,
                 'category_code' => $product->category,
-                'category' => $product->category,
                 'unit' => $product->unit ?? '',
-                'product_group_id' => $product->product_group_id,
-                'status' => $product->status
+                'product_group_id' => $product->product_group_id ?? '',
+                'status' => $product->status,
+                'is_active' => $product->status === 'Act'
             ];
 
             return response()->json([

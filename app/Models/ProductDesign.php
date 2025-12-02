@@ -12,6 +12,7 @@ class ProductDesign extends Model
     protected $fillable = [
         'pd_code',
         'pd_name',
+        'pd_alt_name',
         'pd_design_type',
         'idc',
         'product',

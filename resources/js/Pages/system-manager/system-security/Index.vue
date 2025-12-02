@@ -1,198 +1,176 @@
 <template>
     <AppLayout header="User List">
         <Head title="User Management" />
-        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto relative z-0">
-                <!-- Header Card -->
-                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 sm:p-6">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-                            <div class="flex items-center mb-3 sm:mb-0">
-                                <div class="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
-                                    <UserGroupIcon class="h-7 w-7 sm:h-8 sm:w-8 text-white" />
-                                </div>
-                                <div>
-                                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-1 leading-tight">User Management</h1>
-                                    <p class="text-blue-100 text-xs sm:text-sm">Manage system users and their information</p>
-                                </div>
+                <!-- Header -->
+                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+                    <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                                <UserGroupIcon class="h-5 w-5 text-white" />
                             </div>
-                            <Link href="/user/create"
-                                class="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 bg-white/20 text-white font-semibold rounded-xl shadow hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/30 transition-colors duration-200">
-                                <UserAddIcon class="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3" />
-                                <span class="truncate">Add New User</span>
-                            </Link>
+                            <div>
+                                <h1 class="text-lg sm:text-xl font-semibold text-white leading-tight">User Management</h1>
+                                <p class="text-xs sm:text-sm text-blue-100">Manage system users and their information</p>
+                            </div>
                         </div>
+                        <Link
+                            href="/user/create"
+                            class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                        >
+                            <UserAddIcon class="h-4 w-4 mr-2" />
+                            <span>Add New User</span>
+                        </Link>
                     </div>
                 </div>
 
                 <!-- Success/Error Messages -->
-                <TransitionGroup name="fade" tag="div" class="mb-8">
-                    <div v-if="$page.props.flash.success" key="success" class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 text-green-800 p-6 rounded-xl shadow">
+                <TransitionGroup name="fade" tag="div" class="mb-4">
+                    <div
+                        v-if="$page.props.flash.success"
+                        key="success"
+                        class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-green-500 rounded-full p-2 mr-4">
-                                <CheckCircleIcon class="h-6 w-6 text-white" />
+                            <div class="bg-green-500 rounded-full p-1.5 mr-3">
+                                <CheckCircleIcon class="h-5 w-5 text-white" />
                             </div>
                             <div>
-                                <h3 class="font-semibold text-lg">Success!</h3>
-                                <p>{{ $page.props.flash.success }}</p>
+                                <h3 class="font-semibold text-sm mb-0.5">Success</h3>
+                                <p class="text-sm">{{ $page.props.flash.success }}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div v-if="$page.props.flash.error" key="error" class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 text-red-800 p-6 rounded-xl shadow">
+                    <div
+                        v-if="$page.props.flash.error"
+                        key="error"
+                        class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-sm"
+                    >
                         <div class="flex items-center">
-                            <div class="bg-red-500 rounded-full p-2 mr-4">
-                                <ExclamationCircleIcon class="h-6 w-6 text-white" />
+                            <div class="bg-red-500 rounded-full p-1.5 mr-3">
+                                <ExclamationCircleIcon class="h-5 w-5 text-white" />
                             </div>
                             <div>
-                                <h3 class="font-semibold text-lg">Error!</h3>
-                                <p>{{ $page.props.flash.error }}</p>
+                                <h3 class="font-semibold text-sm mb-0.5">Error</h3>
+                                <p class="text-sm">{{ $page.props.flash.error }}</p>
                             </div>
                         </div>
                     </div>
                 </TransitionGroup>
 
                 <!-- Users Table -->
-                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden">
-                    <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-3 sm:px-6 border-b border-blue-700 bg-blue-600 text-white">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             <div>
-                                <h2 class="text-lg md:text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 rounded-full p-1.5 md:p-2 mr-2 md:mr-3">
-                                        <UserIcon class="h-6 w-6 text-white" />
+                                <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+                                    <div class="h-7 w-7 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <UserIcon class="h-4 w-4 text-white" />
                                     </div>
-                                    User Directory
+                                    <span>User Directory</span>
                                 </h2>
-                                <p class="text-blue-100 text-xs md:text-sm mt-1">Complete list of system users</p>
+                                <p class="text-xs text-blue-100 mt-1">Cari dan kelola user dengan cepat</p>
                             </div>
                             <div class="relative w-full md:w-64">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <MagnifyingGlassIcon class="h-5 w-5 text-white/60" />
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <MagnifyingGlassIcon class="h-4 w-4 text-white/70" />
                                 </div>
                                 <input
                                     v-model="searchQuery"
                                     type="text"
-                                    placeholder="Search users..."
-                                    class="block w-full pl-10 pr-3 py-2 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                                    placeholder="Cari user (ID, username, nama)..."
+                                    class="block w-full rounded-md border border-gray-300 bg-white py-1.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full table-fixed divide-y divide-gray-200">
-                            <thead class="bg-gray-50 md:bg-gradient-to-r md:from-gray-50 md:to-gray-100 hidden lg:table-header-group">
+                        <table class="min-w-full table-auto divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50 hidden md:table-header-group">
                                 <tr>
-                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                        <div class="flex items-center">
-                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-1 mr-2">
-                                                <IdentificationIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            User ID
-                                        </div>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        User ID
                                     </th>
-                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                        <div class="flex items-center">
-                                            <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-1 mr-2">
-                                                <UserIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Username
-                                        </div>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Username
                                     </th>
-                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                        <div class="flex items-center">
-                                            <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-1 mr-2">
-                                                <BadgeCheckIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Official Name
-                                        </div>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Official Name
                                     </th>
-                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                        <div class="flex items-center">
-                                            <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-1 mr-2">
-                                                <BriefcaseIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Position
-                                        </div>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Position
                                     </th>
-                                    <th class="px-8 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                        <div class="flex items-center justify-end">
-                                            <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
-                                                <CogIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Actions
-                                        </div>
+                                    <th class="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white/50 md:divide-y divide-transparent md:divide-gray-200">
-                                <tr v-for="user in filteredUsers" :key="user.id" class="block md:table-row bg-white rounded-xl border border-gray-200 shadow-none mb-3 md:bg-transparent md:border-0 md:rounded-none md:shadow-none hover:bg-white/50 transition-colors duration-150">
-                                    <td class="px-4 py-3 md:px-8 md:py-6 whitespace-normal md:whitespace-nowrap block md:table-cell">
-                                        <div class="flex items-center justify-between md:justify-start">
-                                            <div class="md:hidden text-xs font-medium text-gray-500 mr-3">User ID</div>
-                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg px-3 py-2">
-                                                <span class="text-white font-mono font-semibold text-sm">{{ user.user_id }}</span>
-                                            </div>
-                                        </div>
+                            <tbody class="divide-y divide-gray-100 bg-white">
+                                <tr v-for="user in filteredUsers" :key="user.id" class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 whitespace-nowrap text-xs font-mono text-gray-700">
+                                        {{ user.user_id }}
                                     </td>
-                                    <td class="px-4 py-3 md:px-8 md:py-6 whitespace-normal md:whitespace-nowrap block md:table-cell">
-                                        <div class="flex items-center justify-between md:justify-start">
-                                            <div class="md:hidden text-xs font-medium text-gray-500 mr-3">Username</div>
-                                            <div class="flex items-center">
-                                                <div class="bg-gray-100 rounded-full p-2 mr-3">
-                                                    <UserIcon class="h-5 w-5 text-gray-600" />
-                                                </div>
-                                                <span class="text-gray-900 font-medium text-lg break-words">{{ user.username }}</span>
+                                    <td class="px-4 py-2 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <div class="hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-gray-100">
+                                                <UserIcon class="h-4 w-4 text-gray-500" />
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3 md:px-8 md:py-6 whitespace-normal block md:table-cell overflow-hidden">
-                                        <div class="flex items-center justify-between md:justify-start min-w-0 overflow-hidden">
-                                            <div class="md:hidden text-xs font-medium text-gray-500 mr-3">Official Name</div>
-                                            <div class="flex items-center min-w-0 overflow-hidden">
-                                                <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-2 mr-3">
-                                                    <BadgeCheckIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                <span class="text-gray-900 font-semibold text-lg break-words max-w-full overflow-hidden">{{ user.official_name }}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3 md:px-8 md:py-6 whitespace-normal md:whitespace-nowrap block md:table-cell">
-                                        <div class="flex items-center justify-between md:justify-start">
-                                            <div class="md:hidden text-xs font-medium text-gray-500 mr-3">Position</div>
-                                            <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300 shadow-md whitespace-normal break-words">
-                                                <BriefcaseIcon class="h-4 w-4 mr-2" />
-                                                {{ user.official_title || 'No Position' }}
+                                            <span class="text-sm font-medium text-gray-900">
+                                                {{ user.username }}
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 md:px-8 md:py-6 whitespace-normal md:whitespace-nowrap text-left md:text-right block md:table-cell">
-                                        <div class="md:hidden text-xs font-medium text-gray-500 mb-1">Actions</div>
-                                        <div class="grid grid-cols-2 gap-2 w-full md:w-auto md:flex md:flex-wrap md:gap-2 md:justify-end">
-                                            <Link :href="`/user/${user.user_id}/edit`" class="inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 rounded-lg border text-xs sm:text-sm bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" title="Edit User">
-                                                <PencilIcon class="h-4 w-4 mr-1.5" />
-                                                <span class="hidden sm:inline">Edit</span>
+                                    <td class="px-4 py-2">
+                                        <span class="text-sm text-gray-900">
+                                            {{ user.official_name }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2 whitespace-nowrap">
+                                        <span class="text-xs font-medium text-gray-600">
+                                            {{ user.official_title || 'No Position' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-right">
+                                        <div class="flex justify-end gap-1.5">
+                                            <Link
+                                                :href="`/user/${user.user_id}/edit`"
+                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
+                                                title="Edit User"
+                                            >
+                                                <PencilIcon class="h-4 w-4" />
                                             </Link>
-                                            <Link :href="`/system-security/amend-password?search_user_id=${user.user_id}`" class="inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 rounded-lg border text-xs sm:text-sm bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" title="Change Password">
-                                                <KeyIcon class="h-4 w-4 mr-1.5" />
-                                                <span class="hidden sm:inline">Password</span>
+                                            <Link
+                                                :href="`/system-security/amend-password?search_user_id=${user.user_id}`"
+                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600"
+                                                title="Change Password"
+                                            >
+                                                <KeyIcon class="h-4 w-4" />
                                             </Link>
-                                            <Link href="/system-security/define-access" class="inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 rounded-lg border text-xs sm:text-sm bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100" title="Define Access">
-                                                <LockClosedIcon class="h-4 w-4 mr-1.5" />
-                                                <span class="hidden sm:inline">Access</span>
+                                            <Link
+                                                href="/system-security/define-access"
+                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-purple-50 hover:text-purple-600"
+                                                title="Define Access"
+                                            >
+                                                <LockClosedIcon class="h-4 w-4" />
                                             </Link>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr v-if="users.data.length === 0">
-                                    <td colspan="5" class="px-8 py-16 text-center">
+                                    <td colspan="5" class="px-4 py-10 text-center">
                                         <div class="flex flex-col items-center justify-center">
-                                            <div class="bg-gray-100 md:bg-gradient-to-r md:from-gray-100 md:to-gray-200 rounded-full p-6 mb-4">
-                                                <UserIcon class="h-12 w-12 text-gray-400" />
+                                            <div class="bg-gray-100 rounded-full p-4 mb-3">
+                                                <UserIcon class="h-10 w-10 text-gray-400" />
                                             </div>
-                                            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Users Found</h3>
-                                            <p class="text-gray-500 mb-4">Start by adding your first user to the system</p>
-                                            <Link href="/user/create" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 transition-colors duration-200">
-                                                <UserAddIcon class="h-5 w-5 mr-2" />
+                                            <h3 class="text-lg font-semibold text-gray-600 mb-1">No Users Found</h3>
+                                            <p class="text-sm text-gray-500 mb-3">Start by adding your first user to the system.</p>
+                                            <Link
+                                                href="/user/create"
+                                                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700"
+                                            >
+                                                <UserAddIcon class="h-4 w-4 mr-2" />
                                                 Add First User
                                             </Link>
                                         </div>
@@ -203,21 +181,25 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div v-if="users.links && users.links.length > 3" class="p-6 bg-gray-50 border-t border-gray-200">
+                    <div v-if="users.links && users.links.length > 3" class="px-4 py-3 sm:px-6 bg-gray-50 border-t border-gray-200">
                         <nav class="flex justify-center" aria-label="Pagination">
-                            <div class="flex space-x-2">
+                            <div class="flex space-x-1.5">
                                 <div v-for="(link, i) in users.links" :key="i">
-                                    <span v-if="link.url === null"
-                                          class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-xl cursor-not-allowed"
-                                          v-html="link.label">
+                                    <span
+                                        v-if="link.url === null"
+                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed"
+                                        v-html="link.label"
+                                    >
                                     </span>
-                                    <Link v-else
-                                          :href="link.url"
-                                          :class="{
-                                              'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow': link.active,
-                                              'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600 shadow': !link.active
-                                          }"
-                                          class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 transition-colors duration-200">
+                                    <Link
+                                        v-else
+                                        :href="link.url"
+                                        :class="{
+                                            'bg-indigo-600 text-white shadow-sm': link.active,
+                                            'bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600 shadow-sm': !link.active
+                                        }"
+                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 transition-colors duration-150"
+                                    >
                                         <span v-html="link.label"></span>
                                     </Link>
                                 </div>

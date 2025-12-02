@@ -178,9 +178,9 @@ Route::put('/product-groups/{id}/status', [App\Http\Controllers\ProductGroupCont
 // Product Design API routes
 Route::get('/product-designs', [App\Http\Controllers\ProductDesignController::class, 'getDesignsJson']);
 Route::post('/product-designs', [App\Http\Controllers\ProductDesignController::class, 'apiStore']);
-Route::put('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiUpdate'])->where('id', '[0-9]+');
-Route::delete('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiDestroy'])->where('id', '[0-9]+');
-Route::put('/product-designs/{id}/status', [App\Http\Controllers\ProductDesignController::class, 'toggleStatus'])->where('id', '[0-9]+');
+Route::put('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiUpdate']);
+Route::delete('/product-designs/{id}', [App\Http\Controllers\ProductDesignController::class, 'apiDestroy']);
+Route::put('/product-designs/{id}/status', [App\Http\Controllers\ProductDesignController::class, 'toggleStatus']);
 
 
 // Color API routes
@@ -375,13 +375,6 @@ Route::get('/ac-auto-wo-customers', [UpdateCustomerAccountController::class, 'ap
 Route::get('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiIndex']);
 Route::get('/customer-alternate-addresses/{customerCode}', [CustomerAlternateAddressController::class, 'apiGetCustomerAddresses']);
 
-
-// Product Design API routes
-Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);
-Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
-Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
-Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
-Route::get('/product-designs/export', [ProductDesignController::class, 'apiExport']);
 
 // Finishing API routes
 Route::get('/finishings', [FinishingController::class, 'apiIndex']);
