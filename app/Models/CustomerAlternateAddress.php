@@ -33,9 +33,11 @@ class CustomerAlternateAddress extends Model
 
     /**
      * Get the customer that owns the alternate address.
+     *
+     * Uses the CUSTOMER table via the Customer model (CODE column).
      */
     public function customerAccount()
     {
-        return $this->belongsTo(UpdateCustomerAccount::class, 'customer_code', 'customer_code');
+        return $this->belongsTo(Customer::class, 'customer_code', 'CODE');
     }
 }

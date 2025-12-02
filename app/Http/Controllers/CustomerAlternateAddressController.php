@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CustomerAlternateAddress;
-use App\Models\UpdateCustomerAccount;
+use App\Models\Customer;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,11 +27,15 @@ class CustomerAlternateAddressController extends Controller
 
     private function getInitialData()
     {
+        // Use CUSTOMER table via Customer model to avoid relying on a non-existent update_customer_accounts table
+        $customers = Customer::query()
+            ->select(['CODE as customer_code', 'NAME as customer_name', 'AC_STS as status'])
+            ->orderBy('NAME')
+            ->limit(20)
+            ->get();
+
         return [
-            'customers' => UpdateCustomerAccount::select('customer_code', 'customer_name', 'status')
-                ->orderBy('customer_name')
-                ->limit(20)
-                ->get(),
+            'customers' => $customers,
         ];
     }
 
@@ -39,7 +43,7 @@ class CustomerAlternateAddressController extends Controller
     {
         try {
             $addresses = CustomerAlternateAddress::with('customerAccount')->orderBy('customer_code')->get();
-            
+
             // Map data to include customer_name and status from related CustomerAccount
             $formattedAddresses = $addresses->map(function ($address) {
                 return [
@@ -68,7 +72,7 @@ class CustomerAlternateAddressController extends Controller
             $addresses = CustomerAlternateAddress::where('customer_code', $customerCode)
                 ->orderBy('id')
                 ->get();
-            
+
             Log::info('Fetched alternate addresses for customer: ' . $customerCode);
             return response()->json($addresses);
         } catch (\Exception $e) {
@@ -138,7 +142,7 @@ class CustomerAlternateAddressController extends Controller
         DB::beginTransaction();
         try {
             $address = CustomerAlternateAddress::findOrFail($id);
-            
+
             $address->update($request->all());
 
             DB::commit();
@@ -178,7 +182,7 @@ class CustomerAlternateAddressController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Run the CustomerAlternateAddressSeeder
      */
@@ -189,13 +193,13 @@ class CustomerAlternateAddressController extends Controller
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
             CustomerAlternateAddress::truncate();
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
-            
+
             // Run the seeder
             $seeder = new \Database\Seeders\CustomerAlternateAddressSeeder();
             $seeder->run();
-            
+
             Log::info('Customer alternate address data seeded successfully');
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Customer alternate address data seeded successfully'
