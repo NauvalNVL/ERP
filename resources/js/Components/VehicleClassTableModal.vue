@@ -137,9 +137,16 @@ const errorMessage = ref('')
 const searchQuery = ref('')
 
 const filteredClasses = computed(() => {
-  if (!searchQuery.value) return classes.value
+  // Only show active vehicle classes (STATUS = 'A') in the modal
+  const activeClasses = classes.value.filter(cls => {
+    const status = (cls.STATUS || 'A').toString().toUpperCase()
+    return status === 'A'
+  })
+
+  if (!searchQuery.value) return activeClasses
+
   const q = searchQuery.value.toLowerCase()
-  return classes.value.filter(cls => {
+  return activeClasses.filter(cls => {
     const code = (cls.VEHICLE_CLASS_CODE || '').toLowerCase()
     const desc = (cls.DESCRIPTION || '').toLowerCase()
     return code.includes(q) || desc.includes(q)
@@ -150,7 +157,10 @@ const loadClasses = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await axios.get('/api/vehicle-classes')
+    // Request only active vehicle classes from the API
+    const response = await axios.get('/api/vehicle-classes', {
+      params: { status: 'A' }
+    })
     if (response.data && response.data.success) {
       classes.value = response.data.data || []
     } else {
@@ -167,6 +177,12 @@ const loadClasses = async () => {
 }
 
 const selectClass = (cls) => {
+  // Extra safety: prevent selecting obsolete classes if they ever appear
+  const status = (cls.STATUS || 'A').toString().toUpperCase()
+  if (status !== 'A') {
+    return
+  }
+
   selectedClass.value = cls
 }
 

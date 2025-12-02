@@ -40,7 +40,7 @@
             </div>
           </div>
 
-          <!-- Status Filter -->
+          <!-- Status Filter (only Active vehicles are available in this modal) -->
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Status</label>
             <select
@@ -48,9 +48,7 @@
               @change="searchVehicles"
               class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm shadow-sm"
             >
-              <option value="">All Status</option>
               <option value="A">Active</option>
-              <option value="O">Obsolete</option>
             </select>
           </div>
 
@@ -225,10 +223,19 @@ const selectedVehicle = ref(null)
 const loading = ref(false)
 const errorMessage = ref('')
 const searchQuery = ref('')
-const statusFilter = ref('')
+const statusFilter = ref('A')
 const companyFilter = ref('')
 const companies = ref([])
 const pagination = ref(null)
+
+// Helper to ensure only active vehicles are shown in this modal
+const filterActiveVehicles = (rows) => {
+  if (!Array.isArray(rows)) return []
+  return rows.filter(vehicle => {
+    const status = (vehicle.VEHICLE_STATUS || 'A').toString().toUpperCase()
+    return status === 'A'
+  })
+}
 
 // Search vehicles
 const searchVehicles = async () => {
@@ -239,14 +246,15 @@ const searchVehicles = async () => {
     const response = await axios.get('/api/vehicles', {
       params: {
         search: searchQuery.value,
-        status: statusFilter.value,
+        status: statusFilter.value || 'A',
         company: companyFilter.value,
         plain: false
       }
     })
 
     if (response.data.success) {
-      vehicles.value = response.data.rows || []
+      const rows = filterActiveVehicles(response.data.rows || [])
+      vehicles.value = rows
       pagination.value = response.data.data?.pagination || null
       companies.value = response.data.companies || []
     } else {
@@ -264,6 +272,12 @@ const searchVehicles = async () => {
 
 // Select vehicle
 const selectVehicle = (vehicle) => {
+  // Extra safety: prevent selecting obsolete vehicles if they ever appear
+  const status = (vehicle.VEHICLE_STATUS || 'A').toString().toUpperCase()
+  if (status !== 'A') {
+    return
+  }
+
   selectedVehicle.value = vehicle
 }
 
@@ -284,7 +298,7 @@ const changePage = async (page) => {
     const response = await axios.get('/api/vehicles', {
       params: {
         search: searchQuery.value,
-        status: statusFilter.value,
+        status: statusFilter.value || 'A',
         company: companyFilter.value,
         page: page,
         plain: false
@@ -292,7 +306,8 @@ const changePage = async (page) => {
     })
 
     if (response.data.success) {
-      vehicles.value = response.data.rows || []
+      const rows = filterActiveVehicles(response.data.rows || [])
+      vehicles.value = rows
       pagination.value = response.data.data?.pagination || null
     }
   } catch (error) {
@@ -311,7 +326,7 @@ watch(() => props.isOpen, (isOpen) => {
     // Reset when modal closes
     selectedVehicle.value = null
     searchQuery.value = ''
-    statusFilter.value = ''
+    statusFilter.value = 'A'
     companyFilter.value = ''
     errorMessage.value = ''
   }
