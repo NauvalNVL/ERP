@@ -18,18 +18,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-3 sm:p-4 md:p-5 flex-1 overflow-hidden flex flex-col relative">
-        <!-- Loading overlay for first-time fetch -->
-        <div
-          v-if="loading && allAccounts.length === 0"
-          class="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-20"
-        >
-          <div class="flex flex-col items-center gap-2">
-            <div class="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
-            <span class="text-xs sm:text-sm text-gray-600">Loading customer accounts...</span>
-          </div>
-        </div>
-
+      <div class="p-3 sm:p-4 md:p-5 flex-1 overflow-hidden flex flex-col">
         <div class="mb-3 sm:mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -51,8 +40,28 @@
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-auto rounded-lg border border-gray-200 flex-1 min-h-0">
+        <!-- Table / States (match Master Card modal style) -->
+        <div v-if="loading" class="flex justify-center items-center p-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span class="ml-2 text-gray-600 text-sm">Loading data...</span>
+        </div>
+
+        <div v-else-if="error" class="p-4 text-red-500 bg-red-50 rounded border border-red-200 text-xs sm:text-sm">
+          <div class="font-semibold mb-1">
+            <i class="fas fa-exclamation-triangle mr-1"></i>
+            Error loading customer accounts
+          </div>
+          <div>{{ error }}</div>
+        </div>
+
+        <div v-else-if="filteredAccounts.length === 0" class="p-4 text-center text-gray-500 text-xs sm:text-sm">
+          <p>No accounts found.</p>
+          <div class="mt-1 hidden sm:block">
+            Total loaded: {{ allAccounts.length }}
+          </div>
+        </div>
+
+        <div v-else class="overflow-auto rounded-lg border border-gray-200 flex-1 min-h-0">
           <table class="w-full divide-y divide-gray-200" id="customerAccountDataTable" style="min-width: 650px;">
             <thead class="bg-gray-50 sticky top-0">
             <tr>
@@ -99,34 +108,9 @@
                   </span>
                 </td>
               </tr>
-              <tr v-if="loading && allAccounts.length > 0">
-                <td colspan="5" class="px-2 sm:px-4 md:px-6 py-4 text-center">
-                  <div class="flex items-center justify-center">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-                    <span class="ml-2 text-gray-500 text-xs">Loading...</span>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="error">
-                <td colspan="5" class="px-2 sm:px-4 md:px-6 py-4 text-center">
-                  <div class="text-red-600 text-xs">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    <span class="hidden sm:inline">{{ error }}</span>
-                    <span class="sm:hidden">Error loading data</span>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="filteredAccounts.length === 0">
-                <td colspan="5" class="px-2 sm:px-4 md:px-6 py-4 text-center text-gray-500">
-                  <p class="text-xs">No accounts found.</p>
-                  <div class="mt-1 text-xs hidden sm:block">
-                    Total loaded: {{ allAccounts.length }}
-                  </div>
-                </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
 
         <div class="mt-2 text-xs text-gray-500 italic hidden md:block">
           <p>Click row to select, double-click to select and close.</p>
