@@ -118,9 +118,12 @@
                                         <input type="number"
                                                v-model="form.password_expiry_date"
                                                class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
-                                               placeholder="0 Days [Zero for None]"
+                                               placeholder="Set 0 for no expiry date"
                                                value="0"
                                                min="0">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Set 0 for no expiry date
+                                        </p>
                                     </div>
 
                                     <!-- Amend Expired Password -->
@@ -461,6 +464,7 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ref, defineAsyncComponent } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Import icons from Heroicons v2
 import {
@@ -569,7 +573,7 @@ export default {
                 email: '',
                 password: '',
                 password_confirmation: '',
-                password_expiry_date: 90,
+                password_expiry_date: 0,
                 user_status: 'A',
                 amend_password: 'N',
                 user_printer: '',
@@ -608,7 +612,21 @@ export default {
                 this.showSalespersonModal = true;
             } catch (error) {
                 console.error('Error fetching salespersons:', error);
-                alert('Failed to load salespersons. Please try again.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load salespersons. Please try again.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626',
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    backdrop: 'rgba(15,23,42,0.4)',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl border border-red-100',
+                        title: 'text-xl font-semibold',
+                        confirmButton: 'px-6 py-2 rounded-lg'
+                    },
+                });
             }
         },
         selectSalesperson(salesperson) {
@@ -618,6 +636,87 @@ export default {
             }
         },
         submitForm() {
+            const mobile = (this.form.mobile_number || '').trim();
+            const officialTel = (this.form.official_tel || '').trim();
+            const mobileDigits = mobile.replace(/\D/g, '');
+            const officialTelDigits = officialTel.replace(/\D/g, '');
+
+            if (!mobile) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Validation Error',
+                    text: 'Mobile Number is required.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#2563eb',
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    backdrop: 'rgba(15,23,42,0.4)',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
+                        title: 'text-xl font-semibold',
+                        confirmButton: 'px-6 py-2 rounded-lg'
+                    },
+                });
+                return;
+            }
+
+            if (mobileDigits.length < 8) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Validation Error',
+                    text: 'Mobile Number must be at least 8 digits.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#2563eb',
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    backdrop: 'rgba(15,23,42,0.4)',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
+                        title: 'text-xl font-semibold',
+                        confirmButton: 'px-6 py-2 rounded-lg'
+                    },
+                });
+                return;
+            }
+
+            if (!officialTel) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Validation Error',
+                    text: 'Official Telephone is required.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#2563eb',
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    backdrop: 'rgba(15,23,42,0.4)',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
+                        title: 'text-xl font-semibold',
+                        confirmButton: 'px-6 py-2 rounded-lg'
+                    },
+                });
+                return;
+            }
+
+            if (officialTelDigits.length < 8) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Validation Error',
+                    text: 'Official Telephone must be at least 8 digits.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#2563eb',
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    backdrop: 'rgba(15,23,42,0.4)',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
+                        title: 'text-xl font-semibold',
+                        confirmButton: 'px-6 py-2 rounded-lg'
+                    },
+                });
+                return;
+            }
+
             const passwordExpiry = Math.max(0, Number(this.form.password_expiry_date) || 0);
             const formData = {
                 user_id: this.form.user_id,

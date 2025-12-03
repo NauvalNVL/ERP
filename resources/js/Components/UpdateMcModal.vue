@@ -1912,45 +1912,21 @@ const resolveNumeric = (values) => {
 };
 
 const displayGrossM2PerPcs = computed(() => {
-    const loaded = props.mcLoaded || {};
-    const pd = loaded.pd_setup || {};
-    const fromPd = resolveNumeric([pd.mcGrossM2PerPcs, pd.mc_gross_m2_per_pcs]);
-    const fromLoaded = resolveNumeric([loaded.MC_GROSS_M2_PER_PCS, loaded.mc_gross_m2_per_pcs]);
-    if (fromPd !== null) return fromPd;
-    if (fromLoaded !== null) return fromLoaded;
     const n = parseFloat(mcGrossM2PerPcs.value);
     return isNaN(n) ? 0 : n;
 });
 
 const displayNetM2PerPcs = computed(() => {
-    const loaded = props.mcLoaded || {};
-    const pd = loaded.pd_setup || {};
-    const fromPd = resolveNumeric([pd.mcNetM2PerPcs, pd.mc_net_m2_per_pcs]);
-    const fromLoaded = resolveNumeric([loaded.MC_NET_M2_PER_PCS, loaded.mc_net_m2_per_pcs]);
-    if (fromPd !== null) return fromPd;
-    if (fromLoaded !== null) return fromLoaded;
     const n = parseFloat(mcNetM2PerPcs.value);
     return isNaN(n) ? 0 : n;
 });
 
 const displayGrossKgPerSet = computed(() => {
-    const loaded = props.mcLoaded || {};
-    const pd = loaded.pd_setup || {};
-    const fromPd = resolveNumeric([pd.mcGrossKgPerSet, pd.mc_gross_kg_per_set]);
-    const fromLoaded = resolveNumeric([loaded.MC_GROSS_KG_PER_SET, loaded.mc_gross_kg_per_set]);
-    if (fromPd !== null) return fromPd;
-    if (fromLoaded !== null) return fromLoaded;
     const n = parseFloat(mcGrossKgPerSet.value);
     return isNaN(n) ? 0 : n;
 });
 
 const displayNetKgPerPcs = computed(() => {
-    const loaded = props.mcLoaded || {};
-    const pd = loaded.pd_setup || {};
-    const fromPd = resolveNumeric([pd.mcNetKgPerPcs, pd.mc_net_kg_per_pcs]);
-    const fromLoaded = resolveNumeric([loaded.MC_NET_KG_PER_PCS, loaded.mc_net_kg_per_pcs]);
-    if (fromPd !== null) return fromPd;
-    if (fromLoaded !== null) return fromLoaded;
     const n = parseFloat(mcNetKgPerPcs.value);
     return isNaN(n) ? 0 : n;
 });
@@ -2079,6 +2055,8 @@ const clearPdFields = () => {
     // Scores (8 slots for SL1..SL8, SW1..SW8)
     scoreL.value = [0, 0, 0, 0, 0, 0, 0, 0];
     scoreW.value = [0, 0, 0, 0, 0, 0, 0, 0];
+    scoreLTotal.value = '';
+    scoreWTotal.value = '';
     sheetLength.value = '';
     sheetWidth.value = '';
     conOut.value = '';
@@ -3017,31 +2995,52 @@ const onSelectComponent = (component, index) => {
 const openSetupPd = () => {
     // Ensure a component is selected; default to index 0 (Main)
     if (selectedComponentIndex.value === null) selectedComponentIndex.value = 0;
-    // If the selected component row is empty (no PD, PCS/SET, PART#), clear the PD form
     const idx = selectedComponentIndex.value;
     const row = Array.isArray(localComponents.value) ? localComponents.value[idx] : null;
-    const isRowEmpty = row && !row.pd && !row.pcs_set && !row.part_num;
+    // Determine if the table row has any summary data
+    const rowHasSummary = !!(row && (row.pd || row.pcs_set || row.part_num));
+    // Also check if we already have per-component PD state stored for this index
+    const existingCf = componentForms.value[idx] || makeEmptyPdState();
+    const cfHasData = !!(
+        existingCf && (
+            existingCf.partNo ||
+            existingCf.selectedProductDesign ||
+            existingCf.pcsPerSet ||
+            existingCf.selectedPaperFlute ||
+            existingCf.selectedScoringToolCode ||
+            existingCf.conOut ||
+            existingCf.convDuctX2A ||
+            existingCf.convDuctX2B ||
+            existingCf.pcsToJoint ||
+            existingCf.sheetLength ||
+            existingCf.sheetWidth
+        )
+    );
+
+    const isTrulyEmpty = !rowHasSummary && !cfHasData;
 
     console.log('🔍 openSetupPd - Component row data:', {
         index: idx,
         row: row,
-        isRowEmpty: isRowEmpty,
-        componentForm: componentForms.value[idx]
+        rowHasSummary,
+        cfHasData,
+        isTrulyEmpty,
+        componentForm: existingCf
     });
 
-    if (isRowEmpty) {
+    if (isTrulyEmpty) {
         clearPdFields();
         // Also request parent to clear SO/WO paper quality values
         emit('requestClearSoWo');
-    } else if (row) {
+    } else {
         // If row has saved values, hydrate ALL PD fields from the selected component
         // Preserve already-loaded global PD (from mcLoaded), but override component-specific fields
-        const cf = componentForms.value[idx] || makeEmptyPdState();
+        const cf = existingCf;
 
         // Core identifiers
-        partNo.value = cf.partNo || row.part_num || partNo.value || '';
-        selectedProductDesign.value = cf.selectedProductDesign || row.pd || selectedProductDesign.value || '';
-        pcsPerSet.value = formatTrimZeros(cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '');
+        partNo.value = cf.partNo || row?.part_num || partNo.value || '';
+        selectedProductDesign.value = cf.selectedProductDesign || row?.pd || selectedProductDesign.value || '';
+        pcsPerSet.value = formatTrimZeros(cf.pcsPerSet || row?.pcs_set || pcsPerSet.value || '');
 
         idL.value = formatTrimZeros(cf.id?.L ?? idL.value ?? '');
         idW.value = formatTrimZeros(cf.id?.W ?? idW.value ?? '');
@@ -3127,6 +3126,8 @@ const openSetupPd = () => {
 // Persist key PD fields into the current component form so they don't affect others
 watch([partNo, selectedProductDesign, pcsPerSet], () => {
     if (selectedComponentIndex.value === null) return;
+    // Only persist edits while Setup PD modal is open, so closing/clearing doesn't wipe saved component data
+    if (!props.showSetupPdModal) return;
     const idx = selectedComponentIndex.value;
     const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
     next.partNo = partNo.value;
@@ -3138,6 +3139,8 @@ watch([partNo, selectedProductDesign, pcsPerSet], () => {
 // Persist corrugating / converting fields per component
 watch([selectedPaperFlute, selectedScoringToolCode, conOut, convDuctX2A, convDuctX2B, pcsToJoint], () => {
     if (selectedComponentIndex.value === null) return;
+    // Only persist edits while Setup PD modal is open, so closing/clearing doesn't wipe saved component data
+    if (!props.showSetupPdModal) return;
     const idx = selectedComponentIndex.value;
     const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
     next.selectedPaperFlute = selectedPaperFlute.value;
