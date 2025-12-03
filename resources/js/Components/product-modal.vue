@@ -1,6 +1,6 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 sm:px-0">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -14,7 +14,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-5">
+      <div class="p-5 flex-1 flex flex-col min-h-0">
         <div class="mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -24,23 +24,23 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50 sticky top-0">
+        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+          <table class="w-full divide-y divide-gray-200 table-fixed min-w-[720px] md:min-w-0">
+            <thead class="bg-gray-50 sticky top-0 z-20">
               <tr>
-                <th @click="sortTable('product_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer">
+                <th @click="sortTable('product_code')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer">
                   Product Code <i class="fas fa-sort ml-1"></i>
                 </th>
-                <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer">
+                <th @click="sortTable('description')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%] cursor-pointer">
                   Description <i class="fas fa-sort ml-1"></i>
                 </th>
-                <th @click="sortTable('category')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
+                <th @click="sortTable('category')" class="pl-2 pr-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[22%] cursor-pointer">
                   Category <i class="fas fa-sort ml-1"></i>
                 </th>
-                <th @click="sortTable('product_group_id')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer">
+                <th @click="sortTable('product_group_id')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer">
                   Group <i class="fas fa-sort ml-1"></i>
                 </th>
-                <th @click="sortTable('is_active')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12 cursor-pointer">
+                <th @click="sortTable('is_active')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer">
                   Status <i class="fas fa-sort ml-1"></i>
                 </th>
               </tr>
@@ -50,15 +50,15 @@
                 :class="['hover:bg-emerald-50 cursor-pointer', selectedProduct && selectedProduct.id === product.id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(product)"
                 @dblclick="selectAndClose(product)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ product.product_code }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700 truncate">{{ product.description }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <div class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800 max-w-full overflow-hidden">
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900 truncate max-w-[130px] md:max-w-none">{{ product.product_code }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ product.description }}</td>
+                <td class="pl-2 pr-3 py-3 whitespace-nowrap">
+                  <div class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800 truncate max-w-[120px] md:max-w-[180px] lg:max-w-[220px]">
                     {{ product.category || '1-Corrugated Carton Box' }}
                   </div>
                 </td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ product.product_group_id }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ product.product_group_id }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
                   <span 
                     :class="[
                       'px-2 py-1 text-xs font-medium rounded-full', 
@@ -84,20 +84,20 @@
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select, double-click to select and close the modal.</p>
         </div>
-        <div class="mt-4 grid grid-cols-5 gap-2">
-          <button type="button" @click="sortTable('product_code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+        <div class="mt-4 grid grid-cols-5 gap-2 md:gap-3">
+          <button type="button" @click="sortTable('product_code')" class="py-1.5 px-2 md:py-2 md:px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-[10px] md:text-xs leading-tight break-words text-center rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Code
           </button>
-          <button type="button" @click="sortTable('description')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="sortTable('description')" class="py-1.5 px-2 md:py-2 md:px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-[10px] md:text-xs leading-tight break-words text-center rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Description
           </button>
-          <button type="button" @click="sortTable('category')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="sortTable('category')" class="py-1.5 px-2 md:py-2 md:px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-[10px] md:text-xs leading-tight break-words text-center rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Category
           </button>
-          <button type="button" @click="selectAndClose(selectedProduct)" class="py-2 px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="selectAndClose(selectedProduct)" class="py-1.5 px-2 md:py-2 md:px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] md:text-xs leading-tight break-words text-center rounded-lg transform active:translate-y-px">
             <i class="fas fa-edit mr-1"></i>Select
           </button>
-          <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="$emit('close')" class="py-1.5 px-2 md:py-2 md:px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-[10px] md:text-xs leading-tight break-words text-center rounded-lg transform active:translate-y-px">
             <i class="fas fa-times mr-1"></i>Close
           </button>
         </div>
