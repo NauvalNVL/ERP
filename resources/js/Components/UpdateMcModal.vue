@@ -194,18 +194,6 @@
                             <option value="desc">Desc</option>
                         </select>
                     </div>
-                    <div class="w-full sm:w-40">
-                        <label class="block text-xs text-gray-600 mb-1">Status:</label>
-                        <select
-                            :value="mcsStatusFilter"
-                            @input="$emit('update:mcsStatusFilter', $event.target.value); $emit('fetchMcsData')"
-                            class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="Act">Active</option>
-                            <option value="Obsolete">Obsolete</option>
-                            <option value="all">All</option>
-                        </select>
-                    </div>
                 </div>
 
                 <div v-if="mcsLoading" class="flex justify-center items-center p-4">
@@ -265,11 +253,19 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 text-xs">
-                        <tr v-for="mcs in mcsMasterCards" :key="mcs.seq"
-                            class="hover:bg-blue-50 cursor-pointer transition-colors"
-                            :class="selectedMcs?.seq === mcs.seq ? 'bg-blue-100 border-l-4 border-blue-500' : ''"
-                            @click="$emit('selectMcsItem', mcs)"
-                            @dblclick="$emit('selectMcs', mcs)">
+                        <tr
+                            v-for="mcs in mcsMasterCards"
+                            :key="mcs.seq"
+                            :class="[
+                                'transition-colors',
+                                (!allowObsoleteSelection && isObsoleteStatus(mcs))
+                                    ? 'bg-red-50 text-gray-400 cursor-not-allowed'
+                                    : 'hover:bg-blue-50 cursor-pointer',
+                                selectedMcs?.seq === mcs.seq ? 'bg-blue-100 border-l-4 border-blue-500' : ''
+                            ]"
+                            @click="handleMcsRowClick(mcs)"
+                            @dblclick="handleMcsRowDblClick(mcs)"
+                        >
                             <template v-if="mcsSortOption === 'mc_model'">
                                 <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.model }}</td>
                                 <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.seq }}</td>
@@ -1999,6 +1995,10 @@ const props = defineProps({
     selectedMcs: Object,
     mcsCurrentPage: Number,
     mcsLastPage: Number,
+    allowObsoleteSelection: {
+        type: Boolean,
+        default: true,
+    },
     productDesigns: {
         type: Array,
         default: () => []
@@ -2041,6 +2041,25 @@ const emit = defineEmits([
     'requestClearSoWo',
     'requestSetSoWo'
 ]);
+
+const isObsoleteStatus = (mcs) => {
+    const raw = (mcs && mcs.status != null ? String(mcs.status) : '').toLowerCase();
+    return raw === 'obsolete' || raw === 'obs' || raw === 'o';
+};
+
+const handleMcsRowClick = (mcs) => {
+    if (!props.allowObsoleteSelection && isObsoleteStatus(mcs)) {
+        return;
+    }
+    emit('selectMcsItem', mcs);
+};
+
+const handleMcsRowDblClick = (mcs) => {
+    if (!props.allowObsoleteSelection && isObsoleteStatus(mcs)) {
+        return;
+    }
+    emit('selectMcs', mcs);
+};
 
 // 7-slot array for print color area percent inputs (must be declared before use)
 const colorAreaPercents = ref(['', '', '', '', '', '', '']);

@@ -374,7 +374,7 @@ const openCustomerModal = async () => {
 // Load customer accounts from API
 const loadCustomerAccounts = async () => {
     try {
-        const response = await axios.get('/api/customers-with-status');
+        const response = await axios.get('/api/customers-with-status?status=active');
         const data = response.data;
 
         if (Array.isArray(data)) {

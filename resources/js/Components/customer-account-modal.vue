@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto p-2 sm:p-4 md:p-6">
     <!-- Background overlay -->
     <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('close')"></div>
-    
+
     <!-- Modal content -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl z-110 relative max-h-[95vh] flex flex-col">
       <!-- Modal Header -->
@@ -18,7 +18,18 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-3 sm:p-4 md:p-5 flex-1 overflow-hidden flex flex-col">
+      <div class="p-3 sm:p-4 md:p-5 flex-1 overflow-hidden flex flex-col relative">
+        <!-- Loading overlay for first-time fetch -->
+        <div
+          v-if="loading && allAccounts.length === 0"
+          class="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-20"
+        >
+          <div class="flex flex-col items-center gap-2">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+            <span class="text-xs sm:text-sm text-gray-600">Loading customer accounts...</span>
+          </div>
+        </div>
+
         <div class="mb-3 sm:mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -28,7 +39,7 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm sm:text-base">
         </div>
         </div>
-        
+
         <!-- Filter Controls -->
         <div class="mb-3 sm:mb-4 flex flex-col sm:flex-row gap-2 sm:gap-3">
           <div class="flex-1">
@@ -36,14 +47,6 @@
             <select v-model="sortBy" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:ring-blue-500 focus:border-blue-500">
               <option value="customer_code">Customer Code</option>
               <option value="customer_name">Customer Name</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <label class="block text-xs text-gray-600 mb-1">Status:</label>
-            <select v-model="statusFilter" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:ring-blue-500 focus:border-blue-500">
-              <option value="active">Active</option>
-              <option value="obsolete">Obsolete</option>
-              <option value="all">All</option>
             </select>
           </div>
         </div>
@@ -196,20 +199,22 @@ export default {
         allAccounts.value = props.customerAccounts
         return
       }
-      
+
       loading.value = true
       error.value = null
-      
+
       try {
-        console.log('Fetching customer accounts from API...')
-        
-        const response = await axios.get('/api/customers-with-status')
+        console.log('Fetching customer accounts from API (active only)...')
+
+        const response = await axios.get('/api/customers-with-status', {
+          params: { status: 'active' }
+        })
         const data = response.data
-        
+
         if (data.error) {
           throw new Error(data.error)
         }
-        
+
         if (Array.isArray(data)) {
           allAccounts.value = data
           console.log(`Loaded ${data.length} accounts`)
@@ -220,7 +225,7 @@ export default {
           console.error('Unexpected data format:', data)
           throw new Error('Invalid data format returned from server')
         }
-        
+
         // If we have accounts but none are selected, select the first one by default
         if (allAccounts.value.length > 0 && !selectedAccount.value) {
           console.log('Auto-selecting first account')
@@ -236,30 +241,30 @@ export default {
 
     const filteredAccounts = computed(() => {
       let filtered = [...allAccounts.value]
-      
+
       // Filter based on search query
       if (searchQuery.value.trim()) {
         const query = searchQuery.value.toLowerCase().trim()
-        filtered = filtered.filter(account => 
+        filtered = filtered.filter(account =>
           account.customer_code?.toLowerCase().includes(query) ||
           account.customer_name?.toLowerCase().includes(query)
         )
       }
-      
+
       // Filter based on status
       if (statusFilter.value === 'active') {
         filtered = filtered.filter(account => account.status === 'A' || account.status === 'Active' || account.status === undefined)
       } else if (statusFilter.value === 'obsolete') {
         filtered = filtered.filter(account => account.status === 'I' || account.status === 'Inactive' || account.status === 'Obsolete')
       }
-      
+
       // Sort based on selected field
       filtered.sort((a, b) => {
         const fieldA = a[sortBy.value]?.toString().toLowerCase() || ''
         const fieldB = b[sortBy.value]?.toString().toLowerCase() || ''
         return fieldA.localeCompare(fieldB)
       })
-      
+
       return filtered
     })
 
@@ -273,7 +278,7 @@ export default {
       }
       selectedAccount.value = account
     }
-    
+
     const selectAndClose = (account) => {
       if (account && isAccountSelectable(account)) {
         emit('select', account)
@@ -288,7 +293,7 @@ export default {
     const onRowDblClick = (account) => {
       selectAndClose(account)
     }
-    
+
     const sortTable = (key) => {
       if (sortKey.value === key) {
         sortAsc.value = !sortAsc.value
@@ -308,7 +313,7 @@ export default {
         error.value = 'Please select a customer account'
       }
     }
-    
+
     // Watch for changes in sort options and emit sort event
     watch([sortBy, statusFilter], () => {
       emit('sort', {
@@ -316,21 +321,38 @@ export default {
         status: statusFilter.value
       })
     })
-    
+
     // Watch for changes in the show prop to fetch data when modal is shown
-    watch(() => props.show, (newValue) => {
-      if (newValue === true) {
-        fetchCustomerAccounts()
-      }
-    }, { immediate: true })
+    watch(
+      () => props.show,
+      (newValue) => {
+        if (newValue === true) {
+          // Only fetch if we don't already have data and no external customerAccounts are provided
+          if (
+            allAccounts.value.length === 0 &&
+            !(props.customerAccounts && props.customerAccounts.length > 0)
+          ) {
+            fetchCustomerAccounts()
+          }
+        }
+      },
+      { immediate: true }
+    )
 
     // Watch for changes in external customer accounts
-    watch(() => props.customerAccounts, (newAccounts) => {
-      if (newAccounts && newAccounts.length > 0) {
-        console.log('Customer accounts prop updated:', newAccounts.length)
-        allAccounts.value = newAccounts
+    watch(
+      () => props.customerAccounts,
+      (newAccounts) => {
+        if (newAccounts && newAccounts.length > 0) {
+          console.log('Customer accounts prop updated:', newAccounts.length)
+          allAccounts.value = newAccounts
+        }
+      },
+      {
+        deep: true,
+        immediate: true
       }
-    }, { deep: true })
+    )
 
     // Watch for changes in initialSearch prop
     watch(() => props.initialSearch, (newSearch) => {
@@ -370,4 +392,4 @@ export default {
 .z-110 {
   z-index: 110;
 }
-</style> 
+</style>

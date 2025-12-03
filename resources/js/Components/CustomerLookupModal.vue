@@ -110,7 +110,9 @@ export default {
   methods: {
     async fetchCustomers() {
       try {
-        const response = await axios.get('/api/customers-with-status');
+        const response = await axios.get('/api/customers-with-status', {
+          params: { status: 'active' },
+        });
         this.customers = response.data;
       } catch (error) {
         console.error('Error fetching customers in modal:', error);
@@ -193,4 +195,4 @@ export default {
   display: flex;
   justify-content: flex-end;
 }
-</style> 
+</style>

@@ -866,7 +866,7 @@ const getCustomerGroupName = (code) => {
 // Customer account modal functions
 const openCustomerAccountModal = async () => {
     // Always reload data to ensure fresh data
-    await loadCustomerAccounts()
+    loadCustomerAccounts()
 
     showCustomerAccountModal.value = true
 }
