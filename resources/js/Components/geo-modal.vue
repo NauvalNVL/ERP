@@ -1,10 +1,10 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto">
+  <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto px-4 sm:px-0">
     <!-- Background overlay -->
     <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('close')"></div>
     
     <!-- Modal content -->
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl z-110 relative">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl z-110 relative max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -18,7 +18,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-5">
+      <div class="p-5 flex-1 flex flex-col min-h-0">
         <div class="mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -28,16 +28,16 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
+        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+          <table class="min-w-[720px] w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('code')">Geo Code</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('country')">Country</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('state')">State</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('town')">Town</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('town_section')">Town Section</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('area')">Area</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer" @click="sortTable('code')">Geo Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[22%] cursor-pointer" @click="sortTable('country')">Country</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%] cursor-pointer" @click="sortTable('state')">State</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('town')">Town</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('town_section')">Town Section</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%] cursor-pointer" @click="sortTable('area')">Area</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -45,13 +45,13 @@
                 :class="['hover:bg-emerald-50 cursor-pointer', selectedGeo && selectedGeo.code === geo.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(geo)"
                 @dblclick="selectAndClose(geo)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ geo.code }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ geo.country }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ geo.state }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ geo.town }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ geo.town_section }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full" 
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ geo.code }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px]" :title="geo.country">{{ geo.country }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]" :title="geo.state">{{ geo.state }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]" :title="geo.town">{{ geo.town }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px]" :title="geo.town_section">{{ geo.town_section }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-left">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full truncate max-w-[80px] inline-flex items-center justify-start align-middle text-left" 
                     :class="{
                       'bg-blue-100 text-blue-800': geo.country === 'Indonesia',
                       'bg-red-100 text-red-800': geo.country === 'Malaysia',
