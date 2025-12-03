@@ -99,7 +99,7 @@
                   </span>
                 </td>
               </tr>
-              <tr v-if="loading">
+              <tr v-if="loading && allAccounts.length > 0">
                 <td colspan="5" class="px-2 sm:px-4 md:px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
                     <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
