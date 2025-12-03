@@ -318,7 +318,6 @@ class UserController extends Controller
         try {
             // Get user permissions from user_permissions table
             $permissions = UserPermission::where('user_id', $user->userID)
-                ->where('can_access', true)
                 ->get(['menu_key', 'menu_name', 'menu_route', 'menu_category', 'menu_parent', 'can_access'])
                 ->toArray();
 
@@ -351,7 +350,7 @@ class UserController extends Controller
                     'menu_route' => $permission['menu_route'],
                     'menu_category' => $permission['menu_category'],
                     'menu_parent' => $permission['menu_parent'],
-                    'can_access' => true
+                    'can_access' => isset($permission['can_access']) ? (bool) $permission['can_access'] : true
                 ]);
             }
 
@@ -367,6 +366,52 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyalin permissions: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function copyPermissions(Request $request)
+    {
+        $validated = $request->validate([
+            'from_user_id' => 'required|string|exists:usercps,userID',
+            'to_user_id'   => 'required|string|different:from_user_id|exists:usercps,userID',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Ambil semua permissions dari user sumber langsung dari tabel user_permissions
+            $sourcePermissions = UserPermission::where('user_id', $validated['from_user_id'])->get();
+
+            // Hapus semua permissions lama milik user target
+            UserPermission::where('user_id', $validated['to_user_id'])->delete();
+
+            // Salin persis setiap permission (termasuk nilai can_access)
+            foreach ($sourcePermissions as $permission) {
+                UserPermission::create([
+                    'user_id'       => $validated['to_user_id'],
+                    'menu_key'      => $permission->menu_key,
+                    'menu_name'     => $permission->menu_name,
+                    'menu_route'    => $permission->menu_route,
+                    'menu_category' => $permission->menu_category,
+                    'menu_parent'   => $permission->menu_parent,
+                    'can_access'    => (bool) $permission->can_access,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions berhasil disalin dari ' . $validated['from_user_id'] . ' ke ' . $validated['to_user_id'],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error copying permissions via copyPermissions: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyalin permissions: ' . $e->getMessage(),
             ], 500);
         }
     }

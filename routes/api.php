@@ -378,6 +378,10 @@ Route::get('/ac-auto-wo-customers', [UpdateCustomerAccountController::class, 'ap
 // Customer Alternate Address API routes
 Route::get('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiIndex']);
 Route::get('/customer-alternate-addresses/{customerCode}', [CustomerAlternateAddressController::class, 'apiGetCustomerAddresses']);
+Route::post('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiStore']);
+Route::put('/customer-alternate-addresses/{id}', [CustomerAlternateAddressController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/customer-alternate-addresses/{id}', [CustomerAlternateAddressController::class, 'apiDestroy'])->where('id', '[0-9]+');
+Route::post('/customer-alternate-addresses/seed', [CustomerAlternateAddressController::class, 'seed']);
 
 
 // Finishing API routes
@@ -666,4 +670,5 @@ Route::prefix('delivery-orders')->group(function () {
     Route::post('/', [DeliveryOrderController::class, 'store']);
     Route::get('/', [DeliveryOrderController::class, 'index']);
     Route::get('/{doNumber}', [DeliveryOrderController::class, 'show']);
+    Route::put('/{doNumber}', [DeliveryOrderController::class, 'update']);
 });

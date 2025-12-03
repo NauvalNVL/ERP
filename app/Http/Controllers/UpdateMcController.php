@@ -312,6 +312,13 @@ class UpdateMcController extends Controller
                 $main->COLOR6_AREA_PERCENT ?? null,
                 $main->COLOR7_AREA_PERCENT ?? null,
             ],
+            // Corrugating / converting fields per component
+            'selectedPaperFlute' => $main->FLUTE ?? null,
+            'selectedScoringToolCode' => $main->S_TOOL ?? null,
+            'conOut' => $main->CORR_OUT ?? null,
+            'convDuctX2A' => $main->SLIT_OUT ?? null,
+            'convDuctX2B' => $main->DIE_OUT ?? null,
+            'pcsToJoint' => $main->JOIN_ ?? null,
             // Die cut & blocks
             'dcutSheet' => [
                 'L' => $main->DC_SHT_L ?? null,
@@ -428,6 +435,13 @@ class UpdateMcController extends Controller
                     $fit->COLOR6_AREA_PERCENT ?? null,
                     $fit->COLOR7_AREA_PERCENT ?? null,
                 ],
+                // Corrugating / converting fields per component
+                'selectedPaperFlute' => $fit->FLUTE ?? null,
+                'selectedScoringToolCode' => $fit->S_TOOL ?? null,
+                'conOut' => $fit->CORR_OUT ?? null,
+                'convDuctX2A' => $fit->SLIT_OUT ?? null,
+                'convDuctX2B' => $fit->DIE_OUT ?? null,
+                'pcsToJoint' => $fit->JOIN_ ?? null,
                 // Die cut & blocks
                 'dcutSheet' => [
                     'L' => $fit->DC_SHT_L ?? null,
@@ -1745,6 +1759,13 @@ class UpdateMcController extends Controller
                     'handHole' => $comp->HAND_HOLE ?? null,
                     'rotaryDCut' => $comp->ROTARY_DC ?? null,
                     'fullBlockPrint' => $comp->FB_PRINTING ?? null,
+                    // Corrugating / converting fields per component
+                    'selectedPaperFlute' => $comp->FLUTE ?? null,
+                    'selectedScoringToolCode' => $comp->S_TOOL ?? null,
+                    'conOut' => $comp->CORR_OUT ?? null,
+                    'convDuctX2A' => $comp->SLIT_OUT ?? null,
+                    'convDuctX2B' => $comp->DIE_OUT ?? null,
+                    'pcsToJoint' => $comp->JOIN_ ?? null,
                 ];
             })->toArray();
 

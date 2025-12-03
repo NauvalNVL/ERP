@@ -177,7 +177,13 @@ const props = defineProps({
     required: true
   },
   customer: Object,
-  orderDetails: Object
+  orderDetails: Object,
+  // When true, modal will prefill Order/Bill/Ship To from orderDetails.deliveryLocation (used by AmendDeliveryOrder)
+  // When false (default), modal will ignore orderDetails for initial load and use main customer data (PrepareMCSO behavior)
+  useOrderDetailsDeliveryLocation: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const emit = defineEmits(['close', 'save'])
@@ -332,6 +338,18 @@ watch(() => props.customer, (newCustomer) => {
   }
 }, { deep: true })
 
+// Watch for pre-populated delivery location data (used only when explicitly enabled)
+watch(
+  () => props.orderDetails && props.orderDetails.deliveryLocation,
+  (newLocation, oldLocation) => {
+    if (props.useOrderDetailsDeliveryLocation && newLocation && newLocation !== oldLocation) {
+      console.log('orderDetails.deliveryLocation changed, reloading delivery location in modal')
+      loadMainCustomer()
+    }
+  },
+  { deep: true }
+)
+
 // Initialize component
 onMounted(async () => {
   await loadMainCustomer()
@@ -341,11 +359,13 @@ const loadMainCustomer = async () => {
   try {
     console.log('loadMainCustomer called with props:', {
       customer: props.customer,
-      orderDetails: props.orderDetails
+      orderDetails: props.orderDetails,
+      useOrderDetailsDeliveryLocation: props.useOrderDetailsDeliveryLocation
     })
     
     // First check if we have pre-populated data from orderDetails (from customer alternate delivery location table)
-    if (props.orderDetails?.deliveryLocation) {
+    // This path is only used when explicitly enabled (e.g. Amend Delivery Order)
+    if (props.useOrderDetailsDeliveryLocation && props.orderDetails?.deliveryLocation) {
       const prePopulated = props.orderDetails.deliveryLocation
       
       // Use pre-populated data from customer alternate delivery location table

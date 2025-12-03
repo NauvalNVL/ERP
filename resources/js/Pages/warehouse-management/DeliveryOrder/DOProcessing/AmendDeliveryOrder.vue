@@ -323,13 +323,14 @@
       @close="showDeliveryLocationModal = false"
       @save="saveDeliveryLocation"
       :customer="{ code: selectedDeliveryOrder.customerCode, name: selectedDeliveryOrder.customerName }"
-      :order-details="{}"
+      :order-details="orderDetails"
+      :use-order-details-delivery-location="true"
     />
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import VehicleLookupModal from '@/Components/VehicleTableModal.vue'
 import DeliveryOrderLookupModal from '@/Components/DeliveryOrderLookupModal.vue'
@@ -386,6 +387,11 @@ const deliveryLocation = reactive({
   shipToAddress: ''
 })
 
+// Delivery location details for modal (matches PrepareMCSO structure)
+const orderDetails = reactive({
+  deliveryLocation: null
+})
+
 // Computed properties
 const canAmend = computed(() => {
   return selectedDeliveryOrder.doNumber && 
@@ -412,6 +418,10 @@ const openDeliveryLocationModal = () => {
     return
   }
   showDeliveryLocationModal.value = true
+}
+
+const openVehicleLookup = () => {
+  showVehicleModal.value = true
 }
 
 const selectDeliveryOrder = async (doData) => {
@@ -447,6 +457,9 @@ const loadDeliveryOrderDetails = async (doNumber) => {
       if (doData.DO_VHC_Num) {
         await loadVehicleInfo(doData.DO_VHC_Num)
       }
+      
+      // Load current delivery location / Delivery To information
+      await loadDeliveryLocationForDO(doData)
     }
   } catch (err) {
     console.error('Error loading delivery order details:', err)
@@ -517,10 +530,6 @@ const resetDeliveryOrderSelection = () => {
   selectedDeliveryOrder.originalData = null
 }
 
-const openVehicleLookup = () => {
-  showVehicleModal.value = true
-}
-
 const selectVehicle = (vehicle) => {
   selectedVehicle.id = vehicle.id
   selectedVehicle.vehicleNo = vehicle.VEHICLE_NO
@@ -538,6 +547,143 @@ const selectVehicle = (vehicle) => {
 const openDatePicker = () => {
   // TODO: Implement date picker modal
   info('Date picker functionality will be implemented')
+}
+
+// Save delivery location from modal
+const saveDeliveryLocation = (locationData) => {
+  try {
+    orderDetails.deliveryLocation = {
+      orderBy: {
+        name: locationData.orderBy?.customerName || '',
+        address: locationData.orderBy?.address || '',
+        email: locationData.orderBy?.email || '',
+        contact: locationData.orderBy?.contact || ''
+      },
+      billTo: {
+        name: locationData.billTo?.customerName || '',
+        address: locationData.billTo?.address || '',
+        email: locationData.billTo?.email || '',
+        contact: locationData.billTo?.contact || ''
+      },
+      shipTo: {
+        code: locationData.shipTo?.deliveryCode || '',
+        name: locationData.shipTo?.customerName || '',
+        address: locationData.shipTo?.address || '',
+        email: locationData.shipTo?.email || '',
+        contact: locationData.shipTo?.contact || ''
+      }
+    }
+
+    // Update local Delivery To display
+    deliveryLocation.code = orderDetails.deliveryLocation.shipTo.code
+    deliveryLocation.shipToName =
+      orderDetails.deliveryLocation.shipTo.name ||
+      orderDetails.deliveryLocation.billTo.name
+    deliveryLocation.shipToAddress =
+      orderDetails.deliveryLocation.shipTo.address ||
+      orderDetails.deliveryLocation.billTo.address
+
+    showDeliveryLocationModal.value = false
+    success('Delivery location updated successfully')
+  } catch (err) {
+    console.error('Error saving delivery location in AmendDeliveryOrder:', err)
+    error('Error saving delivery location')
+  }
+}
+
+// Prepare delivery location for DO based on Area1 / Del_Code
+const loadDeliveryLocationForDO = async (doData) => {
+  try {
+    const customerCode = selectedDeliveryOrder.customerCode || doData.AC_Num
+    if (!customerCode) {
+      console.warn('No customer code available for DO delivery location')
+      return
+    }
+
+    // Load main customer account data
+    let mainName = selectedDeliveryOrder.customerName || ''
+    let mainAddress = ''
+    let mainEmail = ''
+    let mainContact = ''
+
+    try {
+      const customerRes = await axios.get(`/api/sales-order/customer/${customerCode}`)
+      const customerPayload = customerRes.data
+      if (customerPayload?.success && customerPayload.data) {
+        const c = customerPayload.data
+        mainName = c.customer_name || mainName
+        mainAddress = c.address || ''
+        mainEmail = c.co_email || c.email || ''
+        mainContact = c.contact_person || c.contact || ''
+      }
+    } catch (e) {
+      console.error('Error loading customer account for DO delivery location:', e)
+    }
+
+    const area1 = doData.Area1 || ''
+    const delCode = doData.Del_Code || ''
+
+    let shipCode = delCode
+    let shipName = ''
+    let shipAddress = ''
+    let shipEmail = ''
+    let shipContact = ''
+
+    // When Del_Code differs from Area1, use customer alternate address as Ship To
+    if (delCode && delCode !== area1) {
+      try {
+        const altRes = await axios.get(`/api/customer-alternate-addresses/${customerCode}`)
+        const altData = altRes.data
+        if (Array.isArray(altData)) {
+          const alt = altData.find(a =>
+            (a.delivery_code || '').toUpperCase() === delCode.toUpperCase()
+          )
+          if (alt) {
+            shipName = alt.ship_to_name || alt.bill_to_name || mainName
+            shipAddress = alt.ship_to_address || alt.bill_to_address || mainAddress
+            shipEmail = alt.email || mainEmail
+            shipContact = alt.contact_person || mainContact
+          }
+        }
+      } catch (e) {
+        console.error('Error loading customer alternate address for DO:', e)
+      }
+    }
+
+    // Fallback to main customer when no alternate found
+    if (!shipName) shipName = mainName
+    if (!shipAddress) shipAddress = mainAddress
+    if (!shipEmail) shipEmail = mainEmail
+    if (!shipContact) shipContact = mainContact
+
+    deliveryLocation.code = shipCode
+    deliveryLocation.shipToName = shipName
+    deliveryLocation.shipToAddress = shipAddress
+
+    orderDetails.deliveryLocation = {
+      orderBy: {
+        name: mainName,
+        address: '',
+        email: mainEmail,
+        contact: mainContact
+      },
+      billTo: {
+        name: mainName,
+        address: mainAddress,
+        email: mainEmail,
+        contact: mainContact
+      },
+      shipTo: {
+        code: shipCode,
+        name: shipName,
+        address: shipAddress,
+        email: shipEmail,
+        contact: shipContact
+      }
+    }
+  } catch (err) {
+    console.error('Error preparing delivery location for DO:', err)
+  }
 }
 
 const saveAmendedDeliveryOrder = async () => {
@@ -559,7 +705,8 @@ const saveAmendedDeliveryOrder = async () => {
       remark1: deliveryOrder.remark1,
       remark2: deliveryOrder.remark2,
       unapply_fg: deliveryOrder.unapplyFG,
-      cancelled_reason: deliveryOrder.cancelledReason
+      cancelled_reason: deliveryOrder.cancelledReason,
+      delivery_code: deliveryLocation.code
     }
     
     console.log('Saving amended delivery order:', amendedData)
@@ -613,6 +760,14 @@ const refreshPage = () => {
     vehicleCompany: ''
   })
   
+  // Reset delivery location
+  Object.assign(deliveryLocation, {
+    code: '',
+    shipToName: '',
+    shipToAddress: ''
+  })
+  orderDetails.deliveryLocation = null
+  
   success('Form reset successfully')
 }
 
@@ -660,7 +815,6 @@ onMounted(() => {
 })
 
 // Cleanup
-import { onUnmounted } from 'vue'
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
 })

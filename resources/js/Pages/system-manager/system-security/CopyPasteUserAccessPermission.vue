@@ -250,24 +250,20 @@ export default {
             }
 
             try {
-                const response = await axios.get('/api/users', {
-                    params: { search: this.form.copyFromUserId }
-                });
+                const response = await axios.get(`/api/users/search/${encodeURIComponent(this.form.copyFromUserId)}`);
+                const data = response.data;
 
-                if (response.data && response.data.length > 0) {
-                    const user = response.data.find(u => u.userID === this.form.copyFromUserId);
-                    if (user) {
-                        this.copyFromUser = {
-                            id: user.id,
-                            user_id: user.userID,
-                            official_name: user.officialName || user.userID || '',
-                            official_title: user.officialTitle || ''
-                        };
-                        this.showMessage('User found successfully', 'success');
-                    } else {
-                        this.copyFromUser = null;
-                        this.showMessage('User ID not found', 'error');
-                    }
+                if (data && data.user) {
+                    const user = data.user;
+                    const userId = user.userID || user.user_id || '';
+
+                    this.copyFromUser = {
+                        id: user.id,
+                        user_id: userId,
+                        official_name: user.official_name ?? user.officialName ?? userId,
+                        official_title: user.official_title ?? user.officialTitle ?? ''
+                    };
+                    this.showMessage('User found successfully', 'success');
                 } else {
                     this.copyFromUser = null;
                     this.showMessage('User ID not found', 'error');
@@ -284,24 +280,20 @@ export default {
             }
 
             try {
-                const response = await axios.get('/api/users', {
-                    params: { search: this.form.pasteToUserId }
-                });
+                const response = await axios.get(`/api/users/search/${encodeURIComponent(this.form.pasteToUserId)}`);
+                const data = response.data;
 
-                if (response.data && response.data.length > 0) {
-                    const user = response.data.find(u => u.userID === this.form.pasteToUserId);
-                    if (user) {
-                        this.pasteToUser = {
-                            id: user.id,
-                            user_id: user.userID,
-                            official_name: user.officialName || user.userID || '',
-                            official_title: user.officialTitle || ''
-                        };
-                        this.showMessage('User found successfully', 'success');
-                    } else {
-                        this.pasteToUser = null;
-                        this.showMessage('User ID not found', 'error');
-                    }
+                if (data && data.user) {
+                    const user = data.user;
+                    const userId = user.userID || user.user_id || '';
+
+                    this.pasteToUser = {
+                        id: user.id,
+                        user_id: userId,
+                        official_name: user.official_name ?? user.officialName ?? userId,
+                        official_title: user.official_title ?? user.officialTitle ?? ''
+                    };
+                    this.showMessage('User found successfully', 'success');
                 } else {
                     this.pasteToUser = null;
                     this.showMessage('User ID not found', 'error');
@@ -325,13 +317,10 @@ export default {
             this.isProcessing = true;
 
             try {
-                // Get permissions from copy-from user
-                const permissionsResponse = await axios.get(`/api/users/${this.copyFromUser.user_id}/permissions`);
-                const permissions = permissionsResponse.data;
-
-                // Paste permissions to paste-to user
-                await axios.post(`/api/users/${this.pasteToUser.user_id}/permissions`, {
-                    permissions: permissions
+                // Minta backend untuk menyalin semua permissions langsung dari user sumber ke user target
+                await axios.post('/api/users/copy-permissions', {
+                    from_user_id: this.copyFromUser.user_id,
+                    to_user_id: this.pasteToUser.user_id,
                 });
 
                 this.showMessage(

@@ -868,10 +868,6 @@ Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-cu
 return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-customer-warehouse-requirement');
 })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-customer-warehouse-requirement');
 
-Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code', function () {
-return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-analysis-code');
-})->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-analysis-code');
-
 // API Routes for Vue components
 Route::prefix('api')->group(function () {
 // User API routes
@@ -880,6 +876,7 @@ Route::post('/users', [UserController::class, 'store']);
 Route::put('/users/{user}', [UserController::class, 'update']);
 Route::get('/users/{user}/permissions', [UserController::class, 'getUserPermissions']);
 Route::post('/users/{user}/permissions', [UserController::class, 'updateAccess']);
+Route::post('/users/copy-permissions', [UserController::class, 'copyPermissions']);
 Route::post('/users/update-password', [UserController::class, 'updatePassword']);
 
 // Salesperson API routes

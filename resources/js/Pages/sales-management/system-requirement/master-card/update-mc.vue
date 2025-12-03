@@ -1239,6 +1239,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         }
 
         // Refresh full MC so subsequent openings have the latest pd_setup
+        // and immediately treat the MC as an existing record so mcLoaded hydrates PD
         try {
             if (form.value.mcs && form.value.ac) {
                 const mcsSeqEnc = encodeURIComponent(form.value.mcs);
@@ -1248,6 +1249,10 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
                 });
                 if (refRes.data) {
                     selectedMcsFull.value = refRes.data;
+                    // Mark this MC as existing so UpdateMcModal receives mcLoaded
+                    recordMode.value = 'existing';
+                    showDetailedMcInfo.value = true;
+                    recordSelected.value = true;
                 }
             }
         } catch (e) {

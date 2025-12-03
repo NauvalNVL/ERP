@@ -267,6 +267,7 @@ const selectDeliveryCode = () => {
   
   // Directly emit the selected delivery code
   emit('select', {
+    id: selectedLocation.value.id,
     code: selectedLocation.value.delivery_code,
     ship_to: selectedLocation.value.ship_to,
     address: selectedLocation.value.address,
@@ -277,7 +278,8 @@ const selectDeliveryCode = () => {
     state: selectedLocation.value.state,
     section: selectedLocation.value.section,
     tel_no: selectedLocation.value.tel_no,
-    fax_no: selectedLocation.value.fax_no
+    fax_no: selectedLocation.value.fax_no,
+    raw: selectedLocation.value.raw
   })
   
   success('Delivery location selected successfully')
@@ -304,6 +306,7 @@ const loadDeliveryLocations = async () => {
     if (response.ok) {
       // Transform data to match the expected format
       deliveryLocations.value = data.map(address => ({
+        id: address.id,
         delivery_code: address.delivery_code,
         ship_to: address.ship_to_name || address.bill_to_name || 'N/A',
         country: address.country || '',
@@ -314,7 +317,8 @@ const loadDeliveryLocations = async () => {
         contact: address.contact_person || '',
         tel_no: address.tel_no || '',
         fax_no: address.fax_no || '',
-        email: address.email || ''
+        email: address.email || '',
+        raw: address
       }))
       
       console.log('Loaded delivery locations:', deliveryLocations.value.length)
@@ -358,6 +362,13 @@ onMounted(() => {
 // Watch for customer code changes
 watch(() => props.customerCode, () => {
   loadDeliveryLocations()
+})
+
+// Reload when modal is opened
+watch(() => props.show, (val) => {
+  if (val) {
+    loadDeliveryLocations()
+  }
 })
 </script>
 

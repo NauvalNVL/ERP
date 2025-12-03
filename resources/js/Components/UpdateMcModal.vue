@@ -2307,10 +2307,6 @@ const hydratePdFromObject = (pd, loaded) => {
 
 // Clear PD fields when Setup PD modal is opened for new MC, and reset on close
 watch(() => props.showSetupPdModal, (newVal, oldVal) => {
-    if (newVal && !props.mcLoaded) {
-        // If opening Setup PD modal and no MC is loaded (new MC), clear all fields
-        clearPdFields();
-    }
     if (!newVal && oldVal) {
         // When closing Setup PD modal, always reset PD fields to avoid cross-component collisions
         clearPdFields();
@@ -2341,6 +2337,13 @@ const makeEmptyPdState = () => ({
     sheetLength: '',
     sheetWidth: '',
     selectedPaperSize: '',
+    // Corrugating / converting fields per component
+    selectedPaperFlute: '',
+    selectedScoringToolCode: '',
+    conOut: '',
+    convDuctX2A: '',
+    convDuctX2B: '',
+    pcsToJoint: '',
     // Misc PD fields
     nestSlot: '',
     creaseValue: '',
@@ -2655,6 +2658,13 @@ watch(() => props.mcLoaded, (loaded) => {
                 cf.creaseValue = compSrc.creaseValue ?? cf.creaseValue;
                 cf.selectedReinforcementTape = compSrc.selectedReinforcementTape ?? cf.selectedReinforcementTape;
                 cf.selectedChemicalCoat = compSrc.selectedChemicalCoat ?? cf.selectedChemicalCoat;
+                // Corrugating / converting values per component
+                cf.selectedPaperFlute = compSrc.selectedPaperFlute ?? cf.selectedPaperFlute;
+                cf.selectedScoringToolCode = compSrc.selectedScoringToolCode ?? cf.selectedScoringToolCode;
+                cf.conOut = compSrc.conOut ?? cf.conOut;
+                cf.convDuctX2A = compSrc.convDuctX2A ?? cf.convDuctX2A;
+                cf.convDuctX2B = compSrc.convDuctX2B ?? cf.convDuctX2B;
+                cf.pcsToJoint = compSrc.pcsToJoint ?? cf.pcsToJoint;
 
                 // Diecut
                 const dcutSheetSrc = compSrc.dcutSheet || {};
@@ -2883,6 +2893,13 @@ const fetchMcComponentsFromDb = async () => {
                     cf.creaseValue = fetchedComp.creaseValue ?? cf.creaseValue;
                     cf.selectedReinforcementTape = fetchedComp.selectedReinforcementTape ?? cf.selectedReinforcementTape;
                     cf.selectedChemicalCoat = fetchedComp.selectedChemicalCoat ?? cf.selectedChemicalCoat;
+                    // Corrugating / converting values per component
+                    cf.selectedPaperFlute = fetchedComp.selectedPaperFlute ?? cf.selectedPaperFlute;
+                    cf.selectedScoringToolCode = fetchedComp.selectedScoringToolCode ?? cf.selectedScoringToolCode;
+                    cf.conOut = fetchedComp.conOut ?? cf.conOut;
+                    cf.convDuctX2A = fetchedComp.convDuctX2A ?? cf.convDuctX2A;
+                    cf.convDuctX2B = fetchedComp.convDuctX2B ?? cf.convDuctX2B;
+                    cf.pcsToJoint = fetchedComp.pcsToJoint ?? cf.pcsToJoint;
 
                     // Diecut
                     const dcutSheetSrc = fetchedComp.dcutSheet || {};
@@ -3040,6 +3057,13 @@ const openSetupPd = () => {
         creaseValue.value = formatTrimZeros(cf.creaseValue ?? creaseValue.value ?? '');
         selectedReinforcementTape.value = (cf.selectedReinforcementTape ?? selectedReinforcementTape.value ?? '').toString();
         selectedChemicalCoat.value = (cf.selectedChemicalCoat ?? selectedChemicalCoat.value ?? '').toString();
+        // Corrugating / converting per component
+        selectedPaperFlute.value = (cf.selectedPaperFlute ?? selectedPaperFlute.value ?? '').toString();
+        selectedScoringToolCode.value = (cf.selectedScoringToolCode ?? selectedScoringToolCode.value ?? '').toString();
+        conOut.value = formatTrimZeros(cf.conOut ?? conOut.value ?? '');
+        convDuctX2A.value = formatTrimZeros(cf.convDuctX2A ?? convDuctX2A.value ?? '');
+        convDuctX2B.value = formatTrimZeros(cf.convDuctX2B ?? convDuctX2B.value ?? '');
+        pcsToJoint.value = formatTrimZeros(cf.pcsToJoint ?? pcsToJoint.value ?? '');
 
         // Diecut
         dcutSheetL.value = formatTrimZeros(cf.dcutSheet?.L ?? dcutSheetL.value ?? '');
@@ -3089,6 +3113,20 @@ watch([partNo, selectedProductDesign, pcsPerSet], () => {
     next.partNo = partNo.value;
     next.selectedProductDesign = selectedProductDesign.value;
     next.pcsPerSet = pcsPerSet.value;
+    componentForms.value[idx] = next;
+});
+
+// Persist corrugating / converting fields per component
+watch([selectedPaperFlute, selectedScoringToolCode, conOut, convDuctX2A, convDuctX2B, pcsToJoint], () => {
+    if (selectedComponentIndex.value === null) return;
+    const idx = selectedComponentIndex.value;
+    const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
+    next.selectedPaperFlute = selectedPaperFlute.value;
+    next.selectedScoringToolCode = selectedScoringToolCode.value;
+    next.conOut = conOut.value;
+    next.convDuctX2A = convDuctX2A.value;
+    next.convDuctX2B = convDuctX2B.value;
+    next.pcsToJoint = pcsToJoint.value;
     componentForms.value[idx] = next;
 });
 

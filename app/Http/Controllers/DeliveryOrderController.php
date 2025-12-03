@@ -563,7 +563,8 @@ class DeliveryOrderController extends Controller
             'remark1' => 'nullable|string|max:250',
             'remark2' => 'nullable|string|max:250',
             'unapply_fg' => 'boolean',
-            'cancelled_reason' => 'nullable|string|max:250'
+            'cancelled_reason' => 'nullable|string|max:250',
+            'delivery_code' => 'nullable|string|max:50',
         ]);
 
         if ($validator->fails()) {
@@ -625,6 +626,18 @@ class DeliveryOrderController extends Controller
             // Add cancelled reason if provided
             if ($request->has('cancelled_reason') && $request->cancelled_reason) {
                 $updateData['Cancelled_Reason'] = $request->cancelled_reason;
+            }
+
+            // Update delivery code (Del_Code) if provided
+            if ($request->has('delivery_code')) {
+                $newDelCode = $request->input('delivery_code');
+
+                if ($newDelCode === null || $newDelCode === '') {
+                    // When empty, default back to main area code
+                    $updateData['Del_Code'] = $existingDO->Area1 ?? '';
+                } else {
+                    $updateData['Del_Code'] = $newDelCode;
+                }
             }
 
             // Update ALL delivery orders with the same DO number

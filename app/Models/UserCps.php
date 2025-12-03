@@ -260,10 +260,9 @@ class UserCps extends Authenticatable
      */
     public function getPermissionsArray()
     {
-        return $this->permissions()
-            ->where('can_access', true)
-            ->pluck('menu_key')
-            ->toArray();
+        // Use centralized helper to ensure permissions are always read
+        // directly from the user_permissions table by userID
+        return UserPermission::getUserPermissions($this->userID);
     }
 
     /**

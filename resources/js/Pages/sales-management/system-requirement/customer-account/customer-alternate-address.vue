@@ -108,7 +108,7 @@
                                         <button
                                             type="button"
                                             class="bg-gradient-to-br from-pink-400 to-purple-500 text-white px-3 hover:from-pink-500 hover:to-purple-600 transition rounded-r-lg"
-                                            @click="handlePreviewDeliveryCode"
+                                            @click="openAlternateDeliveryLocationTable"
                                         >
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -455,16 +455,11 @@
         />
 
         <!-- Delivery Code Preview Modal -->
-        <DeliveryCodePreviewModal
-            :show="showDeliveryCodePreviewModal"
-            :deliveryCode="deliveryCode"
-            :country="country"
-            :state="state"
-            :town="town"
-            :townSection="townSection"
-            :billTo="billTo"
-            :shipTo="shipTo"
-            @close="showDeliveryCodePreviewModal = false"
+        <DeliveryCodeLookupModal
+            :show="showDeliveryCodeLookupModal"
+            :customerCode="customerCode"
+            @close="showDeliveryCodeLookupModal = false"
+            @select="handleSelectAlternateAddress"
         />
     </AppLayout>
 </template>
@@ -474,7 +469,7 @@ import { ref, reactive, computed, onMounted } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import CustomerAccountModal from "@/Components/customer-account-modal.vue";
 import GeoModal from "@/Components/geo-modal.vue";
-import DeliveryCodePreviewModal from "@/Components/DeliveryCodePreviewModal.vue";
+import DeliveryCodeLookupModal from "@/Components/DeliveryCodeLookupModal.vue";
 import { useToast } from "@/Composables/useToast.js";
 import axios from "axios";
 
@@ -502,14 +497,13 @@ const shipTo = reactive({
 
 const showDetailsSection = computed(
     () =>
-        customerCode.value !== "" ||
         deliveryCode.value !== "" ||
         altAddressId.value !== null
 );
 
 const showCustomerAccountModal = ref(false);
 const showGeoModal = ref(false);
-const showDeliveryCodePreviewModal = ref(false);
+const showDeliveryCodeLookupModal = ref(false);
 
 const { addToast } = useToast();
 
@@ -654,7 +648,19 @@ function selectCustomerAccount(selected) {
     billTo.name = selected.customer_name;
     showCustomerAccountModal.value = false;
     console.log("Selected Customer Code:", customerCode.value);
-    fetchAlternateAddress(selected.customer_code); // Attempt to load existing data
+    altAddressId.value = null;
+    deliveryCode.value = "";
+    country.value = "";
+    state.value = "";
+    town.value = "";
+    townSection.value = "";
+    billTo.address = "";
+    shipTo.name = "";
+    shipTo.address = "";
+    shipTo.contactPerson = "";
+    shipTo.telNo = "";
+    shipTo.faxNo = "";
+    shipTo.email = "";
 }
 
 function openDeliveryLookup() {
@@ -667,26 +673,56 @@ function selectGeoLocation(selected) {
     state.value = selected.state;
     town.value = selected.town;
     townSection.value = selected.town_section;
-    shipTo.address = selected.town; // Using town as placeholder for address
+    altAddressId.value = null;
+    billTo.name = "";
+    billTo.address = "";
+    shipTo.name = "";
+    shipTo.address = "";
+    shipTo.contactPerson = "";
+    shipTo.telNo = "";
+    shipTo.faxNo = "";
+    shipTo.email = "";
     showGeoModal.value = false;
     console.log("Selected Delivery Code:", deliveryCode.value);
 }
 
-function handlePreviewDeliveryCode() {
-    if (deliveryCode.value && !country.value && geoData.value.length > 0) {
-        const selectedGeo = geoData.value.find(
-            (geo) => geo.code === deliveryCode.value
-        );
-        if (selectedGeo) {
-            country.value = selectedGeo.country;
-            state.value = selectedGeo.state;
-            town.value = selectedGeo.town;
-            townSection.value = selectedGeo.town_section;
-            shipTo.address = selectedGeo.town; // Assuming town can be a placeholder for shipTo.address
-        }
+function openAlternateDeliveryLocationTable() {
+    if (!customerCode.value) {
+        addToast("Please select a customer first.", "error");
+        return;
     }
 
-    showDeliveryCodePreviewModal.value = true;
+    showDeliveryCodeLookupModal.value = true;
+}
+
+function handleSelectAlternateAddress(selected) {
+    if (!selected) {
+        return;
+    }
+
+    altAddressId.value = selected.id || null;
+
+    deliveryCode.value = selected.code || "";
+    country.value = selected.country || "";
+    state.value = selected.state || "";
+    town.value = selected.town || "";
+    townSection.value = selected.section || "";
+
+    billTo.name = selected.raw?.bill_to_name || "";
+    billTo.address = selected.raw?.bill_to_address || "";
+
+    shipTo.name = selected.ship_to || selected.raw?.ship_to_name || "";
+    shipTo.address =
+        selected.address ||
+        selected.raw?.ship_to_address ||
+        selected.raw?.bill_to_address ||
+        "";
+    shipTo.contactPerson = selected.contact_person || selected.raw?.contact_person || "";
+    shipTo.telNo = selected.tel_no || selected.raw?.tel_no || "";
+    shipTo.faxNo = selected.fax_no || selected.raw?.fax_no || "";
+    shipTo.email = selected.email || selected.raw?.email || "";
+
+    showDeliveryCodeLookupModal.value = false;
 }
 
 async function handleSave() {
@@ -753,13 +789,11 @@ async function handleSave() {
 
 function handleClear() {
     altAddressId.value = null;
-    customerCode.value = "";
     deliveryCode.value = "";
     country.value = "";
     state.value = "";
     town.value = "";
     townSection.value = "";
-    billTo.name = "";
     billTo.address = "";
     shipTo.name = "";
     shipTo.address = "";
