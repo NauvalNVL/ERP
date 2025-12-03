@@ -101,29 +101,38 @@ const sortAsc = ref(true);
 
 // Compute filtered colors based on search query
 const filteredColors = computed(() => {
-  let colors = props.colors;
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
-    colors = colors.filter(color =>
-      color.color_id.toLowerCase().includes(q) ||
-      color.color_name.toLowerCase().includes(q) ||
-      color.color_group_id.toLowerCase().includes(q) ||
-      (color.cg_type && color.cg_type.toLowerCase().includes(q))
-    );
-  }
+	let colors = props.colors;
 
-  // Apply sorting
-  return [...colors].sort((a, b) => {
-    if (sortKey.value === 'color_id') {
-      if (a.color_id < b.color_id) return sortAsc.value ? -1 : 1;
-      if (a.color_id > b.color_id) return sortAsc.value ? 1 : -1;
-      return 0;
-    }
+	if (!Array.isArray(colors)) {
+		console.error('ColorModal - colors is not an array:', colors);
+		return [];
+	}
 
-    if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
-    if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
-    return 0;
-  });
+	// Only show active colors (hide obsolete ones)
+	colors = colors.filter(color => !color.status || color.status === 'Act');
+
+	if (searchQuery.value) {
+		const q = searchQuery.value.toLowerCase();
+		colors = colors.filter(color =>
+			color.color_id.toLowerCase().includes(q) ||
+			color.color_name.toLowerCase().includes(q) ||
+			color.color_group_id.toLowerCase().includes(q) ||
+			(color.cg_type && color.cg_type.toLowerCase().includes(q))
+		);
+	}
+
+	// Apply sorting
+	return [...colors].sort((a, b) => {
+		if (sortKey.value === 'color_id') {
+			if (a.color_id < b.color_id) return sortAsc.value ? -1 : 1;
+			if (a.color_id > b.color_id) return sortAsc.value ? 1 : -1;
+			return 0;
+		}
+
+		if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
+		if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
+		return 0;
+	});
 });
 
 // Select a row

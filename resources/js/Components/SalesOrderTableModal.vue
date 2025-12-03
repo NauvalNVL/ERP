@@ -76,9 +76,17 @@
                           </tr>
                         </template>
                         <template v-else>
-                          <tr v-for="(order, index) in salesOrders" :key="index"
-                              :class="{'bg-blue-100': selectedOrderIndex === index, 'hover:bg-gray-50': selectedOrderIndex !== index}"
-                              @click="selectOrder(index)">
+                          <tr
+                            v-for="(order, index) in salesOrders"
+                            :key="index"
+                            :class="[
+                              selectedOrderIndex === index ? 'bg-blue-100' : '',
+                              isCancelledStatus(order)
+                                ? 'bg-red-50 text-gray-400 cursor-not-allowed'
+                                : 'hover:bg-gray-50 cursor-pointer'
+                            ]"
+                            @click="handleRowClick(order, index)"
+                          >
                             <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.soNumber || '-' }}</td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customerPo || '-' }}</td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.acNumber || '-' }}</td>
@@ -210,7 +218,11 @@
 
               <!-- Action Buttons (Footer) -->
               <div class="flex justify-center space-x-4 mt-4 px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-xl -mx-6 -mb-6">
-                <button @click="selectOrder" class="px-6 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                <button
+                  @click="selectOrder"
+                  :disabled="!selectedOrder || isCancelledStatus(selectedOrder)"
+                  class="px-6 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+                >
                   Select
                 </button>
                 <button @click="closeModal" class="px-6 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors">
@@ -303,6 +315,14 @@ const selectedOrder = computed(() => {
   return selectedOrderIndex.value >= 0 ? salesOrders.value[selectedOrderIndex.value] : null
 })
 
+// Helper: detect cancelled status based on statusLocation text
+const isCancelledStatus = (order) => {
+  const raw = (order && order.statusLocation != null ? String(order.statusLocation) : '').toLowerCase()
+  if (!raw) return false
+  // Handle variations like 'CANCEL', 'Cancelled', 'Cancel', etc.
+  return raw.startsWith('cancel') || raw === 'cx' || raw === 'c'
+}
+
 // Methods
 const closeModal = () => {
   emit('close')
@@ -310,12 +330,16 @@ const closeModal = () => {
 
 const selectOrder = (index) => {
   if (typeof index === 'number') {
+    const order = salesOrders.value[index]
+    if (!order || isCancelledStatus(order)) {
+      return
+    }
     selectedOrderIndex.value = index
     // Fetch and update order info when selecting
     updateOrderInfo()
   } else {
     // Select button clicked
-    if (selectedOrder.value) {
+    if (selectedOrder.value && !isCancelledStatus(selectedOrder.value)) {
       // Create complete order data with all necessary information
       const completeOrderData = {
         ...selectedOrder.value,
@@ -345,6 +369,13 @@ const selectOrder = (index) => {
       closeModal()
     }
   }
+}
+
+const handleRowClick = (order, index) => {
+  if (isCancelledStatus(order)) {
+    return
+  }
+  selectOrder(index)
 }
 
 const selectItem = (index) => {

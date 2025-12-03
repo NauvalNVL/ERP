@@ -91,6 +91,13 @@ const sortAsc = ref(true);
 // Filter finishings based on search query
 const filteredFinishings = computed(() => {
   let items = props.finishings;
+
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  items = items.filter(item => !item.status || item.status === 'Act');
+
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     items = items.filter(item =>

@@ -242,8 +242,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteColor(editForm.color_id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteColor(editForm.color_id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -717,30 +717,39 @@ const saveColorChanges = async () => {
     }
 };
 
-const deleteColor = async (colorId) => {
-    if (!confirm(`Are you sure you want to delete color "${colorId}"?`)) return;
+const obsoleteColor = async (colorId) => {
+    if (!colorId) {
+        showNotification('No color selected', 'error');
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to obsolete color "${colorId}"? This will hide it from selection and tables.`)) {
+        return;
+    }
 
     saving.value = true;
 
     try {
         const csrfToken = getCsrfToken();
 
-        const response = await fetch(`/api/colors/${colorId}`, {
-            method: 'DELETE',
+        const response = await fetch(`/api/colors/${colorId}/status`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
             credentials: 'same-origin' // Include cookies in the request
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting color');
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Error obsoleting color');
         }
 
-        showNotification('Color deleted successfully!', 'success');
+        // Refresh colors so obsolete color disappears from Define Color and modal
         await fetchColors();
 
         if (selectedRow.value && selectedRow.value.color_id === colorId) {
@@ -749,9 +758,11 @@ const deleteColor = async (colorId) => {
         }
 
         closeEditModal();
+
+        showNotification(`Color "${colorId}" has been marked as obsolete successfully.`, 'success');
     } catch (error) {
-        console.error('Error deleting color:', error);
-        showNotification(`Error deleting color: ${error.message}`, 'error');
+        console.error('Error obsoleting color:', error);
+        showNotification(`Error obsoleting color: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }

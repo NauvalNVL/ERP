@@ -380,15 +380,17 @@ class ColorController extends Controller
     public function vueIndex()
     {
         try {
-            // Get only colors (not color groups) from COLOR table
+            // Get only active colors (not color groups) from COLOR table
             $colors = Color::whereNotNull('GroupCode')
                 ->whereRaw('GroupCode != Color_Code')
+                ->where('status', 'Act')
                 ->orderBy('Color_Code', 'asc')
                 ->get();
 
-            // Get color groups for dropdown
+            // Get active color groups for dropdown
             $colorGroups = Color::whereNull('GroupCode')
                 ->orWhereRaw('GroupCode = Color_Code')
+                ->where('status', 'Act')
                 ->orderBy('Color_Code', 'asc')
                 ->get();
 
@@ -429,41 +431,35 @@ class ColorController extends Controller
 
     /**
      * Display a listing of the colors for API consumers (JSON only).
+     * By default returns only active colors (status = 'Act').
+     * Use ?all_status=1 to retrieve all colors including obsolete ones.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            // Get only colors (not color groups) from COLOR table
-            $colors = Color::whereNotNull('GroupCode')
+            // Base query: only colors (not color groups) from COLOR table
+            $query = Color::whereNotNull('GroupCode')
                 ->whereRaw('GroupCode != Color_Code')
-                ->orderBy('Color_Code', 'asc')
-                ->get();
+                ->orderBy('Color_Code', 'asc');
 
-            // Get color groups for dropdown
-            $colorGroups = Color::whereNull('GroupCode')
-                ->orWhereRaw('GroupCode = Color_Code')
-                ->orderBy('Color_Code', 'asc')
-                ->get();
+            // Only return active colors unless explicitly asked for all statuses
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+
+            $colors = $query->get();
 
             // Transform data to match Vue component expected format
             $colorsTransformed = $colors->map(function($color) {
                 return [
-                    'color_code' => $color->Color_Code,
+                    'color_id' => $color->Color_Code,
                     'color_name' => $color->Color_Name,
                     'color_group_id' => $color->GroupCode,
                     'group_name' => $color->colorGroup ? $color->colorGroup->Color_Name : '',
                     'cg_type' => $color->Group,
                     'status' => $color->status
-                ];
-            });
-
-            $colorGroupsTransformed = $colorGroups->map(function($group) {
-                return [
-                    'cg' => $group->Color_Code,
-                    'cg_name' => $group->Color_Name,
-                    'cg_type' => $group->Group
                 ];
             });
 
@@ -521,7 +517,7 @@ class ColorController extends Controller
     public function vueManageStatus()
     {
         try {
-            // Get only colors (not color groups) from COLOR table
+            // Get all colors (not color groups) from COLOR table for status management
             $colors = Color::whereNotNull('GroupCode')
                 ->whereRaw('GroupCode != Color_Code')
                 ->orderBy('Color_Code', 'asc')
@@ -530,7 +526,7 @@ class ColorController extends Controller
             // Transform data
             $colorsTransformed = $colors->map(function($color) {
                 return [
-                    'color_code' => $color->Color_Code,
+                    'color_id' => $color->Color_Code,
                     'color_name' => $color->Color_Name,
                     'group_code' => $color->GroupCode,
                     'group_name' => $color->Group, // Use the Group column which contains the group type/name
@@ -582,7 +578,7 @@ class ColorController extends Controller
                 'success' => true,
                 'message' => 'Color status updated successfully',
                 'data' => [
-                    'color_code' => $color->Color_Code,
+                    'color_id' => $color->Color_Code,
                     'color_name' => $color->Color_Name,
                     'group_code' => $color->GroupCode,
                     'group_name' => $color->Group,

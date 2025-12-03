@@ -1847,8 +1847,8 @@ class SalesOrderController extends Controller
             $query = DB::table('so')
                 ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE');
 
-            // Filter by outstanding status - check multiple possible values
-            // Based on common ERP systems, outstanding could be stored as various values
+            // Filter by status: include typical outstanding statuses PLUS cancelled
+            // so that cancelled SOs still appear in the table (frontend blocks selection)
             $query->where(function($q) {
                 $q->where('so.STS', 'OPEN')
                   ->orWhere('so.STS', 'Outstanding')
@@ -1860,6 +1860,10 @@ class SalesOrderController extends Controller
                   ->orWhere('so.STS', 'ACTIVE')
                   ->orWhere('so.STS', 'NEW')
                   ->orWhere('so.STS', '1') // Numeric status
+                  // Also include cancelled statuses so users can still see them
+                  ->orWhere('so.STS', 'CANCEL')
+                  ->orWhere('so.STS', 'Cancelled')
+                  ->orWhere('so.STS', 'CANCELLED')
                   ->orWhereNull('so.STS')
                   ->orWhere('so.STS', '');
             });
@@ -1918,8 +1922,25 @@ class SalesOrderController extends Controller
                 $sampleOrders = DB::table('so')
                     ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE')
                     ->select([
-                        'so.SO_Num', 'so.STS', 'so.AC_Num', 'CUSTOMER.NAME as AC_NAME',
-                        'so.PO_Num', 'so.MCS_Num', 'so.MODEL'
+                        'so.SO_Num',
+                        'so.AC_Num',
+                        'CUSTOMER.NAME as AC_NAME',
+                        'so.PO_Num',
+                        'so.MCS_Num',
+                        'so.MODEL',
+                        'so.P_DESIGN',
+                        'so.SLM',
+                        'so.GROUP_',
+                        'so.TYPE',
+                        'so.STS',
+                        'so.SO_QTY',
+                        'so.UNIT',
+                        'so.UNIT_PRICE',
+                        'so.AMOUNT',
+                        'so.SO_REMARK',
+                        'so.SO_INSTRUCTION_1',
+                        'so.SO_INSTRUCTION_2',
+                        'so.D_LOC_Num',
                     ])
                     ->limit(10)
                     ->get();
@@ -2583,7 +2604,7 @@ class SalesOrderController extends Controller
 
             // Validate request
             $validated = $request->validate([
-                'cancel_reason' => 'required|string',
+                'cancel_reason' => 'nullable|string',
                 'cancel_date' => 'nullable|string',
                 'cancelled_by' => 'nullable|string',
             ]);
@@ -2611,11 +2632,12 @@ class SalesOrderController extends Controller
             $currentUserId = $this->getCurrentUserId();
 
             // Prepare cancel reason text with date, user info, and reason only
+            $cancelReason = $validated['cancel_reason'] ?? '';
             $cancelInfo = sprintf(
                 "CANCELLED on %s by %s\nReason: %s",
                 $validated['cancel_date'] ?? $nowWib->format('Y-m-d'),
                 $currentUserId,
-                $validated['cancel_reason']
+                $cancelReason
             );
 
             // Prepare update data - using SO_REMARK to store cancel reason since CANCEL_REASON column doesn't exist
@@ -2647,7 +2669,7 @@ class SalesOrderController extends Controller
                 'data' => [
                     'so_number' => $soNumber,
                     'status' => 'CANCEL',
-                    'cancel_reason' => $validated['cancel_reason']
+                    'cancel_reason' => $cancelReason
                 ]
             ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
 

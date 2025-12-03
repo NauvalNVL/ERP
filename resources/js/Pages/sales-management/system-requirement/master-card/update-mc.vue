@@ -713,6 +713,7 @@
             :paperFlutes="paperFlutes"
             :soValues="soValues"
             :woValues="woValues"
+            :allowObsoleteSelection="false"
             @closeErrorModal="showErrorModal = false"
             @closeSetupMcModal="showSetupMcModal = false"
             @closeSetupPdModal="showSetupPdModal = false"

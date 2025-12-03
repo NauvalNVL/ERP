@@ -139,7 +139,7 @@ const fetchFinishings = async () => {
     loading.value = true;
     
     try {
-        const response = await fetch('/api/finishings', {
+        const response = await fetch('/api/finishings?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

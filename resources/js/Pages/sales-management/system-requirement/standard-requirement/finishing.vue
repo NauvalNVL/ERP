@@ -200,8 +200,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteFinishing(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="obsoleteFinishing(editForm.code)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -498,6 +498,57 @@ const deleteFinishing = async (code) => {
     } catch (e) {
         console.error('Error deleting finishing:', e);
         showNotification('Error deleting finishing: ' + e.message, 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+
+const obsoleteFinishing = async (code) => {
+    if (!code) {
+        showNotification('No finishing selected', 'error');
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to obsolete finishing "${code}"? This will hide it from selection and tables.`)) {
+        return;
+    }
+
+    saving.value = true;
+
+    try {
+        const csrfToken = getCsrfToken();
+
+        const response = await fetch(`/api/finishings/${code}/status`, {
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Error obsoleting finishing');
+        }
+
+        await fetchFinishings();
+
+        if (selectedRow.value && selectedRow.value.code === code) {
+            selectedRow.value = null;
+            searchQuery.value = '';
+        }
+
+        closeEditModal();
+
+        showNotification(`Finishing "${code}" has been marked as obsolete successfully.`, 'success');
+    } catch (e) {
+        console.error('Error obsoleting finishing:', e);
+        showNotification('Error obsoleting finishing: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }

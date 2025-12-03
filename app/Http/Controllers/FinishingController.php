@@ -288,10 +288,17 @@ class FinishingController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $finishings = Finishing::orderBy('code')->get();
+            $query = Finishing::orderBy('code');
+
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where('status', 'Act');
+            }
+
+            $finishings = $query->get();
+
             return response()->json($finishings);
         } catch (\Exception $e) {
             Log::error('Error in FinishingController@apiIndex: ' . $e->getMessage());
