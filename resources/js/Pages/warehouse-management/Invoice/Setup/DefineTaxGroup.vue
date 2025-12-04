@@ -1,223 +1,215 @@
 <template>
     <AppLayout :header="'Define Tax Group'">
         <!-- Header Section -->
-        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
-            <div class="flex items-center">
-                <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner mr-4">
-                    <i class="fas fa-layer-group text-white text-2xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Define Tax Group</h2>
-                    <p class="text-teal-100">Organize tax types into groups for invoicing.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Left: Main Form (col-span-2) -->
-                    <div class="lg:col-span-2">
-                        <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
-                            <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
-                            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
-                            <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
-                                <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
-                                    <i class="fas fa-edit text-white"></i>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-800">Tax Group Management</h3>
+                <!-- Header Section -->
+                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+                    <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                                <i class="fas fa-layer-group text-white text-sm"></i>
                             </div>
-                            <!-- Search and Actions -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
-                                <div class="md:col-span-2">
-                                    <label for="taxGroupCode" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Tax Group Code:
-                                    </label>
-                                    <div class="relative flex group">
+                            <div>
+                                <h2 class="text-lg sm:text-xl font-semibold leading-tight">
+                                    Define Tax Group
+                                </h2>
+                                <p class="text-xs sm:text-sm text-blue-100">
+                                    Organize tax types into groups for invoicing.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+                            <div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
+                                <div class="p-2 bg-blue-500 rounded-lg mr-3 text-white">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm sm:text-base font-semibold text-slate-800">Tax Group Management</h3>
+                                    <p class="text-xs text-slate-500">Search, create, and maintain tax groups.</p>
+                                </div>
+                            </div>
+                            <div class="px-4 py-4 sm:px-6">
+                                <!-- Search and Actions -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tax Group Code</label>
+                                        <div class="relative flex">
+                                            <input
+                                                id="taxGroupCode"
+                                                v-model.trim="form.code"
+                                                @input="handleCodeInput"
+                                                @keypress.enter="handleEnterKey"
+                                                type="text"
+                                                placeholder="Search or type tax group code"
+                                                class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400 text-sm"
+                                                :readonly="recordMode === 'review'"
+                                                :class="{ 'bg-gray-100 cursor-not-allowed': recordMode === 'review' }"
+                                            />
+                                            <button
+                                                type="button"
+                                                @click="openTableModal"
+                                                class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-600 hover:bg-blue-700 text-white rounded-r-md text-sm"
+                                            >
+                                                <i class="fas fa-table"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-1">
+                                        <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
+                                        <button
+                                            type="button"
+                                            @click="handleNew"
+                                            class="w-full flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm"
+                                        >
+                                            <i class="fas fa-plus-circle mr-2"></i>
+                                            Add New
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Form Fields -->
+                                <div v-if="recordMode !== 'select'" class="space-y-4 mt-4">
+                                    <!-- Tax Group Name -->
+                                    <div>
+                                        <label for="taxGroupName" class="block text-sm font-semibold text-slate-700 mb-1">
+                                            Tax Group Name:
+                                        </label>
                                         <input
-                                            id="taxGroupCode"
-                                            v-model.trim="form.code"
-                                            @input="handleCodeInput"
-                                            @keypress.enter="handleEnterKey"
+                                            id="taxGroupName"
                                             type="text"
-                                            placeholder="Enter tax group code..."
-                                            class="input-field"
-                                            :readonly="recordMode === 'review'"
-                                            :class="{ 'bg-gray-100 cursor-not-allowed': recordMode === 'review', 'bg-white': recordMode !== 'review' }"
+                                            v-model="form.name"
+                                            placeholder="Enter tax group name..."
+                                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                            required
                                         />
+                                    </div>
+
+                                    <!-- Sales Tax Applied -->
+                                    <div>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                            Sales Tax Applied:
+                                        </label>
+                                        <div class="flex gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    v-model="form.sales_tax_applied"
+                                                    value="Y"
+                                                    class="w-4 h-4 text-blue-600"
+                                                />
+                                                <span class="text-sm">Y-Yes</span>
+                                            </label>
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    v-model="form.sales_tax_applied"
+                                                    value="N"
+                                                    class="w-4 h-4 text-blue-600"
+                                                />
+                                                <span class="text-sm">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tax Item Screen Button -->
+                                    <div v-if="recordMode === 'review'" class="pt-4 border-t border-gray-200">
                                         <button
                                             type="button"
-                                            @click="openTableModal"
-                                            class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
-                                            title="Tax Group Table"
+                                            @click="openTaxItemScreen"
+                                            class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 font-medium text-sm"
                                         >
-                                            <i class="fas fa-table"></i>
+                                            <i class="fas fa-list"></i>
+                                            Tax Item Screen
                                         </button>
                                     </div>
-                                </div>
-                                <div class="md:col-span-1 flex flex-col justify-end">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                                    <button
-                                        type="button"
-                                        @click="handleNew"
-                                        class="primary-button group w-full h-[42px]"
-                                    >
-                                        <span class="shimmer-effect"></span>
-                                        <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
-                                        New Tax Group
-                                    </button>
-                                </div>
-                            </div>
 
-                            <!-- Form Fields (shown only when tax group selected or creating new) -->
-                            <div v-if="recordMode !== 'select'" class="relative z-10 space-y-6">
-                                <!-- Tax Group Name -->
-                                <div>
-                                    <label for="taxGroupName" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Tax Group Name:
-                                    </label>
-                                    <input
-                                        id="taxGroupName"
-                                        type="text"
-                                        v-model="form.name"
-                                        placeholder="Enter tax group name..."
-                                        class="modal-input"
-                                        required
-                                    />
-                                </div>
-
-                                <!-- Sales Tax Applied -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Sales Tax Applied:
-                                    </label>
-                                    <div class="flex gap-8">
-                                        <label class="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                v-model="form.sales_tax_applied"
-                                                value="Y"
-                                                class="w-4 h-4 text-blue-600"
-                                            />
-                                            <span class="text-sm font-medium">Y-Yes</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                v-model="form.sales_tax_applied"
-                                                value="N"
-                                                class="w-4 h-4 text-blue-600"
-                                            />
-                                            <span class="text-sm font-medium">N-No</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Tax Item Screen Button (only in review mode) -->
-                                <div v-if="recordMode === 'review'" class="pt-4 border-t border-gray-200">
-                                    <button
-                                        type="button"
-                                        @click="openTaxItemScreen"
-                                        class="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white rounded-lg flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transition-all"
-                                    >
-                                        <i class="fas fa-list"></i>
-                                        Tax Item Screen
-                                    </button>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="flex justify-between items-center pt-6 border-t border-gray-200">
-                                    <button
-                                        v-if="recordMode === 'review'"
-                                        type="button"
-                                        @click="handleDelete"
-                                        class="secondary-button group text-red-600 border-red-300 hover:bg-red-50"
-                                    >
-                                        <i class="fas fa-trash-alt mr-2"></i>
-                                        Delete
-                                    </button>
-                                    <div v-else></div>
-
-                                    <div class="flex gap-3">
+                                    <!-- Action Buttons -->
+                                    <div class="flex justify-between items-center pt-4 border-t border-gray-200">
                                         <button
+                                            v-if="recordMode === 'review'"
                                             type="button"
-                                            @click="handleCancel"
-                                            class="secondary-button"
+                                            @click="handleDelete"
+                                            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium"
                                         >
-                                            <i class="fas fa-times mr-2"></i>
-                                            Cancel
+                                            <i class="fas fa-trash-alt mr-2"></i>
+                                            Delete
                                         </button>
-                                        <button
-                                            type="button"
-                                            @click="handleSave"
-                                            class="primary-button"
-                                        >
-                                            <span class="shimmer-effect"></span>
-                                            <i class="fas fa-save mr-2"></i>
-                                            Save
-                                        </button>
+                                        <div v-else></div>
+
+                                        <div class="flex gap-3">
+                                            <button
+                                                type="button"
+                                                @click="handleCancel"
+                                                class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium"
+                                            >
+                                                <i class="fas fa-times mr-2"></i>
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="button"
+                                                @click="handleSave"
+                                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                                            >
+                                                <i class="fas fa-save mr-2"></i>
+                                                Save
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right: Information & Quick Links (col-span-1) -->
-                    <div class="flex flex-col space-y-6">
-                        <!-- Information Card -->
-                        <div class="bg-white rounded-xl shadow-md border-t-4 border-blue-400 p-6">
-                            <div class="flex items-center mb-2">
-                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3">
-                                    <i class="fas fa-info text-white text-2xl"></i>
+                    <!-- Right Column - Quick Info -->
+                    <div class="lg:col-span-1 space-y-4">
+                        <!-- Info Card -->
+                        <div class="bg-white shadow-sm rounded-xl border border-blue-100">
+                            <div class="px-4 py-3 sm:px-5 border-b border-blue-100 flex items-center">
+                                <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                                    <i class="fas fa-info-circle text-white"></i>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-800">Information</h3>
+                                <h3 class="text-sm sm:text-base font-semibold text-blue-900">Information</h3>
                             </div>
-                            <hr class="my-2 border-blue-100">
-                            <div class="text-gray-700 mb-4">
-                                Use this form to define tax groups for invoicing. Tax groups categorize similar tax types.
-                            </div>
-                            <div class="bg-blue-50 rounded-lg p-4">
-                                <div class="font-bold text-blue-700 mb-2">Instructions:</div>
-                                <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
-                                    <li>Enter tax group code to search</li>
-                                    <li>Click table button to view all groups</li>
-                                    <li>Fill all required fields</li>
-                                    <li>View tax types per group</li>
-                                    <li>Click Save to apply changes</li>
-                                </ul>
+                            <div class="px-4 py-4 sm:px-5">
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <h4 class="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-2">Instructions</h4>
+                                    <ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
+                                        <li>Enter tax group code to search</li>
+                                        <li>Use table button to view all groups</li>
+                                        <li>Fill all required fields</li>
+                                        <li>Save changes to apply</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Quick Links Card -->
-                        <div class="bg-white rounded-xl shadow-md border-t-4 border-cyan-400 p-6">
-                            <div class="flex items-center mb-2">
-                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-400 rounded-lg mr-3">
-                                    <i class="fas fa-link text-white text-2xl"></i>
+                        <!-- Quick Links -->
+                        <div class="bg-white shadow-sm rounded-xl border border-violet-100">
+                            <div class="px-4 py-3 sm:px-5 border-b border-violet-100 flex items-center">
+                                <div class="p-2 bg-violet-500 rounded-lg mr-3">
+                                    <i class="fas fa-link text-white"></i>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-800">Quick Links</h3>
+                                <h3 class="text-sm sm:text-base font-semibold text-slate-800">Quick Links</h3>
                             </div>
-                            <hr class="my-2 border-cyan-100">
-                            <div class="space-y-3 mt-4">
-                                <a href="/warehouse-management/invoice/setup/print-tax-group" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
-                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
-                                        <i class="fas fa-print text-white text-xl"></i>
-                                    </span>
-                                    <div>
-                                        <div class="font-bold text-green-800">View & Print</div>
-                                        <div class="text-xs text-green-700">Print tax group list</div>
-                                    </div>
-                                </a>
-                                <a href="#" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
-                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
-                                        <i class="fas fa-list text-white text-xl"></i>
-                                    </span>
-                                    <div>
-                                        <div class="font-bold text-blue-800">Tax Types</div>
-                                        <div class="text-xs text-blue-700">Manage tax types per group</div>
-                                    </div>
-                                </a>
+                            <div class="px-4 py-4 sm:px-5">
+                                <div class="grid grid-cols-1 gap-3">
+                                    <a href="/warehouse-management/invoice/setup/print-tax-group" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100">
+                                        <div class="p-2 bg-blue-500 rounded-full mr-3">
+                                            <i class="fas fa-print text-white text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-blue-900 text-sm">View & Print</p>
+                                            <p class="text-xs text-blue-700">Print tax group list</p>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
