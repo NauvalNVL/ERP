@@ -1,70 +1,72 @@
 <template>
   <AppLayout :header="'Define Vehicle Class'">
     <Head title="Define Vehicle Class" />
-
-    <div class="p-6">
-      <!-- Header Section -->
-      <div class="mb-6">
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
-          <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,white,transparent_50%)]"></div>
-          <div class="flex items-center justify-between p-5">
-            <div class="flex items-center gap-3 text-white">
-              <i class="fas fa-layer-group text-2xl"></i>
-              <div>
-                <h1 class="text-2xl font-semibold">Define Vehicle Class</h1>
-                <p class="text-white/80 text-sm">Manage vehicle class definitions and specifications</p>
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto space-y-4">
+        <!-- Header Section -->
+        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700">
+          <div class="flex items-center justify-between px-4 py-3 sm:px-6">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center">
+                <i class="fas fa-layer-group text-lg"></i>
               </div>
+              <div>
+                <h1 class="text-lg sm:text-xl font-semibold">Define Vehicle Class</h1>
+                <p class="text-xs sm:text-sm text-blue-100">Manage vehicle class definitions and specifications</p>
+              </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 text-xs text-blue-100">
+              <i class="fas fa-info-circle"></i>
+              <span>Search existing classes or add a new one.</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Main Panel: Define Vehicle Class + Info/Links -->
-      <div class="bg-gradient-to-br from-slate-50 via-white to-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
+        <!-- Main Panel: Define Vehicle Class + Info/Links -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <!-- Left Column - Define Vehicle Class Card -->
           <div class="lg:col-span-2">
-            <div class="bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl shadow-md border border-blue-100">
-              <div class="flex items-center mb-5 sm:mb-6 pb-3 border-b border-gray-100">
-                <div class="p-2.5 bg-blue-500 rounded-xl mr-3 text-white">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
+              <div class="flex items-center mb-4 pb-3 border-b border-gray-100">
+                <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
                   <i class="fas fa-layer-group"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg sm:text-xl font-semibold text-slate-800">Define Vehicle Class</h3>
-                  <p class="text-xs sm:text-sm text-slate-500">Search, create, and maintain your vehicle classes</p>
+                  <h3 class="text-base sm:text-lg font-semibold text-gray-900">Define Vehicle Class</h3>
+                  <p class="text-xs sm:text-sm text-gray-500">Search, create, and maintain your vehicle classes</p>
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-2">
-                  <label class="block text-sm font-semibold text-slate-700 mb-1">Vehicle Class Code</label>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Vehicle Class Code</label>
                   <div class="relative flex">
-                    <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
+                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500">
                       <i class="fas fa-layer-group"></i>
                     </span>
                     <input
                       v-model="searchQuery"
                       type="text"
                       placeholder="Search by code or description..."
-                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400 text-sm sm:text-base transition-colors"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 text-sm sm:text-base transition-colors"
                       @input="searchVehicleClasses"
                     />
                     <button
                       type="button"
                       @click="showVehicleClassModal = true"
-                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-xl text-sm transition-colors transform active:translate-y-px"
+                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-lg text-sm transition-colors transform active:translate-y-px"
                     >
                       <i class="fas fa-table"></i>
                     </button>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Action</label>
                   <div class="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       @click="openModal('add')"
-                      class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm"
+                      class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"
                     >
                       <i class="fas fa-plus-circle"></i>
                       Add New
@@ -76,15 +78,15 @@
           </div>
 
           <!-- Right Column - Info & Quick Links -->
-          <div class="space-y-6">
-            <div class="bg-blue-50/80 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-blue-100">
-              <div class="flex items-center mb-4 pb-2 border-b border-blue-100">
-                <div class="p-2.5 bg-blue-500 rounded-xl mr-3">
+          <div class="space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-5">
+              <div class="flex items-center mb-3 pb-2 border-b border-blue-100">
+                <div class="p-2.5 bg-blue-500 rounded-lg mr-3">
                   <i class="fas fa-info-circle text-white"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-semibold text-blue-900">Vehicle Class Information</h3>
+                <h3 class="text-sm sm:text-base font-semibold text-blue-900">Vehicle Class Information</h3>
               </div>
-              <div class="space-y-2 text-xs sm:text-sm text-slate-600">
+              <div class="space-y-2 text-xs sm:text-sm text-gray-600">
                 <ul class="list-disc pl-5 space-y-1">
                   <li>Vehicle class code should be unique and readable for users.</li>
                   <li>Use clear descriptions to differentiate similar vehicle types.</li>
@@ -94,18 +96,18 @@
               </div>
             </div>
 
-            <div class="bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-violet-100">
-              <div class="flex items-center mb-4 pb-2 border-b border-violet-100">
-                <div class="p-2.5 bg-violet-500 rounded-xl mr-3">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
+              <div class="flex items-center mb-3 pb-2 border-b border-gray-100">
+                <div class="p-2.5 bg-blue-500 rounded-lg mr-3">
                   <i class="fas fa-link text-white"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-semibold text-slate-800">Quick Links</h3>
+                <h3 class="text-sm sm:text-base font-semibold text-gray-900">Quick Links</h3>
               </div>
 
               <div class="grid grid-cols-1 gap-3">
                 <Link
                   href="/warehouse-management/delivery-order/setup/vehicle"
-                  class="flex items-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border border-blue-100"
+                  class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100"
                 >
                   <div class="p-2.5 bg-blue-500 rounded-full mr-3">
                     <i class="fas fa-truck text-white text-sm"></i>
@@ -118,14 +120,14 @@
 
                 <Link
                   href="/warehouse-management/delivery-order/setup/vehicle-class/view-print"
-                  class="flex items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors border border-sky-100"
+                  class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100"
                 >
-                  <div class="p-2.5 bg-sky-500 rounded-full mr-3">
+                  <div class="p-2.5 bg-blue-500 rounded-full mr-3">
                     <i class="fas fa-print text-white text-sm"></i>
                   </div>
                   <div>
-                    <p class="font-medium text-sky-900 text-sm">View &amp; Print Vehicle Class</p>
-                    <p class="text-xs text-sky-700">Print vehicle class list</p>
+                    <p class="font-medium text-blue-900 text-sm">View &amp; Print Vehicle Class</p>
+                    <p class="text-xs text-blue-700">Print vehicle class list</p>
                   </div>
                 </Link>
               </div>

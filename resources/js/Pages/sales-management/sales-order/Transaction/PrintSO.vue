@@ -1479,15 +1479,15 @@ function renderSoReport(so, details, schedules) {
 <style scoped>
 /* Modern Input Styles */
 .modern-input {
-  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200
-         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-         hover:border-gray-300 bg-white/80 backdrop-blur-sm;
+  @apply w-full px-3 py-2 border border-gray-200 rounded-lg text-sm transition-all duration-200
+         focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500
+         hover:border-gray-300 bg-white;
 }
 
 .modern-select {
-  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200
-         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-         hover:border-gray-300 bg-white/80 backdrop-blur-sm cursor-pointer;
+  @apply w-full px-3 py-2 border border-gray-200 rounded-lg text-sm transition-all duration-200
+         focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500
+         hover:border-gray-300 bg-white cursor-pointer;
 }
 
 .modern-label {
@@ -1496,25 +1496,25 @@ function renderSoReport(so, details, schedules) {
 
 /* Modern Section Styles */
 .modern-section {
-  @apply bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 shadow-lg overflow-hidden;
+  @apply bg-white rounded-lg border border-gray-200 shadow-sm;
 }
 
 .modern-section-header {
-  @apply flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100;
+  @apply flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100;
 }
 
 .modern-section-title {
-  @apply text-lg font-bold text-gray-800;
+  @apply text-base font-semibold text-gray-800;
 }
 
 .modern-section-content {
-  @apply p-4;
+  @apply p-2;
 }
 
 /* Modern Button Styles */
 .modern-btn-primary {
-  @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white
-         font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white
+         font-semibold rounded-md shadow-md hover:shadow-lg transform hover:scale-105
          transition-all duration-200 hover:from-blue-600 hover:to-blue-700;
 }
 
@@ -1543,15 +1543,15 @@ function renderSoReport(so, details, schedules) {
 }
 
 .modern-icon-btn {
-  @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200
+  @apply inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200
          text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600
-         transition-all duration-200 shadow-sm hover:shadow-md;
+         transition-all duration-200;
 }
 
 /* Modern Checkbox Styles */
 .modern-checkbox {
-  @apply flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50
-         cursor-pointer transition-all duration-200 hover:shadow-sm;
+  @apply flex items-center gap-3 p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50
+         cursor-pointer transition-all duration-200;
 }
 
 .modern-checkbox input[type="checkbox"] {
