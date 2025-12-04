@@ -3,70 +3,54 @@
     <Head title="View & Print Master Cards" />
 
     <!-- Main Container with vibrant gradient background -->
-    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 md:p-6">
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
         <!-- Header Section with animated elements -->
-        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-xl shadow-lg overflow-hidden mb-6 transform transition-all duration-500 hover:shadow-xl">
-          <div class="relative overflow-hidden">
+        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+          <div class="px-4 py-4 sm:px-6">
             <!-- Decorative Elements -->
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"></div>
-            <div class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
-            
-            <div class="p-6 md:p-8 relative z-10">
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div class="flex items-start md:items-center space-x-4 mb-4 md:mb-0">
-                  <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
-                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
-                    <i class="fas fa-print text-white text-2xl z-10"></i>
-                  </div>
-                  <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-white text-shadow">View & Print Master Cards</h1>
-                    <p class="text-blue-100 max-w-2xl">Preview and print master card data</p>
-                  </div>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div class="flex items-start md:items-center space-x-4 mb-2 md:mb-0">
+                <div class="bg-blue-500 p-3 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-print text-white text-2xl"></i>
                 </div>
-                <div class="flex flex-wrap gap-3">
-                  <button @click="printTable" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
-                    <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
-                    <div class="relative z-10 flex items-center">
-                      <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
-                        <i class="fas fa-print text-white"></i>
-                      </div>
-                      <span>Print List</span>
-                    </div>
-                  </button>
-                  <Link href="/sales-management/system-requirement/master-card/obsolete-reactive-mc" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
-                    <span class="absolute inset-0 bg-white opacity-10 transform scale-x-0 origin-left transition-transform hover:scale-x-100"></span>
-                    <div class="relative z-10 flex items-center">
-                      <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 transition-transform transform group-hover:rotate-12 shadow-inner">
-                        <i class="fas fa-arrow-left text-white"></i>
-                      </div>
-                      <span>Back</span>
-                    </div>
-                  </Link>
+                <div>
+                  <h1 class="text-2xl md:text-3xl font-bold text-white text-shadow">View & Print Master Cards</h1>
+                  <p class="text-blue-100 max-w-2xl">Preview and print master card data</p>
                 </div>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 shadow-sm">
+                  <div class="bg-white bg-opacity-20 rounded-full p-1 mr-2">
+                    <i class="fas fa-print text-white"></i>
+                  </div>
+                  <span>Print List</span>
+                </button>
+                <Link href="/sales-management/system-requirement/master-card/obsolete-reactive-mc" class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white border border-white border-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-200">
+                  <div class="bg-white bg-opacity-20 rounded-full p-1.5 mr-2">
+                    <i class="fas fa-arrow-left text-white"></i>
+                  </div>
+                  <span>Back</span>
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
+          <div class="bg-slate-50 border-b border-gray-200 py-3 px-6">
             <div class="flex items-center">
-              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner relative overflow-hidden">
-                <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full"></div>
-                <div class="absolute -bottom-1 -left-1 w-3 h-3 bg-yellow-300 opacity-30 rounded-full"></div>
-                <i class="fas fa-filter text-xl relative z-10"></i>
+              <div class="mr-3 bg-blue-500 bg-opacity-10 p-2 rounded-full">
+                <i class="fas fa-filter text-blue-600 text-xl"></i>
               </div>
               <div>
-                <h2 class="text-xl font-bold">Search Parameters</h2>
-                <p class="text-xs text-blue-100 opacity-80">Filter master cards by various criteria</p>
+                <h2 class="text-sm sm:text-base font-semibold text-slate-800">Search Parameters</h2>
+                <p class="text-xs text-slate-500">Filter master cards by various criteria</p>
               </div>
             </div>
           </div>
 
-          <div class="p-6">
+          <div class="p-4 sm:p-6">
             <!-- Actions Bar -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <!-- Search Field -->
@@ -160,8 +144,8 @@
         </div>
 
         <!-- Table Section -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="bg-blue-600 text-white py-4 px-6">
             <div class="flex items-center">
               <div class="mr-4 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
                 <i class="fas fa-id-card text-2xl"></i>
@@ -177,7 +161,7 @@
             <div id="printableTable" class="min-w-full bg-white">
               <!-- Table Content -->
               <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
+                <thead class="bg-gray-50">
                   <tr>
                     <th @click="sortTable('mc_seq')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
                       <div class="flex items-center">
@@ -218,7 +202,7 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-if="loading" class="hover:bg-purple-50">
+                  <tr v-if="loading" class="hover:bg-gray-50">
                     <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                       <div class="flex justify-center">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
@@ -226,7 +210,7 @@
                       <p class="mt-2">Loading master card data...</p>
                     </td>
                   </tr>
-                  <tr v-else-if="filteredMasterCards.length === 0" class="hover:bg-purple-50">
+                  <tr v-else-if="filteredMasterCards.length === 0" class="hover:bg-gray-50">
                     <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                       No master cards found. 
                       <template v-if="searchQuery">
@@ -236,7 +220,7 @@
                     </td>
                   </tr>
                   <tr v-for="(card, index) in filteredMasterCards" :key="card.id" 
-                    :class="{'bg-purple-50': index % 2 === 0}" 
+                    :class="{'bg-gray-50': index % 2 === 0}" 
                     class="hover:bg-indigo-50 transition-colors duration-150">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm font-medium text-gray-900">{{ card.mc_seq }}</div>
@@ -279,7 +263,7 @@
           </div>
 
           <!-- Table Footer -->
-          <div class="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-3 border-t border-purple-100">
+          <div class="bg-gray-50 px-6 py-3 border-t border-gray-100">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <div class="text-sm text-indigo-700 flex items-center">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mr-2">
@@ -300,8 +284,8 @@
         </div>
 
         <!-- Instructions and Tips -->
-        <div class="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-lg overflow-hidden mb-6 mt-6">
-          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 mt-6">
+          <div class="bg-blue-600 text-white py-3 px-6">
             <div class="flex items-center">
               <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
                 <i class="fas fa-lightbulb text-xl"></i>

@@ -8,40 +8,36 @@
     </form>
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
-        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
-        <div class="flex items-center">
-            <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner flex items-center justify-center mr-4">
-                <i class="fas fa-user-slash text-white text-2xl z-10"></i>
-            </div>
-            <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Obsolete/Reactive Customer Account</h2>
-                <p class="text-teal-100 max-w-2xl">Manage customer account status: Activate or Deactivate accounts</p>
+    <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+        <div class="px-4 py-4 sm:px-6 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i class="fas fa-user-slash text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg sm:text-xl font-semibold leading-tight">Obsolete/Reactive Customer Account</h2>
+                    <p class="text-xs sm:text-sm text-blue-100">Manage customer account status: Activate or Deactivate accounts</p>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50 overflow-hidden relative">
-        <div class="absolute -top-16 -right-16 w-32 h-32 bg-cyan-50 rounded-full opacity-50"></div>
-        <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-teal-50 rounded-full opacity-50"></div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
-                    <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
-                    <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
-                    <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
-                        <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
+                <div class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-100 mb-6">
+                    <div class="flex items-center mb-4 pb-3 border-b border-gray-200">
+                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
                             <i class="fas fa-user-edit text-white"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Customer Account Status Management</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800">Customer Account Status Management</h3>
                     </div>
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
                                 <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-white mr-2 shadow-md">
                                     <i class="fas fa-user text-xs"></i>
                                 </span>
@@ -55,7 +51,7 @@
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
                                 <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white mr-2 shadow-md">
                                     <i class="fas fa-sync-alt text-xs"></i>
                                 </span>
@@ -132,7 +128,7 @@
                                 </label>
                             </div>
                             <div class="mt-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                <label class="text-sm font-medium text-gray-700 mb-1 flex items-center">
                                     <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-pink-500 to-red-500 text-white mr-2 shadow-md">
                                         <i class="fas fa-comment-dots text-xs"></i>
                                     </span>
@@ -154,14 +150,12 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 bg-gradient-to-br from-white to-teal-50 overflow-hidden relative">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-full opacity-20"></div>
-                    <div class="absolute bottom-0 left-0 w-20 h-20 bg-cyan-50 rounded-full opacity-20"></div>
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
-                            <i class="fas fa-info-circle text-white"></i>
+                <div class="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-5 mb-6">
+                    <div class="flex items-center mb-3 pb-2 border-b border-gray-100">
+                        <div class="inline-flex items-center justify-center w-9 h-9 bg-blue-500 rounded-lg mr-3">
+                            <i class="fas fa-info-circle text-white text-lg"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Account Status Information</h3>
+                        <h3 class="text-sm sm:text-base font-semibold text-gray-800">Account Status Information</h3>
                     </div>
                     <div class="space-y-4">
                         <div class="p-4 bg-teal-50 rounded-lg">
@@ -191,14 +185,12 @@
                     </div>
                 </div>
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500 bg-gradient-to-br from-white to-purple-50 overflow-hidden relative">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full opacity-20"></div>
-                    <div class="absolute bottom-0 left-0 w-20 h-20 bg-indigo-50 rounded-full opacity-20"></div>
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg mr-3 shadow-md">
-                            <i class="fas fa-link text-white"></i>
+                <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-4 sm:p-5">
+                    <div class="flex items-center mb-3 pb-2 border-b border-violet-100">
+                        <div class="inline-flex items-center justify-center w-9 h-9 bg-violet-500 rounded-lg mr-3">
+                            <i class="fas fa-link text-white text-lg"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
+                        <h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
                     </div>
                     <div class="grid grid-cols-1 gap-3">
                         <Link href="/update-customer-account" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">

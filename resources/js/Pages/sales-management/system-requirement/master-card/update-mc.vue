@@ -3,36 +3,36 @@
         <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
         <!-- Header Section with animated elements -->
-        <div
-            class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4"
-        >
-            <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                <div
-                    class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center"
-                >
-                    <i class="fas fa-id-card text-white text-lg"></i>
+        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+            <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                        <i class="fas fa-id-card text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-semibold leading-tight">
+                            Update Master Card
+                        </h2>
+                        <p class="text-xs sm:text-sm text-blue-100">
+                            Manage and update master card information in the system
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h2
-                        class="text-lg sm:text-xl font-semibold text-white leading-tight"
-                    >
-                        Update Master Card
-                    </h2>
-                    <p class="text-xs sm:text-sm text-blue-100">
-                        Manage and update master card information in the system
-                    </p>
+                <div class="flex items-center gap-2 text-xs text-blue-100">
+                    <i class="fas fa-info-circle text-sm"></i>
+                    <span>Search or update Master Card by AC# and MCS#.</span>
                 </div>
             </div>
         </div>
 
         <div
-            class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6"
+            class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-5 mb-4"
         >
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left Column - Main Content -->
                 <div class="lg:col-span-2">
                     <div
-                        class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-indigo-500 relative"
+                        class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-100"
                     >
                         <div
                             class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10"
@@ -48,7 +48,7 @@
                         </div>
 
                         <!-- Form content -->
-                        <form @submit.prevent="saveRecord" class="space-y-6">
+                        <form @submit.prevent="saveRecord" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label
@@ -328,56 +328,46 @@
                     <!-- Detailed MC Info Section -->
                     <div
                         v-if="showDetailedMcInfo"
-                        class="mt-6 bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden"
+                        class="mt-4 bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5"
                     >
-                        <div
-                            class="absolute -top-20 -right-20 w-40 h-40 bg-emerald-50 rounded-full opacity-20"
-                        ></div>
-                        <div
-                            class="absolute -bottom-8 -left-8 w-24 h-24 bg-green-50 rounded-full opacity-20"
-                        ></div>
 
                         <div
-                            class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10"
+                            class="flex items-center mb-4 pb-2 border-b border-gray-100"
                         >
                             <div
-                                class="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg mr-3 shadow-md"
+                                class="p-2 bg-blue-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-info-circle text-white"></i>
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-800">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                                 Detailed Master Card Information
                             </h3>
                         </div>
 
                         <div
-                            class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
+                            class="grid grid-cols-2 gap-4 text-sm"
                         >
-                            <div class="space-y-2">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-gray-600"
-                                            >Last MCS#:</label
-                                        >
-                                        <input
-                                            type="text"
-                                            :value="mcDetails.last_mcs"
-                                            readonly
-                                            class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label class="block text-gray-600"
-                                            >Last Updated Seq#:</label
-                                        >
-                                        <input
-                                            type="text"
-                                            :value="mcDetails.last_updated_seq"
-                                            readonly
-                                            class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-600"
+                                    >Last MCS#:</label
+                                >
+                                <input
+                                    type="text"
+                                    :value="mcDetails.last_mcs"
+                                    readonly
+                                    class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-gray-600"
+                                    >Last Updated Seq#:</label
+                                >
+                                <input
+                                    type="text"
+                                    :value="mcDetails.last_updated_seq"
+                                    readonly
+                                    class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
+                                />
                             </div>
                         </div>
 
@@ -405,18 +395,18 @@
                 <div class="lg:col-span-1">
                     <!-- Info Card -->
                     <div
-                        class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-teal-500 mb-4"
+                        class="bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5 mb-4"
                     >
 
                         <div
-                            class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10"
+                            class="flex items-center mb-3 pb-2 border-b border-gray-100"
                         >
                             <div
-                                class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md"
+                                class="p-2 bg-blue-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-info-circle text-white"></i>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-800">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                                 Master Card Info
                             </h3>
 
@@ -606,18 +596,18 @@
 
                     <!-- Quick Links -->
                     <div
-                        class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-purple-500"
+                        class="bg-white shadow-sm rounded-xl border border-violet-100 p-4 sm:p-5"
                     >
 
                         <div
-                            class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10"
+                            class="flex items-center mb-3 pb-2 border-b border-violet-100"
                         >
                             <div
-                                class="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-3 shadow-md"
+                                class="p-2 bg-violet-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-link text-white"></i>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-800">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                                 Quick Links
                             </h3>
                         </div>

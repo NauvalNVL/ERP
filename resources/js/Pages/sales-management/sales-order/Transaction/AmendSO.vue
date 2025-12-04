@@ -1,8 +1,9 @@
 <template>
   <AppLayout header="Amend SO">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
       <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b border-blue-700 text-white">
+      <div class="bg-blue-600 px-6 py-4 border-b border-blue-700 text-white">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <i class="fas fa-edit text-2xl text-orange-600"></i>
@@ -403,6 +404,7 @@
             <p>No sales order found with the specified number.</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
 
