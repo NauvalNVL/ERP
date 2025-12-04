@@ -1,6 +1,6 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 sm:px-0">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -14,7 +14,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-5">
+      <div class="p-5 flex-1 flex flex-col min-h-0">
         <div class="mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -24,14 +24,14 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50 sticky top-0">
+        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+          <table class="w-full divide-y divide-gray-200 table-fixed min-w-[640px] md:min-w-0">
+            <thead class="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('color_id')">Color#</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('color_name')">Color Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('color_group_id')">CG#</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('cg_type')">CG Type</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('color_id')">Color#</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[38%] cursor-pointer" @click="sortTable('color_name')">Color Name</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[16%] cursor-pointer" @click="sortTable('color_group_id')">CG#</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[28%] cursor-pointer" @click="sortTable('cg_type')">CG Type</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -39,12 +39,12 @@
                 :class="['hover:bg-emerald-50 cursor-pointer', selectedColor && selectedColor.color_id === color.color_id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(color)"
                 @dblclick="selectAndClose(color)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ color.color_id }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ color.color_name }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ color.color_id }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ color.color_name }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
                   <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">{{ color.color_group_id }}</span>
                 </td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ color.cg_type }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px] md:max-w-none">{{ color.cg_type }}</td>
               </tr>
               <tr v-if="filteredColors.length === 0">
                 <td colspan="4" class="px-6 py-4 text-center text-gray-500">No color data available.</td>
