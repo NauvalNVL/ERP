@@ -1,6 +1,6 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-5xl">
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 sm:px-0">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -14,7 +14,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-5">
+      <div class="p-5 flex-1 flex flex-col min-h-0">
         <div class="mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -24,17 +24,17 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50 sticky top-0">
+        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+          <table class="w-full divide-y divide-gray-200 table-fixed min-w-[900px] md:min-w-0">
+            <thead class="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('paper_quality')">Paper Quality</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('status')">Record Status</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('paper_name')">Paper Name</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('weight_kg_m')">Weight</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('commercial_code')">Commercial Code</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('wet_end_code')">CORR Wet-End Code</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('decc_code')">CORR DECC Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%] cursor-pointer" @click="sortTable('paper_quality')">Paper Quality</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%] cursor-pointer" @click="sortTable('status')">Record Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[26%] cursor-pointer" @click="sortTable('paper_name')">Paper Name</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%] cursor-pointer" @click="sortTable('weight_kg_m')">Weight</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer" @click="sortTable('commercial_code')">Commercial Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer" @click="sortTable('wet_end_code')">CORR Wet-End Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer" @click="sortTable('decc_code')">CORR DECC Code</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -42,7 +42,7 @@
                 :class="['hover:bg-emerald-50 cursor-pointer', selectedQuality && selectedQuality.id === quality.id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                 @click="selectRow(quality)"
                 @dblclick="selectAndClose(quality)">
-                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ quality.paper_quality }}</td>
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900 truncate max-w-[110px]">{{ quality.paper_quality }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">
                   <span v-if="quality.status === 'Act'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                     Active
@@ -51,11 +51,11 @@
                     Obsolete
                   </span>
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.paper_name }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ quality.paper_name }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.weight_kg_m }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.commercial_code || '' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.wet_end_code || '' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.decc_code || '' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[120px]">{{ quality.commercial_code || '' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[120px]">{{ quality.wet_end_code || '' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[120px]">{{ quality.decc_code || '' }}</td>
               </tr>
               <tr v-if="filteredQualities.length === 0">
                 <td colspan="7" class="px-4 py-4 text-center text-gray-500">No paper quality data available.</td>
