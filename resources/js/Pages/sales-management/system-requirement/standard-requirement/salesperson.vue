@@ -7,22 +7,26 @@
         @csrf
     </form>
 
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 sm:p-7 md:p-8 rounded-t-2xl shadow-lg">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center">
-            <span class="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white/15 mr-3">
-                <i class="fas fa-user-tie text-lg md:text-xl"></i>
-            </span>
-            Define Salesperson
-        </h2>
-        <p class="text-emerald-100 text-sm md:text-base">Define salespersons for sales management</p>
+    <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+        <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                <i class="fas fa-user-tie text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-lg sm:text-xl font-semibold text-white leading-tight">Define Salesperson</h2>
+                <p class="text-xs sm:text-sm text-blue-100">Define salespersons for sales management</p>
+            </div>
+        </div>
     </div>
 
-    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-2xl shadow-lg p-4 sm:p-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-emerald-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
                         <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
@@ -76,7 +80,7 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Salesperson Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-teal-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
                         <div class="p-2 bg-teal-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
@@ -116,7 +120,7 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-purple-500">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
                         <div class="p-2 bg-purple-500 rounded-lg mr-3">
                             <i class="fas fa-link text-white"></i>
@@ -158,6 +162,8 @@
                 </div>
             </div>
         </div>
+        </div>
+    </div>
     </div>
 
     <!-- Modal Table -->

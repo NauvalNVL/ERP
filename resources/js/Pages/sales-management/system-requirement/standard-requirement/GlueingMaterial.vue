@@ -8,152 +8,191 @@
     </form>
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-vial mr-3"></i> Define Glueing Material
-        </h2>
-        <p class="text-emerald-100">Manage Glueing Material definitions for production</p>
-    </div>
-
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
-            <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
-                    <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
-                            <i class="fas fa-edit text-white"></i>
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+                <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                            <i class="fas fa-vial text-white text-sm"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Define Glueing Material</h3>
-                    </div>
-
-                    <!-- Search Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Glueing Material Code:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-vial"></i>
-                                </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
-                                    <i class="fas fa-table"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="createNewglueingMaterial" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded transition-colors transform active:translate-y-px">
-                                <i class="fas fa-plus-circle mr-2"></i> Add New
-                            </button>
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-semibold leading-tight">
+                                Define Glueing Material
+                            </h2>
+                            <p class="text-xs sm:text-sm text-emerald-100">
+                                Manage Glueing Material definitions for production.
+                            </p>
                         </div>
                     </div>
-
-                    <!-- Data Status Information -->
-                    <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
-                        <div class="flex items-center">
-                            <div class="mr-3 animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
-                            <p class="text-sm font-medium text-yellow-800">Loading Glueing Material data...</p>
-                        </div>
-                    </div>
-                    <div v-else-if="glueingMaterials.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
-                        <p class="text-sm font-medium text-yellow-800">No Glueing Material data available.</p>
-                        <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
-                    </div>
-                    <div v-else class="mt-4 bg-green-100 p-3 rounded">
-                        <p class="text-sm font-medium text-green-800">Data available: {{ glueingMaterials.length }} Glueing Materials found.</p>
-                        <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }}
-                        </p>
+                    <div class="flex items-center gap-2 text-xs text-emerald-100">
+                        <i class="fas fa-info-circle text-sm"></i>
+                        <span>Use glueing material codes to manage glue processes.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column - Quick Info -->
-            <div class="lg:col-span-1">
-                <!-- Glueing Material Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 mb-6">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
-                            <i class="fas fa-info-circle text-white"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Left Column -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+                        <div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
+                            <div class="p-2 bg-emerald-500 rounded-lg mr-3 text-white">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm sm:text-base font-semibold text-slate-800">Define Glueing Material</h3>
+                                <p class="text-xs text-slate-500">Search, create, and maintain your Glueing Materials.</p>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Glueing Material Info</h3>
-                    </div>
+                        <div class="px-4 py-4 sm:px-6">
+                            <!-- Search Section -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Glueing Material Code</label>
+                                    <div class="relative flex">
+                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
+                                            <i class="fas fa-vial"></i>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            v-model="searchQuery"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500 text-slate-800 placeholder-slate-400 text-sm transition-colors"
+                                            placeholder="Search or type glueing material code"
+                                        >
+                                        <button
+                                            type="button"
+                                            @click="showModal = true"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-600 hover:bg-emerald-700 text-white rounded-r-md text-sm"
+                                        >
+                                            <i class="fas fa-table"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
+                                    <button
+                                        type="button"
+                                        @click="createNewglueingMaterial"
+                                        class="w-full flex items-center justify-center px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm"
+                                    >
+                                        <i class="fas fa-plus-circle mr-2"></i>
+                                        Add New
+                                    </button>
+                                </div>
+                            </div>
 
-                    <div class="space-y-4">
-                        <div class="p-4 bg-emerald-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Instructions</h4>
-                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Glueing Material code must be unique</li>
-                                <li>Use the search button to select a string</li>
-                                <li>Specify string size and type</li>
-                                <li>Any changes must be saved</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-4 bg-emerald-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Common Sizes</h4>
-                            <div class="space-y-2 text-sm">
+                            <!-- Data Status Information -->
+                            <div v-if="loading" class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-center space-x-3 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded-full font-bold mr-2">5</span>
-                                    <span>5 MM</span>
+                                    <div class="mr-3 animate-spin rounded-full h-6 w-6 border-2 border-amber-300 border-t-amber-600"></div>
+                                    <p class="font-medium text-amber-800">Loading Glueing Material data...</p>
                                 </div>
-                                <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">7</span>
-                                    <span>7 MM</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">10</span>
-                                    <span>10 MM</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-emerald-600 text-white rounded-full font-bold mr-2">12</span>
-                                    <span>12 MM</span>
-                                </div>
+                            </div>
+                            <div v-else-if="glueingMaterials.length === 0" class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                                <p class="text-sm font-semibold text-amber-800">No Glueing Material data available.</p>
+                                <p class="text-xs text-amber-700 mt-1">Data will be automatically loaded when available.</p>
+                            </div>
+                            <div v-else class="mt-3 bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+                                <p class="text-sm font-semibold text-emerald-800">Data available: {{ glueingMaterials.length }} Glueing Materials found.</p>
+                                <p v-if="selectedRow" class="text-xs text-emerald-700 mt-1">
+                                    Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
-                            <i class="fas fa-vial text-white"></i>
+                <!-- Right Column - Quick Info -->
+                <div class="lg:col-span-1 space-y-4">
+                    <!-- Glueing Material Info Card -->
+                    <div class="bg-white shadow-sm rounded-xl border border-emerald-100">
+                        <div class="px-4 py-3 sm:px-5 border-b border-emerald-100 flex items-center">
+                            <div class="p-2 bg-emerald-500 rounded-lg mr-3">
+                                <i class="fas fa-info-circle text-white"></i>
+                            </div>
+                            <h3 class="text-sm sm:text-base font-semibold text-emerald-900">Glueing Material Info</h3>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
+
+                        <div class="px-4 py-4 sm:px-5">
+                            <div class="space-y-4">
+                                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                                    <h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">Instructions</h4>
+                                    <ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
+                                        <li>Glueing Material code must be unique</li>
+                                        <li>Use the search button to select a string</li>
+                                        <li>Specify string size and type</li>
+                                        <li>Any changes must be saved</li>
+                                    </ul>
+                                </div>
+
+                                <div class="p-4 bg-sky-50 rounded-lg border border-sky-100">
+                                    <h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Common Sizes</h4>
+                                    <div class="space-y-2 text-xs sm:text-sm">
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-orange-500 text-white rounded-full font-bold mr-2">5</span>
+                                            <span>5 MM</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">7</span>
+                                            <span>7 MM</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">10</span>
+                                            <span>10 MM</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-emerald-600 text-white rounded-full font-bold mr-2">12</span>
+                                            <span>12 MM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link href="/reinforcement-tape" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                <i class="fas fa-tape text-white text-sm"></i>
+                    <!-- Quick Links -->
+                    <div class="bg-white shadow-sm rounded-xl border border-violet-100">
+                        <div class="px-4 py-3 sm:px-5 border-b border-violet-100 flex items-center">
+                            <div class="p-2 bg-violet-500 rounded-lg mr-3">
+                                <i class="fas fa-vial text-white"></i>
                             </div>
-                            <div>
-                                <p class="font-medium text-emerald-900">Reinforcement Tape</p>
-                                <p class="text-xs text-emerald-700">Manage reinforcement tape</p>
-                            </div>
-                        </Link>
+                            <h3 class="text-sm sm:text-base font-semibold text-slate-800">Quick Links</h3>
+                        </div>
 
-                        <Link href="/chemical-coat" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                <i class="fas fa-vial text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-green-900">Chemical Coat</p>
-                                <p class="text-xs text-green-700">Manage chemical coatings</p>
-                            </div>
-                        </Link>
+                        <div class="px-4 py-4 sm:px-5">
+                            <div class="grid grid-cols-1 gap-3">
+                                <Link href="/reinforcement-tape" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-100">
+                                    <div class="p-2 bg-purple-500 rounded-full mr-3">
+                                        <i class="fas fa-tape text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-purple-900 text-sm">Reinforcement Tape</p>
+                                        <p class="text-xs text-purple-700">Manage reinforcement tape</p>
+                                    </div>
+                                </Link>
 
-                        <Link href="/glueing-material/view-print" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                <i class="fas fa-print text-white text-sm"></i>
+                                <Link href="/chemical-coat" class="flex items-center p-3 bg-sky-50 rounded-lg hover:bg-sky-100 transition-colors border border-sky-100">
+                                    <div class="p-2 bg-sky-500 rounded-full mr-3">
+                                        <i class="fas fa-vial text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-sky-900 text-sm">Chemical Coat</p>
+                                        <p class="text-xs text-sky-700">Manage chemical coatings</p>
+                                    </div>
+                                </Link>
+
+                                <Link href="/glueing-material/view-print" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
+                                    <div class="p-2 bg-emerald-500 rounded-full mr-3">
+                                        <i class="fas fa-print text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-emerald-900 text-sm">Print List</p>
+                                        <p class="text-xs text-emerald-700">Print Glueing Material list</p>
+                                    </div>
+                                </Link>
                             </div>
-                            <div>
-                                <p class="font-medium text-emerald-900">Print List</p>
-                                <p class="text-xs text-emerald-700">Print Glueing Material list</p>
-                            </div>
-                        </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,20 +209,20 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
                         <i class="fas fa-vial"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Glueing Material' : 'Edit Glueing Material' }}</h3>
+                    <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Glueing Material' : 'Edit Glueing Material' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200 transform active:translate-y-px">
-                    <i class="fas fa-times text-xl"></i>
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
-            <div class="p-6">
+            <div class="p-5">
                 <form @submit.prevent="saveglueingMaterialChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
@@ -192,7 +231,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-hashtag"></i>
                                 </span>
-                                <input v-model="editForm.code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                                <input v-model="editForm.code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                             </div>
                         </div>
                         <div>
@@ -214,18 +253,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteglueingMaterial(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
+                    <div class="flex justify-between mt-5 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deleteglueingMaterial(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
-                                <i class="fas fa-times mr-2"></i>Cancel
-                            </button>
-                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-colors text-sm transform active:translate-y-px">
-                                <i class="fas fa-save mr-2"></i>Save
-                            </button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
                         </div>
                     </div>
                 </form>

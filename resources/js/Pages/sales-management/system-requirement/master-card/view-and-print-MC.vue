@@ -71,7 +71,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <!-- Search Field -->
               <div class="space-y-2">
-                <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                <label class="flex items-center text-sm font-medium text-indigo-700 mb-2">
                   <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
                     <i class="fas fa-search text-white text-sm"></i>
                   </div>
@@ -92,7 +92,7 @@
               
               <!-- Status Filter -->
               <div class="space-y-2">
-                <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                <label class="flex items-center text-sm font-medium text-indigo-700 mb-2">
                   <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
                     <i class="fas fa-tag text-white text-sm"></i>
                   </div>
@@ -523,15 +523,6 @@ onMounted(() => {
 /* Transition effects */
 .transition-all {
   transition: all 0.3s ease;
-}
-
-/* Button hover effects */
-button:hover {
-  transform: translateY(-1px);
-}
-
-button:active {
-  transform: translateY(0);
 }
 
 /* Custom animation for slow ping effect */

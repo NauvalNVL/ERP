@@ -1,406 +1,438 @@
 <template>
-    <AppLayout :header="'Product'">
-    <Head title="Product Management" />
+	<AppLayout header="Product">
+		<Head title="Product Management" />
 
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 sm:p-7 md:p-8 rounded-t-2xl shadow-lg">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center">
-            <span class="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white/15 mr-3">
-                <i class="fas fa-box text-lg md:text-xl"></i>
-            </span>
-            Define Product
-        </h2>
-        <p class="text-emerald-100 text-sm md:text-base">Define products and manage their categories</p>
-    </div>
+		<!-- Header & Main Layout -->
+		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+			<div class="max-w-7xl mx-auto">
+				<!-- Header Section -->
+				<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+						<div class="flex items-center gap-3">
+							<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+								<i class="fas fa-box text-white text-sm"></i>
+							</div>
+							<div>
+								<h2 class="text-lg sm:text-xl font-semibold leading-tight">
+									Define Product
+								</h2>
+								<p class="text-xs sm:text-sm text-emerald-100">
+									Define products and manage their categories.
+								</p>
+							</div>
+						</div>
+						<div class="flex items-center gap-2 text-xs text-emerald-100">
+							<i class="fas fa-info-circle text-sm"></i>
+							<span>Search, create, and maintain standard products.</span>
+						</div>
+					</div>
+				</div>
 
-    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-2xl shadow-lg p-4 sm:p-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-            <!-- Left Column -->
-            <div class="lg:col-span-2">
-                <div class="bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl shadow-md border border-emerald-100">
-                    <div class="flex items-center mb-5 sm:mb-6 pb-3 border-b border-gray-100">
-                        <div class="p-2.5 bg-emerald-500 rounded-xl mr-3 text-white">
-                            <i class="fas fa-edit"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-semibold text-slate-800">Product Management</h3>
-                            <p class="text-xs sm:text-sm text-slate-500">Search, create, and maintain your products</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Search Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-semibold text-slate-700 mb-1">Product Code</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
-                                    <i class="fas fa-box"></i>
-                                </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500 text-slate-800 placeholder-slate-400 text-sm sm:text-base transition-colors" placeholder="Search or type product code">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-xl text-sm">
-                                    <i class="fas fa-table"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-span-1">
-                            <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
-                            <button type="button" @click="createNewProduct" class="w-full flex items-center justify-center px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-sm font-semibold shadow-md">
-                                <i class="fas fa-plus-circle mr-2"></i>
-                                Add New
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Data Status Information -->
-                    <div v-if="loading" class="mt-4 bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center space-x-3 text-sm">
-                        <div class="flex items-center">
-                            <div class="mr-3">
-                                <div class="animate-spin rounded-full h-6 w-6 border-2 border-amber-300 border-t-amber-600"></div>
-                            </div>
-                            <p class="font-medium text-amber-800">Loading product data...</p>
-                        </div>
-                    </div>
-                    <div v-else-if="products.length === 0" class="mt-4 bg-amber-50 border border-amber-200 p-3 rounded-xl">
-                        <p class="text-sm font-semibold text-amber-800">No product data available.</p>
-                        <p class="text-xs text-amber-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                        <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchProducts" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">Reload Data</button>
-                        </div>
-                    </div>
-                    <div v-else class="mt-4 bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
-                        <p class="text-sm font-semibold text-emerald-800">Data available: {{ products.length }} products found.</p>
-                        <p v-if="selectedRow" class="text-xs text-emerald-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.product_code }}</span> - {{ selectedRow.description }} ({{ selectedRow.category }})
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <!-- Right Column - Quick Info -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Product Info Card -->
-                <div class="bg-emerald-50/80 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-emerald-100">
-                    <div class="flex items-center mb-4 pb-2 border-b border-emerald-100">
-                        <div class="p-2.5 bg-emerald-500 rounded-xl mr-3">
-                            <i class="fas fa-info-circle text-white"></i>
-                        </div>
-                        <h3 class="text-base sm:text-lg font-semibold text-emerald-900">Product Information</h3>
-                    </div>
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+					<!-- Left Column -->
+					<div class="lg:col-span-2 space-y-4">
+						<div class="bg-white shadow-sm rounded-xl border border-gray-200">
+							<div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
+								<div class="p-2 bg-emerald-500 rounded-lg mr-3 text-white">
+									<i class="fas fa-edit"></i>
+								</div>
+								<div>
+									<h3 class="text-sm sm:text-base font-semibold text-gray-800">Product Management</h3>
+									<p class="text-xs text-gray-500">Search, create, and maintain products.</p>
+								</div>
+							</div>
+							<div class="px-4 py-4 sm:px-6">
+								<!-- Search Section -->
+								<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+									<div class="col-span-2">
+										<label class="block text-sm font-medium text-gray-700 mb-1">Product Code</label>
+										<div class="relative flex">
+											<span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+												<i class="fas fa-box"></i>
+											</span>
+											<input
+												type="text"
+												v-model="searchQuery"
+												class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-colors"
+												placeholder="Search or type product code"
+											/>
+											<button
+												type="button"
+												@click="showModal = true"
+												class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-600 hover:bg-emerald-700 text-white rounded-r-md text-sm"
+											>
+												<i class="fas fa-table"></i>
+											</button>
+										</div>
+									</div>
+									<div class="col-span-1">
+										<label class="block text-sm font-medium text-gray-700 mb-1">Action</label>
+										<button
+											type="button"
+											@click="createNewProduct"
+											class="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-semibold shadow-sm"
+										>
+											<i class="fas fa-plus-circle mr-2"></i>
+											Add New
+										</button>
+									</div>
+								</div>
+								<!-- Data Status Information -->
+								<div v-if="loading" class="mt-3 bg-yellow-50 border border-yellow-100 p-3 rounded-lg flex items-center space-x-3 text-sm">
+									<div class="flex items-center">
+										<div class="mr-3">
+											<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
+										</div>
+										<p class="font-medium text-yellow-800">Loading product data...</p>
+									</div>
+								</div>
+								<div v-else-if="products.length === 0" class="mt-3 bg-yellow-50 border border-yellow-100 p-3 rounded-lg">
+									<p class="text-sm font-medium text-yellow-800">No product data available.</p>
+									<p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
+									<div class="mt-2 flex items-center space-x-3">
+										<button @click="fetchProducts" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">Reload Data</button>
+									</div>
+								</div>
+								<div v-else class="mt-3 bg-emerald-50 border border-emerald-100 p-3 rounded-lg">
+									<p class="text-sm font-medium text-emerald-800">Data available: {{ products.length }} products found.</p>
+									<p v-if="selectedRow" class="text-xs text-emerald-700 mt-1">
+										Selected: <span class="font-semibold">{{ selectedRow.product_code }}</span> - {{ selectedRow.description }} ({{ selectedRow.category }})
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
 
-                    <div class="space-y-4">
-                        <div class="p-4 bg-white/80 rounded-xl border border-emerald-100">
-                            <h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">Instructions</h4>
-                            <ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
-                                <li>Product code must be unique</li>
-                                <li>Use the <span class="font-medium">search</span> button to select a product</li>
-                                <li>Assign a category to each product</li>
-                                <li>Any changes must be saved</li>
-                            </ul>
-                        </div>
+					<!-- Right Column - Quick Info -->
+					<div class="lg:col-span-1 space-y-4">
+						<!-- Product Info Card -->
+						<div class="bg-white shadow-sm rounded-xl border border-emerald-100">
+							<div class="px-4 py-3 sm:px-5 border-b border-emerald-100 flex items-center">
+								<div class="p-2 bg-emerald-500 rounded-lg mr-3">
+									<i class="fas fa-info-circle text-white"></i>
+								</div>
+								<h3 class="text-sm sm:text-base font-semibold text-emerald-900">Product Information</h3>
+							</div>
+							<div class="px-4 py-4 sm:px-5">
+								<div class="space-y-4">
+									<div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+										<h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">Instructions</h4>
+										<ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
+											<li>Product code must be unique</li>
+											<li>Use the <span class="font-medium">search</span> button to select a product</li>
+											<li>Assign a category to each product</li>
+											<li>Any changes must be saved</li>
+										</ul>
+									</div>
 
-                        <div class="p-4 bg-sky-50 rounded-xl border border-sky-100">
-                            <h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Common Categories</h4>
-                            <div class="grid grid-cols-1 gap-2 text-xs sm:text-sm">
-                                <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">1</span>
-                                    <span>Corrugated Carton Box</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">2</span>
-                                    <span>Single Facer Roll</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">3</span>
-                                    <span>Single Facer Roll/KG</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">7</span>
-                                    <span>Other Packaging Products</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+									<div class="p-4 bg-sky-50 rounded-lg border border-sky-100">
+										<h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Common Categories</h4>
+										<div class="grid grid-cols-1 gap-2 text-xs sm:text-sm">
+											<div class="flex items-center">
+												<span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">1</span>
+												<span>Corrugated Carton Box</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">2</span>
+												<span>Single Facer Roll</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-7 h-7 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">3</span>
+												<span>Single Facer Roll/KG</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">7</span>
+												<span>Other Packaging Products</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
-                            <i class="fas fa-link text-white"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
-                    </div>
+						<!-- Quick Links -->
+						<div class="bg-white shadow-sm rounded-xl border border-emerald-100">
+							<div class="px-4 py-3 sm:px-5 border-b border-gray-100 flex items-center">
+								<div class="p-2 bg-emerald-500 rounded-lg mr-3">
+									<i class="fas fa-link text-white"></i>
+								</div>
+								<h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
+							</div>
+							<div class="px-4 py-4 sm:px-5">
+								<div class="grid grid-cols-1 gap-3">
+									<Link href="/product-group" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
+										<div class="p-2 bg-emerald-500 rounded-full mr-3">
+											<i class="fas fa-layer-group text-white text-sm"></i>
+										</div>
+										<div>
+											<p class="font-medium text-emerald-900">Product Groups</p>
+											<p class="text-xs text-emerald-700">Manage product groups</p>
+										</div>
+									</Link>
 
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link href="/product-group" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-layer-group text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-purple-900">Product Groups</p>
-                                <p class="text-xs text-purple-700">Manage product groups</p>
-                            </div>
-                        </Link>
+									<Link href="/product-design" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
+										<div class="p-2 bg-emerald-500 rounded-full mr-3">
+											<i class="fas fa-th-list text-white text-sm"></i>
+										</div>
+										<div>
+											<p class="font-medium text-emerald-900">Product Designs</p>
+											<p class="text-xs text-emerald-700">Manage product designs</p>
+										</div>
+									</Link>
 
-                        <Link href="/product-design" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                <i class="fas fa-th-list text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-blue-900">Product Designs</p>
-                                <p class="text-xs text-blue-700">Manage product designs</p>
-                            </div>
-                        </Link>
+									<Link href="/product/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-100">
+										<div class="p-2 bg-green-500 rounded-full mr-3">
+											<i class="fas fa-print text-white text-sm"></i>
+										</div>
+										<div>
+											<p class="font-medium text-green-900">Print List</p>
+											<p class="text-xs text-green-700">Print product list</p>
+										</div>
+									</Link>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                        <Link href="/product/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
-                                <i class="fas fa-print text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-green-900">Print List</p>
-                                <p class="text-xs text-green-700">Print product list</p>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+		<!-- Modal Table -->
+		<ProductModal
+			:show="showModal"
+			:products="products"
+			:categories="categories"
+			:loading="loading"
+			@close="showModal = false"
+			@select="onProductSelected"
+		/>
 
-    <!-- Modal Table -->
-    <ProductModal
-        :show="showModal"
-        :products="products"
-        :categories="categories"
-        :loading="loading"
-        @close="showModal = false"
-        @select="onProductSelected"
-    />
+		<!-- Edit Modal -->
+		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center p-4 overflow-y-auto">
+			<div class="bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+					<div class="flex items-center">
+						<div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+							<i class="fas fa-box"></i>
+						</div>
+						<h3 class="text-sm sm:text-base font-semibold">{{ isCreating ? 'Create Product' : 'Edit Product' }}</h3>
+					</div>
+					<button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+						<i class="fas fa-times text-lg"></i>
+					</button>
+				</div>
+				<div class="flex-1 overflow-y-auto p-6">
+					<form @submit.prevent="saveProductChanges" class="space-y-4">
+						<!-- UOM Reference Table -->
+						<div class="mb-6 bg-emerald-50 p-4 rounded-lg border border-emerald-200 shadow-sm">
+							<h4 class="text-sm font-semibold text-emerald-800 mb-3 flex items-center">
+								<i class="fas fa-table mr-2"></i>
+								Product Category and UOM allowable:
+							</h4>
+							<div class="overflow-x-auto -mx-2">
+								<table class="min-w-full text-xs border-collapse border border-gray-300">
+									<thead>
+										<tr class="bg-teal-700 text-white">
+											<th class="border border-gray-300 px-2 py-1 text-left">Category</th>
+											<th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+											<th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+											<th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+											<th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+											<th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+											<th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+										</tr>
+									</thead>
+									<tbody class="bg-white">
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">1-Corrugated Carton Box</td>
+											<td class="border border-gray-300 px-2 py-1">P-Piece</td>
+											<td class="border border-gray-300 px-2 py-1">S-Set</td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+										</tr>
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">2-Single Facer Roll</td>
+											<td class="border border-gray-300 px-2 py-1">R-Roll</td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+										</tr>
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">3-Single Facer Roll/KG</td>
+											<td class="border border-gray-300 px-2 py-1">K-KG</td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+										</tr>
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">4-Single Facer Sheet</td>
+											<td class="border border-gray-300 px-2 py-1">T-Sheet</td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+										</tr>
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">5-Corrugated Sheet Board/Piece</td>
+											<td class="border border-gray-300 px-2 py-1">P-Piece(Gross M2)</td>
+											<td class="border border-gray-300 px-2 py-1">Q-Piece(Trim M2)</td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+										</tr>
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">6-Corrugated Sheet Board/M2</td>
+											<td class="border border-gray-300 px-2 py-1">M-Gross M2</td>
+											<td class="border border-gray-300 px-2 py-1">N-Trimmed M2</td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+											<td class="border border-gray-300 px-2 py-1"></td>
+										</tr>
+										<tr>
+											<td class="border border-gray-300 px-2 py-1">7-Other Packaging Products</td>
+											<td class="border border-gray-300 px-2 py-1">P-Piece</td>
+											<td class="border border-gray-300 px-2 py-1">S-Set</td>
+											<td class="border border-gray-300 px-2 py-1">D-Bundle</td>
+											<td class="border border-gray-300 px-2 py-1">L-Pallet</td>
+											<td class="border border-gray-300 px-2 py-1">K-KG</td>
+											<td class="border border-gray-300 px-2 py-1">B-Box</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
 
-    <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
-                <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Product' : 'Edit Product' }}</h3>
-                </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-6">
-                <form @submit.prevent="saveProductChanges" class="space-y-4">
-                    <!-- UOM Reference Table -->
-                    <div class="mb-6 bg-emerald-50 p-4 rounded-lg border border-emerald-200 shadow-sm">
-                        <h4 class="text-sm font-semibold text-emerald-800 mb-3 flex items-center">
-                            <i class="fas fa-table mr-2"></i>
-                            Product Category and UOM allowable:
-                        </h4>
-                        <div class="overflow-x-auto -mx-2">
-                            <table class="min-w-full text-xs border-collapse border border-gray-300">
-                                <thead>
-                                    <tr class="bg-teal-700 text-white">
-                                        <th class="border border-gray-300 px-2 py-1 text-left">Category</th>
-                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
-                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
-                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
-                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
-                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
-                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white">
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">1-Corrugated Carton Box</td>
-                                        <td class="border border-gray-300 px-2 py-1">P-Piece</td>
-                                        <td class="border border-gray-300 px-2 py-1">S-Set</td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">2-Single Facer Roll</td>
-                                        <td class="border border-gray-300 px-2 py-1">R-Roll</td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">3-Single Facer Roll/KG</td>
-                                        <td class="border border-gray-300 px-2 py-1">K-KG</td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">4-Single Facer Sheet</td>
-                                        <td class="border border-gray-300 px-2 py-1">T-Sheet</td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">5-Corrugated Sheet Board/Piece</td>
-                                        <td class="border border-gray-300 px-2 py-1">P-Piece(Gross M2)</td>
-                                        <td class="border border-gray-300 px-2 py-1">Q-Piece(Trim M2)</td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">6-Corrugated Sheet Board/M2</td>
-                                        <td class="border border-gray-300 px-2 py-1">M-Gross M2</td>
-                                        <td class="border border-gray-300 px-2 py-1">N-Trimmed M2</td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                        <td class="border border-gray-300 px-2 py-1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-300 px-2 py-1">7-Other Packaging Products</td>
-                                        <td class="border border-gray-300 px-2 py-1">P-Piece</td>
-                                        <td class="border border-gray-300 px-2 py-1">S-Set</td>
-                                        <td class="border border-gray-300 px-2 py-1">D-Bundle</td>
-                                        <td class="border border-gray-300 px-2 py-1">L-Pallet</td>
-                                        <td class="border border-gray-300 px-2 py-1">K-KG</td>
-                                        <td class="border border-gray-300 px-2 py-1">B-Box</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+						<!-- Form Fields -->
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">
+									<i class="fas fa-barcode text-emerald-500 mr-1"></i>
+									Product Code:
+								</label>
+								<input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+								<span class="text-xs text-gray-500 mt-1 block">Product code must be unique</span>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">
+									<i class="fas fa-align-left text-emerald-500 mr-1"></i>
+									Description:
+								</label>
+								<input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">
+									<i class="fas fa-tags text-emerald-500 mr-1"></i>
+									Category:
+								</label>
+								<template v-if="isCreating">
+									<select v-model="editForm.category" @change="updateUnitBasedOnCategory" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+										<option value="">Select a category</option>
+										<option value="1-Corrugated Carton Box">1-Corrugated Carton Box</option>
+										<option value="2-Single Facer Roll">2-Single Facer Roll</option>
+										<option value="3-Single Facer Roll/KG">3-Single Facer Roll/KG</option>
+										<option value="4-Single Facer Sheet">4-Single Facer Sheet</option>
+										<option value="5-Corrugated Sheet Board/Piece">5-Corrugated Sheet Board/Piece</option>
+										<option value="6-Corrugated Sheet Board/M2">6-Corrugated Sheet Board/M2</option>
+										<option value="7-Other Packaging Products">7-Other Packaging Products</option>
+									</select>
+									<span class="text-xs text-gray-500 mt-1 block">Select from one of the predefined product categories</span>
+								</template>
+								<template v-else>
+									<input type="text" :value="editForm.category" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
+									<span class="text-xs text-gray-500 mt-1 block">Category cannot be changed after creation</span>
+								</template>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">
+									<i class="fas fa-ruler text-emerald-500 mr-1"></i>
+									Unit (UOM):
+								</label>
+								<input v-model="editForm.unit" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-emerald-50 font-medium text-emerald-700" readonly>
+								<span class="text-xs text-gray-500 mt-1 block">Unit is automatically set based on category selection</span>
+							</div>
+							<div class="md:col-span-2">
+								<label class="block text-sm font-medium text-gray-700 mb-1">
+									<i class="fas fa-layer-group text-emerald-500 mr-1"></i>
+									Product Group ID:
+								</label>
+								<select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+									<option value="">Select a product group</option>
+									<option v-for="group in productGroups" :key="group.id || group.product_group_id" :value="group.product_group_id">
+										{{ group.product_group_id }} - {{ group.product_group_name }}
+									</option>
+								</select>
+								<span class="text-xs text-gray-500 mt-1 block">Required: Select a valid product group (e.g., B for Box, R for Roll)</span>
+							</div>
+							<div class="md:col-span-2">
+								<label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer">
+									<input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-emerald-600 shadow-sm focus:border-emerald-300 focus:ring focus:ring-emerald-200 focus:ring-opacity-50 w-4 h-4">
+									<span class="ml-3 text-sm font-medium text-gray-700">
+										<i class="fas fa-check-circle text-green-500 mr-1"></i>
+										Active Status
+									</span>
+								</label>
+							</div>
+						</div>
+					</form>
+				</div>
+				
+				<!-- Sticky Footer with Buttons -->
+				<div class="border-t border-gray-200 bg-gray-50 px-6 py-4 rounded-b-xl">
+					<div class="flex justify-between items-center">
+						<button type="button" v-if="!isCreating" @click="obsoleteProduct(editForm.id)" class="px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors shadow-sm flex items-center">
+							<i class="fas fa-ban mr-2"></i>Obsolete Product
+						</button>
+						<div v-else></div>
+						<div class="flex space-x-3">
+							<button type="button" @click="closeEditModal" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm flex items-center">
+								<i class="fas fa-times mr-2"></i>Cancel
+							</button>
+							<button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-sm flex items-center">
+								<i class="fas fa-save mr-2"></i>Save Changes
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                    <!-- Form Fields -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-barcode text-emerald-500 mr-1"></i>
-                                Product Code:
-                            </label>
-                            <input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
-                            <span class="text-xs text-gray-500 mt-1 block">Product code must be unique</span>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-align-left text-emerald-500 mr-1"></i>
-                                Description:
-                            </label>
-                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-tags text-emerald-500 mr-1"></i>
-                                Category:
-                            </label>
-                            <template v-if="isCreating">
-                                <select v-model="editForm.category" @change="updateUnitBasedOnCategory" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
-                                    <option value="">Select a category</option>
-                                    <option value="1-Corrugated Carton Box">1-Corrugated Carton Box</option>
-                                    <option value="2-Single Facer Roll">2-Single Facer Roll</option>
-                                    <option value="3-Single Facer Roll/KG">3-Single Facer Roll/KG</option>
-                                    <option value="4-Single Facer Sheet">4-Single Facer Sheet</option>
-                                    <option value="5-Corrugated Sheet Board/Piece">5-Corrugated Sheet Board/Piece</option>
-                                    <option value="6-Corrugated Sheet Board/M2">6-Corrugated Sheet Board/M2</option>
-                                    <option value="7-Other Packaging Products">7-Other Packaging Products</option>
-                                </select>
-                                <span class="text-xs text-gray-500 mt-1 block">Select from one of the predefined product categories</span>
-                            </template>
-                            <template v-else>
-                                <input type="text" :value="editForm.category" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
-                                <span class="text-xs text-gray-500 mt-1 block">Category cannot be changed after creation</span>
-                            </template>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-ruler text-emerald-500 mr-1"></i>
-                                Unit (UOM):
-                            </label>
-                            <input v-model="editForm.unit" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-emerald-50 font-medium text-emerald-700" readonly>
-                            <span class="text-xs text-gray-500 mt-1 block">Unit is automatically set based on category selection</span>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-layer-group text-emerald-500 mr-1"></i>
-                                Product Group ID:
-                            </label>
-                            <select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
-                                <option value="">Select a product group</option>
-                                <option v-for="group in productGroups" :key="group.id || group.product_group_id" :value="group.product_group_id">
-                                    {{ group.product_group_id }} - {{ group.product_group_name }}
-                                </option>
-                            </select>
-                            <span class="text-xs text-gray-500 mt-1 block">Required: Select a valid product group (e.g., B for Box, R for Roll)</span>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer">
-                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-emerald-600 shadow-sm focus:border-emerald-300 focus:ring focus:ring-emerald-200 focus:ring-opacity-50 w-4 h-4">
-                                <span class="ml-3 text-sm font-medium text-gray-700">
-                                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                                    Active Status
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Sticky Footer with Buttons -->
-            <div class="border-t border-gray-200 bg-gray-50 px-6 py-4 rounded-b-lg">
-                <div class="flex justify-between items-center">
-                    <button type="button" v-if="!isCreating" @click="obsoleteProduct(editForm.id)" class="px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors shadow-sm flex items-center">
-                        <i class="fas fa-ban mr-2"></i>Obsolete Product
-                    </button>
-                    <div v-else></div>
-                    <div class="flex space-x-3">
-                        <button type="button" @click="closeEditModal" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm flex items-center">
-                            <i class="fas fa-times mr-2"></i>Cancel
-                        </button>
-                        <button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-colors shadow-sm flex items-center">
-                            <i class="fas fa-save mr-2"></i>Save Changes
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-    
-    <!-- Notification Toast -->
-    <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
-         :class="{
-             'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
-             'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
-             'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning'
-         }">
-        <div class="p-4 flex items-center">
-            <div class="mr-3">
-                <i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
-                <i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
-                <i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
-            </div>
-            <div>
-                <p :class="{
-                    'text-green-800': notification.type === 'success',
-                    'text-red-800': notification.type === 'error',
-                    'text-yellow-800': notification.type === 'warning'
-                }">{{ notification.message }}</p>
-            </div>
-        </div>
-    </div>
-    </AppLayout>
+		<!-- Loading Overlay -->
+		<div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-center">
+			<div class="w-10 h-10 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+		</div>
+		
+		<!-- Notification Toast -->
+		<div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-lg rounded-lg transition-all duration-300"
+			 :class="{
+				 'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
+				 'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
+				 'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning'
+			 }">
+			<div class="p-4 flex items-center">
+				<div class="mr-3">
+					<i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
+					<i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+					<i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+				</div>
+				<div>
+					<p :class="{
+						'text-green-800': notification.type === 'success',
+						'text-red-800': notification.type === 'error',
+						'text-yellow-800': notification.type === 'warning'
+					}">{{ notification.message }}</p>
+				</div>
+			</div>
+		</div>
+	</AppLayout>
 </template>
 
 <script setup>

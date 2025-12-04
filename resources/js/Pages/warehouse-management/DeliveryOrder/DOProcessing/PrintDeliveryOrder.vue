@@ -1,24 +1,24 @@
 <template>
   <AppLayout header="Print Delivery Order">
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" v-page-transition>
-      <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8" v-page-transition>
+      <div class="max-w-6xl mx-auto">
         <!-- Main Card -->
-        <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 animate-fade-in-up">
+        <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">
           <!-- Card Header -->
-          <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+          <div class="bg-blue-600 px-4 py-3 sm:px-6">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                  <i class="fa-solid fa-print text-white text-lg"></i>
+              <div class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                  <i class="fa-solid fa-print text-white"></i>
                 </div>
                 <div>
-                  <h2 class="text-xl font-bold text-white">Print Configuration</h2>
-                  <p class="text-blue-100 text-sm">Configure your delivery order printing parameters</p>
+                  <h2 class="text-lg sm:text-xl font-semibold text-white leading-tight">Print Configuration</h2>
+                  <p class="text-xs sm:text-sm text-blue-100">Configure your delivery order printing parameters</p>
                 </div>
               </div>
               <button
                 @click="refreshForm"
-                class="modern-btn-secondary"
+                class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg bg-white text-blue-600 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
               >
                 <i class="fa-solid fa-rotate-left mr-2"></i>
                 Reset Form
@@ -27,8 +27,8 @@
           </div>
 
           <!-- Card Content -->
-          <div class="p-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <!-- Left Column -->
               <div class="space-y-6">
                 <!-- Current Period Section -->
@@ -127,7 +127,7 @@
                         class="modern-input flex-1"
                         placeholder="Enter DO Number (e.g. DO20250001)"
                       />
-                      <button class="modern-btn-primary" @click="quickPrint">
+                      <button class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700" @click="quickPrint">
                         <i class="fa-solid fa-bolt mr-2"></i>Quick Print
                       </button>
                     </div>
@@ -136,7 +136,7 @@
               </div>
 
               <!-- Right Column -->
-              <div class="space-y-6">
+              <div class="space-y-4">
                 <!-- Customer Selection Section -->
                 <div class="modern-section">
                   <div class="modern-section-header">
@@ -201,8 +201,8 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-8 flex justify-center">
-              <button class="modern-btn-confirm" @click="proceedToPrint" :disabled="!hasValidRange">
+            <div class="mt-6 flex justify-center">
+              <button class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed" @click="proceedToPrint" :disabled="!hasValidRange">
                 <i class="fa-solid fa-print mr-2"></i>
                 Proceed to Print
               </button>
@@ -212,46 +212,46 @@
 
         <!-- Status Messages -->
         <div v-if="message" class="mt-6">
-          <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-white/20">
-            <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-4">
+          <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">
+            <div class="bg-blue-600 px-4 py-3 sm:px-6">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <i class="fa-solid fa-check text-white"></i>
+                <div class="h-7 w-7 rounded-full bg-blue-500 flex items-center justify-center">
+                  <i class="fa-solid fa-check text-white text-sm"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-white">Status Update</h3>
-                  <p class="text-green-100 text-sm">Operation completed successfully</p>
+                  <h3 class="text-sm font-semibold text-white">Status Update</h3>
+                  <p class="text-xs text-blue-100">Operation completed successfully</p>
                 </div>
               </div>
             </div>
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
               <p class="text-gray-700">{{ message }}</p>
             </div>
           </div>
         </div>
 
         <!-- Preview Section -->
-        <div v-if="preview" class="mt-6 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-white/20">
-          <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-4">
+        <div v-if="preview" class="mt-6 bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">
+          <div class="bg-blue-600 px-4 py-3 sm:px-6">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <i class="fa-solid fa-eye text-white"></i>
+                <div class="h-7 w-7 rounded-full bg-blue-500 flex items-center justify-center">
+                  <i class="fa-solid fa-eye text-white text-sm"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-white">Preview Surat Jalan</h3>
-                  <p class="text-green-100 text-sm">Review sebelum mencetak PDF</p>
+                  <h3 class="text-sm font-semibold text-white">Preview Surat Jalan</h3>
+                  <p class="text-xs text-blue-100">Review sebelum mencetak PDF</p>
                 </div>
               </div>
               <div class="flex gap-2">
-                <button class="modern-btn-primary" @click="downloadPdf">
+                <button class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-blue-600 shadow-sm hover:bg-blue-50" @click="downloadPdf">
                   <i class="fa-solid fa-file-pdf mr-2"></i> PDF
                 </button>
               </div>
             </div>
           </div>
-          <div class="p-6 overflow-auto max-h-96">
-            <pre class="font-mono text-xs leading-5 bg-white p-6 rounded-lg border shadow-sm" style="font-family: 'Courier New', monospace; white-space: pre-wrap;">{{ previewText }}</pre>
+          <div class="p-4 sm:p-6">
+            <pre class="font-mono text-xs leading-5 bg-gray-50 p-4 rounded-lg border border-gray-200" style="font-family: 'Courier New', monospace; white-space: pre-wrap;">{{ previewText }}</pre>
           </div>
         </div>
       </div>

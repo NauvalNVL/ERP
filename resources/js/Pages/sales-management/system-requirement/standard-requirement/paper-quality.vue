@@ -3,164 +3,195 @@
     <Head title="Paper Quality Management" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 sm:p-7 md:p-8 rounded-t-2xl shadow-lg">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center">
-            <span class="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white/15 mr-3">
-                <i class="fas fa-scroll text-lg md:text-xl"></i>
-            </span>
-            Define Paper Quality
-        </h2>
-        <p class="text-emerald-100 text-sm md:text-base">Define paper quality types for various production needs</p>
-    </div>
-
-    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-2xl shadow-lg p-4 sm:p-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-            <!-- Left Column - Main Content -->
-            <div class="lg:col-span-2">
-                <div class="bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl shadow-md border border-emerald-100">
-                    <div class="flex items-center mb-5 sm:mb-6 pb-3 border-b border-gray-100">
-                        <div class="p-2.5 bg-emerald-500 rounded-xl mr-3 text-white">
-                            <i class="fas fa-scroll"></i>
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+                <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                            <i class="fas fa-scroll text-white text-sm"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg sm:text-xl font-semibold text-slate-800">Paper Quality Management</h3>
-                            <p class="text-xs sm:text-sm text-slate-500">Search, create, and maintain your paper qualities</p>
+                            <h2 class="text-lg sm:text-xl font-semibold leading-tight">
+                                Define Paper Quality
+                            </h2>
+                            <p class="text-xs sm:text-sm text-emerald-100">
+                                Define paper quality types for various production needs.
+                            </p>
                         </div>
                     </div>
-
-                    <!-- Search Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-semibold text-slate-700 mb-1">Paper Quality Code</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
-                                    <i class="fas fa-hashtag"></i>
-                                </span>
-                                <input type="text" v-model="searchQuery"
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500 text-slate-800 placeholder-slate-400 text-sm sm:text-base transition-colors" placeholder="Search or type paper quality code">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-xl text-sm transition-colors transform active:translate-y-px">
-                                    <i class="fas fa-table"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-span-1">
-                            <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
-                            <button type="button" @click="createNewPaperQuality" class="w-full flex items-center justify-center px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-sm font-semibold shadow-md transform active:translate-y-px">
-                                <i class="fas fa-plus-circle mr-2"></i>
-                                Add New
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Data Status Information -->
-                    <div v-if="loading" class="mt-4 bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center space-x-3 text-sm">
-                        <div class="flex items-center">
-                            <div class="mr-3 animate-spin rounded-full h-6 w-6 border-2 border-amber-300 border-t-amber-600"></div>
-                            <p class="font-medium text-amber-800">Loading paper quality data...</p>
-                        </div>
-                    </div>
-                    <div v-else-if="paperQualities.length === 0" class="mt-4 bg-amber-50 border border-amber-200 p-3 rounded-xl">
-                        <p class="text-sm font-semibold text-amber-800">No paper quality data available.</p>
-                        <p class="text-xs text-amber-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                        <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchPaperQualities" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">Reload Data</button>
-                        </div>
-                    </div>
-                    <div v-else class="mt-4 bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
-                        <p class="text-sm font-semibold text-emerald-800">Data available: {{ paperQualities.length }} paper qualities found.</p>
-                        <p v-if="selectedQuality" class="text-xs text-emerald-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedQuality.paper_quality }}</span> - {{ selectedQuality.paper_name }}
-                        </p>
+                    <div class="flex items-center gap-2 text-xs text-emerald-100">
+                        <i class="fas fa-info-circle text-sm"></i>
+                        <span>Use paper quality codes to manage GSM, type, and mapping.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column - Quick Info -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Paper Quality Info Card -->
-                <div class="bg-emerald-50/80 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-emerald-100">
-                    <div class="flex items-center mb-4 pb-2 border-b border-emerald-100">
-                        <div class="p-2.5 bg-emerald-500 rounded-xl mr-3">
-                            <i class="fas fa-info-circle text-white"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Left Column - Main Content -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white shadow-sm rounded-xl border border-emerald-100">
+                        <div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
+                            <div class="p-2 bg-emerald-500 rounded-lg mr-3 text-white">
+                                <i class="fas fa-scroll"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm sm:text-base font-semibold text-slate-800">Paper Quality Management</h3>
+                                <p class="text-xs text-slate-500">Search, create, and maintain your paper qualities.</p>
+                            </div>
                         </div>
-                        <h3 class="text-base sm:text-lg font-semibold text-emerald-900">Paper Quality Info</h3>
-                    </div>
+                        <div class="px-4 py-4 sm:px-6">
+                            <!-- Search Section -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Paper Quality Code</label>
+                                    <div class="relative flex">
+                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
+                                            <i class="fas fa-hashtag"></i>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            v-model="searchQuery"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500 text-slate-800 placeholder-slate-400 text-sm transition-colors"
+                                            placeholder="Search or type paper quality code"
+                                        >
+                                        <button
+                                            type="button"
+                                            @click="showModal = true"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-600 hover:bg-emerald-700 text-white rounded-r-md text-sm"
+                                        >
+                                            <i class="fas fa-table"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-                    <div class="space-y-4">
-                        <div class="p-4 bg-white/80 rounded-xl border border-emerald-100">
-                            <h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">Instructions</h4>
-                            <ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
-                                <li>Paper quality code must be unique</li>
-                                <li>GSM is the gramature measurement (g/m²)</li>
-                                <li>Use inactive status for paper types no longer in use</li>
-                                <li>Any changes must be saved</li>
-                            </ul>
-                        </div>
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
+                                    <button
+                                        type="button"
+                                        @click="createNewPaperQuality"
+                                        class="w-full flex items-center justify-center px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm"
+                                    >
+                                        <i class="fas fa-plus-circle mr-2"></i>
+                                        Add New
+                                    </button>
+                                </div>
+                            </div>
 
-                        <div class="p-4 bg-sky-50 rounded-xl border border-sky-100">
-                            <h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Paper Types</h4>
-                            <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                            <!-- Data Status Information -->
+                            <div v-if="loading" class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-center space-x-3 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">L</span>
-                                    <span>Liner</span>
+                                    <div class="mr-3 animate-spin rounded-full h-6 w-6 border-2 border-amber-300 border-t-amber-600"></div>
+                                    <p class="font-medium text-amber-800">Loading paper quality data...</p>
                                 </div>
-                                <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">M</span>
-                                    <span>Medium</span>
+                            </div>
+                            <div v-else-if="paperQualities.length === 0" class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                                <p class="text-sm font-semibold text-amber-800">No paper quality data available.</p>
+                                <p class="text-xs text-amber-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
+                                <div class="mt-2 flex items-center space-x-3">
+                                    <button @click="fetchPaperQualities" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">Reload Data</button>
                                 </div>
-                                <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">K</span>
-                                    <span>Kraft</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">C</span>
-                                    <span>Chipboard</span>
-                                </div>
+                            </div>
+                            <div v-else class="mt-3 bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+                                <p class="text-sm font-semibold text-emerald-800">Data available: {{ paperQualities.length }} paper qualities found.</p>
+                                <p v-if="selectedQuality" class="text-xs text-emerald-700 mt-1">
+                                    Selected: <span class="font-semibold">{{ selectedQuality.paper_quality }}</span> - {{ selectedQuality.paper_name }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Links -->
-                <div class="bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-violet-100">
-                    <div class="flex items-center mb-4 pb-2 border-b border-violet-100">
-                        <div class="p-2.5 bg-violet-500 rounded-xl mr-3">
-                            <i class="fas fa-link text-white"></i>
+                <!-- Right Column - Quick Info -->
+                <div class="lg:col-span-1 space-y-4">
+                    <!-- Paper Quality Info Card -->
+                    <div class="bg-white shadow-sm rounded-xl border border-emerald-100">
+                        <div class="px-4 py-3 sm:px-5 border-b border-emerald-100 flex items-center">
+                            <div class="p-2 bg-emerald-500 rounded-lg mr-3">
+                                <i class="fas fa-info-circle text-white"></i>
+                            </div>
+                            <h3 class="text-sm sm:text-base font-semibold text-emerald-900">Paper Quality Info</h3>
                         </div>
-                        <h3 class="text-base sm:text-lg font-semibold text-slate-800">Quick Links</h3>
+
+                        <div class="px-4 py-4 sm:px-5">
+                            <div class="space-y-4">
+                                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                                    <h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">Instructions</h4>
+                                    <ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
+                                        <li>Paper quality code must be unique</li>
+                                        <li>GSM is the gramature measurement (g/m²)</li>
+                                        <li>Use inactive status for paper types no longer in use</li>
+                                        <li>Any changes must be saved</li>
+                                    </ul>
+                                </div>
+
+                                <div class="p-4 bg-sky-50 rounded-lg border border-sky-100">
+                                    <h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Paper Types</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">L</span>
+                                            <span>Liner</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">M</span>
+                                            <span>Medium</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">K</span>
+                                            <span>Kraft</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">C</span>
+                                            <span>Chipboard</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link href="/paper-quality/view-print" class="flex items-center p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors border border-purple-100">
-                            <div class="p-2.5 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-print text-white text-sm"></i>
+                    <!-- Quick Links -->
+                    <div class="bg-white shadow-sm rounded-xl border border-violet-100">
+                        <div class="px-4 py-3 sm:px-5 border-b border-violet-100 flex items-center">
+                            <div class="p-2 bg-violet-500 rounded-lg mr-3">
+                                <i class="fas fa-link text-white"></i>
                             </div>
-                            <div>
-                                <p class="font-medium text-purple-900 text-sm">Print Paper Quality</p>
-                                <p class="text-xs text-purple-700">Print paper quality list</p>
-                            </div>
-                        </Link>
+                            <h3 class="text-sm sm:text-base font-semibold text-slate-800">Quick Links</h3>
+                        </div>
 
-                        <Link href="/paper-flute" class="flex items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors border border-sky-100">
-                            <div class="p-2.5 bg-sky-500 rounded-full mr-3">
-                                <i class="fas fa-layer-group text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-sky-900 text-sm">Paper Flute</p>
-                                <p class="text-xs text-sky-700">Manage paper flutes</p>
-                            </div>
-                        </Link>
+                        <div class="px-4 py-4 sm:px-5">
+                            <div class="grid grid-cols-1 gap-3">
+                                <Link href="/paper-quality/view-print" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-100">
+                                    <div class="p-2 bg-purple-500 rounded-full mr-3">
+                                        <i class="fas fa-print text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-purple-900 text-sm">Print Paper Quality</p>
+                                        <p class="text-xs text-purple-700">Print paper quality list</p>
+                                    </div>
+                                </Link>
 
-                        <Link href="/paper-size" class="flex items-center p-3 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors border border-emerald-100">
-                            <div class="p-2.5 bg-emerald-500 rounded-full mr-3">
-                                <i class="fas fa-ruler-combined text-white text-sm"></i>
+                                <Link href="/paper-flute" class="flex items-center p-3 bg-sky-50 rounded-lg hover:bg-sky-100 transition-colors border border-sky-100">
+                                    <div class="p-2 bg-sky-500 rounded-full mr-3">
+                                        <i class="fas fa-layer-group text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-sky-900 text-sm">Paper Flute</p>
+                                        <p class="text-xs text-sky-700">Manage paper flutes</p>
+                                    </div>
+                                </Link>
+
+                                <Link href="/paper-size" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
+                                    <div class="p-2 bg-emerald-500 rounded-full mr-3">
+                                        <i class="fas fa-ruler-combined text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-emerald-900 text-sm">Paper Size</p>
+                                        <p class="text-xs text-emerald-700">Manage paper sizes</p>
+                                    </div>
+                                </Link>
                             </div>
-                            <div>
-                                <p class="font-medium text-emerald-900 text-sm">Paper Size</p>
-                                <p class="text-xs text-emerald-700">Manage paper sizes</p>
-                            </div>
-                        </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,73 +208,73 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
                         <i class="fas fa-scroll"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Paper Quality' : 'Edit Paper Quality' }}</h3>
+                    <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Paper Quality' : 'Edit Paper Quality' }}</h3>
                 </div>
                 <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
+                    <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
-            <div class="p-6">
+            <div class="p-5">
                 <form @submit.prevent="saveChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality:</label>
-                            <input v-model="form.paper_quality" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm"
+                            <input v-model="form.paper_quality" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"
                                 :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                         </div>
                         <div v-if="!isCreating">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Record Status:</label>
-                            <input v-model="form.status" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
+                            <input v-model="form.status" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 text-sm" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Paper Name:</label>
-                            <input v-model="form.paper_name" type="text" maxlength="50" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <input v-model="form.paper_name" type="text" maxlength="50" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Weight:</label>
                             <div class="flex items-center space-x-2">
                                 <input v-model="form.weight_kg_m" type="number" step="0.0001" min="0" max="9.9999"
-                                    class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
                                 <span class="text-sm text-gray-600 whitespace-nowrap">Kg/m2 for Weight Calculation</span>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Commercial Code:</label>
                             <div class="flex items-center space-x-2">
-                                <input v-model="form.commercial_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <input v-model="form.commercial_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
                                 <span class="text-sm text-gray-600 whitespace-nowrap">For Forms like QT, DO, IV, etc</span>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">CORR Wet-End Code:</label>
                             <div class="flex items-center space-x-2">
-                                <input v-model="form.wet_end_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <input v-model="form.wet_end_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
                                 <span class="text-sm text-gray-600 whitespace-nowrap">For Roll FIFO Line-Up</span>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">CORR DECC Code:</label>
                             <div class="flex items-center space-x-2">
-                                <input v-model="form.decc_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <input v-model="form.decc_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
                                 <span class="text-sm text-gray-600 whitespace-nowrap">For Linking to CPMS</span>
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="obsoletePaperQuality" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                    <div class="flex justify-between mt-5 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="obsoletePaperQuality" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium">
                             <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700">Save</button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
                         </div>
                     </div>
                 </form>
