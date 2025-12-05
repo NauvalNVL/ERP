@@ -301,41 +301,94 @@
 			</div>
 		</div>
 
-		<!-- Loading Overlay -->
-		<div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-center">
-			<div class="w-10 h-10 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-		</div>
-		
-		<!-- Notification Toast -->
-		<div
-			v-if="notification.show"
-			class="fixed bottom-4 right-4 z-50 shadow-lg rounded-lg transition-all duration-300"
-			:class="{
-				'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
-				'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
-				'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning'
-			}"
-		>
-			<div class="p-4 flex items-center">
-				<div class="mr-3">
-					<i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
-					<i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
-					<i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
-				</div>
-				<div>
-					<p
-						:class="{
-							'text-green-800': notification.type === 'success',
-							'text-red-800': notification.type === 'error',
-							'text-yellow-800': notification.type === 'warning'
-						}"
-					>
-						{{ notification.message }}
-					</p>
-				</div>
-			</div>
-		</div>
-	</AppLayout>
+    <!-- Edit/Create Modal -->
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Add Industry' : 'Edit Industry' }}</h3>
+                </div>
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div v-if="!isCreating" class="mb-4 text-sm text-emerald-700 bg-emerald-50 p-3 rounded-lg">
+                    <p><i class="fas fa-info-circle mr-2"></i> You are editing industry <span class="font-bold">{{ editForm.code }}</span></p>
+                </div>
+                <form @submit.prevent="saveIndustryChanges" class="space-y-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Industry Code:</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                                <input v-model="editForm.code" type="text" maxlength="4" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Industry Name:</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-font"></i>
+                                </span>
+                                <input v-model="editForm.name" type="text" maxlength="100" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
+                            <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
+                                <p>Industry code maximum 4 characters. Industry name maximum 100 characters.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deleteIndustry" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
+                        </button>
+                        <div v-else class="w-24"></div>
+                        <div class="flex space-x-3">
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+    
+    <!-- Notification Toast -->
+    <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
+         :class="{
+             'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
+             'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
+             'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning'
+         }">
+        <div class="p-4 flex items-center">
+            <div class="mr-3">
+                <i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
+                <i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                <i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+            </div>
+            <div>
+                <p :class="{
+                    'text-green-800': notification.type === 'success',
+                    'text-red-800': notification.type === 'error',
+                    'text-yellow-800': notification.type === 'warning'
+                }">{{ notification.message }}</p>
+            </div>
+        </div>
+    </div>
+    </AppLayout>
 </template>
 
 <script setup>
@@ -693,7 +746,7 @@ const deleteIndustry = async () => {
         
         if (!response.ok) {
             const result = await response.json();
-            throw new Error(result.message || 'Error deleting industry');
+            throw new Error(result.message || 'Error obsoleting industry');
         }
         
         // Get response data
@@ -714,8 +767,8 @@ const deleteIndustry = async () => {
         // Sync with server in background to ensure data consistency
         fetchIndustries();
     } catch (e) {
-        console.error('Error deleting industry:', e);
-        showNotification(e.message || 'Error deleting industry. Please try again.', 'error');
+        console.error('Error obsoleting industry:', e);
+        showNotification(e.message || 'Error obsoleting industry. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

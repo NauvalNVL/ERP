@@ -195,7 +195,6 @@ Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
 Route::post('/color-groups', [ColorGroupController::class, 'store']);
 Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
 Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
-Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();
@@ -413,7 +412,6 @@ Route::post('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeContr
 Route::put('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'update']);
 Route::put('/reinforcement-tapes/{code}/status', [App\Http\Controllers\ReinforcementTapeController::class, 'toggleStatus']);
 Route::delete('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'destroy']);
-Route::post('/reinforcement-tapes/seed', [App\Http\Controllers\ReinforcementTapeController::class, 'seed']);
 
 // Bundling String API routes
 Route::get('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'apiIndex']);
@@ -424,7 +422,6 @@ Route::delete('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringCo
 
 // Machine API routes
 Route::get('/machines', [MachineController::class, 'index']);
-Route::post('/bundling-strings/seed', [App\Http\Controllers\BundlingStringController::class, 'seed']);
 
 // Wrapping Material API routes
 Route::get('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'apiIndex']);
@@ -432,7 +429,6 @@ Route::post('/wrapping-materials', [App\Http\Controllers\WrappingMaterialControl
 Route::put('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'update']);
 Route::put('/wrapping-materials/{code}/status', [App\Http\Controllers\WrappingMaterialController::class, 'toggleStatus']);
 Route::delete('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'destroy']);
-Route::post('/wrapping-materials/seed', [App\Http\Controllers\WrappingMaterialController::class, 'seed']);
 
 // Glueing Material API routes
 Route::get('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'apiIndex']);
@@ -440,7 +436,6 @@ Route::post('/glueing-materials', [App\Http\Controllers\GlueingMaterialControlle
 Route::put('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'update']);
 Route::put('/glueing-materials/{code}/status', [App\Http\Controllers\GlueingMaterialController::class, 'toggleStatus']);
 Route::delete('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'destroy']);
-Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialController::class, 'seed']);
 
 // Machine API routes
 Route::get('/machines', [MachineController::class, 'index']);
@@ -448,7 +443,6 @@ Route::post('/machines', [MachineController::class, 'store']);
 Route::put('/machines/{id}', [MachineController::class, 'update']);
 Route::put('/machines/{code}/status', [MachineController::class, 'toggleStatus']);
 Route::delete('/machines/{id}', [MachineController::class, 'destroy']);
-Route::post('/machines/seed', [MachineController::class, 'seed']);
 
 // Approve MC API routes
 Route::get('/approve-mc/by-customer/{customerId}', [UpdateMcController::class, 'apiIndex']);
@@ -621,7 +615,6 @@ Route::post('/industry', [App\Http\Controllers\IndustryController::class, 'store
 Route::get('/industry/search/{code}', [App\Http\Controllers\IndustryController::class, 'search']);
 Route::put('/industry/{code}', [App\Http\Controllers\IndustryController::class, 'update']);
 Route::delete('/industry/{code}', [App\Http\Controllers\IndustryController::class, 'destroy']);
-Route::post('/industry/seed', [App\Http\Controllers\IndustryController::class, 'seed']);
 
 // Geo API routes (complete CRUD)
 Route::get('/geo', [App\Http\Controllers\GeoController::class, 'apiIndex']);
@@ -630,7 +623,6 @@ Route::post('/geo', [App\Http\Controllers\GeoController::class, 'store']);
 Route::get('/geo/{code}', [App\Http\Controllers\GeoController::class, 'show']);
 Route::put('/geo/{code}', [App\Http\Controllers\GeoController::class, 'update']);
 Route::delete('/geo/{code}', [App\Http\Controllers\GeoController::class, 'destroy']);
-Route::post('/geo/seed', [App\Http\Controllers\GeoController::class, 'seed']);
 
 // Salesperson API routes
 // Public routes (read-only)
@@ -648,7 +640,6 @@ Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::cl
 Route::post('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiStore'])->name('api.customer-groups.store');
 Route::put('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiUpdate'])->name('api.customer-groups.update');
 Route::delete('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiDestroy'])->name('api.customer-groups.destroy');
-Route::post('/customer-groups/seed', [App\Http\Controllers\CustomerGroupController::class, 'seed'])->name('api.customer-groups.seed');
 
 // Update Customer Account API route
 Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);

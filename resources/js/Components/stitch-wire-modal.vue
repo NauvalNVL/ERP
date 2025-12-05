@@ -1,6 +1,6 @@
 <template>
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl">
+    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 sm:px-0">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
             <!-- Header -->
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
@@ -15,7 +15,7 @@
             </div>
 
             <!-- Body -->
-            <div class="p-5">
+            <div class="p-5 flex-1 flex flex-col min-h-0">
                 <!-- Search -->
                 <div class="mb-4">
                     <div class="relative">
@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Table -->
-                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
+                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
                     <table class="w-full divide-y divide-gray-200 table-fixed">
                         <thead class="bg-gray-50 sticky top-0">
                             <tr>

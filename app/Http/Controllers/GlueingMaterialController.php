@@ -14,12 +14,7 @@ class GlueingMaterialController extends Controller
     {
         try {
             $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            
-            if ($glueingMaterials->isEmpty()) {
-                $this->seedData();
-                $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            }
-            
+
             return response()->json($glueingMaterials);
         } catch (\Exception $e) {
             Log::error('Error in GlueingMaterialController@apiIndex: ' . $e->getMessage());
@@ -31,11 +26,6 @@ class GlueingMaterialController extends Controller
     {
         try {
             $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-
-            if ($glueingMaterials->isEmpty()) {
-                $this->seedData();
-                $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            }
 
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($glueingMaterials);
@@ -193,19 +183,14 @@ class GlueingMaterialController extends Controller
     {
         try {
             $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            
-            if ($glueingMaterials->isEmpty()) {
-                $this->seedData();
-                $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/GlueingMaterial', [
                 'glueingMaterials' => $glueingMaterials,
                 'header' => 'Define Glueing Material'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in GlueingMaterialController@vueIndex: ' . $e->getMessage());
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/GlueingMaterial', [
                 'glueingMaterials' => [],
                 'header' => 'Define Glueing Material',
@@ -226,35 +211,6 @@ class GlueingMaterialController extends Controller
                 'header' => 'View & Print Glueing Materials',
                 'error' => 'Failed to load glueing material data for printing'
             ]);
-        }
-    }
-
-    private function seedData()
-    {
-        try {
-            $glueingMaterials = [
-                ['code' => '001', 'name' => 'PVAC', 'description' => 'Polyvinyl Acetate Glue', 'status' => 'Act', 'is_active' => true],
-                ['code' => '002', 'name' => 'STARCH', 'description' => 'Starch Based Glue', 'status' => 'Act', 'is_active' => true],
-            ];
-
-            foreach ($glueingMaterials as $material) {
-                if (!GlueingMaterial::where('code', $material['code'])->exists()) {
-                    GlueingMaterial::create($material);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding glueing material data: ' . $e->getMessage());
-        }
-    }
-
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            return response()->json(['success' => true, 'message' => 'Glueing material seed data created successfully']);
-        } catch (\Exception $e) {
-            Log::error('Error in GlueingMaterialController@seed: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to seed glueing material data'], 500);
         }
     }
 

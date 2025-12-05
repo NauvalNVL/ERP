@@ -1,17 +1,25 @@
 <template>
     <AppLayout header="Amend User Password">
         <Head title="Amend User Password" />
-        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden no-overscroll gutter-stable">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden no-overscroll gutter-stable">
             <div class="max-w-4xl mx-auto relative z-0">
+                <!-- Floating background bubbles -->
+                <div class="hidden md:block absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+                    <div class="bubble bubble-1"></div>
+                    <div class="bubble bubble-2"></div>
+                    <div class="bubble bubble-4"></div>
+                </div>
                 <!-- Header Card -->
-                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
-                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                        <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
-                            <KeyIcon class="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">Password Management</h1>
-                            <p class="text-xs sm:text-sm text-blue-100">Update user password securely</p>
+                <div class="bg-white/80 shadow-lg rounded-2xl border border-white/40 mb-6 backdrop-blur-sm">
+                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-4 sm:px-6 sm:py-5">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                                <KeyIcon class="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                                <h1 class="text-lg sm:text-2xl font-bold leading-tight text-white">Password Management</h1>
+                                <p class="text-xs sm:text-sm text-indigo-100">Update user password securely</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -22,14 +30,14 @@
                         <!-- Search Section -->
                         <div>
                             <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col" style="content-visibility:auto; contain-intrinsic-size: 1px 280px; contain: content;">
-                                <div class="px-4 py-3 sm:px-6 border-b border-blue-700 bg-blue-600 text-white">
+                                <div class="px-4 py-3 sm:px-6 border-b border-indigo-600 bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
                                     <h3 class="text-sm font-semibold flex items-center gap-2">
-                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-500">
+                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
                                             <SearchIcon class="h-4 w-4 text-white" />
                                         </span>
                                         <span>Find User</span>
                                     </h3>
-                                    <p class="text-xs text-blue-100 mt-1">Search by User ID</p>
+                                    <p class="text-xs text-indigo-100 mt-1">Search by User ID</p>
                                 </div>
                                 <div class="p-4 sm:p-6 flex-1 flex flex-col justify-between">
                                     <form @submit.prevent="searchUser" class="space-y-3">
@@ -41,14 +49,14 @@
                                                 type="text"
                                                 v-model="search_user_id"
                                                 id="search_user_id"
-                                                class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-indigo-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 placeholder="Enter User ID..."
                                                 required
                                             >
                                         </div>
                                         <button
                                             type="submit"
-                                            class="w-full inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                                            class="w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
                                         >
                                             <SearchIcon class="h-4 w-4 mr-2" />
                                             Search User
@@ -61,9 +69,9 @@
                         <!-- User Guide Section -->
                         <div>
                             <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col">
-                                <div class="px-4 py-3 sm:px-6 border-b border-gray-200 bg-yellow-300">
-                                    <h3 class="text-sm font-semibold text-gray-900">User Guide</h3>
-                                    <p class="text-xs text-gray-500 mt-1">Quick guide to use the password change screen.</p>
+                                <div class="px-4 py-3 sm:px-6 border-b border-indigo-200 bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
+                                    <h3 class="text-sm font-semibold text-white">User Guide</h3>
+                                    <p class="text-xs text-indigo-100 mt-1">Quick guide to use the password change screen.</p>
                                 </div>
                                 <div class="p-4 sm:p-6 text-sm text-gray-700 space-y-2 flex-1">
                                     <p class="leading-relaxed">
@@ -116,16 +124,16 @@
 
                         <!-- Update Password Form -->
                         <div v-if="foundUser" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 360px; contain: content;">
-                            <div class="bg-blue-600 px-4 py-3 sm:px-6 border-b border-blue-700">
+                            <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-3 sm:px-6 border-b border-indigo-700">
                                 <div class="flex items-center gap-3">
-                                    <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <div class="h-9 w-9 rounded-full bg-white/20 flex items-center justify-center">
                                         <UserCircleIcon class="h-5 w-5 text-white" />
                                     </div>
                                     <div>
                                         <h3 class="text-sm sm:text-base font-semibold text-white">
                                             {{ foundUser.official_name }}
                                         </h3>
-                                        <p class="text-xs text-blue-100">User ID: {{ foundUser.user_id }}</p>
+                                        <p class="text-xs text-indigo-100">User ID: {{ foundUser.user_id }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -229,7 +237,7 @@
                                     <button
                                         type="submit"
                                         :disabled="!form.new_password || !form.new_password_confirmation || form.new_password !== form.new_password_confirmation"
-                                        class="flex-1 inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="flex-1 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <RefreshIcon class="h-5 w-5 mr-2" />
                                         Update Password

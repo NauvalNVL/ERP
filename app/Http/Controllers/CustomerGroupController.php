@@ -14,12 +14,7 @@ class CustomerGroupController extends Controller
     {
         try {
             $customerGroups = CustomerGroup::orderBy('Group_ID')->get();
-            
-            if ($customerGroups->isEmpty()) {
-                $this->seedData();
-                $customerGroups = CustomerGroup::orderBy('Group_ID')->get();
-            }
-            
+
             return view('sales-management.system-requirement.customer-account.customergroup', compact('customerGroups'));
         } catch (\Exception $e) {
             Log::error('Error in CustomerGroup index: ' . $e->getMessage());
@@ -93,7 +88,7 @@ class CustomerGroupController extends Controller
         $customerGroups = CustomerGroup::orderBy('Group_ID')->get();
         return view('sales-management.system-requirement.customer-account.customergroup-print', compact('customerGroups'));
     }
-    
+
     public function vueViewAndPrint()
     {
         return inertia('sales-management/system-requirement/customer-account/view-and-print-customer-group');
@@ -103,12 +98,7 @@ class CustomerGroupController extends Controller
     {
         try {
             $customerGroups = CustomerGroup::orderBy('Group_ID')->get();
-            
-            if ($customerGroups->isEmpty()) {
-                $this->seedData();
-                $customerGroups = CustomerGroup::orderBy('Group_ID')->get();
-            }
-            
+
             Log::info('Customer Groups API Response:', ['data' => $customerGroups->toArray()]);
             return response()->json($customerGroups);
         } catch (\Exception $e) {
@@ -116,7 +106,7 @@ class CustomerGroupController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    
+
     // API methods for Vue frontend
 
     public function apiStore(Request $request)
@@ -132,13 +122,13 @@ class CustomerGroupController extends Controller
             // Auto-generate sequential No
             $maxNo = CustomerGroup::max('No');
             $nextNo = $maxNo ? ((int)$maxNo + 1) : 1;
-            
+
             Log::info('Creating customer group', [
                 'group_code' => $request->group_code,
                 'description' => $request->description,
                 'no' => $nextNo
             ]);
-            
+
             $customerGroup = CustomerGroup::create([
                 'No' => (string)$nextNo,
                 'Group_ID' => strtoupper($request->group_code),
@@ -176,10 +166,10 @@ class CustomerGroupController extends Controller
                 'group_code' => $group_code,
                 'description' => $request->description
             ]);
-            
+
             // Find by Group_ID
             $customerGroup = CustomerGroup::findOrFail($group_code);
-            
+
             // Update using CPS fields
             $customerGroup->update([
                 'Group_Name' => $request->description
@@ -211,7 +201,7 @@ class CustomerGroupController extends Controller
             Log::info('Deleting customer group', [
                 'group_code' => $group_code
             ]);
-            
+
             $customerGroup = CustomerGroup::findOrFail($group_code);
             $customerGroup->delete();
 
@@ -226,54 +216,6 @@ class CustomerGroupController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete Customer Group: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    private function seedData()
-    {
-        try {
-            Log::info('Seeding customer groups from CPS');
-            
-            // Sample customer groups based on CPS images with sequential No
-            $groups = [
-                ['No' => '1', 'Group_ID' => '01', 'Group_Name' => 'PHUTANG TRADER'],
-                ['No' => '2', 'Group_ID' => '02', 'Group_Name' => 'PHUTANG USAHA PENDAPATAN LAIN1'],
-                ['No' => '3', 'Group_ID' => '03', 'Group_Name' => 'PHUTANG USAHA PENDAPATAN LAIN2'],
-                ['No' => '4', 'Group_ID' => 'NA', 'Group_Name' => 'PHUTANG USAHA']
-            ];
-
-            foreach ($groups as $group) {
-                CustomerGroup::updateOrCreate(
-                    ['Group_ID' => $group['Group_ID']],
-                    [
-                        'No' => $group['No'],
-                        'Group_Name' => $group['Group_Name'],
-                        'Currency' => null,
-                        'AC' => null,
-                        'Name' => null
-                    ]
-                );
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding customer groups: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer Group seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error seeding customer groups: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed Customer Groups: ' . $e->getMessage()
             ], 500);
         }
     }
