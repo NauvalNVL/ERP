@@ -39,6 +39,10 @@ class DatabaseSeeder extends Seeder
             VehicleClassSeeder::class,
             VehicleSeeder::class,
             MachineSeeder::class,
+            ReinforcementTapeSeeder::class,
+            GlueingMaterialSeeder::class,
+            WrappingMaterialSeeder::class,
+            BundlingStringSeeder::class,
             // McTableSeeder::class,
         ]);
     }

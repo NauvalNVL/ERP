@@ -1,29 +1,33 @@
 <template>
   <AppLayout header="Prepare Delivery Order (Multiple Item)">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-      <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-6 py-4 border-b border-blue-700">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <i class="fas fa-truck text-2xl text-white opacity-90"></i>
-            <div>
-              <h1 class="text-xl font-semibold text-white">Prepare Delivery Order (Multiple Item)</h1>
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <!-- Header with controls -->
+          <div class="bg-blue-600 px-4 py-3 sm:px-6 border-b border-blue-700">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center">
+                  <i class="fas fa-truck text-lg text-white"></i>
+                </div>
+                <div>
+                  <h1 class="text-lg sm:text-xl font-semibold text-white">Prepare Delivery Order (Multiple Item)</h1>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  @click="refreshPage"
+                  class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  title="Refresh (F5)"
+                >
+                  <i class="fas fa-sync-alt text-sm"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <button
-              @click="refreshPage"
-              class="p-2 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full transition-colors border border-white border-opacity-20"
-              title="Refresh (F5)"
-            >
-              <i class="fas fa-sync-alt"></i>
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <!-- Main Form Content -->
-      <div class="p-6">
+          <!-- Main Form Content -->
+          <div class="p-6">
         <!-- Form Container -->
         <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
           <!-- Current Period -->
@@ -254,6 +258,8 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Customer Lookup Modal -->
     <CustomerAccountModal

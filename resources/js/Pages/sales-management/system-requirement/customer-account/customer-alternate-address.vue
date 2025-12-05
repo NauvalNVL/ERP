@@ -1,40 +1,36 @@
 <template>
     <AppLayout :header="'Define Customer Alternate Address'">
-        <!-- Header -->
-        <div
-            class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative mb-6"
-        >
-            <div
-                class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"
-            ></div>
-            <div
-                class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"
-            ></div>
-            <div class="flex items-center">
-                <div
-                    class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner flex items-center justify-center mr-4"
-                >
-                    <i class="fas fa-address-book text-white text-2xl z-10"></i>
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+                    <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                                <i class="fas fa-address-book text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg sm:text-xl font-semibold leading-tight">
+                                    Define Customer Alternate Address
+                                </h2>
+                                <p class="text-xs sm:text-sm text-blue-100">
+                                    Easily manage customer alternate addresses.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-blue-100">
+                            <i class="fas fa-info-circle text-sm"></i>
+                            <span>Use delivery codes to define alternate ship-to locations.</span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h2
-                        class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow"
-                    >
-                        Define Customer Alternate Address
-                    </h2>
-                    <p class="text-cyan-100">
-                        Easily manage customer alternate addresses
-                    </p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             <!-- Left: Main Container -->
             <div class="lg:col-span-2">
                 <div
-                    class="relative bg-white rounded-2xl shadow-xl border border-gray-200 p-8 animate-fade-in-up overflow-hidden"
+                    class="relative bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 animate-fade-in-up overflow-hidden"
                 >
                     <div class="flex items-center mb-6">
                         <div
@@ -86,7 +82,7 @@
                                         class="flex items-center text-gray-700 font-semibold mb-2"
                                     >
                                         <span
-                                            class="inline-flex items-center justify-center w-7 h-7 bg-gradient-to-br from-pink-400 to-purple-500 text-white rounded-lg mr-2"
+                                            class="inline-flex items-center justify-center w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-lg mr-2"
                                         >
                                             <i class="fas fa-truck"></i>
                                         </span>
@@ -95,19 +91,19 @@
                                     <div class="flex">
                                         <input
                                             type="text"
-                                            class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:ring-2 focus:ring-pink-400"
+                                            class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
                                             v-model="deliveryCode"
                                         />
                                         <button
                                             type="button"
-                                            class="bg-gradient-to-br from-pink-400 to-purple-500 text-white px-3 hover:from-pink-500 hover:to-purple-600 transition rounded-none"
+                                            class="bg-gradient-to-br from-blue-500 to-blue-700 text-white px-3 hover:from-blue-600 hover:to-blue-800 transition rounded-none"
                                             @click="openDeliveryLookup"
                                         >
                                             <i class="fas fa-table"></i>
                                         </button>
                                         <button
                                             type="button"
-                                            class="bg-gradient-to-br from-pink-400 to-purple-500 text-white px-3 hover:from-pink-500 hover:to-purple-600 transition rounded-r-lg"
+                                            class="bg-gradient-to-br from-blue-500 to-blue-700 text-white px-3 hover:from-blue-600 hover:to-blue-800 transition rounded-r-lg"
                                             @click="openAlternateDeliveryLocationTable"
                                         >
                                             <i class="fas fa-eye"></i>
@@ -226,10 +222,10 @@
 
                             <!-- Ship To Section -->
                             <div
-                                class="bg-white p-6 rounded-lg shadow-lg mb-6 border border-purple-200"
+                                class="bg-blue-50 p-6 rounded-lg shadow-sm mb-6 border border-blue-100"
                             >
                                 <h3
-                                    class="text-lg font-bold text-purple-800 mb-4 flex items-center"
+                                    class="text-lg font-bold text-blue-800 mb-4 flex items-center"
                                 >
                                     <i class="fas fa-shipping-fast mr-2"></i
                                     >Ship To
@@ -247,7 +243,7 @@
                                             type="text"
                                             id="shipToName"
                                             v-model="shipTo.name"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                         />
                                     </div>
                                     <div class="md:col-span-2">
@@ -260,7 +256,7 @@
                                             id="shipToAddress"
                                             v-model="shipTo.address"
                                             rows="3"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                         ></textarea>
                                     </div>
                                     <div>
@@ -273,7 +269,7 @@
                                             type="text"
                                             id="contactPerson"
                                             v-model="shipTo.contactPerson"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                         />
                                     </div>
                                     <div>
@@ -286,7 +282,7 @@
                                             type="text"
                                             id="telNo"
                                             v-model="shipTo.telNo"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                         />
                                     </div>
                                     <div>
@@ -299,7 +295,7 @@
                                             type="text"
                                             id="faxNo"
                                             v-model="shipTo.faxNo"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                         />
                                     </div>
                                     <div>
@@ -312,7 +308,7 @@
                                             type="email"
                                             id="email"
                                             v-model="shipTo.email"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                         />
                                     </div>
                                 </div>
@@ -347,11 +343,11 @@
             <div class="flex flex-col space-y-6">
                 <!-- Information Card -->
                 <div
-                    class="bg-white rounded-xl shadow-md border-t-4 border-blue-400 p-6"
+                    class="bg-white rounded-xl shadow-md border-t-4 border-blue-500 p-6"
                 >
                     <div class="flex items-center mb-2">
                         <div
-                            class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3"
+                            class="inline-flex items-center justify-center w-10 h-10 bg-blue-500 rounded-lg mr-3"
                         >
                             <i class="fas fa-info text-white text-2xl"></i>
                         </div>
@@ -383,11 +379,11 @@
                 </div>
                 <!-- Quick Links Card -->
                 <div
-                    class="bg-white rounded-xl shadow-md border-t-4 border-purple-400 p-6"
+                    class="bg-white rounded-xl shadow-md border-t-4 border-blue-500 p-6"
                 >
                     <div class="flex items-center mb-2">
                         <div
-                            class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg mr-3"
+                            class="inline-flex items-center justify-center w-10 h-10 bg-blue-500 rounded-lg mr-3"
                         >
                             <i class="fas fa-link text-white text-2xl"></i>
                         </div>
@@ -395,22 +391,22 @@
                             Quick Links
                         </h3>
                     </div>
-                    <hr class="my-2 border-purple-100" />
+                    <hr class="my-2 border-blue-100" />
                     <div class="space-y-3 mt-4">
                         <a
                             href="#"
-                            class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition"
+                            class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition"
                         >
                             <span
-                                class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3"
+                                class="inline-flex items-center justify-center w-9 h-9 bg-blue-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-print text-white text-xl"></i>
                             </span>
                             <div>
-                                <div class="font-bold text-green-800">
+                                <div class="font-bold text-blue-800">
                                     View & Print
                                 </div>
-                                <div class="text-xs text-green-700">
+                                <div class="text-xs text-blue-700">
                                     Print customer list
                                 </div>
                             </div>
@@ -434,6 +430,8 @@
                             </div>
                         </a>
                     </div>
+                </div>
+            </div>
                 </div>
             </div>
         </div>

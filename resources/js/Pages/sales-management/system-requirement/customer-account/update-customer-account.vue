@@ -1,136 +1,134 @@
 <template>
-    <AppLayout :header="'Update Customer Account'">
-    <Head title="Customer Account Management" />
+	<AppLayout :header="'Update Customer Account'">
+	<Head title="Customer Account Management" />
 
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
-        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
-        <div class="flex items-center">
-            <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner mr-4">
-                <i class="fas fa-user-edit text-white text-2xl"></i>
-            </div>
-            <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Update Customer Account</h2>
-                <p class="text-teal-100">Manage and update customer account information</p>
-            </div>
-        </div>
-    </div>
+	<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+		<div class="max-w-7xl mx-auto">
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50">
-        <div class="max-w-7xl mx-auto">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
-            <div class="lg:col-span-2">
-              <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
-                <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
-                <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
-                <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
-                    <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
-                        <i class="fas fa-search text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-800">Find Customer</h3>
-                </div>
+		<!-- Header Section -->
+		<div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+			<div class="px-4 py-4 sm:px-6 flex items-center justify-between">
+				<div class="flex items-center gap-3">
+					<div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+						<i class="fas fa-user-edit text-white text-lg"></i>
+					</div>
+					<div>
+						<h2 class="text-lg sm:text-xl font-semibold leading-tight">Update Customer Account</h2>
+						<p class="text-xs sm:text-sm text-blue-100">Manage and update customer account information</p>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                <!-- Search Section -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
-                    <div class="md:col-span-2">
-                      <label for="searchQuery" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                        <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 text-white mr-3 shadow-md">
-                          <i class="fas fa-search text-xs"></i>
-                      </span>
-                        Find Customer Account
-                      </label>
-                      <div class="relative flex group">
-                        <input id="searchQuery" type="text" v-model="searchQuery" placeholder="Search by code or name..." class="input-field" @keyup.enter="openCustomerAccountModal">
-                        <button type="button" @click="openCustomerAccountModal" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
-                        <i class="fas fa-table"></i>
-                      </button>
-                    </div>
-                  </div>
-                    <div class="md:col-span-1 flex flex-col justify-end">
-                      <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                      <button type="button" @click="openAddNewCustomerModal" class="primary-button group w-full whitespace-nowrap">
-                          <span class="shimmer-effect"></span>
-                          <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
-                          Add New Customer
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+		<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+		  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+			<!-- Left Column -->
+			<div class="lg:col-span-2">
+			  <div class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-100 mb-6">
+				<div class="flex items-center mb-4 pb-3 border-b border-gray-200">
+					<div class="p-2 bg-blue-500 rounded-lg mr-4">
+						<i class="fas fa-search text-white"></i>
+					</div>
+					<h3 class="text-base sm:text-lg font-semibold text-gray-800">Find Customer</h3>
+				</div>
+				
+				<!-- Search Section -->
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+					<div class="md:col-span-2">
+					  <label for="searchQuery" class="flex items-center text-sm font-medium text-gray-700 mb-2">
+						<span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 text-white mr-3 shadow-md">
+						  <i class="fas fa-search text-xs"></i>
+					  </span>
+						Find Customer Account
+					  </label>
+					  <div class="relative flex group">
+						<input id="searchQuery" type="text" v-model="searchQuery" placeholder="Search by code or name..." class="input-field" @keyup.enter="openCustomerAccountModal">
+						<button type="button" @click="openCustomerAccountModal" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+						<i class="fas fa-table"></i>
+					  </button>
+					</div>
+				  </div>
+					<div class="md:col-span-1 flex flex-col justify-end">
+					  <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
+					  <button type="button" @click="openAddNewCustomerModal" class="primary-button group w-full whitespace-nowrap">
+						  <span class="shimmer-effect"></span>
+						  <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
+						  Add New Customer
+					</button>
+				  </div>
+				</div>
+			  </div>
+			</div>
 
-            <!-- Right Column -->
-            <div class="flex flex-col space-y-6">
-              <!-- Information Card -->
-              <div class="bg-white rounded-xl shadow-md border-t-4 border-blue-400 p-6">
-                <div class="flex items-center mb-2">
-                  <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3">
-                    <i class="fas fa-info text-white text-2xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-800">Information</h3>
-                </div>
-                <hr class="my-2 border-blue-100">
-
-                <div class="text-gray-700 mb-4">
-                  Use this form to update customer account data. Make sure all information entered is correct and complete.
-                </div>
-                <div class="bg-blue-50 rounded-lg p-4">
-                  <div class="font-bold text-blue-700 mb-2">Instructions:</div>
-                  <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
-                    <li>Enter the customer code to search for data</li>
-                    <li>Click the table button to view the customer list</li>
-                    <li>Select a customer from the modal to edit</li>
-                    <li>Click 'Add New' to create a new customer</li>
-                    <li>Click Save to store your changes</li>
-                  </ul>
-                </div>
-              </div>
-
-
-              <!-- Quick Links Card -->
-              <div class="bg-white rounded-xl shadow-md border-t-4 border-purple-400 p-6">
-                <div class="flex items-center mb-2">
-                  <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg mr-3">
-                    <i class="fas fa-link text-white text-2xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-800">Quick Links</h3>
-                </div>
-                <hr class="my-2 border-purple-100">
-                <div class="space-y-3 mt-4">
-                  <Link :href="route('vue.update-customer-account.view-print')" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
-                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
-                      <i class="fas fa-print text-white text-xl"></i>
-                    </span>
-                    <div>
-                      <div class="font-bold text-green-800">View & Print</div>
-                      <div class="text-xs text-green-700">Print customer list</div>
-                    </div>
-                  </Link>
-                  <Link :href="route('vue.customer-group.index')" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
-                    <span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
-                      <i class="fas fa-users text-white text-xl"></i>
-                    </span>
-                    <div>
-                      <div class="font-bold text-blue-800">Customer Groups</div>
-                      <div class="text-xs text-blue-700">Manage customer groups</div>
-                    </div>
-                  </Link>
-                  <Link :href="route('vue.customer-alternate-address.index')" class="flex items-center p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition">
-                    <span class="inline-flex items-center justify-center w-9 h-9 bg-purple-400 rounded-lg mr-3">
-                      <i class="fas fa-map-marker-alt text-white text-xl"></i>
-                    </span>
-                    <div>
-                      <div class="font-bold text-purple-800">Alternate Addresses</div>
-                      <div class="text-xs text-purple-700">Manage addresses</div>
-                    </div>
-                  </Link>
-                </div>
-                </div>
-              </div>
-            </div>
-        </div>
-    </div>
+			<!-- Right Column -->
+			<div class="flex flex-col space-y-6">
+			  <!-- Information Card -->
+			  <div class="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-5">
+				<div class="flex items-center mb-3 pb-2 border-b border-gray-100">
+				  <div class="inline-flex items-center justify-center w-9 h-9 bg-blue-500 rounded-lg mr-3">
+					<i class="fas fa-info text-white text-lg"></i>
+				  </div>
+				  <h3 class="text-sm sm:text-base font-semibold text-gray-800">Information</h3>
+				</div>
+				
+				<div class="text-gray-700 mb-4 text-sm">
+				  Use this form to update customer account data. Make sure all information entered is correct and complete.
+				</div>
+				<div class="bg-blue-50 rounded-lg p-4">
+				  <div class="font-bold text-blue-700 mb-2 text-sm">Instructions:</div>
+				  <ul class="list-disc pl-5 text-blue-700 space-y-1 text-xs sm:text-sm">
+					<li>Enter the customer code to search for data</li>
+					<li>Click the table button to view the customer list</li>
+					<li>Select a customer from the modal to edit</li>
+					<li>Click 'Add New' to create a new customer</li>
+					<li>Click Save to store your changes</li>
+				  </ul>
+				</div>
+			  </div>
+			
+			  <!-- Quick Links Card -->
+			  <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-4 sm:p-5">
+				<div class="flex items-center mb-3 pb-2 border-b border-violet-100">
+				  <div class="inline-flex items-center justify-center w-9 h-9 bg-violet-500 rounded-lg mr-3">
+					<i class="fas fa-link text-white text-lg"></i>
+				  </div>
+				  <h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
+				</div>
+				<div class="space-y-3 mt-3">
+				  <Link :href="route('vue.update-customer-account.view-print')" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
+					<span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
+					  <i class="fas fa-print text-white text-base"></i>
+					</span>
+					<div>
+					  <div class="font-bold text-green-800 text-sm">View & Print</div>
+					  <div class="text-xs text-green-700">Print customer list</div>
+					</div>
+				  </Link>
+				  <Link :href="route('vue.customer-group.index')" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
+					<span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
+					  <i class="fas fa-users text-white text-base"></i>
+					</span>
+					<div>
+					  <div class="font-bold text-blue-800 text-sm">Customer Groups</div>
+					  <div class="text-xs text-blue-700">Manage customer groups</div>
+					</div>
+				  </Link>
+				  <Link :href="route('vue.customer-alternate-address.index')" class="flex items-center p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition">
+					<span class="inline-flex items-center justify-center w-9 h-9 bg-purple-400 rounded-lg mr-3">
+					  <i class="fas fa-map-marker-alt text-white text-base"></i>
+					</span>
+					<div>
+					  <div class="font-bold text-purple-800 text-sm">Alternate Addresses</div>
+					  <div class="text-xs text-purple-700">Manage addresses</div>
+					</div>
+				  </Link>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	</div>
+	</div>
 
     <!-- Customer Account Selection Modal -->
     <CustomerAccountModal

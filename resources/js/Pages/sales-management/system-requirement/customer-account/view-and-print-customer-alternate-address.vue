@@ -4,12 +4,12 @@
 
         <!-- Main Container with vibrant gradient background -->
         <div
-            class="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 p-4 md:p-6"
+            class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8"
         >
             <div class="max-w-7xl mx-auto">
                 <!-- Header Section with animated elements -->
                 <div
-                    class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-xl shadow-lg overflow-hidden mb-6 transform transition-all duration-500 hover:shadow-xl"
+                    class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4"
                 >
                     <div class="relative overflow-hidden">
                         <!-- Decorative Elements -->
@@ -83,9 +83,9 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
                     <div
-                        class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 px-6"
+                        class="bg-blue-50 border-b border-gray-100 text-slate-800 py-3 px-6"
                     >
                         <div class="flex items-center">
                             <div
@@ -116,12 +116,12 @@
                     <div class="p-6">
                         <!-- Actions Bar -->
                         <div
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end"
                         >
                             <!-- Search Field -->
                             <div class="space-y-2">
                                 <label
-                                    class="block text-sm font-medium text-blue-700 mb-2 flex items-center"
+                                    class="text-sm font-medium text-blue-700 mb-2 flex items-center"
                                 >
                                     <div
                                         class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm"
@@ -152,7 +152,7 @@
                             <!-- Status Filter -->
                             <div class="space-y-2">
                                 <label
-                                    class="block text-sm font-medium text-blue-700 mb-2 flex items-center"
+                                    class="text-sm font-medium text-blue-700 mb-2 flex items-center"
                                 >
                                     <div
                                         class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm"
@@ -202,9 +202,9 @@
                 </div>
 
                 <!-- Data Table -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div
-                        class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 px-6"
+                        class="bg-blue-50 border-b border-gray-100 text-slate-800 py-3 px-6"
                     >
                         <div class="flex items-center">
                             <div

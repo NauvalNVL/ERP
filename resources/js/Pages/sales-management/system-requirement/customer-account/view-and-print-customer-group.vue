@@ -3,10 +3,10 @@
     <Head title="View & Print Customer Groups" />
 
     <!-- Main Container with vibrant gradient background -->
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 p-4 md:p-6">
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
         <!-- Header Section with animated elements -->
-        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-xl shadow-lg overflow-hidden mb-6 transform transition-all duration-500 hover:shadow-xl">
+        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
           <div class="relative overflow-hidden">
             <!-- Decorative Elements -->
             <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
@@ -51,8 +51,8 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 px-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
+          <div class="bg-blue-50 border-b border-gray-100 text-slate-800 py-3 px-6">
             <div class="flex items-center">
               <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner relative overflow-hidden">
                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-cyan-300 opacity-30 rounded-full"></div>
@@ -68,10 +68,10 @@
 
           <div class="p-6">
             <!-- Actions Bar -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
               <!-- Search Field -->
               <div class="space-y-2">
-                <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
+                <label class="text-sm font-medium text-blue-700 mb-2 flex items-center">
                   <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
                     <i class="fas fa-search text-white text-sm"></i>
                 </div>
@@ -92,7 +92,7 @@
 
               <!-- Sort Options -->
               <div class="space-y-2">
-                <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
+                <label class="text-sm font-medium text-blue-700 mb-2 flex items-center">
                   <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
                     <i class="fas fa-sort text-white text-sm"></i>
                   </div>
@@ -120,8 +120,8 @@
         </div>
 
         <!-- Table Section -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 px-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="bg-blue-50 border-b border-gray-100 text-slate-800 py-3 px-6">
                     <div class="flex items-center">
               <div class="mr-4 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
                 <i class="fas fa-users text-2xl"></i>
@@ -188,16 +188,16 @@
                 </table>
 
                 <!-- Table Footer -->
-              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-white">
+              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-slate-700">
                     <div class="flex items-center justify-between">
                   <div class="flex items-center">
-                    <i class="fas fa-info-circle mr-2 text-white"></i>
-                    <span>Total Customer Groups: <span class="font-semibold text-white">{{ filteredCustomerGroups.length }}</span></span>
+                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                    <span>Total Customer Groups: <span class="font-semibold text-blue-800">{{ filteredCustomerGroups.length }}</span></span>
                   </div>
-                  <div v-if="searchQuery" class="text-white">
+                  <div v-if="searchQuery" class="text-slate-700">
                     Filtered from {{ customerGroups.length }} total records
                   </div>
-                        <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
+                        <div class="text-xs text-slate-600">Generated: {{ currentDate }}</div>
                 </div>
                     </div>
                 </div>

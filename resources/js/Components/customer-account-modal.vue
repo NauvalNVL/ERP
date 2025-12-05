@@ -62,9 +62,9 @@
         </div>
 
         <div v-else class="overflow-auto rounded-lg border border-gray-200 flex-1 min-h-0">
-          <table class="w-full divide-y divide-gray-200" id="customerAccountDataTable" style="min-width: 650px;">
+          <table class="w-full divide-y divide-gray-200 hidden sm:table" id="customerAccountDataTable" style="min-width: 650px;">
             <thead class="bg-gray-50 sticky top-0">
-            <tr>
+              <tr>
                 <th @click="sortTable('customer_code')" class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer whitespace-nowrap" style="width: 15%;">
                   <span class="hidden sm:inline">Code</span>
                   <span class="sm:hidden">Code</span>
@@ -84,8 +84,8 @@
                 <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" style="width: 20%;">
                   Status
                 </th>
-            </tr>
-          </thead>
+              </tr>
+            </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
               <tr v-for="account in filteredAccounts" :key="account.customer_code"
                 :class="[
@@ -110,6 +110,36 @@
               </tr>
             </tbody>
           </table>
+
+          <div class="sm:hidden space-y-2 p-1">
+            <div
+              v-for="account in filteredAccounts"
+              :key="account.customer_code"
+              :class="[
+                'p-3 rounded-md border text-xs transition-colors',
+                isAccountSelectable(account) ? 'bg-white hover:bg-blue-50 cursor-pointer border-gray-200' : 'bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200',
+                selectedAccount && selectedAccount.customer_code === account.customer_code ? 'bg-blue-100 border-blue-500' : ''
+              ]"
+              @click="onRowClick(account)"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <div class="font-semibold text-gray-900">{{ account.customer_code }}</div>
+                <span
+                  :class="(account.status === 'A' || account.status === 'Active' || !account.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  class="px-2 py-0.5 rounded-full text-xs"
+                >
+                  {{ account.status === 'A' ? 'Active' : (account.status === 'I' ? 'Inactive' : (account.status || 'Active')) }}
+                </span>
+              </div>
+              <div class="text-gray-700 font-medium truncate mb-1" :title="account.customer_name">
+                {{ account.customer_name }}
+              </div>
+              <div class="flex flex-wrap gap-x-4 gap-y-0.5 text-gray-600 text-[11px]">
+                <div><span class="font-semibold">S/P:</span> {{ account.salesperson_code || '-' }}</div>
+                <div><span class="font-semibold">Curr:</span> {{ account.currency_code || '-' }}</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="mt-2 text-xs text-gray-500 italic hidden md:block">

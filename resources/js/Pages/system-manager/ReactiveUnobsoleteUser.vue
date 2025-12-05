@@ -1,174 +1,196 @@
 <template>
-    <AppLayout :header="'Reactive / Unobsolete User'">
-        <Head title="Reactive / Unobsolete User" />
+	<AppLayout :header="'Reactive / Unobsolete User'">
+		<Head title="Reactive / Unobsolete User" />
 
-        <!-- Header Section -->
-        <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-6 rounded-t-lg shadow-lg mb-6">
-            <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-                <i class="fas fa-user-clock mr-3"></i> Reactive / Unobsolete User
-            </h2>
-            <p class="text-blue-100">View user list and prepare UI for reactivating / un-obsoleting users.</p>
-        </div>
+		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+			<div class="max-w-7xl mx-auto relative z-0">
+				<!-- Header Section -->
+				<div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+						<div class="flex items-center gap-3">
+							<div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+								<i class="fas fa-user-clock text-white text-sm"></i>
+							</div>
+							<div>
+								<h2 class="text-lg sm:text-xl font-semibold text-white leading-tight">
+									Reactive / Unobsolete User
+								</h2>
+								<p class="text-xs sm:text-sm text-blue-100">
+									View user list and manage obsolete / inactive users
+								</p>
+							</div>
+						</div>
+						<div class="text-xs sm:text-sm text-blue-100">
+							<span class="font-semibold">{{ filteredUsers.length }}</span>
+							<span class="ml-1">users found</span>
+						</div>
+					</div>
+				</div>
 
-        <div class="bg-white rounded-b-lg shadow-lg p-6">
-            <!-- Success/Error Messages -->
-            <div
-                v-if="notification.show"
-                :class="{
-                    'bg-green-100 border border-green-400 text-green-700': notification.type === 'success',
-                    'bg-red-100 border border-red-400 text-red-700': notification.type === 'error',
-                    'px-4 py-3 rounded relative mb-4': true
-                }"
-            >
-                <span class="block sm:inline">{{ notification.message }}</span>
-            </div>
+				<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+					<!-- Success/Error Messages -->
+					<div
+						v-if="notification.show"
+						:class="{
+							'bg-green-50 border border-green-200 text-green-800': notification.type === 'success',
+							'bg-red-50 border border-red-200 text-red-800': notification.type === 'error',
+							'px-4 py-3 rounded-lg mb-4 shadow-sm': true
+						}"
+					>
+						<span class="block text-sm">{{ notification.message }}</span>
+					</div>
 
-            <!-- Search and Filter Controls -->
-            <div class="mb-6 flex flex-wrap items-center gap-4">
-                <div class="flex-1 min-w-[300px]">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input
-                            type="text"
-                            v-model="searchQuery"
-                            placeholder="Search users..."
-                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50"
-                        >
-                    </div>
-                </div>
-                <div>
-                    <select
-                        v-model="statusFilter"
-                        class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active Only</option>
-                        <option value="obsolete">Obsolete Only</option>
-                    </select>
-                </div>
-            </div>
+					<!-- Search and Filter Controls -->
+					<div class="mb-4 flex flex-wrap items-center gap-3">
+						<div class="flex-1 min-w-[260px]">
+							<div class="relative">
+								<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+									<i class="fas fa-search text-xs"></i>
+								</span>
+								<input
+									type="text"
+									v-model="searchQuery"
+									placeholder="Search users (ID, username, name, title)..."
+									class="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm text-gray-900 placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500"
+								>
+							</div>
+						</div>
+						<div>
+							<select
+								v-model="statusFilter"
+								class="py-2 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
+							>
+								<option value="all">All Statuses</option>
+								<option value="active">Active Only</option>
+								<option value="obsolete">Obsolete Only</option>
+							</select>
+						</div>
+					</div>
 
-            <!-- Loading Indicator -->
-            <div v-if="loading" class="my-8 flex justify-center">
-                <div class="w-12 h-12 border-4 border-solid border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+					<!-- Loading Indicator -->
+					<div v-if="loading" class="my-10 flex justify-center">
+						<div class="w-10 h-10 border-4 border-solid border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+					</div>
 
-            <!-- Users Table -->
-            <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                <table class="min-w-full divide-y divide-gray-200 bg-white">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Official Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr
-                            v-for="user in paginatedUsers"
-                            :key="user.user_id"
-                            class="hover:bg-gray-50"
-                        >
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ user.user_id }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                {{ user.username || '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                {{ user.official_name || '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                {{ user.official_title || '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                                <span
-                                    v-if="user.is_active"
-                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                                >
-                                    <i class="fas fa-check-circle mr-1"></i> Active
-                                </span>
-                                <span
-                                    v-else
-                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
-                                >
-                                    <i class="fas fa-times-circle mr-1"></i> Obsolete
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                                <button
-                                    @click="toggleUserStatus(user)"
-                                    :disabled="isToggling"
-                                    class="transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold flex items-center justify-center"
-                                    :class="[
-                                        isToggling
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            : user.is_active
-                                                ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white hover:from-red-600 hover:to-rose-700 focus:ring-red-500'
-                                                : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 focus:ring-emerald-500'
-                                    ]"
-                                    :style="{ minWidth: '150px' }"
-                                >
-                                    <i
-                                        :class="[
-                                            'mr-1',
-                                            user.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on'
-                                        ]"
-                                    ></i>
-                                    <span>
-                                        {{ user.is_active ? 'Mark Obsolete' : 'Mark Active' }}
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="paginatedUsers.length === 0">
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No users found.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+					<!-- Users Table -->
+					<div v-else class="overflow-x-auto rounded-lg border border-gray-200">
+						<table class="min-w-full table-auto divide-y divide-gray-200 text-sm bg-white">
+							<thead class="bg-gray-50">
+								<tr>
+									<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">User ID</th>
+									<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Username</th>
+									<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Official Name</th>
+									<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Title</th>
+									<th scope="col" class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+									<th scope="col" class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</th>
+								</tr>
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-100">
+								<tr
+									v-for="user in paginatedUsers"
+									:key="user.user_id"
+									class="hover:bg-gray-50"
+								>
+									<td class="px-4 py-2 whitespace-nowrap text-xs font-mono text-gray-700">
+										{{ user.user_id }}
+									</td>
+									<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+										{{ user.username || '-' }}
+									</td>
+									<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+										{{ user.official_name || '-' }}
+									</td>
+									<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+										{{ user.official_title || '-' }}
+									</td>
+									<td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+										<span
+											v-if="user.is_active"
+											class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100"
+										>
+											<i class="fas fa-check-circle mr-1"></i>
+											Active
+										</span>
+										<span
+											v-else
+											class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100"
+										>
+											<i class="fas fa-times-circle mr-1"></i>
+											Obsolete
+										</span>
+									</td>
+									<td class="px-4 py-2 whitespace-nowrap text-xs font-medium text-center">
+										<button
+											@click="toggleUserStatus(user)"
+											:disabled="isToggling"
+											class="inline-flex items-center justify-center px-3 py-1.5 rounded-md text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-offset-1"
+											:class="[
+												isToggling
+													? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+													: user.is_active
+														? 'bg-red-50 text-red-700 hover:bg-red-100 focus:ring-red-400'
+														: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 focus:ring-emerald-400'
+											]"
+											:style="{ minWidth: '140px' }"
+										>
+											<i
+												:class="[
+													'mr-1',
+													user.is_active ? 'fas fa-toggle-off' : 'fas fa-toggle-on'
+												]"
+											></i>
+											<span>
+												{{ user.is_active ? 'Mark Obsolete' : 'Mark Active' }}
+											</span>
+										</button>
+									</td>
+								</tr>
+								<tr v-if="paginatedUsers.length === 0">
+									<td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">No users found.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 
-            <!-- Pagination Controls -->
-            <div v-if="totalPages > 1" class="flex items-center justify-between mt-6">
-                <div class="flex-1 flex justify-between items-center">
-                    <button
-                        @click="changePage(currentPage - 1)"
-                        :disabled="currentPage === 1"
-                        :class="[
-                            currentPage === 1
-                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white hover:from-indigo-600 hover:to-blue-700',
-                            'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-                        ]"
-                    >
-                        Previous
-                    </button>
+					<!-- Pagination Controls -->
+					<div v-if="totalPages > 1" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+						<div class="flex items-center gap-3">
+							<span class="text-xs text-gray-500">
+								Page {{ currentPage }} of {{ totalPages }}
+							</span>
+						</div>
+						<div class="flex items-center justify-end gap-2">
+							<button
+								@click="changePage(currentPage - 1)"
+								:disabled="currentPage === 1"
+								:class="[
+									currentPage === 1
+										? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+										: 'bg-white text-gray-700 hover:bg-gray-50',
+									'inline-flex items-center px-3 py-1.5 border border-gray-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500'
+								]"
+							>
+								Previous
+							</button>
 
-                    <span class="text-sm text-gray-700">
-                        Page {{ currentPage }} of {{ totalPages }}
-                    </span>
-
-                    <button
-                        @click="changePage(currentPage + 1)"
-                        :disabled="currentPage >= totalPages"
-                        :class="[
-                            currentPage >= totalPages
-                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white hover:from-indigo-600 hover:to-blue-700',
-                            'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-                        ]"
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
-        </div>
-    </AppLayout>
+							<button
+								@click="changePage(currentPage + 1)"
+								:disabled="currentPage >= totalPages"
+								:class="[
+									currentPage >= totalPages
+										? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+										: 'bg-white text-gray-700 hover:bg-gray-50',
+									'inline-flex items-center px-3 py-1.5 border border-gray-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500'
+								]"
+							>
+								Next
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</AppLayout>
 </template>
 
 <script setup>

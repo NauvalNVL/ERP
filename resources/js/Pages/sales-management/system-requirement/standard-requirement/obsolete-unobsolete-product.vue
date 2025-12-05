@@ -1,109 +1,229 @@
 <template>
-    <AppLayout :header="'Manage Product Status'">
-    <Head title="Manage Product Status" />
+	<AppLayout header="Manage Product Status">
+		<Head title="Manage Product Status" />
 
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg mb-6">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-sync-alt mr-3"></i> Manage Product Status (Obsolete/Unobsolete)
-        </h2>
-        <p class="text-emerald-100">Toggle the active status of products.</p>
-    </div>
+		<!-- Header & Main Layout -->
+		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+			<div class="max-w-7xl mx-auto">
+				<!-- Header Section -->
+				<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+						<div class="flex items-center gap-3">
+							<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+								<i class="fas fa-sync-alt text-white text-sm"></i>
+							</div>
+							<div>
+								<h2 class="text-lg sm:text-xl font-semibold leading-tight">
+									Manage Product Status (Obsolete/Unobsolete)
+								</h2>
+								<p class="text-xs sm:text-sm text-emerald-100">
+									Toggle the active status of products.
+								</p>
+							</div>
+						</div>
+						<div class="relative w-full sm:w-72">
+							<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-100">
+								<i class="fas fa-search text-xs"></i>
+							</span>
+							<input
+								v-model="searchQuery"
+								type="text"
+								placeholder="Search products (code, description, category)..."
+								class="block w-full rounded-md border border-gray-200 bg-white py-1.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+							/>
+						</div>
+					</div>
+				</div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6">
-        <!-- Success/Error Messages -->
-        <div v-if="notification.show" 
-             :class="{
-                'bg-green-100 border border-green-400 text-green-700': notification.type === 'success',
-                'bg-red-100 border border-red-400 text-red-700': notification.type === 'error',
-                'px-4 py-3 rounded relative mb-4': true
-             }">
-            <span class="block sm:inline">{{ notification.message }}</span>
-        </div>
+				<!-- Success/Error Messages -->
+				<div
+					v-if="notification.show"
+					:class="[
+						notification.type === 'success'
+							? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+							: 'bg-red-50 border-red-200 text-red-800',
+						'px-4 py-3 mb-4 rounded-lg border text-sm shadow-sm'
+					]"
+				>
+					<span class="block">{{ notification.message }}</span>
+				</div>
 
-        <!-- Search and Filter Controls -->
-        <div class="mb-6 flex flex-wrap items-center gap-4">
-            <div class="flex-1 min-w-[300px]">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" v-model="searchQuery" placeholder="Search products..."
-                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
-                </div>
-            </div>
-            <div>
-                <select v-model="statusFilter" class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="all">All Statuses</option>
-                    <option value="active">Active Only</option>
-                    <option value="obsolete">Obsolete Only</option>
-                </select>
-            </div>
-        </div>
+				<!-- Main Card -->
+				<div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+					<!-- Card Header -->
+					<div class="px-4 py-2 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white">
+						<div>
+							<h2 class="text-sm font-semibold text-gray-800">
+								Product List
+							</h2>
+							<p class="text-xs text-gray-500">
+								{{ filteredProducts.length }} of {{ products.length }} products
+							</p>
+						</div>
+						<div class="flex items-center gap-2">
+							<label class="text-xs font-medium text-gray-600">
+								Status:
+							</label>
+							<select
+								v-model="statusFilter"
+								class="py-1.5 px-2.5 text-xs border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+							>
+								<option value="all">All</option>
+								<option value="active">Active Only</option>
+								<option value="obsolete">Obsolete Only</option>
+							</select>
+						</div>
+					</div>
 
-        <!-- Loading Indicator -->
-        <div v-if="loading" class="my-8 flex justify-center">
-            <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+					<!-- Table / Loading -->
+					<div class="relative">
+						<!-- Loading Indicator -->
+						<div v-if="loading" class="py-10 flex justify-center items-center">
+							<div class="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+						</div>
 
-        <!-- Products Table -->
-        <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-            <table class="min-w-full divide-y divide-gray-200 bg-white">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.product_code }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.description }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ product.category }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <span v-if="product.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                <i class="fas fa-check-circle mr-1"></i> Active
-                            </span>
-                            <span v-else class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                <i class="fas fa-times-circle mr-1"></i> Obsolete
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex justify-center">
-                                <button @click="toggleProductStatus(product)" :disabled="isToggling"
-                                    :class="[
-                                        product.status === 'Act'
-                                            ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200'
-                                            : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200',
-                                        'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1 rounded text-xs font-semibold inline-flex items-center justify-center'
-                                    ]"
-                                    :style="{ minWidth: '120px' }">
-                                    <i :class="[product.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
-                                    {{ product.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-if="filteredProducts.length === 0">
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No products found.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+						<!-- Products Table -->
+						<div v-else class="overflow-x-auto">
+							<table class="min-w-full table-auto divide-y divide-gray-200 text-sm">
+								<thead class="bg-gray-50">
+									<tr>
+										<th
+											scope="col"
+											class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+										>
+											Code
+										</th>
+										<th
+											scope="col"
+											class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+										>
+											Name
+										</th>
+										<th
+											scope="col"
+											class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+										>
+											Category
+										</th>
+										<th
+											scope="col"
+											class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide"
+										>
+											Status
+										</th>
+										<th
+											scope="col"
+											class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide"
+										>
+											Action
+										</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-gray-100 bg-white">
+									<tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-gray-50">
+										<td class="px-4 py-2 whitespace-nowrap text-xs font-mono text-gray-700">
+											{{ product.product_code }}
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-800">
+											{{ product.description }}
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-600">
+											{{ product.category }}
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+											<span
+												v-if="product.status === 'Act'"
+												class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100"
+											>
+												<i class="fas fa-check-circle mr-1"></i>
+												Active
+											</span>
+											<span
+												v-else
+												class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100"
+											>
+												<i class="fas fa-times-circle mr-1"></i>
+												Obsolete
+											</span>
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm">
+											<div class="flex justify-center">
+												<button
+													@click="toggleProductStatus(product)"
+													:disabled="isToggling"
+													:class="[
+														product.status === 'Act'
+															? 'text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-100'
+															: 'text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100',
+														'transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-emerald-500 px-3 py-1 rounded-md text-xs font-semibold inline-flex items-center justify-center'
+													]"
+													:style="{ minWidth: '120px' }"
+												>
+													<i :class="[product.status === 'Act' ? 'fas fa-toggle-off' : 'fas fa-toggle-on', 'mr-1']"></i>
+													{{ product.status === 'Act' ? 'Mark Obsolete' : 'Mark Active' }}
+												</button>
+											</div>
+										</td>
+									</tr>
+									<tr v-if="filteredProducts.length === 0">
+										<td colspan="5" class="px-4 py-10 text-center text-sm text-gray-500">
+											No products found.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
 
-    </div>
+					<!-- Pagination Controls -->
+					<div
+						v-if="pagination.total > pagination.perPage"
+						class="px-4 py-3 sm:px-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+					>
+						<div class="flex-1 flex justify-between items-center">
+							<button
+									@click="changePage(pagination.currentPage - 1)"
+									:disabled="pagination.currentPage === 1"
+									:class="[
+										pagination.currentPage === 1
+											? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+											: 'bg-white text-gray-700 hover:bg-gray-100',
+										'py-1.5 px-3 border border-gray-300 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500'
+									]"
+							>
+								Previous
+							</button>
 
-    <!-- Loading Overlay -->
-    <div v-if="isToggling" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="bg-white p-4 rounded-lg shadow-lg text-center">
-            <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-            <p>Updating status...</p>
-        </div>
-    </div>
-    </AppLayout>
+							<span class="text-xs text-gray-600">
+								Page {{ pagination.currentPage }} of {{ Math.ceil(pagination.total / pagination.perPage) }}
+							</span>
+
+							<button
+									@click="changePage(pagination.currentPage + 1)"
+									:disabled="pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage)"
+									:class="[
+										pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage)
+											? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+											: 'bg-white text-gray-700 hover:bg-gray-100',
+										'py-1.5 px-3 border border-gray-300 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500'
+									]"
+							>
+								Next
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Loading Overlay -->
+		<div v-if="isToggling" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-center">
+			<div class="bg-white px-6 py-4 rounded-lg shadow-lg text-center">
+				<div class="w-8 h-8 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+				<p class="text-sm text-gray-700">Updating status...</p>
+			</div>
+		</div>
+	</AppLayout>
 </template>
 
 <script setup>

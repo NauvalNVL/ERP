@@ -1,44 +1,25 @@
 <template>
   <AppLayout header="Cancel Delivery Order">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-      <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-4 border-b border-gray-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <i class="fas fa-times-circle text-2xl text-red-600"></i>
-            <div>
-              <h1 class="text-xl font-semibold text-gray-800">Cancel Delivery Order</h1>
-              <p class="text-xs text-gray-500">F2: DO Lookup • F3: Items • F4: Calendar • Ctrl+S: Save • F5: Refresh</p>
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <!-- Header with controls -->
+          <div class="bg-blue-600 px-4 py-3 sm:px-6 border-b border-blue-700">
+            <div class="flex items-center justify-start">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
+                  <i class="fas fa-times-circle text-lg text-red-100"></i>
+                </div>
+                <div>
+                  <h1 class="text-lg sm:text-xl font-semibold text-white">Cancel Delivery Order</h1>
+                  <p class="text-xs text-blue-100">F2: DO Lookup • F3: Items • F4: Calendar • Ctrl+S: Save • F5: Refresh</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <button 
-              @click="exitPage" 
-              class="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-              title="Exit"
-            >
-              <i class="fas fa-power-off"></i>
-            </button>
-            <button 
-              @click="cancelDeliveryOrder" 
-              class="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-              title="Cancel DO"
-            >
-              <i class="fas fa-ban"></i>
-            </button>
-            <button 
-              @click="refreshPage" 
-              class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-              title="Refresh (F5)"
-            >
-              <i class="fas fa-sync-alt"></i>
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <!-- Main Form Content -->
-      <div class="p-6">
+          <!-- Main Form Content -->
+          <div class="p-6">
         <!-- Form Container -->
         <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
           <!-- Current Period -->
@@ -215,6 +196,8 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Delivery Order Lookup Modal -->
     <DeliveryOrderLookupModal 

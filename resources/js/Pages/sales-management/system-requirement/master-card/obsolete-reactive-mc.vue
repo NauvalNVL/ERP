@@ -1,28 +1,26 @@
 <template>
     <AppLayout :header="'Obsolete & Reactive MC'">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
-        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
-            <div class="flex items-center">
-                <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner mr-4">
-                    <i class="fas fa-sync-alt text-white text-2xl"></i>
+        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+            <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i class="fas fa-sync-alt text-white text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Obsolete & Reactive Master Card</h2>
-                    <p class="text-blue-100">Manage individual master card status by changing it to obsolete or reactivating it based on specific requirements.</p>
+                    <h2 class="text-lg sm:text-xl font-semibold text-white leading-tight">Obsolete & Reactive Master Card</h2>
+                    <p class="text-xs sm:text-sm text-blue-100">Manage individual master card status by changing it to obsolete or reactivating it based on specific requirements.</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 <!-- Left Column - Main Content (The Form) -->
-                <div class="animate-fade-in-up">
-                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-xl relative overflow-hidden">
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full opacity-50"></div>
-                        <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-50 rounded-full opacity-50"></div>
+                <div>
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-indigo-500">
                         
                         <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
                             <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-4 shadow-md">
@@ -262,9 +260,9 @@
                                     type="button"
                                     :disabled="!canSave"
                                     :class="[
-                                        'w-full px-4 py-3 font-semibold rounded-lg shadow-md transition-all duration-200 flex items-center justify-center space-x-2',
+                                        'w-full px-4 py-3 font-semibold rounded-lg shadow-sm flex items-center justify-center space-x-2',
                                         canSave 
-                                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transform hover:-translate-y-0.5' 
+                                            ? 'bg-blue-600 text-white hover:bg-blue-700' 
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     ]"
                                 >
@@ -278,9 +276,9 @@
                 </div>
 
                 <!-- Right Column - Description Info Panel -->
-                <div class="lg:col-span-1 animate-fade-in-up animation-delay-300">
+                <div class="lg:col-span-1">
                     <div class="sticky top-24">
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-teal-500">
+                        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-teal-500">
                             <div class="flex items-center mb-4 pb-3 border-b border-gray-200">
                                 <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-4 shadow-md">
                                     <i class="fas fa-info-circle text-white"></i>
@@ -325,6 +323,8 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
             </div>
         </div>
 

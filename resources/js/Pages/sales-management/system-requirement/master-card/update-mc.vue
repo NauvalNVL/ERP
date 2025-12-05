@@ -1,61 +1,39 @@
 <template>
     <AppLayout :header="'Update MC'">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
         <!-- Header Section with animated elements -->
-        <div
-            class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative"
-        >
-            <!-- Decorative Elements -->
-            <div
-                class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"
-            ></div>
-            <div
-                class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"
-            ></div>
-            <div
-                class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-400 opacity-5 rounded-full translate-y-10 translate-x-10"
-            ></div>
-
-            <div class="flex items-center">
-                <div
-                    class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4"
-                >
-                    <div
-                        class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"
-                    ></div>
-                    <div
-                        class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"
-                    ></div>
-                    <i class="fas fa-id-card text-white text-2xl z-10"></i>
+        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+            <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+                        <i class="fas fa-id-card text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-semibold leading-tight">
+                            Update Master Card
+                        </h2>
+                        <p class="text-xs sm:text-sm text-blue-100">
+                            Manage and update master card information in the system
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h2
-                        class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow"
-                    >
-                        Update Master Card
-                    </h2>
-                    <p class="text-blue-100 max-w-2xl">
-                        Manage and update master card information in the system
-                    </p>
+                <div class="flex items-center gap-2 text-xs text-blue-100">
+                    <i class="fas fa-info-circle text-sm"></i>
+                    <span>Search or update Master Card by AC# and MCS#.</span>
                 </div>
             </div>
         </div>
 
         <div
-            class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50"
+            class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-5 mb-4"
         >
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left Column - Main Content -->
                 <div class="lg:col-span-2">
                     <div
-                        class="bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden"
+                        class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-100"
                     >
-                        <div
-                            class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-50 rounded-full opacity-20"
-                        ></div>
-                        <div
-                            class="absolute -bottom-8 -left-8 w-24 h-24 bg-purple-50 rounded-full opacity-20"
-                        ></div>
-
                         <div
                             class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10"
                         >
@@ -70,7 +48,7 @@
                         </div>
 
                         <!-- Form content -->
-                        <form @submit.prevent="saveRecord" class="space-y-6">
+                        <form @submit.prevent="saveRecord" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label
@@ -350,56 +328,46 @@
                     <!-- Detailed MC Info Section -->
                     <div
                         v-if="showDetailedMcInfo"
-                        class="mt-6 bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden"
+                        class="mt-4 bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5"
                     >
-                        <div
-                            class="absolute -top-20 -right-20 w-40 h-40 bg-emerald-50 rounded-full opacity-20"
-                        ></div>
-                        <div
-                            class="absolute -bottom-8 -left-8 w-24 h-24 bg-green-50 rounded-full opacity-20"
-                        ></div>
 
                         <div
-                            class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10"
+                            class="flex items-center mb-4 pb-2 border-b border-gray-100"
                         >
                             <div
-                                class="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg mr-3 shadow-md"
+                                class="p-2 bg-blue-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-info-circle text-white"></i>
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-800">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                                 Detailed Master Card Information
                             </h3>
                         </div>
 
                         <div
-                            class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
+                            class="grid grid-cols-2 gap-4 text-sm"
                         >
-                            <div class="space-y-2">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-gray-600"
-                                            >Last MCS#:</label
-                                        >
-                                        <input
-                                            type="text"
-                                            :value="mcDetails.last_mcs"
-                                            readonly
-                                            class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label class="block text-gray-600"
-                                            >Last Updated Seq#:</label
-                                        >
-                                        <input
-                                            type="text"
-                                            :value="mcDetails.last_updated_seq"
-                                            readonly
-                                            class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-600"
+                                    >Last MCS#:</label
+                                >
+                                <input
+                                    type="text"
+                                    :value="mcDetails.last_mcs"
+                                    readonly
+                                    class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-gray-600"
+                                    >Last Updated Seq#:</label
+                                >
+                                <input
+                                    type="text"
+                                    :value="mcDetails.last_updated_seq"
+                                    readonly
+                                    class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
+                                />
                             </div>
                         </div>
 
@@ -427,24 +395,18 @@
                 <div class="lg:col-span-1">
                     <!-- Info Card -->
                     <div
-                        class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden"
+                        class="bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5 mb-4"
                     >
-                        <div
-                            class="absolute -top-16 -right-16 w-32 h-32 bg-teal-50 rounded-full opacity-20"
-                        ></div>
-                        <div
-                            class="absolute -bottom-6 -left-6 w-20 h-20 bg-green-50 rounded-full opacity-20"
-                        ></div>
 
                         <div
-                            class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10"
+                            class="flex items-center mb-3 pb-2 border-b border-gray-100"
                         >
                             <div
-                                class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md"
+                                class="p-2 bg-blue-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-info-circle text-white"></i>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-800">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                                 Master Card Info
                             </h3>
 
@@ -469,7 +431,7 @@
                         </div>
 
                         <div class="space-y-4">
-                            <div class="p-4 bg-teal-50 rounded-lg">
+                            <div class="p-3 bg-teal-50 rounded-lg">
                                 <h4
                                     class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2 flex items-center"
                                 >
@@ -570,7 +532,7 @@
                                 </div>
                             </div>
 
-                            <div class="p-4 bg-blue-50 rounded-lg">
+                            <div class="p-3 bg-blue-50 rounded-lg">
                                 <h4
                                     class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2 flex items-center"
                                 >
@@ -634,24 +596,18 @@
 
                     <!-- Quick Links -->
                     <div
-                        class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden"
+                        class="bg-white shadow-sm rounded-xl border border-violet-100 p-4 sm:p-5"
                     >
-                        <div
-                            class="absolute -top-16 -right-16 w-32 h-32 bg-purple-50 rounded-full opacity-20"
-                        ></div>
-                        <div
-                            class="absolute -bottom-6 -left-6 w-20 h-20 bg-pink-50 rounded-full opacity-20"
-                        ></div>
 
                         <div
-                            class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10"
+                            class="flex items-center mb-3 pb-2 border-b border-violet-100"
                         >
                             <div
-                                class="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-3 shadow-md"
+                                class="p-2 bg-violet-500 rounded-lg mr-3"
                             >
                                 <i class="fas fa-link text-white"></i>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-800">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                                 Quick Links
                             </h3>
                         </div>
@@ -678,6 +634,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
 
@@ -795,58 +753,50 @@
         <!-- Customer Account Modal with Modern Design -->
         <div
             v-if="showCustomerAccountModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
         >
             <div
-                class="bg-white rounded-lg shadow-xl w-3/4 max-w-4xl max-h-[80vh] flex flex-col transform transition-all duration-300 animate-scaleIn"
+                class="bg-white rounded-lg shadow-lg w-11/12 max-w-4xl max-h-[80vh] flex flex-col"
             >
-                <!-- Modal Header with Gradient Background -->
+                <!-- Modal Header -->
                 <div
-                    class="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 text-white px-6 py-4 rounded-t-lg flex justify-between items-center relative overflow-hidden"
+                    class="bg-blue-600 text-white px-4 py-3 sm:px-6 rounded-t-lg flex justify-between items-center"
                 >
-                    <!-- Decorative Elements -->
-                    <div
-                        class="absolute top-0 right-0 w-20 h-20 bg-white opacity-5 rounded-full -translate-y-10 translate-x-10 animate-pulse-slow"
-                    ></div>
-                    <div
-                        class="absolute bottom-0 left-0 w-16 h-16 bg-white opacity-5 rounded-full translate-y-8 -translate-x-8 animate-pulse-slow animation-delay-500"
-                    ></div>
-
-                    <div class="flex items-center space-x-3 relative z-10">
+                    <div class="flex items-center space-x-3">
                         <div
-                            class="bg-white bg-opacity-20 p-2 rounded-lg shadow-inner transform transition-transform hover:scale-110"
+                            class="bg-white bg-opacity-20 p-2 rounded-lg"
                         >
                             <i class="fas fa-users text-xl"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-shadow">
+                        <h3 class="text-lg sm:text-xl font-semibold">
                             Customer Account Table
                         </h3>
                     </div>
                     <button
                         @click="showCustomerAccountModal = false"
-                        class="text-white hover:text-gray-200 transition-colors transform hover:scale-110 focus:outline-none"
+                        class="text-white hover:text-gray-200 focus:outline-none"
                     >
                         <i class="fas fa-times text-lg"></i>
                     </button>
                 </div>
 
-                <!-- Search and Filter Bar with Animation -->
+                <!-- Search and Filter Bar -->
                 <div
-                    class="p-4 border-b bg-gradient-to-r from-gray-50 to-white"
+                    class="p-4 border-b bg-white"
                 >
                     <div class="flex flex-col md:flex-row gap-4">
                         <!-- Search Input -->
                         <div
-                            class="relative flex-grow transform transition-all duration-300 hover:scale-[1.01]"
+                            class="relative flex-grow"
                         >
                             <input
                                 type="text"
                                 v-model="searchTerm"
                                 placeholder="Search by customer code or name..."
-                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-shadow duration-300 hover:shadow-md"
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
                             />
                             <div
-                                class="absolute left-3 top-2.5 text-gray-400 transition-colors duration-300 group-hover:text-indigo-500"
+                                class="absolute left-3 top-2.5 text-gray-400"
                             >
                                 <i class="fas fa-search"></i>
                             </div>
@@ -905,7 +855,7 @@
 
                 <!-- Customer List with Enhanced Styling -->
                 <div
-                    class="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-gray-50"
+                    class="flex-1 overflow-y-auto p-4 bg-white"
                 >
                     <!-- Loading State -->
                     <div
@@ -974,16 +924,11 @@
                                         customer, index
                                     ) in filteredCustomers"
                                     :key="customer.customer_code"
-                                    class="hover:bg-blue-50 cursor-pointer transition-colors animate-fadeIn"
+                                    class="hover:bg-blue-50 cursor-pointer transition-colors"
                                     :class="{
                                         'bg-blue-100':
                                             selectedCustomer?.customer_code ===
-                                            customer.customer_code,
-                                        'animation-delay-100': index % 5 === 0,
-                                        'animation-delay-200': index % 5 === 1,
-                                        'animation-delay-300': index % 5 === 2,
-                                        'animation-delay-200': index % 5 === 3,
-                                        'animation-delay-100': index % 5 === 4,
+                                            customer.customer_code
                                     }"
                                     @click="selectCustomer(customer)"
                                 >
@@ -1002,10 +947,10 @@
                                             @click.stop="
                                                 selectCustomer(customer)
                                             "
-                                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-transform"
+                                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                         >
                                             <i
-                                                class="fas fa-check mr-1.5 animate-bounce-gentle"
+                                                class="fas fa-check mr-1.5"
                                             ></i>
                                             Select
                                         </button>
