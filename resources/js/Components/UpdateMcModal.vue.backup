@@ -549,434 +549,275 @@
 
             <!-- Modal Body -->
             <div class="p-4 overflow-y-auto flex-grow bg-gray-50">
-<!-- PRODUCT Section -->
+                <!-- PRODUCT Section -->
                 <div class="border border-gray-400 rounded mb-4 bg-white">
                     <div class="bg-blue-200 px-3 py-1 border-b border-gray-400">
                         <h4 class="text-sm font-bold text-blue-900">PRODUCT</h4>
                     </div>
                     <div class="p-3">
-                        <!-- DESKTOP LAYOUT (>= lg) -->
-                        <div class="hidden lg:block">
-                            <!-- Row 1: P/Design, Flute, Part No -->
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="flex flex-wrap items-center space-x-4 flex-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">P/Design:</label>
-                                        <input type="text" v-model="selectedProductDesign" class="w-32 px-2 py-1 border border-gray-400 text-xs" readonly>
-                                        <button @click="openProductDesignModal" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-12">Flute:</label>
-                                        <input type="text" v-model="selectedPaperFlute" class="w-20 px-2 py-1 border border-gray-400 text-xs" readonly>
-                                        <button @click="showPaperFluteModal = true" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">Part No:</label>
-                                        <input type="text" v-model="partNo" class="w-40 px-2 py-1 border border-gray-400 text-xs">
-                                    </div>
-                                    <div class="flex items-center">
-                                        <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium" @click="openMoreDescriptionModal">Description</button>
-                                    </div>
+                        <!-- Row 1: P/Design, Flute, Part No -->
+                        <div class="mb-3 space-y-3 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
+                            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:space-x-4 flex-1 space-y-2 sm:space-y-0">
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">P/Design:</label>
+                                    <input type="text" v-model="selectedProductDesign" class="w-28 sm:w-32 px-2 py-1 border border-gray-400 text-xs" readonly>
+                                    <button @click="openProductDesignModal" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <i class="fas fa-search"></i>
+                                    </button>
                                 </div>
-                                <div class="w-64 flex flex-col space-y-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-32 whitespace-nowrap">System Gross Area:</label>
-                                        <div class="flex items-center">
-                                            <input type="text" :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                            <span class="text-xs ml-1">m2</span>
-                                        </div>
-                                    </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-12">Flute:</label>
+                                    <input type="text" v-model="selectedPaperFlute" class="w-16 sm:w-20 px-2 py-1 border border-gray-400 text-xs" readonly>
+                                    <button @click="showPaperFluteModal = true" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">Part No:</label>
+                                    <input type="text" v-model="partNo" class="w-full sm:w-40 px-2 py-1 border border-gray-400 text-xs">
+                                </div>
+                                <div class="flex items-center">
+                                    <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium" @click="openMoreDescriptionModal">Description</button>
                                 </div>
                             </div>
-
-                            <!-- Row 2: B/Quality -->
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="bg-yellow-200 p-2 rounded flex-1">
-                                    <div class="flex flex-wrap items-center gap-1">
-                                        <label class="text-xs font-bold w-16">B/Quality:</label>
-                                        <input type="text" value="DB" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible"><i class="fas fa-search"></i></button>
-                                        <input type="text" value="B" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible"><i class="fas fa-search"></i></button>
-                                        <input type="text" value="1L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible"><i class="fas fa-search"></i></button>
-                                        <input type="text" value="A/C/E" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible"><i class="fas fa-search"></i></button>
-                                        <input type="text" value="2L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
-                                        <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible"><i class="fas fa-search"></i></button>
-                                    </div>
-                                </div>
-                                <div class="w-64 flex flex-col space-y-1">
+                            <!-- Right side column for measurements -->
+                            <div class="mt-2 lg:mt-0 lg:w-64 w-full flex flex-col space-y-1">
+                                <div class="flex items-center justify-between lg:justify-start">
+                                    <label class="text-xs font-medium lg:w-32 whitespace-nowrap mr-2">System Gross Area:</label>
                                     <div class="flex items-center">
-                                        <label class="text-xs font-medium w-32 whitespace-nowrap">System Gross Weight:</label>
-                                        <div class="flex items-center">
-                                            <input type="text" :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                            <span class="text-xs ml-1">kg</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Row 3: SO -->
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="p-2 rounded flex-1">
-                                    <div class="flex flex-wrap items-center gap-1">
-                                        <label class="text-xs font-bold w-16">SO:</label>
-                                        <input type="text" :value="getSoDisplay(0)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getSoDisplay(1)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getSoDisplay(2)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getSoDisplay(3)" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getSoDisplay(4)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                    </div>
-                                </div>
-                                <div class="w-64 flex flex-col space-y-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-32 whitespace-nowrap">Input Gross Area:</label>
-                                        <div class="flex items-center">
-                                            <input type="text" :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs text-right">
-                                            <span class="text-xs ml-1">m2</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Row 4: WO -->
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="p-2 rounded flex-1">
-                                    <div class="flex flex-wrap items-center gap-1">
-                                        <label class="text-xs font-bold w-16">WO:</label>
-                                        <input type="text" :value="getWoDisplay(0)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openWoPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getWoDisplay(1)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openWoPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getWoDisplay(2)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openWoPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getWoDisplay(3)" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openWoPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                        <input type="text" :value="getWoDisplay(4)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button @click="emit('openWoPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                    </div>
-                                </div>
-                                <div class="w-64 flex flex-col space-y-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-32 whitespace-nowrap">Input Gross Weight:</label>
-                                        <div class="flex items-center">
-                                            <input type="text" :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs text-right">
-                                            <span class="text-xs ml-1">kg</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Row 5: ID -->
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="flex flex-wrap items-center space-x-4 flex-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-8">ID:</label>
-                                        <input type="text" v-model="idL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                        <span class="text-xs ml-1">L</span>
-                                        <input type="text" v-model="idW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
-                                        <span class="text-xs ml-1">W</span>
-                                        <input type="text" v-model="idH" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
-                                        <span class="text-xs ml-1">H</span>
-                                        <span class="ml-2 px-2 py-1 bg-red-200 border border-red-400 text-xs">t2e</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">Pcs/Set:</label>
-                                        <input type="text" v-model="pcsPerSet" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">Crease:</label>
-                                        <input type="text" v-model="creaseValue" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">Chem Coat:</label>
-                                        <input type="text" :value="selectedChemicalCoat" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                        <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openChemicalCoatModal"><i class="fas fa-search"></i></button>
-                                    </div>
-                                </div>
-                                <div class="w-64 flex flex-col space-y-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-32 whitespace-nowrap">Input Net Area:</label>
-                                        <div class="flex items-center">
-                                            <input type="text" :value="formatTrimZeros((displayNetM2PerPcs || 0).toFixed(6))" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs text-right">
-                                            <span class="text-xs ml-1">m2</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Row 6: ED -->
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="flex flex-wrap items-center space-x-4 flex-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-8">ED:</label>
-                                        <input type="text" v-model="edL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                        <span class="text-xs ml-1">L</span>
-                                        <input type="text" v-model="edW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
-                                        <span class="text-xs ml-1">W</span>
-                                        <input type="text" v-model="edH" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
-                                        <span class="text-xs ml-1">H</span>
-                                        <span class="ml-2 px-2 py-1 bg-red-200 border border-red-400 text-xs">e2t</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">Nest/Slot:</label>
-                                        <input type="text" v-model="nestSlot" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    </div>
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-16">R/F Tape:</label>
-                                        <input type="text" :value="selectedReinforcementTape" readonly class="w-28 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                        <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openReinforcementTapeModal"><i class="fas fa-search"></i></button>
-                                    </div>
-                                </div>
-                                <div class="w-64 flex flex-col space-y-1">
-                                    <div class="flex items-center">
-                                        <label class="text-xs font-medium w-32 whitespace-nowrap">Input Net Weight:</label>
-                                        <div class="flex items-center">
-                                            <input type="text" :value="formatTrimZeros((displayNetKgPerPcs || 0).toFixed(6))" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs text-right">
-                                            <span class="text-xs ml-1">kg</span>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-24 lg:w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                        >
+                                        <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- MOBILE LAYOUT (< lg) -->
-                        <div class="block lg:hidden space-y-2">
-                            <!-- P/Design -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">P/design:</label>
-                                <input type="text" v-model="selectedProductDesign" class="flex-1 px-2 py-1 border border-gray-400 text-xs" readonly>
-                                <button @click="openProductDesignModal" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-
-                            <!-- Flute -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">Flute:</label>
-                                <input type="text" v-model="selectedPaperFlute" class="flex-1 px-2 py-1 border border-gray-400 text-xs" readonly>
-                                <button @click="showPaperFluteModal = true" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-
-                            <!-- Part No -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">Part No:</label>
-                                <input type="text" v-model="partNo" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                            </div>
-
-                            <!-- Description Button -->
-                            <div class="flex items-center justify-end">
-                                <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium" @click="openMoreDescriptionModal">Description</button>
-                            </div>
-
-                            <!-- B/Quality, SO, WO Table -->
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-xs border-collapse">
-                                    <thead>
-                                        <tr class="bg-yellow-200">
-                                            <th class="border border-gray-400 px-2 py-1 text-left font-bold">B/quality</th>
-                                            <th class="border border-gray-400 px-2 py-1 text-center font-bold">SO</th>
-                                            <th class="border border-gray-400 px-2 py-1 text-center font-bold">WO</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="border border-gray-400 px-2 py-1 bg-yellow-100 text-center">DB</td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getSoDisplay(0)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openPaperQualityModal', 0)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getWoDisplay(0)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openWoPaperQualityModal', 0)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border border-gray-400 px-2 py-1 bg-yellow-100 text-center">B</td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getSoDisplay(1)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openPaperQualityModal', 1)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getWoDisplay(1)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openWoPaperQualityModal', 1)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border border-gray-400 px-2 py-1 bg-yellow-100 text-center">1L</td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getSoDisplay(2)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openPaperQualityModal', 2)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getWoDisplay(2)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openWoPaperQualityModal', 2)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border border-gray-400 px-2 py-1 bg-yellow-100 text-center">A/C/E</td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getSoDisplay(3)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openPaperQualityModal', 3)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getWoDisplay(3)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openWoPaperQualityModal', 3)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border border-gray-400 px-2 py-1 bg-yellow-100 text-center">2L</td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getSoDisplay(4)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openPaperQualityModal', 4)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                            <td class="border border-gray-400 px-1 py-1">
-                                                <div class="flex items-center justify-center gap-1">
-                                                    <input type="text" :value="getWoDisplay(4)" readonly class="w-16 px-1 py-0.5 border border-gray-400 text-xs text-center bg-gray-50">
-                                                    <button @click="emit('openWoPaperQualityModal', 4)" class="px-1 py-0.5 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white"><i class="fas fa-search"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- ID Row -->
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium w-8">ID:</label>
-                                <input type="text" v-model="idL" class="w-14 px-2 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">L</span>
-                                <input type="text" v-model="idW" class="w-14 px-2 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">W</span>
-                                <input type="text" v-model="idH" class="w-14 px-2 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">H</span>
-                                <span class="px-2 py-1 bg-red-200 border border-red-400 text-xs">t2e</span>
-                            </div>
-
-                            <!-- ED Row -->
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium w-8">ED:</label>
-                                <input type="text" v-model="edL" class="w-14 px-2 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">L</span>
-                                <input type="text" v-model="edW" class="w-14 px-2 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">W</span>
-                                <input type="text" v-model="edH" class="w-14 px-2 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">H</span>
-                                <span class="px-2 py-1 bg-red-200 border border-red-400 text-xs">e2t</span>
-                            </div>
-
-                            <!-- Pcs/Set Row -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-16">Pcs/Set:</label>
-                                <input type="text" v-model="pcsPerSet" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                            </div>
-
-                            <!-- Nest/Slot Row (inside PRODUCT section) -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">Nest/Slot:</label>
-                                <input type="text" v-model="nestSlot" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                            </div>
-
-                            <!-- Crease Row -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-16">Crease:</label>
-                                <input type="text" v-model="creaseValue" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                            </div>
-
-                            <!-- Chem Coat Row -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">Chem coat:</label>
-                                <input type="text" :value="selectedChemicalCoat" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openChemicalCoatModal">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-
-                            <!-- RF Tape Row -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">RF tape:</label>
-                                <input type="text" :value="selectedReinforcementTape" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openReinforcementTapeModal">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-
-                            <!-- Measurement Fields (Below RF Tape) -->
-                            <div class="border-t border-gray-300 pt-2 mt-2 space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">System Gross Area:</label>
-                                    <div class="flex items-center">
-                                        <input type="text" :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                        <span class="text-xs ml-1">m2</span>
-                                    </div>
+                        <!-- Row 2: B/Quality (Yellow background) -->
+                        <div class="mb-3 space-y-3 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
+                            <div class="bg-yellow-200 p-2 rounded flex-1">
+                                <div class="flex flex-wrap items-center gap-1">
+                                    <label class="text-xs font-bold w-16">B/Quality:</label>
+                                    <!-- Header for SO/WO 1 (DB) -->
+                                    <input type="text" value="DB" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                    <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <!-- Header for SO/WO 2 (B) -->
+                                    <input type="text" value="B" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                    <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <!-- Header for SO/WO 3 (1L) -->
+                                    <input type="text" value="1L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                    <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <!-- Header for SO/WO 4 (A/C/E) -->
+                                    <input type="text" value="A/C/E" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                    <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <!-- Header for SO/WO 5 (2L) -->
+                                    <input type="text" value="2L" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-yellow-100">
+                                    <button class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs invisible">
+                                        <i class="fas fa-search"></i>
+                                    </button>
                                 </div>
-
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">System Gross Weight:</label>
+                            </div>
+                            <!-- Right side column for measurements -->
+                            <div class="mt-2 lg:mt-0 lg:w-64 w-full flex flex-col space-y-1">
+                                <div class="flex items-center justify-between lg:justify-start">
+                                    <label class="text-xs font-medium lg:w-32 whitespace-nowrap mr-2">System Gross Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
+                                            readonly
+                                            class="w-24 lg:w-20 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                        >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Gross Area:</label>
+
+
+                        <!-- Row 3: SO -->
+                        <div class="mb-3 space-y-3 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
+                            <div class="p-2 rounded flex-1">
+                                <div class="flex flex-wrap items-center gap-1">
+                                    <label class="text-xs font-bold w-16">SO:</label>
+                                    <input type="text" :value="getSoDisplay(0)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getSoDisplay(1)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getSoDisplay(2)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getSoDisplay(3)" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getSoDisplay(4)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Right side column for measurements -->
+                            <div class="mt-2 lg:mt-0 lg:w-64 w-full flex flex-col space-y-1">
+                                <div class="flex items-center justify-between lg:justify-start">
+                                    <label class="text-xs font-medium lg:w-32 whitespace-nowrap mr-2">Input Gross Area:</label>
                                     <div class="flex items-center">
-                                        <input type="text" :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-24 lg:w-20 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Gross Weight:</label>
+                        <!-- Row 4: WO -->
+                        <div class="mb-3 space-y-3 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
+                            <div class="p-2 rounded flex-1">
+                                <div class="flex flex-wrap items-center gap-1">
+                                    <label class="text-xs font-bold w-16">WO:</label>
+                                    <input type="text" :value="getWoDisplay(0)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openWoPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getWoDisplay(1)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openWoPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getWoDisplay(2)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openWoPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getWoDisplay(3)" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openWoPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <input type="text" :value="getWoDisplay(4)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button @click="emit('openWoPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Right side column for measurements -->
+                            <div class="mt-2 lg:mt-0 lg:w-64 w-full flex flex-col space-y-1">
+                                <div class="flex items-center justify-between lg:justify-start">
+                                    <label class="text-xs font-medium lg:w-32 whitespace-nowrap mr-2">Input Gross Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
+                                            readonly
+                                            class="w-24 lg:w-20 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Net Area:</label>
+                        <!-- Row 5: ID -->
+                        <div class="mb-3 space-y-3 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
+                            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:space-x-4 flex-1 space-y-2 sm:space-y-0">
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-8">ID:</label>
+                                    <input type="text" v-model="idL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <span class="text-xs ml-1">L</span>
+                                    <input type="text" v-model="idW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <span class="text-xs ml-1">W</span>
+                                    <input type="text" v-model="idH" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <span class="text-xs ml-1">H</span>
+                                    <span class="ml-2 px-2 py-1 bg-red-200 border border-red-400 text-xs">t2e</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">Pcs/Set:</label>
+                                    <input type="text" v-model="pcsPerSet" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">Crease:</label>
+                                    <input type="text" v-model="creaseValue" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">Chem Coat:</label>
+                                    <input type="text" :value="selectedChemicalCoat" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openChemicalCoatModal" title="Select Chemical Coat">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Right side column for measurements -->
+                            <div class="mt-2 lg:mt-0 lg:w-64 w-full flex flex-col space-y-1">
+                                <div class="flex items-center justify-between lg:justify-start">
+                                    <label class="text-xs font-medium lg:w-32 whitespace-nowrap mr-2">Input Net Area:</label>
                                     <div class="flex items-center">
-                                        <input type="text" :value="formatTrimZeros((displayNetM2PerPcs || 0).toFixed(6))" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayNetM2PerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-24 lg:w-20 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="flex items-center justify-between">
-                                    <label class="text-xs font-medium">Input Net Weight:</label>
+                        <!-- Row 6: ED -->
+                        <div class="mb-3 space-y-3 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
+                            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:space-x-4 flex-1 space-y-2 sm:space-y-0">
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-8">ED:</label>
+                                    <input type="text" v-model="edL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <span class="text-xs ml-1">L</span>
+                                    <input type="text" v-model="edW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <span class="text-xs ml-1">W</span>
+                                    <input type="text" v-model="edH" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <span class="text-xs ml-1">H</span>
+                                    <span class="ml-2 px-2 py-1 bg-red-200 border border-red-400 text-xs">e2t</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">Nest/Slot:</label>
+                                    <input type="text" v-model="nestSlot" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="text-xs font-medium w-16">R/F Tape:</label>
+                                    <input type="text" :value="selectedReinforcementTape" readonly class="w-28 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openReinforcementTapeModal" title="Select Reinforcement Tape">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Right side column for measurements -->
+                            <div class="mt-2 lg:mt-0 lg:w-64 w-full flex flex-col space-y-1">
+                                <div class="flex items-center justify-between lg:justify-start">
+                                    <label class="text-xs font-medium lg:w-32 whitespace-nowrap mr-2">Input Net Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" :value="formatTrimZeros((displayNetKgPerPcs || 0).toFixed(6))" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayNetKgPerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-24 lg:w-20 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
@@ -991,175 +832,82 @@
                         <h4 class="text-sm font-bold text-blue-900">CORRUGATING</h4>
                     </div>
                     <div class="p-3">
-                        <!-- DESKTOP LAYOUT (>= lg) -->
-                        <div class="hidden lg:block">
-                            <!-- Score L Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
+                        <!-- Score L Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
+                            <div class="flex flex-wrap items-center gap-1">
+                                <label class="text-xs font-medium w-16">Score L:</label>
                                 <div class="flex flex-wrap items-center gap-1">
-                                    <label class="text-xs font-medium w-16">Score L:</label>
-                                    <div class="flex flex-wrap items-center gap-1">
-                                        <template v-for="i in 8" :key="'scoreL'+i">
-                                            <input type="text" v-model.number="scoreL[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                            <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
-                                        </template>
-                                    </div>
-                                    <span class="mx-2 text-xs font-bold">=</span>
-                                    <input type="text" :value="scoreLTotal" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                    <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreL">
-                                        <i class="fas fa-calculator"></i>
-                                    </button>
+                                    <template v-for="i in 8" :key="'scoreL'+i">
+                                        <input type="text" v-model.number="scoreL[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
+                                    </template>
                                 </div>
-                                <div class="flex items-center lg:ml-4">
-                                    <label class="text-xs font-medium w-20">Sheet Length:</label>
-                                    <input type="text" v-model="sheetLength" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    <span class="text-xs ml-1">mm</span>
-                                </div>
+                                <span class="mx-2 text-xs font-bold">=</span>
+                                <input type="text" :value="scoreLTotal" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
+                                <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreL">
+                                    <i class="fas fa-calculator"></i>
+                                </button>
                             </div>
-
-                            <!-- Score W Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
-                                <div class="flex flex-wrap items-center gap-1">
-                                    <label class="text-xs font-medium w-16">Score W:</label>
-                                    <div class="flex flex-wrap items-center gap-1">
-                                        <template v-for="i in 8" :key="'scoreW'+i">
-                                            <input type="text" v-model.number="scoreW[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                            <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
-                                        </template>
-                                    </div>
-                                    <span class="mx-2 text-xs font-bold">=</span>
-                                    <input type="text" :value="scoreWTotal" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                    <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreW">
-                                        <i class="fas fa-calculator"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center lg:ml-4">
-                                    <label class="text-xs font-medium w-20">Sheet Width:</label>
-                                    <input type="text" v-model="sheetWidth" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    <span class="text-xs ml-1">mm</span>
-                                </div>
-                            </div>
-
-                            <!-- P/Size Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-12">P/Size:</label>
-                                    <input type="text" :value="selectedPaperSize" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openPaperSizeModal" title="Select Paper Size">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <span class="text-xs ml-1">mm</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-16">Corr. Out:</label>
-                                    <input type="text" v-model="conOut" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Conv. Out 1 x 2:</label>
-                                    <input type="text" v-model="convDuctX2A" class="w-12 px-2 py-1 border border-gray-400 text-xs text-center">
-                                    <span class="mx-1 text-xs font-bold">x</span>
-                                    <input type="text" v-model="convDuctX2B" class="w-12 px-2 py-1 border border-gray-400 text-xs text-center">
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-20">Pcs-to-Joint:</label>
-                                    <input type="text" v-model="pcsToJoint" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-12">S/Tool:</label>
-                                    <input type="text" :value="selectedScoringToolCode" readonly class="w-8 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openScoringToolModal" title="Select Scoring Tool">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
+                            <div class="flex items-center lg:ml-4">
+                                <label class="text-xs font-medium w-20">Sheet Length:</label>
+                                <input type="text" v-model="sheetLength" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <span class="text-xs ml-1">mm</span>
                             </div>
                         </div>
 
-                        <!-- MOBILE LAYOUT (< lg) -->
-                        <div class="block lg:hidden space-y-3">
-                            <!-- Score L -->
-                            <div class="space-y-2">
-                                <div class="flex items-start">
-                                    <label class="text-xs font-medium w-24 flex-shrink-0">Score L:</label>
-                                    <div class="flex flex-wrap items-center gap-1 flex-1">
-                                        <template v-for="i in 8" :key="'mobileScoreL'+i">
-                                            <input type="text" v-model.number="scoreL[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                            <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
-                                        </template>
-                                    </div>
+                        <!-- Score W Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
+                            <div class="flex flex-wrap items-center gap-1">
+                                <label class="text-xs font-medium w-16">Score W:</label>
+                                <div class="flex flex-wrap items-center gap-1">
+                                    <template v-for="i in 8" :key="'scoreW'+i">
+                                        <input type="text" v-model.number="scoreW[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
+                                    </template>
                                 </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Total Score L:</label>
-                                    <input type="text" :value="scoreLTotal" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreL">
-                                        <i class="fas fa-calculator"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Sheet Length:</label>
-                                    <input type="text" v-model="sheetLength" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                                    <span class="text-xs ml-1">mm</span>
-                                </div>
+                                <span class="mx-2 text-xs font-bold">=</span>
+                                <input type="text" :value="scoreWTotal" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
+                                <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreW">
+                                    <i class="fas fa-calculator"></i>
+                                </button>
                             </div>
-
-                            <!-- Score W -->
-                            <div class="space-y-2">
-                                <div class="flex items-start">
-                                    <label class="text-xs font-medium w-24 flex-shrink-0">Score W:</label>
-                                    <div class="flex flex-wrap items-center gap-1 flex-1">
-                                        <template v-for="i in 8" :key="'mobileScoreW'+i">
-                                            <input type="text" v-model.number="scoreW[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                            <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
-                                        </template>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Total Score W:</label>
-                                    <input type="text" :value="scoreWTotal" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreW">
-                                        <i class="fas fa-calculator"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Sheet Width:</label>
-                                    <input type="text" v-model="sheetWidth" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                                    <span class="text-xs ml-1">mm</span>
-                                </div>
+                            <div class="flex items-center lg:ml-4">
+                                <label class="text-xs font-medium w-20">Sheet Width:</label>
+                                <input type="text" v-model="sheetWidth" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <span class="text-xs ml-1">mm</span>
                             </div>
+                        </div>
 
-                            <!-- Paper size / Tool -->
-                            <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">P/Size:</label>
-                                    <input type="text" :value="selectedPaperSize" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openPaperSizeModal" title="Select Paper Size">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <span class="text-xs ml-1">mm</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">S/Tool:</label>
-                                    <input type="text" :value="selectedScoringToolCode" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openScoringToolModal" title="Select Scoring Tool">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Corrugating Values -->
+                        <!-- P/Size Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Corr. Out:</label>
-                                <input type="text" v-model="conOut" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
+                                <label class="text-xs font-medium w-12">P/Size:</label>
+                                <input type="text" :value="selectedPaperSize" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openPaperSizeModal" title="Select Paper Size">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <span class="text-xs ml-1">mm</span>
                             </div>
-
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-16">Corr. Out:</label>
+                                <input type="text" v-model="conOut" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                            </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-24">Conv. Out 1 x 2:</label>
-                                <input type="text" v-model="convDuctX2A" class="flex-1 px-2 py-1 border border-gray-400 text-xs text-center max-w-[4.5rem]">
+                                <input type="text" v-model="convDuctX2A" class="w-12 px-2 py-1 border border-gray-400 text-xs text-center">
                                 <span class="mx-1 text-xs font-bold">x</span>
-                                <input type="text" v-model="convDuctX2B" class="flex-1 px-2 py-1 border border-gray-400 text-xs text-center max-w-[4.5rem]">
+                                <input type="text" v-model="convDuctX2B" class="w-12 px-2 py-1 border border-gray-400 text-xs text-center">
                             </div>
-
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Pcs-to-Joint:</label>
-                                <input type="text" v-model="pcsToJoint" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
+                                <label class="text-xs font-medium w-20">Pcs-to-Joint:</label>
+                                <input type="text" v-model="pcsToJoint" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-12">S/Tool:</label>
+                                <input type="text" :value="selectedScoringToolCode" readonly class="w-8 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openScoringToolModal" title="Select Scoring Tool">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1171,289 +919,133 @@
                         <h4 class="text-sm font-bold text-blue-900">CONVERTING</h4>
                     </div>
                     <div class="p-3">
-                        <!-- DESKTOP LAYOUT (>= lg) -->
-                        <div class="hidden lg:block">
-                            <!-- Print Color Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-start">
-                                <label class="text-xs font-medium w-20 flex-shrink-0">Print Color:</label>
-                                <div class="flex flex-wrap gap-1">
-                                    <div v-for="i in 7" :key="'color'+i" class="flex items-center space-x-1">
-                                        <input type="text" :value="printColorCodes[i-1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                        <button class="w-8 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openColorModal(i-1)" title="Select Color">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Print Area Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
-                                <div class="flex items-center flex-1 flex-wrap gap-1">
-                                    <label class="text-xs font-medium w-20">Print Area(%):</label>
-                                    <div class="flex flex-wrap gap-1">
-                                        <input type="text" v-model="colorAreaPercents[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'area'+i">
-                                    </div>
-                                </div>
-                                <div class="flex items-center lg:w-64 w-full lg:mt-0 mt-1">
-                                    <label class="text-xs font-medium w-24">Prt Block#:</label>
-                                    <input type="text" v-model="pitBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
-                                </div>
-                            </div>
-
-                            <!-- D/Cut Sheet Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-20">D/Cut Sheet:</label>
-                                    <input type="text" v-model="dcutSheetL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    <span class="text-xs ml-1">L</span>
-                                    <input type="text" v-model="dcutSheetW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
-                                    <span class="text-xs ml-1">W</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">D/Cut Block#:</label>
-                                    <input type="text" v-model="dcutBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-16">Glueing:</label>
-                                    <input type="text" :value="selectedGlueingCode" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openGlueingModal" title="Select Glueing Material">
+                        <!-- Print Color Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-start">
+                            <label class="text-xs font-medium w-20 flex-shrink-0">Print Color:</label>
+                            <div class="flex flex-wrap gap-1">
+                                <div v-for="i in 7" :key="'color'+i" class="flex items-center space-x-1">
+                                    <input type="text" :value="printColorCodes[i-1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button class="w-8 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openColorModal(i-1)" title="Select Color">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                </div>
-                                <div class="flex items-center lg:ml-auto">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="handHole" v-model="handHole" class="mr-1">
-                                        <label for="handHole" class="text-xs">Hand Hole:</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- D/Cut Mould Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-20">D/Cut Mould:</label>
-                                    <input type="text" v-model="dcutMouldL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    <span class="text-xs ml-1">L</span>
-                                    <input type="text" v-model="dcutMouldW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
-                                    <span class="text-xs ml-1">W</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Stitch Wire Pcs:</label>
-                                    <input type="text" :value="selectedStitchWireCode" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openStitchWireModal" title="Select Stitch Wire">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <input type="text" v-model="stitchWirePieces" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="pcs">
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-16">Wrapping:</label>
-                                    <input type="text" :value="selectedWrappingCode" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openWrappingModal" title="Select Wrapping Material">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center lg:ml-auto">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="rotaryDCut" v-model="rotaryDCut" class="mr-1">
-                                        <label for="rotaryDCut" class="text-xs">Rotary D/Cut:</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Finishing Row -->
-                            <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-16">Finishing:</label>
-                                    <input type="text" :value="selectedFinishingCode" readonly class="w-32 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openFinishingModal" title="Select Finishing">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Bundle String Qty:</label>
-                                    <input type="text" :value="selectedBundlingStringCode" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openBundlingStringModal" title="Select Bundling String">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <input type="text" v-model="bundlingStringQty" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="qty">
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-16">Bdl/Pallet:</label>
-                                    <input type="text" v-model="bdlPerPallet" class="w-12 px-2 py-1 border border-gray-400 text-xs">
-                                </div>
-                                <div class="flex items-center lg:ml-auto">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="fullBlockPrint" v-model="fullBlockPrint" class="mr-1">
-                                        <label for="fullBlockPrint" class="text-xs">Full Block Print:</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Item Remark Row -->
-                            <div class="space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
-                                <div class="flex items-center lg:w-80 w-full">
-                                    <label class="text-xs font-medium w-20">Item Remark:</label>
-                                    <input type="text" v-model="itemRemark" class="w-full lg:w-40 px-2 py-1 border border-gray-400 text-xs">
-                                </div>
-                                <div class="flex items-center lg:w-64 w-full lg:justify-start justify-between mt-1 lg:mt-0">
-                                    <label class="text-xs font-medium w-24">Peel Off%:</label>
-                                    <input type="text" v-model="peelOffPercent" class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
-                                </div>
-                                <div class="flex items-center lg:ml-auto mt-1 lg:mt-0">
-                                    <button class="px-3 py-1 bg-blue-500 hover:bg-blue-600 border border-blue-600 text-xs font-bold text-white transition-colors" @click="openMspModal">MSP</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- MOBILE LAYOUT (< lg) -->
-                        <div class="block lg:hidden space-y-3">
-                            <!-- Print Color and Print Area - Two Columns -->
-                            <div class="grid grid-cols-2 gap-3">
-                                <!-- Print Color Column -->
-                                <div class="space-y-1 min-w-0">
-                                    <label class="text-xs font-bold block text-center">Print Color:</label>
-                                    <div class="space-y-1">
-                                        <div v-for="i in 7" :key="'mobileColor'+i" class="flex items-center gap-1">
-                                            <input type="text" :value="printColorCodes[i-1]" readonly class="flex-1 min-w-0 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
-                                            <button class="flex-shrink-0 w-7 h-7 px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openColorModal(i-1)" title="Select Color">
-                                                <i class="fas fa-search text-[10px]"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Print Area Column -->
-                                <div class="space-y-1 min-w-0">
-                                    <label class="text-xs font-bold block text-center">Print Area(%):</label>
-                                    <div class="space-y-1">
-                                        <input type="text" v-model="colorAreaPercents[i-1]" class="w-full min-w-0 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'mobileArea'+i">
-                                    </div>
+                        <!-- Print Area Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
+                            <div class="flex items-center flex-1 flex-wrap gap-1">
+                                <label class="text-xs font-medium w-20">Print Area(%):</label>
+                                <div class="flex flex-wrap gap-1">
+                                    <input type="text" v-model="colorAreaPercents[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'area'+i">
                                 </div>
                             </div>
-
-                            <!-- D/Cut Sheet -->
-                            <div class="flex items-center gap-1">
-                                <label class="text-xs font-medium w-24 flex-shrink-0">D/Cut Sheet:</label>
-                                <input type="text" v-model="dcutSheetL" class="w-16 px-1 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">L</span>
-                                <input type="text" v-model="dcutSheetW" class="w-16 px-1 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">W</span>
+                            <div class="flex items-center lg:w-64 w-full lg:mt-0 mt-1">
+                                <label class="text-xs font-medium w-24">Prt Block#:</label>
+                                <input type="text" v-model="pitBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
+                        </div>
 
-                            <!-- D/Cut Mould -->
-                            <div class="flex items-center gap-1">
-                                <label class="text-xs font-medium w-24 flex-shrink-0">D/Cut Mould:</label>
-                                <input type="text" v-model="dcutMouldL" class="w-16 px-1 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">L</span>
-                                <input type="text" v-model="dcutMouldW" class="w-16 px-1 py-1 border border-gray-400 text-xs">
-                                <span class="text-xs">W</span>
+                        <!-- D/Cut Sheet Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-20">D/Cut Sheet:</label>
+                                <input type="text" v-model="dcutSheetL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <span class="text-xs ml-1">L</span>
+                                <input type="text" v-model="dcutSheetW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                <span class="text-xs ml-1">W</span>
                             </div>
-
-                            <!-- D/Cut Block# -->
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-24">D/Cut Block#:</label>
-                                <input type="text" v-model="dcutBlockNo" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="dcutBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
-
-                            <!-- Peel Off% -->
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Peel Off%:</label>
-                                <input type="text" v-model="peelOffPercent" class="flex-1 px-2 py-1 border border-gray-400 text-xs text-right">
-                            </div>
-
-                            <!-- Bdl/Pallet -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Bdl/Pallet:</label>
-                                <input type="text" v-model="bdlPerPallet" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                            </div>
-
-                            <!-- Prt Block# -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Plt Block#:</label>
-                                <input type="text" v-model="pitBlockNo" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
-                            </div>
-
-                            <!-- Stitch Wire Pcs -->
-                            <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Stitch Wire Pcs:</label>
-                                    <input type="text" :value="selectedStitchWireCode" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openStitchWireModal" title="Select Stitch Wire">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24"></label>
-                                    <input type="text" v-model="stitchWirePieces" class="flex-1 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="pcs">
-                                </div>
-                            </div>
-
-                            <!-- Bundle String Qty -->
-                            <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24">Bundle String Qty:</label>
-                                    <input type="text" :value="selectedBundlingStringCode" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openBundlingStringModal" title="Select Bundling String">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-24"></label>
-                                    <input type="text" v-model="bundlingStringQty" class="flex-1 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="qty">
-                                </div>
-                            </div>
-
-                            <!-- Finishing -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Finishing:</label>
-                                <input type="text" :value="selectedFinishingCode" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openFinishingModal" title="Select Finishing">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-
-                            <!-- Glueing -->
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Glueing:</label>
-                                <input type="text" :value="selectedGlueingCode" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <label class="text-xs font-medium w-16">Glueing:</label>
+                                <input type="text" :value="selectedGlueingCode" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openGlueingModal" title="Select Glueing Material">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
+                            <div class="flex items-center lg:ml-auto">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="handHole" v-model="handHole" class="mr-1">
+                                    <label for="handHole" class="text-xs">Hand Hole:</label>
+                                </div>
+                            </div>
+                        </div>
 
-                            <!-- Wrapping -->
+                        <!-- D/Cut Mould Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Wrapping:</label>
-                                <input type="text" :value="selectedWrappingCode" readonly class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <label class="text-xs font-medium w-20">D/Cut Mould:</label>
+                                <input type="text" v-model="dcutMouldL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <span class="text-xs ml-1">L</span>
+                                <input type="text" v-model="dcutMouldW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                <span class="text-xs ml-1">W</span>
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-24">Stitch Wire Pcs:</label>
+                                <input type="text" :value="selectedStitchWireCode" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openStitchWireModal" title="Select Stitch Wire">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <input type="text" v-model="stitchWirePieces" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="pcs">
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-16">Wrapping:</label>
+                                <input type="text" :value="selectedWrappingCode" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openWrappingModal" title="Select Wrapping Material">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
+                            <div class="flex items-center lg:ml-auto">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="rotaryDCut" v-model="rotaryDCut" class="mr-1">
+                                    <label for="rotaryDCut" class="text-xs">Rotary D/Cut:</label>
+                                </div>
+                            </div>
+                        </div>
 
-                            <!-- Item Remark -->
+                        <!-- Finishing Row -->
+                        <div class="mb-2 space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-24">Item Remark:</label>
-                                <input type="text" v-model="itemRemark" class="flex-1 px-2 py-1 border border-gray-400 text-xs">
+                                <label class="text-xs font-medium w-16">Finishing:</label>
+                                <input type="text" :value="selectedFinishingCode" readonly class="w-32 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openFinishingModal" title="Select Finishing">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
-
-                            <!-- Checkboxes -->
-                            <div class="flex items-center justify-between gap-2 text-xs">
-                                <div class="flex items-center gap-1">
-                                    <label for="handHoleMobile" class="font-medium">Hand Hole:</label>
-                                    <input type="checkbox" id="handHoleMobile" v-model="handHole" class="w-4 h-4">
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <label for="rotaryDCutMobile" class="font-medium">Rotary D/Cut:</label>
-                                    <input type="checkbox" id="rotaryDCutMobile" v-model="rotaryDCut" class="w-4 h-4">
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <label for="fullBlockPrintMobile" class="font-medium">Full Block Print:</label>
-                                    <input type="checkbox" id="fullBlockPrintMobile" v-model="fullBlockPrint" class="w-4 h-4">
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-24">Bundle String Qty:</label>
+                                <input type="text" :value="selectedBundlingStringCode" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openBundlingStringModal" title="Select Bundling String">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <input type="text" v-model="bundlingStringQty" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="qty">
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-16">Bdl/Pallet:</label>
+                                <input type="text" v-model="bdlPerPallet" class="w-12 px-2 py-1 border border-gray-400 text-xs">
+                            </div>
+                            <div class="flex items-center lg:ml-auto">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="fullBlockPrint" v-model="fullBlockPrint" class="mr-1">
+                                    <label for="fullBlockPrint" class="text-xs">Full Block Print:</label>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- MSP Button -->
-                            <div class="flex justify-end">
+                        <!-- Item Remark Row -->
+                        <div class="space-y-2 lg:space-y-0 lg:flex lg:items-center lg:justify-between">
+                            <div class="flex items-center lg:w-80 w-full">
+                                <label class="text-xs font-medium w-20">Item Remark:</label>
+                                <input type="text" v-model="itemRemark" class="w-full lg:w-40 px-2 py-1 border border-gray-400 text-xs">
+                            </div>
+                            <div class="flex items-center lg:w-64 w-full lg:justify-start justify-between mt-1 lg:mt-0">
+                                <label class="text-xs font-medium w-24">Peel Off%:</label>
+                                <input type="text" v-model="peelOffPercent" class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                            </div>
+                            <div class="flex items-center lg:ml-auto mt-1 lg:mt-0">
                                 <button class="px-3 py-1 bg-blue-500 hover:bg-blue-600 border border-blue-600 text-xs font-bold text-white transition-colors" @click="openMspModal">MSP</button>
                             </div>
                         </div>
