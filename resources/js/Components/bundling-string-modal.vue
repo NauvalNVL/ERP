@@ -1,6 +1,6 @@
 <template>
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl">
+    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 sm:px-0">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] flex flex-col">
             <!-- Header -->
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
@@ -15,7 +15,7 @@
             </div>
 
             <!-- Body -->
-            <div class="p-5">
+            <div class="p-5 flex-1 flex flex-col min-h-0">
                 <!-- Search -->
                 <div class="mb-4">
                     <div class="relative">
@@ -28,13 +28,13 @@
                 </div>
 
                 <!-- Table -->
-                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-                    <table class="w-full divide-y divide-gray-200 table-fixed">
+                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+                    <table class="w-full divide-y divide-gray-200 table-fixed min-w-[480px] md:min-w-0">
                         <thead class="bg-gray-50 sticky top-0">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="toggleSort('code')">Code</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="toggleSort('name')">Name</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="toggleSort('code')">Code</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[57%] cursor-pointer" @click="toggleSort('name')">Name</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -42,9 +42,9 @@
                                 :class="['hover:bg-emerald-50 cursor-pointer', selected && selected.code === item.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
                                 @click="selectRow(item)"
                                 @dblclick="selectAndClose(item)">
-                                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
-                                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
-                                <td class="px-6 py-3 whitespace-nowrap text-center">
+                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ item.name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
                                     <span
                                         :class="[
                                             item.status === 'Obs'

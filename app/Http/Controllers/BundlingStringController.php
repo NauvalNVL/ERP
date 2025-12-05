@@ -18,12 +18,6 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-
-            if ($bundlingStrings->isEmpty()) {
-                $this->seedData();
-                $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            }
-
             return response()->json($bundlingStrings);
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@apiIndex: ' . $e->getMessage());
@@ -41,13 +35,6 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-
-            // If no data exists, seed sample data
-            if ($bundlingStrings->isEmpty()) {
-                $this->seedData();
-                $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            }
-
             Log::info('Found ' . $bundlingStrings->count() . ' bundling strings in the database');
 
             // Only return JSON for explicit API requests
@@ -307,49 +294,6 @@ class BundlingStringController extends Controller
                 'header' => 'View & Print Bundling Strings',
                 'error' => 'Failed to load bundling string data for printing'
             ]);
-        }
-    }
-
-    /**
-     * Seed bundling string data (private method for internal use).
-     */
-    private function seedData()
-    {
-        try {
-            $bundlingStrings = [
-                ['code' => '001', 'name' => '5 MM', 'status' => 'Act', 'is_active' => true],
-                ['code' => '002', 'name' => '7 MM', 'status' => 'Act', 'is_active' => true],
-                ['code' => '003', 'name' => '10 MM', 'status' => 'Act', 'is_active' => true],
-            ];
-
-            foreach ($bundlingStrings as $string) {
-                if (!BundlingString::where('code', $string['code'])->exists()) {
-                    BundlingString::create($string);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding bundling string data: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Seed the database with sample bundling string data (public API method).
-     */
-    public function seed()
-    {
-        try {
-            $this->seedData();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Bundling string seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in BundlingStringController@seed: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed bundling string data: ' . $e->getMessage()
-            ], 500);
         }
     }
 

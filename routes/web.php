@@ -968,7 +968,6 @@ Route::get('/customer-groups', [CustomerGroupController::class, 'apiIndex']);
 Route::post('/customer-groups', [CustomerGroupController::class, 'apiStore']);
 Route::put('/customer-groups/{group_code}', [CustomerGroupController::class, 'apiUpdate']);
 Route::delete('/customer-groups/{group_code}', [CustomerGroupController::class, 'apiDestroy']);
-Route::post('/customer-groups/seed', [CustomerGroupController::class, 'seed']);
 
 // Customer Accounts API routes
 Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);

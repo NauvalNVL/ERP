@@ -257,9 +257,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-5 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteChemicalCoat(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deleteChemicalCoat(editForm.code)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -509,7 +509,7 @@ const saveChemicalCoatChanges = async () => {
 };
 
 const deleteChemicalCoat = async (code) => {
-    if (!confirm(`Are you sure you want to delete chemical coat "${code}"?`)) return;
+    if (!confirm(`Are you sure you want to obsolete chemical coat "${code}"?`)) return;
 
     saving.value = true;
 
@@ -528,10 +528,10 @@ const deleteChemicalCoat = async (code) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting chemical coat');
+            throw new Error(errorData.message || 'Error obsoleting chemical coat');
         }
 
-        showNotification('Chemical coat deleted successfully!', 'success');
+        showNotification('Chemical coat obsoleted successfully!', 'success');
         await fetchChemicalCoats();
 
         if (selectedRow.value && selectedRow.value.code === code) {
@@ -541,8 +541,8 @@ const deleteChemicalCoat = async (code) => {
 
         closeEditModal();
     } catch (error) {
-        console.error('Error deleting chemical coat:', error);
-        showNotification(`Error deleting chemical coat: ${error.message}`, 'error');
+        console.error('Error obsoleting chemical coat:', error);
+        showNotification(`Error obsoleting chemical coat: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }

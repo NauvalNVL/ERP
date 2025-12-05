@@ -55,12 +55,6 @@ class Customer extends Model
     {
         return $this->hasMany(CustomerSalesTaxIndex::class, 'customer_code', 'CODE');
     }
-
-    public function taxProductTieups()
-    {
-        return $this->hasMany(CustomerTaxProductTieup::class, 'customer_code', 'CODE');
-    }
-
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'SLM', 'Code');

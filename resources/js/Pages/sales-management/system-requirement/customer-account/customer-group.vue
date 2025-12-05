@@ -53,11 +53,11 @@
                   </div>
                     <div class="md:col-span-1 flex flex-col justify-end">
                       <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                      <button type="button" @click="createNewCustomerGroup" class="primary-button group w-auto text-sm px-4 py-1">
+                      <button type="button" @click="createNewCustomerGroup" class="primary-button group w-full whitespace-nowrap">
                           <span class="shimmer-effect"></span>
                           <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
-                          New Group
-                    </button>
+                          Add New Group
+                      </button>
                   </div>
                 </div>
                 <!-- Data Status Information -->

@@ -305,7 +305,7 @@
 		<div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-center">
 			<div class="w-10 h-10 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
 		</div>
-		
+
 		<!-- Notification Toast -->
 		<div
 			v-if="notification.show"
@@ -363,8 +363,8 @@ const showEditModal = ref(false);
 const selectedIndustry = ref(null);
 const industryCode = ref('');
 const searchResult = ref('');
-const editForm = ref({ 
-    code: '', 
+const editForm = ref({
+    code: '',
     name: ''
 });
 const isCreating = ref(false);
@@ -375,7 +375,7 @@ const fetchIndustries = async () => {
     loading.value = true;
     try {
         console.log('Fetching industry data from API...');
-        
+
         // Using fetch API
         const res = await fetch('/api/industry', {
             method: 'GET',
@@ -384,13 +384,13 @@ const fetchIndustries = async () => {
                 'Accept': 'application/json'
             }
         });
-        
+
         if (!res.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await res.json();
-        
+
         if (Array.isArray(data)) {
             industries.value = data;
         } else {
@@ -417,12 +417,12 @@ const searchIndustryCode = () => {
         searchResult.value = '';
         return;
     }
-    
-    const matches = industries.value.filter(industry => 
+
+    const matches = industries.value.filter(industry =>
         industry.code.toLowerCase().includes(industryCode.value.toLowerCase()) ||
         industry.name.toLowerCase().includes(industryCode.value.toLowerCase())
     );
-    
+
     if (matches.length > 0) {
         if (matches.length === 1 && matches[0].code.toLowerCase() === industryCode.value.toLowerCase()) {
             // Exact match - show details and edit button
@@ -441,7 +441,7 @@ const searchIndustryCode = () => {
             let html = `<div class="p-3 bg-blue-100 rounded-lg mt-2">
                 <p class="text-sm text-blue-800 mb-2">Multiple codes found:</p>
                 <ul class="space-y-1">`;
-            
+
             matches.forEach(match => {
                 html += `<li class="flex justify-between items-center">
                     <button class="text-sm text-blue-700 hover:text-blue-900 hover:underline focus:outline-none">
@@ -449,7 +449,7 @@ const searchIndustryCode = () => {
                     </button>
                 </li>`;
             });
-            
+
             html += `</ul></div>`;
             searchResult.value = html;
         } else {
@@ -475,23 +475,23 @@ const searchIndustryCode = () => {
 // Handle search and create functionality when pressing Enter on industry code input
 const handleSearchAndCreate = async () => {
     if (!industryCode.value) return;
-    
+
     saving.value = true;
     try {
         const res = await fetch(`/api/industry/search/${industryCode.value.toUpperCase()}`, {
-            headers: { 
+            headers: {
                 'Accept': 'application/json'
             }
         });
-        
+
         const data = await res.json();
-        
+
         if (data.exists) {
             // Industry exists, find it and select it
             const industry = industries.value.find(
                 i => i.code.toUpperCase() === industryCode.value.toUpperCase()
             );
-            
+
             if (industry) {
                 selectedIndustry.value = industry;
                 searchResult.value = `
@@ -525,12 +525,12 @@ const onIndustrySelected = (industry) => {
     selectedIndustry.value = industry;
     industryCode.value = industry.code;
     showModal.value = false;
-    
+
     // Open edit modal automatically
     isCreating.value = false;
     editForm.value = { ...industry };
     showEditModal.value = true;
-    
+
     // Update search result
     searchResult.value = `
         <div class="p-3 bg-green-100 rounded-lg mt-2">
@@ -546,12 +546,12 @@ const onIndustrySelected = (industry) => {
 const onIndustryEdit = (industry) => {
     selectedIndustry.value = industry;
     industryCode.value = industry.code;
-    
+
     // Open the edit modal for the selected industry
     isCreating.value = false;
     editForm.value = { ...industry };
     showEditModal.value = true;
-    
+
     // Update search result
     searchResult.value = `
         <div class="p-3 bg-green-100 rounded-lg mt-2">
@@ -576,8 +576,8 @@ const editSelectedIndustry = () => {
 
 const createNewIndustry = () => {
     isCreating.value = true;
-    editForm.value = { 
-        code: industryCode.value.toUpperCase() || '', 
+    editForm.value = {
+        code: industryCode.value.toUpperCase() || '',
         name: ''
     };
     showEditModal.value = true;
@@ -592,25 +592,25 @@ const saveIndustryChanges = async () => {
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        
+
         if (!csrfToken) {
             throw new Error('CSRF token not found');
         }
-        
+
         // Different API call for create vs update
         let url = isCreating.value ? '/api/industry' : `/api/industry/${editForm.value.code}`;
         let method = isCreating.value ? 'POST' : 'PUT';
-        
+
         console.log('Making API request to:', url, 'with method:', method);
-        
+
         const formData = new FormData();
         formData.append('code', editForm.value.code.toUpperCase());
         formData.append('name', editForm.value.name);
-        
+
         if (!isCreating.value) {
             formData.append('_method', 'PUT');
         }
-        
+
         const response = await fetch(url, {
             method: isCreating.value ? 'POST' : 'POST', // Always POST with FormData for method spoofing
             headers: {
@@ -620,23 +620,23 @@ const saveIndustryChanges = async () => {
             },
             body: formData
         });
-        
+
         if (!response.ok) {
             const result = await response.json();
             throw new Error(result.message || 'Error saving industry');
         }
-        
+
         // Refresh the industry list
         await fetchIndustries();
-        
+
         // Update the industry code field with the saved code
         industryCode.value = editForm.value.code.toUpperCase();
-        
+
         // Find the saved industry in the refreshed list
         const savedIndustry = industries.value.find(
             i => i.code.toUpperCase() === editForm.value.code.toUpperCase()
         );
-        
+
         if (savedIndustry) {
             selectedIndustry.value = savedIndustry;
             searchResult.value = `
@@ -649,7 +649,7 @@ const saveIndustryChanges = async () => {
                 </div>
             `;
         }
-        
+
         showNotification(`Industry ${isCreating.value ? 'created' : 'updated'} successfully`, 'success');
         closeEditModal();
     } catch (e) {
@@ -666,22 +666,22 @@ const deleteIndustry = async () => {
         showNotification('No industry selected', 'error');
         return;
     }
-    
+
     if (!confirm(`Are you sure you want to mark industry "${selectedIndustry.value.code}" as obsolete?`)) {
         return;
     }
-    
+
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        
+
         if (!csrfToken) {
             throw new Error('CSRF token not found');
         }
-        
+
         const formData = new FormData();
         formData.append('_method', 'DELETE');
-        
+
         const response = await fetch(`/api/industry/${selectedIndustry.value.code}`, {
             method: 'POST',
             headers: {
@@ -690,32 +690,32 @@ const deleteIndustry = async () => {
             },
             body: formData
         });
-        
+
         if (!response.ok) {
             const result = await response.json();
-            throw new Error(result.message || 'Error deleting industry');
+            throw new Error(result.message || 'Error obsoleting industry');
         }
-        
+
         // Get response data
         const result = await response.json();
-        
+
         // Immediately remove the obsoleted item from local array for instant UI update
         const obsoletedCode = selectedIndustry.value.code;
         industries.value = industries.value.filter(ind => ind.code !== obsoletedCode);
-        
+
         // Clear selection and search
         selectedIndustry.value = null;
         industryCode.value = '';
         searchResult.value = '';
-        
+
         showNotification(result.message || 'Industry marked as obsolete successfully', 'success');
         closeEditModal();
-        
+
         // Sync with server in background to ensure data consistency
         fetchIndustries();
     } catch (e) {
-        console.error('Error deleting industry:', e);
-        showNotification(e.message || 'Error deleting industry. Please try again.', 'error');
+        console.error('Error obsoleting industry:', e);
+        showNotification(e.message || 'Error obsoleting industry. Please try again.', 'error');
     } finally {
         saving.value = false;
     }
@@ -727,7 +727,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     };
-    
+
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);

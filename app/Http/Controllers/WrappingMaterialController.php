@@ -15,11 +15,6 @@ class WrappingMaterialController extends Controller
         try {
             $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
 
-            if ($wrappingMaterials->isEmpty()) {
-                $this->seedData();
-                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            }
-
             return response()->json($wrappingMaterials);
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@apiIndex: ' . $e->getMessage());
@@ -31,11 +26,6 @@ class WrappingMaterialController extends Controller
     {
         try {
             $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-
-            if ($wrappingMaterials->isEmpty()) {
-                $this->seedData();
-                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            }
 
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($wrappingMaterials);
@@ -194,11 +184,6 @@ class WrappingMaterialController extends Controller
         try {
             $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
 
-            if ($wrappingMaterials->isEmpty()) {
-                $this->seedData();
-                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            }
-
             return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
                 'wrappingMaterials' => $wrappingMaterials,
                 'header' => 'Define Wrapping Material'
@@ -226,35 +211,6 @@ class WrappingMaterialController extends Controller
                 'header' => 'View & Print Wrapping Materials',
                 'error' => 'Failed to load wrapping material data for printing'
             ]);
-        }
-    }
-
-    private function seedData()
-    {
-        try {
-            $wrappingMaterials = [
-                ['code' => '001', 'name' => 'PLASTIK', 'description' => 'Plastic Wrapping Material', 'status' => 'Act', 'is_active' => true],
-                ['code' => '002', 'name' => 'KERTAS', 'description' => 'Paper Wrapping Material', 'status' => 'Act', 'is_active' => true],
-            ];
-
-            foreach ($wrappingMaterials as $material) {
-                if (!WrappingMaterial::where('code', $material['code'])->exists()) {
-                    WrappingMaterial::create($material);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding wrapping material data: ' . $e->getMessage());
-        }
-    }
-
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            return response()->json(['success' => true, 'message' => 'Wrapping material seed data created successfully']);
-        } catch (\Exception $e) {
-            Log::error('Error in WrappingMaterialController@seed: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to seed wrapping material data'], 500);
         }
     }
 

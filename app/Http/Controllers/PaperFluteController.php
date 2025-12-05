@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Database\Seeders\PaperFluteSeeder;
 use Inertia\Inertia;
 
 class PaperFluteController extends Controller
@@ -20,29 +19,22 @@ class PaperFluteController extends Controller
         try {
             // Always load from database, ordered by Flute
             $paperFlutes = PaperFlute::orderBy('Flute')->get();
-            
-            // If there are no flutes in the database, seed them
-            if ($paperFlutes->isEmpty()) {
-                $this->seedData();
-                $paperFlutes = PaperFlute::orderBy('Flute')->get();
-            }
-            
             // If the request wants JSON, return JSON response
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json($paperFlutes);
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.paperflute', compact('paperFlutes'));
         } catch (\Exception $e) {
             Log::error('Error loading paper flutes: ' . $e->getMessage());
-            
+
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'error' => true,
                     'message' => 'Error loading data from database: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             // Return view with error message using session flash
             return redirect()->back()->with('error', 'Error loading data from database: ' . $e->getMessage());
         }
@@ -76,7 +68,7 @@ class PaperFluteController extends Controller
             $data = $request->all();
             $data['No'] = PaperFlute::max('No') + 1;
             $data['status'] = 'Act'; // Set default status to Active
-            
+
             $paperFlute = PaperFlute::create($data);
 
             return response()->json([
@@ -100,7 +92,7 @@ class PaperFluteController extends Controller
     {
         $paperFlute = PaperFlute::findOrFail($id);
         $paperFlutes = PaperFlute::orderBy('code')->paginate(10);
-        
+
         return view('sales-management.system-requirement.system-requirement.standard-requirement.paperflute', compact('paperFlute', 'paperFlutes'));
     }
 
@@ -116,7 +108,7 @@ class PaperFluteController extends Controller
             } else {
                 $paperFlute = PaperFlute::where('Flute', $flute)->first();
             }
-            
+
             if (!$paperFlute) {
                 return response()->json([
                     'success' => false,
@@ -189,7 +181,7 @@ class PaperFluteController extends Controller
 
             // Find the existing flute data in the seeder file
             $pattern = "/\[\s*'code'\s*=>\s*'{$paperFlute->code}'.*?\]/s";
-            
+
             if (preg_match($pattern, $seederContent)) {
                 // Replace existing flute data
                 $newContent = preg_replace($pattern, $newFluteData, $seederContent);
@@ -220,11 +212,11 @@ class PaperFluteController extends Controller
     {
         try {
             $paperFlute = PaperFlute::where('Flute', $flute)->firstOrFail();
-            
+
             // Soft delete by changing status to Obsolete
             $paperFlute->status = 'Obs';
             $paperFlute->save();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Paper flute berhasil diubah menjadi obsolete.',
@@ -246,13 +238,13 @@ class PaperFluteController extends Controller
     {
         try {
             $paperFlute = PaperFlute::where('No', $id)->firstOrFail();
-            
+
             // Toggle status
             $paperFlute->status = ($paperFlute->status === 'Act') ? 'Obs' : 'Act';
             $paperFlute->save();
-            
+
             $statusText = ($paperFlute->status === 'Act') ? 'activated' : 'deactivated';
-            
+
             return response()->json([
                 'success' => true,
                 'message' => "Paper flute {$paperFlute->Flute} successfully {$statusText}.",
@@ -284,8 +276,8 @@ class PaperFluteController extends Controller
     public function viewAndPrint()
     {
         // Ambil semua data paper flute, urutkan berdasarkan Flute
-        $paperFlutes = PaperFlute::orderBy('Flute')->get(); 
-        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperflute', compact('paperFlutes')); 
+        $paperFlutes = PaperFlute::orderBy('Flute')->get();
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperflute', compact('paperFlutes'));
     }
 
     /**
@@ -364,12 +356,12 @@ class PaperFluteController extends Controller
     {
         try {
             $query = PaperFlute::orderBy('Flute');
-            
+
             // Filter by active status by default, unless all_status=1 is passed
             if (!$request->has('all_status') || !$request->all_status) {
                 $query->where('status', 'Act');
             }
-            
+
             $paperFlutes = $query->get();
             return response()->json($paperFlutes);
         } catch (\Exception $e) {
@@ -377,28 +369,4 @@ class PaperFluteController extends Controller
             return response()->json(['error' => 'Failed to load paper flute data'], 500);
         }
     }
-
-    private function seedData()
-    {
-        try {
-            $seeder = new PaperFluteSeeder();
-            $seeder->run();
-        } catch (\Exception $e) {
-            Log::error('Error seeding paper flute data: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            return response()->json(['success' => true, 'message' => 'Paper flute seed data created successfully']);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating paper flute seed data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-} 
+}

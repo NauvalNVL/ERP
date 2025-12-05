@@ -6,7 +6,7 @@
     <form ref="csrfForm" class="hidden">
         @csrf
     </form>
- 
+
     <!-- Header Section -->
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
@@ -243,14 +243,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-5 pt-4 border-t border-gray-200">
-                        <button
-                            type="button"
-                            v-if="!isCreating"
-                            @click="deleteStitchWire(editForm.code)"
-                            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium"
-                        >
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deleteStitchWire(editForm.code)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -511,7 +506,7 @@ const saveStitchWireChanges = async () => {
 };
 
 const deleteStitchWire = async (code) => {
-    if (!confirm(`Are you sure you want to delete stitch wire "${code}"?`)) return;
+    if (!confirm(`Are you sure you want to obsolete stitch wire "${code}"?`)) return;
 
     saving.value = true;
 
@@ -530,10 +525,10 @@ const deleteStitchWire = async (code) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting stitch wire');
+            throw new Error(errorData.message || 'Error obsoleting stitch wire');
         }
 
-        showNotification('Stitch wire deleted successfully!', 'success');
+        showNotification('Stitch wire obsoleted successfully!', 'success');
         await fetchStitchWires();
 
         if (selectedRow.value && selectedRow.value.code === code) {
@@ -543,8 +538,8 @@ const deleteStitchWire = async (code) => {
 
         closeEditModal();
     } catch (error) {
-        console.error('Error deleting stitch wire:', error);
-        showNotification(`Error deleting stitch wire: ${error.message}`, 'error');
+        console.error('Error obsoleting stitch wire:', error);
+        showNotification(`Error obsoleting stitch wire: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }

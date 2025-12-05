@@ -223,8 +223,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deletewrappingMaterial(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="deletewrappingMaterial(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -483,43 +483,43 @@ const savewrappingMaterialChanges = async () => {
 };
 
 const deletewrappingMaterial = async (id) => {
-    if (!confirm(`Are you sure you want to delete this Wrapping Material?`)) return;
+	if (!confirm(`Are you sure you want to obsolete this Wrapping Material?`)) return;
 
-    saving.value = true;
+	saving.value = true;
 
-    try {
-        const csrfToken = getCsrfToken();
+	try {
+		const csrfToken = getCsrfToken();
 
-        const response = await fetch(`/api/wrapping-materials/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
+		const response = await fetch(`/api/wrapping-materials/${id}`, {
+			method: 'DELETE',
+			headers: {
+				'X-CSRF-TOKEN': csrfToken,
+				'Accept': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
+			credentials: 'same-origin'
+		});
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting Wrapping Material');
-        }
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.message || 'Error obsoleting Wrapping Material');
+		}
 
-        showNotification('Wrapping Material deleted successfully!', 'success');
-        await fetchWrappingMaterials();
+		showNotification('Wrapping Material obsoleted successfully!', 'success');
+		await fetchWrappingMaterials();
 
-        if (selectedRow.value && selectedRow.value.id === id) {
-            selectedRow.value = null;
-            searchQuery.value = '';
-        }
+		if (selectedRow.value && selectedRow.value.id === id) {
+			selectedRow.value = null;
+			searchQuery.value = '';
+		}
 
-        closeEditModal();
-    } catch (error) {
-        console.error('Error deleting Wrapping Material:', error);
-        showNotification(`Error deleting Wrapping Material: ${error.message}`, 'error');
-    } finally {
-        saving.value = false;
-    }
+		closeEditModal();
+	} catch (error) {
+		console.error('Error obsoleting Wrapping Material:', error);
+		showNotification(`Error obsoleting Wrapping Material: ${error.message}`, 'error');
+	} finally {
+		saving.value = false;
+	}
 };
 
 const showNotification = (message, type = 'success') => {

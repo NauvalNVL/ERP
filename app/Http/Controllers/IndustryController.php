@@ -12,17 +12,11 @@ class IndustryController extends Controller
     public function index()
     {
         $industries = Industry::orderBy('code')->get();
-        
-        // If no data exists, automatically seed the data
-        if ($industries->isEmpty()) {
-            $this->seedData();
-            $industries = Industry::orderBy('code')->get();
-        }
-        
+
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json($industries);
         }
-        
+
         return view('sales-management.system-requirement.system-requirement.standard-requirement.industry', compact('industries'));
     }
 
@@ -58,7 +52,7 @@ class IndustryController extends Controller
     public function update(Request $request, $code)
     {
         $industry = Industry::where('code', $code)->firstOrFail();
-        
+
         $request->validate([
             'name' => 'nullable|string|max:30',
             'status' => 'nullable|string|max:3',
@@ -89,17 +83,17 @@ class IndustryController extends Controller
     public function destroy($code)
     {
         $industry = Industry::where('code', $code)->firstOrFail();
-        
+
         // Mark as obsolete instead of deleting
         $industry->update(['status' => 'Obs']);
-        
+
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Industry marked as obsolete successfully'
             ]);
         }
-        
+
         return redirect()->route('vue.industry.index')->with('success', 'Industry marked as obsolete successfully');
     }
 
@@ -138,14 +132,14 @@ class IndustryController extends Controller
                 ->where('status', 'Act')
                 ->orderBy('code')
                 ->get();
-                
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
                 'industries' => $industries,
                 'header' => 'Industry Management'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in IndustryController@vueIndex: ' . $e->getMessage());
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
                 'industries' => [],
                 'header' => 'Industry Management',
@@ -221,7 +215,7 @@ class IndustryController extends Controller
                     $industry->status = $industry->status ?? 'Act';
                     return $industry;
                 });
-            
+
             return response()->json($industries, 200, [], JSON_PRETTY_PRINT);
         } catch (\Exception $e) {
             Log::error('Error in IndustryController@apiIndex: ' . $e->getMessage());
@@ -233,57 +227,5 @@ class IndustryController extends Controller
         }
     }
 
-    /**
-     * Seed industry data (private method for internal use).
-     *
-     * @return void
-     */
-    private function seedData()
-    {
-        try {
-            // Default industries
-            $defaultIndustries = [
-                ['code' => 'F', 'name' => 'Food'],
-                ['code' => 'E', 'name' => 'Electronics'],
-                ['code' => 'P', 'name' => 'Pharmaceuticals'],
-                ['code' => 'A', 'name' => 'Automotive'],
-                ['code' => 'R', 'name' => 'Retail']
-            ];
 
-            foreach ($defaultIndustries as $industry) {
-                $exists = Industry::where('code', $industry['code'])->exists();
-                if (!$exists) {
-                    Industry::create([
-                        'code' => $industry['code'],
-                        'name' => $industry['name']
-                    ]);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding industry data: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Seed industry data (public API method).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Industry seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error seeding industry data: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error seeding industry data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }

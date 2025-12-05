@@ -256,9 +256,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-5 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteMachine(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deleteMachine(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -412,7 +412,7 @@ const saveMachineChanges = async () => {
     try {
         const url = isCreating.value ? '/machine' : `/machine/${editForm.value.id}`;
         const method = isCreating.value ? 'POST' : 'PUT';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -443,7 +443,7 @@ const saveMachineChanges = async () => {
 };
 
 const deleteMachine = async (id) => {
-    if (!confirm('Are you sure you want to delete this machine?')) {
+    if (!confirm('Are you sure you want to obsolete this machine?')) {
         return;
     }
 
@@ -462,15 +462,15 @@ const deleteMachine = async (id) => {
         const data = await response.json();
 
         if (data.success) {
-            showNotification(data.message, 'success');
+            showNotification('Machine obsoleted successfully', 'success');
             closeEditModal();
             await refreshMachines();
         } else {
-            showNotification(data.message || 'Failed to delete machine', 'error');
+            showNotification(data.message || 'Failed to obsolete machine', 'error');
         }
     } catch (error) {
-        console.error('Error deleting machine:', error);
-        showNotification('Error deleting machine', 'error');
+        console.error('Error obsoleting machine:', error);
+        showNotification('Error obsoleting machine', 'error');
     } finally {
         saving.value = false;
     }

@@ -1,31 +1,33 @@
 <template>
     <AppLayout header="Define User Access Permission">
         <Head title="Define User Access Permission" />
-        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
             <div class="max-w-6xl w-full mx-auto relative z-0">
                 <!-- Header Card -->
-                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
-                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                        <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
-                            <ShieldCheckIcon class="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">User Access Permission</h1>
-                            <p class="text-xs sm:text-sm text-blue-100">Define and manage user permissions for system access</p>
+                <div class="bg-white/80 shadow-lg rounded-2xl border border-white/40 mb-6 backdrop-blur-sm">
+                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-4 sm:px-6 sm:py-5">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                                <ShieldCheckIcon class="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                                <h1 class="text-lg sm:text-2xl font-bold leading-tight text-white">User Access Permission</h1>
+                                <p class="text-xs sm:text-sm text-indigo-100">Define and manage user permissions for system access</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Search User Section -->
                 <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4">
-                    <div class="px-4 py-3 sm:px-6 border-b border-blue-700 bg-blue-600 text-white">
+                    <div class="px-4 py-3 sm:px-6 border-b border-indigo-600 bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
                         <h2 class="text-sm font-semibold flex items-center gap-2">
-                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-500">
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
                                 <UserIcon class="h-4 w-4 text-white" />
                             </span>
                             <span>Find User</span>
                         </h2>
-                        <p class="text-xs text-blue-100 mt-1">Search for a user to define permissions.</p>
+                        <p class="text-xs text-indigo-100 mt-1">Search for a user to define permissions.</p>
                     </div>
                     <div class="px-4 py-3 sm:px-6 sm:py-4">
                         <form @submit.prevent="searchUser" class="space-y-2">
@@ -42,7 +44,7 @@
                                             id="search_user_id"
                                             type="text"
                                             v-model="searchForm.user_id"
-                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-indigo-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                             placeholder="Enter User ID (e.g. ADMIN001, USER001)"
                                             required
                                         >
@@ -50,7 +52,7 @@
                                     <button
                                         type="submit"
                                         :disabled="isSearching"
-                                        class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <SearchIcon class="h-4 w-4 mr-2" />
                                         <span>{{ isSearching ? 'Searching...' : 'Search User' }}</span>
@@ -98,10 +100,10 @@
                 <!-- User Permission Form -->
                 <div v-if="foundUser" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                     <!-- User Info Header -->
-                    <div class="bg-blue-600 px-4 py-3 sm:px-6 md:py-4 border-b border-blue-700">
+                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-3 sm:px-6 md:py-4 border-b border-indigo-700">
                         <div class="flex flex-col lg:flex-row items-center justify-between">
                             <div class="flex items-center mb-4 lg:mb-0">
-                                <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-500/80 rounded-full flex items-center justify-center text-white font-bold text-2xl mr-4 md:mr-6">
+                                <div class="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-2xl mr-4 md:mr-6">
                                     {{ foundUser.official_name.charAt(0).toUpperCase() }}
                                 </div>
                                 <div class="text-center lg:text-left">
@@ -116,10 +118,10 @@
                                 </div>
                             </div>
                             <div class="text-center lg:text-right">
-                                <div class="bg-blue-500/70 rounded-xl px-4 py-3">
-                                    <p class="text-xs text-blue-100 mb-1">Total Permissions</p>
+                                <div class="bg-indigo-500/40 rounded-xl px-4 py-3">
+                                    <p class="text-xs text-indigo-100 mb-1">Total Permissions</p>
                                     <p class="text-2xl md:text-3xl font-bold text-white">{{ selectedPermissionsCount }}</p>
-                                    <p class="text-[11px] text-blue-100">of {{ totalPermissionsCount }}</p>
+                                    <p class="text-[11px] text-indigo-100">of {{ totalPermissionsCount }}</p>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +141,7 @@
                                         <div class="flex items-center">
                                             <SwitchLabel class="mr-3 text-sm font-medium text-gray-700">Select All</SwitchLabel>
                                             <Switch v-model="selectAllPermissions" @click="toggleAllPermissions"
-                                                :class="[selectAllPermissions ? 'bg-blue-600' : 'bg-gray-200', 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2']">
+                                                :class="[selectAllPermissions ? 'bg-indigo-600' : 'bg-gray-200', 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2']">
                                                 <span :class="[selectAllPermissions ? 'translate-x-6' : 'translate-x-1', 'inline-block h-4 w-4 transform rounded-full bg-white transition-transform']" />
                                             </Switch>
                                         </div>
@@ -152,16 +154,16 @@
                         <div class="space-y-6">
                             <!-- Dashboard -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <div class="dashboard-header bg-gradient-to-r from-blue-600 to-blue-700 px-4 md:px-6 py-4 border-b border-blue-800">
+                                <div class="dashboard-header bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 md:px-6 py-4 border-b border-indigo-800">
                                     <h4 class="font-semibold text-white flex items-center">
-                                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3 text-blue-200"></i>
+                                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3 text-indigo-200"></i>
                                         Dashboard
-                                        <span class="ml-auto text-sm text-blue-200">({{ getSelectedCountForCategory('dashboard') }}/{{ getCategoryPermissions('dashboard').length }})</span>
+                                        <span class="ml-auto text-sm text-indigo-200">({{ getSelectedCountForCategory('dashboard') }}/{{ getCategoryPermissions('dashboard').length }})</span>
                                     </h4>
                                 </div>
                                 <div class="p-4 md:p-6">
                                     <label class="flex items-center">
-                                        <input type="checkbox" v-model="form.permissions.dashboard" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                        <input type="checkbox" v-model="form.permissions.dashboard" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                         <span class="ml-3 text-sm text-gray-700">Dashboard Access</span>
                                     </label>
                                 </div>
