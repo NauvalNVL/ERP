@@ -421,6 +421,8 @@
       :show="showProductDesignModal"
       :initial-quantity="selectedSO ? Number(selectedSO.setQuantity) : 0"
       :master-card="selectedSO ? { model: selectedSO.product } : null"
+      :mc-components="mcComponentsForDesign"
+      :read-only-quantity="selectedSO ? Number(selectedSO.setQuantity) > 0 : false"
       @close="showProductDesignModal = false"
       @save="handleProductDesignSave"
     />
@@ -463,8 +465,11 @@
         customer_name: selectedSO.customerName,
         model: selectedSO.product,
         setQuantity: selectedSO.setQuantity,
-        mainQuantity: selectedSO.setQuantity
+        mainQuantity: selectedSO.mainQuantity || selectedSO.setQuantity,
+        productDesignQuantities: selectedSO.productDesignQuantities || {},
+        isProductDesignQuantity: selectedSO.isProductDesignQuantity || false
       } : null"
+      :mc-components="mcComponentsForDesign"
       @close="showDeliveryScheduleModal = false"
       @save="handleDeliveryScheduleSave"
     />
@@ -509,13 +514,60 @@ export default {
             showProductDesignModal: false,
             showDeliveryLocationModal: false,
             showDeliveryScheduleModal: false,
-            selectedRowIndex: -1
+            selectedRowIndex: -1,
+            mcComponentsForDesign: []
         }
     },
     methods: {
         openSalesOrderTableModal() {
             this.showSalesOrderTableModal = true;
             this.selectedRowIndex = -1;
+        },
+
+        async fetchMcComponentsForDesign() {
+            try {
+                const so = this.selectedSO;
+                const mcSeq = so && so.mcardSeq ? so.mcardSeq : null;
+                const customerCode = so && so.customerCode ? so.customerCode : null;
+
+                if (!mcSeq || !customerCode) {
+                    console.warn('Cannot fetch MC components for AmendSO Product Design Screen: missing mcardSeq or customerCode', {
+                        mcardSeq: mcSeq,
+                        customerCode: customerCode
+                    });
+                    this.mcComponentsForDesign = [];
+                    return;
+                }
+
+                const mcsSeqEnc = encodeURIComponent(mcSeq);
+                const custEnc = encodeURIComponent(customerCode);
+
+                console.log('Fetching MC components for AmendSO Product Design Screen:', {
+                    mcSeq,
+                    customerCode
+                });
+
+                const response = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}/components?customer_code=${custEnc}`, {
+                    headers: {
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.warn('Failed to fetch MC components for AmendSO design:', response.statusText);
+                    this.mcComponentsForDesign = [];
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('MC components for AmendSO design fetched:', data);
+
+                this.mcComponentsForDesign = Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('Error fetching MC components for AmendSO design:', error);
+                this.mcComponentsForDesign = [];
+            }
         },
 
         async handleSalesOrderSelect(selectedOrder) {
@@ -578,6 +630,11 @@ export default {
                             status: data.order_info.so_status || 'Active',
                             totalAmount: 0,
 
+                            // Product design and quantity mapping (used by DeliveryScheduleModal)
+                            productDesignQuantities: {},
+                            isProductDesignQuantity: false,
+                            mainQuantity: 0,
+
                             // Store original data for update
                             _originalData: data
                         };
@@ -597,17 +654,54 @@ export default {
             }
         },
 
-        openProductDesignScreen() {
+        async openProductDesignScreen() {
             if (!this.selectedSO) {
                 alert('Please select a sales order first.');
                 return;
             }
+
+            await this.fetchMcComponentsForDesign();
             this.showProductDesignModal = true;
         },
 
         handleProductDesignSave(data) {
             // Handle product design data and move to next step
-            console.log('Product design data:', data);
+            try {
+                console.log('Product design data (AmendSO):', data);
+
+                const componentQtyMap = {};
+                if (Array.isArray(data.items)) {
+                    data.items.forEach((item) => {
+                        const qty = Number(item.quantity) || 0;
+                        const name = (item.name || '').toString();
+                        if (!name || qty <= 0) {
+                            return;
+                        }
+                        componentQtyMap[name] = qty;
+                    });
+                }
+
+                const totalDesignQty = Array.isArray(data.items)
+                    ? data.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+                    : 0;
+
+                if (!this.selectedSO) {
+                    this.selectedSO = {};
+                }
+
+                this.selectedSO.productDesignQuantities = componentQtyMap;
+
+                if (totalDesignQty > 0) {
+                    this.selectedSO.mainQuantity = totalDesignQty;
+                    this.selectedSO.isProductDesignQuantity = true;
+                } else {
+                    this.selectedSO.mainQuantity = this.selectedSO.setQuantity;
+                    this.selectedSO.isProductDesignQuantity = false;
+                }
+            } catch (error) {
+                console.warn('Failed to map product design values in AmendSO:', error);
+            }
+
             this.showProductDesignModal = false;
             this.showDeliveryLocationModal = true;
         },
