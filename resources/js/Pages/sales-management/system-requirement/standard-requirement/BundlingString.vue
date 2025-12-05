@@ -214,8 +214,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteBundlingString(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="deleteBundlingString(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -469,7 +469,7 @@ const saveBundlingStringChanges = async () => {
 };
 
 const deleteBundlingString = async (id) => {
-    if (!confirm(`Are you sure you want to delete this bundling string?`)) return;
+    if (!confirm(`Are you sure you want to obsolete this bundling string?`)) return;
 
     saving.value = true;
 
@@ -488,10 +488,10 @@ const deleteBundlingString = async (id) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting bundling string');
+            throw new Error(errorData.message || 'Error obsoleting bundling string');
         }
 
-        showNotification('Bundling string deleted successfully!', 'success');
+        showNotification('Bundling string obsoleted successfully!', 'success');
         await fetchBundlingStrings();
 
         if (selectedRow.value && selectedRow.value.id === id) {
@@ -501,8 +501,8 @@ const deleteBundlingString = async (id) => {
 
         closeEditModal();
     } catch (error) {
-        console.error('Error deleting bundling string:', error);
-        showNotification(`Error deleting bundling string: ${error.message}`, 'error');
+        console.error('Error obsoleting bundling string:', error);
+        showNotification(`Error obsoleting bundling string: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }

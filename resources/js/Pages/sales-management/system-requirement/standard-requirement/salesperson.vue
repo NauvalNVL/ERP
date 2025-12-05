@@ -250,8 +250,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteSalesperson(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="deleteSalesperson(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -614,7 +614,7 @@ const saveSalespersonChanges = async () => {
 };
 
 const deleteSalesperson = async (id) => {
-    if (!confirm(`Are you sure you want to delete this salesperson?`)) {
+    if (!confirm(`Are you sure you want to obsolete this salesperson?`)) {
         return;
     }
 
@@ -624,7 +624,7 @@ const deleteSalesperson = async (id) => {
 
         // Use the code as identifier, not the ID
         const code = editForm.value.code;
-        console.log('Deleting salesperson with code:', code);
+        console.log('Obsoleting salesperson with code:', code);
 
         // Create form data - no need for method spoofing now
         const formData = new FormData();
@@ -642,7 +642,7 @@ const deleteSalesperson = async (id) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting salesperson');
+            throw new Error(errorData.message || 'Error obsoleting salesperson');
         }
 
         const result = await response.json();
@@ -657,13 +657,13 @@ const deleteSalesperson = async (id) => {
             }
 
             closeEditModal();
-            showNotification('Salesperson deleted successfully', 'success');
+            showNotification('Salesperson obsoleted successfully', 'success');
         } else {
-            showNotification('Error deleting salesperson: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Error obsoleting salesperson: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting salesperson:', e);
-        showNotification('Error deleting salesperson: ' + e.message, 'error');
+        console.error('Error obsoleting salesperson:', e);
+        showNotification('Error obsoleting salesperson: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }

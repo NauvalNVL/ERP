@@ -215,8 +215,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteglueingMaterial(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="deleteglueingMaterial(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -479,7 +479,7 @@ const saveglueingMaterialChanges = async () => {
 };
 
 const deleteglueingMaterial = async (id) => {
-    if (!confirm(`Are you sure you want to delete this Glueing Material?`)) return;
+    if (!confirm(`Are you sure you want to obsolete this Glueing Material?`)) return;
 
     saving.value = true;
 
@@ -498,10 +498,10 @@ const deleteglueingMaterial = async (id) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting Glueing Material');
+            throw new Error(errorData.message || 'Error obsoleting Glueing Material');
         }
 
-        showNotification('Glueing Material deleted successfully!', 'success');
+        showNotification('Glueing Material obsoleted successfully!', 'success');
         await fetchglueingMaterials();
 
         if (selectedRow.value && selectedRow.value.id === id) {
@@ -511,8 +511,8 @@ const deleteglueingMaterial = async (id) => {
 
         closeEditModal();
     } catch (error) {
-        console.error('Error deleting Glueing Material:', error);
-        showNotification(`Error deleting Glueing Material: ${error.message}`, 'error');
+        console.error('Error obsoleting Glueing Material:', error);
+        showNotification(`Error obsoleting Glueing Material: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }

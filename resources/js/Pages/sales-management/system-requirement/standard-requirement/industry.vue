@@ -215,8 +215,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteIndustry" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="deleteIndustry" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -614,7 +614,7 @@ const deleteIndustry = async () => {
         
         if (!response.ok) {
             const result = await response.json();
-            throw new Error(result.message || 'Error deleting industry');
+            throw new Error(result.message || 'Error obsoleting industry');
         }
         
         // Get response data
@@ -635,8 +635,8 @@ const deleteIndustry = async () => {
         // Sync with server in background to ensure data consistency
         fetchIndustries();
     } catch (e) {
-        console.error('Error deleting industry:', e);
-        showNotification(e.message || 'Error deleting industry. Please try again.', 'error');
+        console.error('Error obsoleting industry:', e);
+        showNotification(e.message || 'Error obsoleting industry. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

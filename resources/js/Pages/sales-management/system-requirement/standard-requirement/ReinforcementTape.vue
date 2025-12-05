@@ -215,8 +215,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteReinforcementTape(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <button type="button" v-if="!isCreating" @click="deleteReinforcementTape(editForm.id)" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-ban mr-2"></i>Obsolete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
@@ -470,7 +470,7 @@ const saveReinforcementTapeChanges = async () => {
 };
 
 const deleteReinforcementTape = async (id) => {
-    if (!confirm(`Are you sure you want to delete this reinforcement tape?`)) return;
+    if (!confirm(`Are you sure you want to obsolete this reinforcement tape?`)) return;
 
     saving.value = true;
 
@@ -489,10 +489,10 @@ const deleteReinforcementTape = async (id) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting reinforcement tape');
+            throw new Error(errorData.message || 'Error obsoleting reinforcement tape');
         }
 
-        showNotification('Reinforcement tape deleted successfully!', 'success');
+        showNotification('Reinforcement tape obsoleted successfully!', 'success');
         await fetchReinforcementTapes();
 
         if (selectedRow.value && selectedRow.value.id === id) {
@@ -502,8 +502,8 @@ const deleteReinforcementTape = async (id) => {
 
         closeEditModal();
     } catch (error) {
-        console.error('Error deleting reinforcement tape:', error);
-        showNotification(`Error deleting reinforcement tape: ${error.message}`, 'error');
+        console.error('Error obsoleting reinforcement tape:', error);
+        showNotification(`Error obsoleting reinforcement tape: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }
