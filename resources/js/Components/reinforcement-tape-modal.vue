@@ -1,6 +1,6 @@
 <template>
-	<div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-		<div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
+	<div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 sm:px-0">
+		<div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
 			<!-- Modal Header -->
 			<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
 				<div class="flex items-center">
@@ -15,7 +15,7 @@
 			</div>
 
 			<!-- Modal Content -->
-			<div class="p-5">
+			<div class="p-5 flex-1 flex flex-col min-h-0">
 				<div class="relative mb-3">
 					<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
 						<i class="fas fa-search"></i>
@@ -23,8 +23,8 @@
 					<input type="text" v-model="searchQuery" placeholder="Search reinforcement tapes..."
 						class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
 				</div>
-				<div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-					<table class="w-full divide-y divide-gray-200 table-fixed">
+				<div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+					<table class="w-full divide-y divide-gray-200 table-fixed min-w-[560px] md:min-w-0">
 						<thead class="bg-gray-50 sticky top-0">
 							<tr>
 								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('code')">Code</th>
@@ -39,7 +39,7 @@
 								@click="selectRow(item)"
 								@dblclick="selectAndClose(item)">
 								<td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
-								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
+								<td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ item.name }}</td>
 								<td class="px-4 py-3 whitespace-nowrap text-center">
 									<span
 										:class="[
