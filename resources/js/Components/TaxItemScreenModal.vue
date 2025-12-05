@@ -247,20 +247,22 @@ const loadTaxTypes = async () => {
 
 const loadAvailableTaxTypes = async () => {
     try {
-        const res = await axios.get('/api/invoices/tax-types');
-        console.log('Available Tax Types - API Response:', res.data);
+        const res = await axios.get('/api/invoices/tax-types')
+        console.log('Available Tax Types - API Response:', res.data)
 
         if (res.data && res.data.success) {
-            const data = res.data.data || [];
+            const rows = res.data.data || []
+            // Only keep active tax types (status = 'A') to avoid showing obsolete ones
+            const activeRows = rows.filter(row => (row.status || 'A').toString().toUpperCase() === 'A')
             // Normalize available tax types
-            availableTaxTypes.value = data.map(item => ({
+            availableTaxTypes.value = activeRows.map(item => ({
                 code: item.code,
                 name: item.name,
                 apply: item.apply === 'Y' || item.apply === true,
                 rate: item.rate || 0,
                 custom_type: item.custom_type || 'Nil',
-            }));
-            console.log('✅ Loaded available tax types:', availableTaxTypes.value.length);
+            }))
+            console.log('✅ Loaded available active tax types:', availableTaxTypes.value.length)
         } else {
             availableTaxTypes.value = [];
         }
