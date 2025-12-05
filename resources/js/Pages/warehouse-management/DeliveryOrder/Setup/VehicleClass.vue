@@ -212,26 +212,40 @@
               </div>
 
               <!-- Modal Footer -->
-              <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 mt-4">
+              <div class="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 mt-4">
                 <button
+                  v-if="modalMode === 'edit' && form.id"
                   type="button"
-                  @click="closeModal"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px"
+                  @click="deleteVehicleClass(form)"
+                  class="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transform active:translate-y-px flex items-center"
                 >
-                  <i class="fas fa-times mr-2"></i>
-                  Cancel
+                  <i class="fas fa-ban mr-2"></i>
+                  Obsolete
                 </button>
-                <button
-                  type="submit"
-                  :disabled="saving"
-                  class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-px"
-                >
-                  <span v-if="saving" class="flex items-center">
-                    <i class="fas fa-spinner fa-spin -ml-1 mr-2"></i>
-                    Saving...
-                  </span>
-                  <span v-else>{{ modalMode === 'add' ? 'Add Vehicle Class' : 'Update Vehicle Class' }}</span>
-                </button>
+                <div class="flex items-center gap-3 ml-auto">
+                  <button
+                    type="button"
+                    @click="closeModal"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px"
+                  >
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="saving"
+                    class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-px"
+                  >
+                    <span v-if="saving" class="flex items-center">
+                      <i class="fas fa-spinner fa-spin -ml-1 mr-2"></i>
+                      Saving...
+                    </span>
+                    <span v-else class="flex items-center">
+                      <i class="fas fa-save mr-2"></i>
+                      {{ modalMode === 'add' ? 'Add Vehicle Class' : 'Update Vehicle Class' }}
+                    </span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -427,31 +441,40 @@ const saveVehicleClass = async () => {
 }
 
 const deleteVehicleClass = async (vehicleClass) => {
-  if (!confirm(`Are you sure you want to delete vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}"?`)) {
+  if (!confirm(`Are you sure you want to obsolete vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}"?`)) {
     return
   }
 
   try {
-    const response = await fetch(`/api/vehicle-classes/${vehicleClass.id}`, {
-      method: 'DELETE',
+    const response = await fetch(`/api/vehicle-classes/${vehicleClass.id}/status`, {
+      method: 'PUT',
       headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        STATUS: 'O'
+      })
     })
+
+    if (!response.ok) {
+      throw new Error('Failed to obsolete vehicle class')
+    }
 
     const data = await response.json()
 
-    if (data.success) {
-      addToast(data.message, 'success')
-      await fetchVehicleClasses()
-    } else {
-      addToast(data.message || 'Error deleting vehicle class', 'error')
+    if (!data || !data.success) {
+      throw new Error(data?.message || 'Unknown error from server')
     }
+
+    addToast(`Vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}" obsoleted successfully`, 'success')
+    closeModal()
+    await fetchVehicleClasses()
   } catch (error) {
-    addToast('Error deleting vehicle class', 'error')
+    addToast('Error obsoleting vehicle class: ' + (error?.message || error), 'error')
   }
 }
-
 
 const formatNumber = (number) => {
   return parseFloat(number).toFixed(2)

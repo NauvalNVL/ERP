@@ -120,16 +120,20 @@ class VehicleClassController extends Controller
     public function destroy(VehicleClass $vehicleClass)
     {
         try {
-            $vehicleClass->delete();
+            // Soft delete: mark vehicle class as obsolete instead of deleting the record
+            $vehicleClass->update([
+                'STATUS' => 'O',
+            ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Vehicle class deleted successfully'
+                'message' => 'Vehicle class marked as obsolete successfully',
+                'data' => $vehicleClass->fresh(),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting vehicle class: ' . $e->getMessage()
+                'message' => 'Error obsoleting vehicle class: ' . $e->getMessage(),
             ], 500);
         }
     }
