@@ -74,8 +74,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Form Fields -->
-                                <div v-if="recordMode !== 'select'" class="space-y-4 mt-4">
+                                <!-- Form Fields (disabled: create/edit now handled fully by modal) -->
+                                <div v-if="false" class="space-y-4 mt-4">
                                     <!-- Tax Group Name -->
                                     <div>
                                         <label for="taxGroupName" class="block text-sm font-semibold text-slate-700 mb-1">
@@ -233,6 +233,110 @@
             @close="showTaxItemScreen = false"
         />
 
+        <!-- Create/Edit Tax Group Modal -->
+        <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-blue-600 text-white rounded-t-xl">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Tax Group' : 'Edit Tax Group' }}</h3>
+                    </div>
+                    <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <div class="p-5">
+                    <form @submit.prevent="saveTaxGroupChanges" class="space-y-4">
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Group Code:</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                        <i class="fas fa-hashtag"></i>
+                                    </span>
+                                    <input
+                                        v-model="editForm.code"
+                                        type="text"
+                                        class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                                        :class="{ 'bg-gray-100': !isCreating }"
+                                        :readonly="!isCreating"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Group Name:</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                        <i class="fas fa-font"></i>
+                                    </span>
+                                    <input
+                                        v-model="editForm.name"
+                                        type="text"
+                                        class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Sales Tax Applied:</label>
+                                <div class="flex gap-6">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            v-model="editForm.sales_tax_applied"
+                                            value="Y"
+                                            class="w-4 h-4 text-blue-600"
+                                        />
+                                        <span class="text-sm">Y-Yes</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            v-model="editForm.sales_tax_applied"
+                                            value="N"
+                                            class="w-4 h-4 text-blue-600"
+                                        />
+                                        <span class="text-sm">N-No</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-5 pt-4 border-t border-gray-200">
+                            <button
+                                type="button"
+                                v-if="!isCreating"
+                                @click="handleDeleteFromModal"
+                                class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium flex items-center"
+                            >
+                                <i class="fas fa-trash-alt mr-2"></i>
+                                Delete
+                            </button>
+                            <div v-else class="w-24"></div>
+                            <div class="flex space-x-3">
+                                <button
+                                    type="button"
+                                    @click="closeEditModal"
+                                    class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
+                                >
+                                    <i class="fas fa-arrow-right mr-2"></i>
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Loading Overlay -->
         <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
             <div class="w-12 h-12 border-4 border-solid border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -278,6 +382,16 @@ const showTaxItemScreen = ref(false);
 const loading = ref(false);
 const saving = ref(false);
 const recordMode = ref('select'); // 'select', 'add', 'review'
+
+// Modal state for create/edit Tax Group
+const showEditModal = ref(false);
+const isCreating = ref(false);
+const editForm = ref({
+    code: '',
+    name: '',
+    sales_tax_applied: 'Y',
+    status: 'A'
+});
 
 // Data
 const taxGroups = ref([]);
@@ -329,26 +443,17 @@ const openTableModal = () => {
 };
 
 const handleNew = () => {
-    // Create new tax group mode
-    form.value = {
+    isCreating.value = true;
+    editForm.value = {
         code: '',
         name: '',
         sales_tax_applied: 'Y',
         status: 'A'
     };
+    form.value = { ...editForm.value };
     originalCode.value = '';
     recordMode.value = 'add';
-    showNotification('Create new tax group - Enter code and details', 'success');
-
-    // Focus on code input
-    setTimeout(() => {
-        const codeInput = document.getElementById('taxGroupCode');
-        if (codeInput) {
-            codeInput.removeAttribute('readonly');
-            codeInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
-            codeInput.focus();
-        }
-    }, 100);
+    showEditModal.value = true;
 };
 
 const handleCodeInput = () => {
@@ -400,6 +505,11 @@ const onTaxGroupSelected = (group) => {
     originalCode.value = group.code;
     recordMode.value = 'review';
 
+    // Open edit modal with selected group
+    isCreating.value = false;
+    editForm.value = { ...form.value };
+    showEditModal.value = true;
+
     showNotification('Tax group loaded: ' + group.code, 'success');
 };
 
@@ -417,15 +527,16 @@ const handleCancel = () => {
 const handleSave = async () => {
     if (!form.value.code || !form.value.name) {
         showNotification('Tax Group Code and Name are required.', 'error');
-        return;
+        return false;
     }
 
     // Show confirmation dialog
     if (!confirm('Confirm Saving / Updating ?')) {
-        return;
+        return false;
     }
 
     saving.value = true;
+    let success = false;
     try {
         let response;
         const payload = {
@@ -453,6 +564,7 @@ const handleSave = async () => {
             // Keep in review mode after save
             originalCode.value = form.value.code.toUpperCase();
             recordMode.value = 'review';
+            success = true;
         } else {
             showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
         }
@@ -463,6 +575,8 @@ const handleSave = async () => {
     } finally {
         saving.value = false;
     }
+
+    return success;
 };
 
 const handleDelete = async () => {
@@ -492,6 +606,60 @@ const handleDelete = async () => {
     } finally {
         saving.value = false;
     }
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
+    editForm.value = {
+        code: '',
+        name: '',
+        sales_tax_applied: 'Y',
+        status: 'A'
+    };
+    isCreating.value = false;
+};
+
+const saveTaxGroupChanges = async () => {
+    if (!editForm.value.code || !editForm.value.name) {
+        showNotification('Tax Group Code and Name are required.', 'error');
+        return;
+    }
+
+    // Sinkronkan data modal ke form utama
+    form.value = {
+        code: editForm.value.code.toUpperCase(),
+        name: editForm.value.name,
+        sales_tax_applied: editForm.value.sales_tax_applied || 'Y',
+        status: editForm.value.status || 'A'
+    };
+
+    // Tentukan mode create vs update sebelum menyimpan
+    if (isCreating.value || !originalCode.value || originalCode.value !== form.value.code) {
+        recordMode.value = 'add';
+        originalCode.value = '';
+    } else {
+        recordMode.value = 'review';
+    }
+
+    const success = await handleSave();
+    if (!success) {
+        // Jika gagal simpan, tetap di modal agar user bisa koreksi
+        return;
+    }
+
+    // Tutup modal Tax Group dan lanjut ke Tax Item Screen untuk group ini
+    showEditModal.value = false;
+    openTaxItemScreen();
+};
+
+const handleDeleteFromModal = async () => {
+    if (!editForm.value.code) {
+        showNotification('Please select a tax group first.', 'warning');
+        return;
+    }
+    form.value.code = editForm.value.code;
+    await handleDelete();
+    showEditModal.value = false;
 };
 
 const openTaxItemScreen = () => {
