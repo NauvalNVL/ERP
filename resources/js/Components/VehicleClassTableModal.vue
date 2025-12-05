@@ -103,14 +103,20 @@
           @click="$emit('close')"
           class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors text-sm font-medium"
         >
-          Cancel
+          <span class="flex items-center">
+            <i class="fas fa-times mr-2"></i>
+            Cancel
+          </span>
         </button>
         <button
           @click="confirmSelection"
           :disabled="!selectedClass"
           class="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
         >
-          Select Class
+          <span class="flex items-center justify-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            Select Class
+          </span>
         </button>
       </div>
     </div>
