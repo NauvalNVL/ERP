@@ -17,13 +17,7 @@ class ColorGroupController extends Controller
     {
         try {
             $colorGroups = ColorGroup::orderBy('CG', 'asc')->get();
-            
-            // If no data exists, seed sample data
-            if ($colorGroups->isEmpty()) {
-                $this->seedData();
-                $colorGroups = ColorGroup::orderBy('CG', 'asc')->get();
-            }
-            
+
             // Transform data to match Vue component expected format
             $colorGroupsTransformed = $colorGroups->map(function($group) {
                 return [
@@ -32,26 +26,26 @@ class ColorGroupController extends Controller
                     'cg_type' => $group->CG_Type
                 ];
             });
-            
+
             // Only return JSON for explicit API requests
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($colorGroupsTransformed);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/color-group', [
                 'colorGroups' => $colorGroupsTransformed,
                 'header' => 'Define Color Group'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@index: ' . $e->getMessage());
-            
+
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json([
                     'error' => true,
                     'message' => 'Error loading color groups: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/color-group', [
                 'colorGroups' => [],
                 'header' => 'Define Color Group',
@@ -91,7 +85,7 @@ class ColorGroupController extends Controller
             ]);
 
             Log::info('Color group created successfully:', ['CG' => $colorGroup->CG]);
-            
+
             // Transform back to Vue format for response
             $colorGroupResponse = [
                 'cg' => $colorGroup->CG,
@@ -108,7 +102,7 @@ class ColorGroupController extends Controller
         } catch (\Exception $e) {
             Log::error('Error creating color group: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating color group: ' . $e->getMessage()
@@ -143,7 +137,7 @@ class ColorGroupController extends Controller
             }
 
             $colorGroup = ColorGroup::where('CG', $code)->first();
-            
+
             if (!$colorGroup) {
                 Log::warning('Color group not found with CG: ' . $code);
                 return response()->json([
@@ -158,11 +152,11 @@ class ColorGroupController extends Controller
             if ($request->has('cg_type')) $updateData['CG_Type'] = trim($request->cg_type);
             // Status update should be done via toggleStatus
             // if ($request->has('status')) $updateData['status'] = $request->status;
-            
+
             $colorGroup->update($updateData);
 
             Log::info('Color group updated successfully:', ['CG' => $code]);
-            
+
             // Transform back to Vue format for response
             $colorGroupResponse = [
                 'cg' => $colorGroup->CG,
@@ -179,7 +173,7 @@ class ColorGroupController extends Controller
         } catch (\Exception $e) {
             Log::error('Error updating color group: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating color group: ' . $e->getMessage()
@@ -194,7 +188,7 @@ class ColorGroupController extends Controller
     {
         try {
             $colorGroup = ColorGroup::where('CG', $code)->first();
-            
+
             if (!$colorGroup) {
                 return response()->json([
                     'success' => false,
@@ -231,7 +225,7 @@ class ColorGroupController extends Controller
     {
         try {
             $colorGroup = ColorGroup::where('CG', $code)->first();
-            
+
             if (!$colorGroup) {
                 return response()->json([
                     'success' => false,
@@ -340,7 +334,7 @@ class ColorGroupController extends Controller
             }
 
             $colorGroups = $query->get();
-            
+
             // Transform data
             $colorGroupsTransformed = $colorGroups->map(function($group) {
                 return [
@@ -350,7 +344,7 @@ class ColorGroupController extends Controller
                     'status' => $group->status
                 ];
             });
-            
+
             return response()->json($colorGroupsTransformed);
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@apiIndex: ' . $e->getMessage());
@@ -361,62 +355,4 @@ class ColorGroupController extends Controller
         }
     }
 
-    /**
-     * Seed color group data (private method)
-     */
-    private function seedData()
-    {
-        try {
-            $colorGroups = [
-                ['CG' => '01', 'CG_Name' => 'BLACK', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '02', 'CG_Name' => 'WHITE', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '03', 'CG_Name' => 'RED', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '04', 'CG_Name' => 'BLUE', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '05', 'CG_Name' => 'GREEN', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '06', 'CG_Name' => 'CYAN', 'CG_Type' => 'C-Coating'],
-                ['CG' => '07', 'CG_Name' => 'MAGENTA', 'CG_Type' => 'C-Coating'],
-                ['CG' => '08', 'CG_Name' => 'YELLOW', 'CG_Type' => 'S-Offset'],
-                ['CG' => '09', 'CG_Name' => 'ORANGE', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '10', 'CG_Name' => 'YELLOW', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '11', 'CG_Name' => 'PINK', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '12', 'CG_Name' => 'GOLD', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '13', 'CG_Name' => 'GRAY', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '14', 'CG_Name' => 'BROWN', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '15', 'CG_Name' => 'VARNISH', 'CG_Type' => 'C-Coating'],
-                ['CG' => '16', 'CG_Name' => 'VIOLET', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '17', 'CG_Name' => 'PURPLE', 'CG_Type' => 'X-Flexo'],
-                ['CG' => '18', 'CG_Name' => 'SILVER', 'CG_Type' => 'S-Offset'],
-                ['CG' => 'PANTONE', 'CG_Name' => 'PANTONE', 'CG_Type' => 'S-Offset'],
-            ];
-
-            foreach ($colorGroups as $group) {
-                if (!ColorGroup::where('CG', $group['CG'])->exists()) {
-                    ColorGroup::create($group);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding color group data: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Seed the database with sample color group data (public API method)
-     */
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Color group seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in ColorGroupController@seed: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed color group data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Geo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Database\Seeders\GeoSeeder;
 
 class GeoController extends Controller
 {
@@ -15,20 +14,10 @@ class GeoController extends Controller
             if ($request->ajax()) {
                 $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
 
-                if ($geos->isEmpty()) {
-                    $this->seedData();
-                    $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
-                }
-
                 return response()->json($geos);
             }
 
             $geoData = Geo::all();
-
-            if ($geoData->isEmpty()) {
-                $this->seedData();
-                $geoData = Geo::all();
-            }
 
             return view('sales-management.system-requirement.system-requirement.standard-requirement.geo', compact('geoData'));
         } catch (\Exception $e) {
@@ -86,7 +75,7 @@ class GeoController extends Controller
             ]);
 
             $geo = Geo::where('CODE', $code)->firstOrFail();
-            
+
             if ($request->has('country')) {
                 $geo->COUNTRY = $request->country;
             }
@@ -105,7 +94,7 @@ class GeoController extends Controller
             if ($request->has('status')) {
                 $geo->STATUS = $request->status;
             }
-            
+
             $geo->save();
 
             return response()->json([
@@ -261,12 +250,12 @@ class GeoController extends Controller
     {
         try {
             $query = Geo::orderBy('country')->orderBy('state');
-            
+
             // Only filter by active status if all_status is not requested
             if (!$request->has('all_status') || !$request->all_status) {
                 $query->where('STATUS', 'Act');
             }
-            
+
             $geos = $query->get();
 
             Log::info('GeoController@apiIndex: Returning ' . $geos->count() . ' geo records');
@@ -275,30 +264,6 @@ class GeoController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load geo data'], 500);
-        }
-    }
-
-    private function seedData()
-    {
-        try {
-            $seeder = new GeoSeeder();
-            $seeder->run();
-        } catch (\Exception $e) {
-            Log::error('Error seeding geo data: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function seed()
-    {
-        try {
-            $this->seedData();
-            return response()->json(['success' => true, 'message' => 'Geo seed data created successfully']);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating geo seed data: ' . $e->getMessage()
-            ], 500);
         }
     }
 }

@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ProductDesignSeeder::class,
             VehicleClassSeeder::class,
             VehicleSeeder::class,
+            MachineSeeder::class,
             // McTableSeeder::class,
         ]);
     }

@@ -15,38 +15,32 @@ class ProductGroupController extends Controller
         try {
             // Build query ordered by product_group_id
             $query = ProductGroup::orderBy('product_group_id');
-            
+
             // Only filter by active status if all_status is not requested (for API)
             if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
                 if (!$request->has('all_status') || !$request->all_status) {
                     $query->where('status', 'Act');
                 }
             }
-            
+
             $productGroups = $query->get();
-            
-            // If there are no product groups in the database, seed them
-            if ($productGroups->isEmpty() && !$request->has('all_status')) {
-                $this->seedData();
-                $productGroups = ProductGroup::where('status', 'Act')->orderBy('product_group_id')->get();
-            }
-            
+
             // If the request wants JSON, return JSON response
             if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
                 return response()->json($productGroups);
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.productgroup', compact('productGroups'));
         } catch (\Exception $e) {
             Log::error('Error loading product groups: ' . $e->getMessage());
-            
+
             if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error loading data from database: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             // Return view with error message using session flash
             return redirect()->back()->with('error', 'Error loading data from database: ' . $e->getMessage());
         }
@@ -114,7 +108,7 @@ class ProductGroupController extends Controller
     {
         try {
             $productGroup = ProductGroup::findOrFail($id);
-            
+
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:100',
                 'is_active' => 'boolean',
@@ -207,57 +201,6 @@ class ProductGroupController extends Controller
         }
     }
 
-    /**
-     * API method to seed product groups data
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function seedData()
-    {
-        try {
-            $sampleGroups = [
-                ['code' => 'B', 'name' => 'Box', 'is_active' => true],
-                ['code' => 'P', 'name' => 'Paper', 'is_active' => true],
-                ['code' => 'C', 'name' => 'Carton', 'is_active' => true],
-                ['code' => 'L', 'name' => 'Label', 'is_active' => true],
-                ['code' => 'F', 'name' => 'Film', 'is_active' => true],
-            ];
-
-            foreach ($sampleGroups as $group) {
-                // Check if the group already exists
-                $existingGroup = ProductGroup::where('product_group_id', $group['code'])->first();
-                
-                if (!$existingGroup) {
-                    ProductGroup::create([
-                        'product_group_id' => $group['code'],
-                        'product_group_name' => $group['name'],
-                        'is_active' => $group['is_active']
-                    ]);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding product group data: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function apiSeed()
-    {
-        try {
-            $this->seedData();
-            return response()->json([
-                'success' => true,
-                'message' => 'Product group seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in ProductGroupController@apiSeed: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error seeding product groups: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -272,7 +215,7 @@ class ProductGroupController extends Controller
                     'message' => $validator->errors()->first()
                 ], 422);
             }
-            
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -296,14 +239,14 @@ class ProductGroupController extends Controller
         return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil ditambahkan');
         } catch (\Exception $e) {
             Log::error('Error creating product group: ' . $e->getMessage());
-            
+
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error creating product group: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return redirect()->back()->with('error', 'Error creating product group: ' . $e->getMessage());
         }
     }
@@ -319,13 +262,13 @@ class ProductGroupController extends Controller
     {
         try {
             $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
-            
+
             // Log the incoming request data to debug
             Log::info('Update product group request data', [
                 'id' => $id,
                 'request_data' => $request->all()
             ]);
-            
+
         $validator = Validator::make($request->all(), [
             'product_group_name' => 'required|string|max:100',
                 'is_active' => 'required|boolean',
@@ -335,7 +278,7 @@ class ProductGroupController extends Controller
                 Log::warning('Product group validation failed', [
                     'errors' => $validator->errors()->toArray()
                 ]);
-                
+
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
@@ -362,7 +305,7 @@ class ProductGroupController extends Controller
                 'id' => $id,
                 'exception' => $e
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating product group: ' . $e->getMessage()
@@ -386,14 +329,14 @@ class ProductGroupController extends Controller
         return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error deleting product group: ' . $e->getMessage());
-            
+
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error deleting product group: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return redirect()->back()->with('error', 'Error deleting product group: ' . $e->getMessage());
         }
     }
@@ -408,7 +351,7 @@ class ProductGroupController extends Controller
         $productGroups = ProductGroup::orderBy('product_group_name')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductgroup', compact('productGroups'));
     }
-    
+
     /**
      * Display a listing of the resource for printing in Vue.
      *
@@ -423,7 +366,7 @@ class ProductGroupController extends Controller
             return response()->json(['error' => 'Failed to load product group data for printing'], 500);
         }
     }
-    
+
     /**
      * Render the Vue component for product group management.
      *
@@ -475,4 +418,4 @@ class ProductGroupController extends Controller
             ]);
         }
     }
-} 
+}

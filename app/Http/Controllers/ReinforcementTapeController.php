@@ -22,11 +22,6 @@ class ReinforcementTapeController extends Controller
         try {
             $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
 
-            if ($reinforcementTapes->isEmpty()) {
-                $this->seedData();
-                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            }
-
             return response()->json($reinforcementTapes);
         } catch (\Exception $e) {
             Log::error('Error in ReinforcementTapeController@apiIndex: ' . $e->getMessage());
@@ -47,12 +42,6 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-
-            // If no data exists, seed sample data
-            if ($reinforcementTapes->isEmpty()) {
-                $this->seedData();
-                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            }
 
             // For debugging
             if ($reinforcementTapes->isEmpty()) {
@@ -271,13 +260,6 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-
-            // If no data exists, seed sample data
-            if ($reinforcementTapes->isEmpty()) {
-                $this->seedData();
-                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            }
-
             return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
                 'reinforcementTapes' => $reinforcementTapes,
                 'header' => 'Define Reinforcement Tape'
@@ -333,53 +315,6 @@ class ReinforcementTapeController extends Controller
                 'header' => 'View & Print Reinforcement Tapes',
                 'error' => 'Failed to load reinforcement tape data for printing'
             ]);
-        }
-    }
-
-    /**
-     * Seed reinforcement tape data (private method for internal use).
-     *
-     * @return void
-     */
-    private function seedData()
-    {
-        try {
-            $reinforcementTapes = [
-                ['code' => '001', 'name' => 'LAKBAN SERAT', 'dry_end_code' => '1', 'status' => 'Act', 'is_active' => true],
-                ['code' => '002', 'name' => 'REINFORCEMENT TAPE TYPE A', 'dry_end_code' => '2', 'status' => 'Act', 'is_active' => true],
-                ['code' => '003', 'name' => 'REINFORCEMENT TAPE TYPE B', 'dry_end_code' => '3', 'status' => 'Act', 'is_active' => true],
-            ];
-
-            foreach ($reinforcementTapes as $tape) {
-                if (!ReinforcementTape::where('code', $tape['code'])->exists()) {
-                    ReinforcementTape::create($tape);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error seeding reinforcement tape data: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Seed the database with sample reinforcement tape data (public API method).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function seed()
-    {
-        try {
-            $this->seedData();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Reinforcement tape seed data created successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in ReinforcementTapeController@seed: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed reinforcement tape data: ' . $e->getMessage()
-            ], 500);
         }
     }
 
