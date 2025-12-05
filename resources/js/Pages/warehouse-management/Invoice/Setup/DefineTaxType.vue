@@ -227,15 +227,21 @@
                         v-if="recordMode === 'review'"
                         type="button"
                         @click="handleDelete"
-                        class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium"
+                        class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium flex items-center"
                     >
-                        <i class="fas fa-trash-alt mr-2"></i>Delete
+                        <i class="fas fa-ban mr-2"></i>
+                        Obsolete
                     </button>
                     <div v-else class="w-24"></div>
                     <div class="flex space-x-3">
                         <button type="button" @click="closeForm" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium border border-gray-300">Cancel</button>
-                        <button @click="handleSave" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
-                            <i class="fas fa-save mr-2"></i>
+                        <button
+                            @click="handleSave"
+                            :disabled="saving"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>
+                            <i v-else class="fas fa-save mr-2"></i>
                             Save
                         </button>
                     </div>
@@ -528,10 +534,10 @@ const handleSave = () => {
 
 const handleDelete = () => {
     if (!form.value.code) {
-        alert('Please select a tax type to delete');
+        alert('Please select a tax type to obsolete');
         return;
     }
-    confirmationMessage.value = 'Confirm Deleting ?';
+    confirmationMessage.value = 'Confirm Obsoleting ?';
     confirmationAction.value = 'delete';
     showConfirmation.value = true;
 };
@@ -589,20 +595,19 @@ const saveTaxType = async () => {
 };
 
 const deleteTaxType = async () => {
-    if (!confirm(`Are you sure you want to delete tax type "${form.value.code}"? This action cannot be undone.`)) {
-        return;
-    }
     saving.value = true;
     try {
-        const res = await axios.delete(`/api/invoices/tax-types/${form.value.code}`);
+        const res = await axios.put(`/api/invoices/tax-types/${form.value.code}/status`, {
+            status: 'O',
+        });
         if (res.data && res.data.success) {
-            showNotification(res.data.message || 'Tax type deleted successfully', 'success');
+            showNotification(res.data.message || 'Tax type marked obsolete successfully', 'success');
             await loadTaxTypes();
             resetForm();
             showForm.value = false;
         }
     } catch (e) {
-        showNotification(e.response?.data?.message || 'Error deleting tax type', 'error');
+        showNotification(e.response?.data?.message || 'Error obsoleting tax type', 'error');
     } finally {
         saving.value = false;
     }

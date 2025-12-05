@@ -245,50 +245,37 @@ const fetchTaxOptions = async () => {
         console.log('Tax items response:', data)
         
         const taxItems = Array.isArray(data) ? data : (data.data || [])
+        // Only include active tax items (status = 'A') so obsolete tax types are not shown
+        const activeItems = taxItems.filter(item => (item.status || 'A').toString().toUpperCase() === 'A')
         
         // Map tax items to display format
-        taxOptions.value = taxItems.map(item => ({
+        taxOptions.value = activeItems.map(item => ({
           code: item.tax_code || item.code,
           name: item.tax_name || item.name || item.tax_type?.name || '',
           rate: parseFloat(item.rate || item.tax_rate || 0),
-          apply: item.status === 'A' || item.apply === true,
+          apply: true,
           include: item.include === true || item.include === 'Y',
         }))
-        
-        if (taxOptions.value.length > 0) {
-          console.log('✅ Loaded tax items from Tax Group:', taxOptions.value)
-          
-          // Auto-select first active tax
-          const firstActive = taxOptions.value.find(t => t.apply)
-          if (firstActive) {
-            selectedTax.value = firstActive
-            console.log('🎯 Auto-selected first active tax:', firstActive.code)
-          } else {
-            selectedTax.value = taxOptions.value[0]
-            console.log('🎯 Auto-selected first tax (no active found):', taxOptions.value[0].code)
-          }
-        } else {
-          console.warn('⚠️ Tax Group has no tax items. Please assign tax types in Define Tax Group menu.')
-          console.warn('   Tax Group:', props.selectedIndexData.tax_group_code)
-          console.warn('   Solution: Define Tax Group → Select', props.selectedIndexData.tax_group_code, '→ Tax Item Screen → Add tax types')
-        }
       } else {
         throw new Error('Failed to fetch tax items from tax group')
       }
     } else {
       // Fallback: fetch all tax types if no index selected
       console.log('⚠️ No selectedIndexData, falling back to generic tax types')
-      const res = await fetch('/api/material-management/tax-types', {
+      const res = await fetch('/api/invoices/tax-types', {
         headers: { 'Accept': 'application/json' }
       })
       
       if (res.ok) {
         const data = await res.json()
-        let allTaxes = (Array.isArray(data) ? data : (data.data || [])).map(tax => ({
+        const rows = Array.isArray(data) ? data : (data.data || [])
+        // Only keep active tax types
+        const activeTaxes = rows.filter(tax => (tax.status || 'A').toString().toUpperCase() === 'A')
+        let allTaxes = activeTaxes.map(tax => ({
           code: tax.code || tax.tax_code || '',
           name: tax.name || tax.description || '',
           rate: parseFloat(tax.rate || tax.tax_rate || 0),
-          apply: !!(tax.status ?? tax.is_active ?? true),
+          apply: true,
           include: tax.include === true || tax.include === 'Yes',
         }))
         
