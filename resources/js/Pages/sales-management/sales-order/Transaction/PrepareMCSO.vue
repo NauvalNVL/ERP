@@ -150,7 +150,6 @@
                       type="text"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter customer code"
-                      @blur="validateCustomer"
                     >
                     <button
                       @click="openCustomerLookup"
@@ -473,17 +472,17 @@
             </ul>
           </div>
 
-          <!-- Master Card Approval Warning -->
+          <!-- Master Card Status Warning -->
           <div v-if="canProceed && !isMasterCardApproved" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <div class="flex items-center">
               <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
               <span class="text-sm text-orange-800 font-medium">
-                Master Card Approval Notice
+                Master Card Status Notice
               </span>
             </div>
             <p class="text-xs text-orange-700 mt-1">
-              The selected master card is not yet approved. You can proceed with creating the sales order,
-              but the master card may need to be approved before production can begin.
+              The selected master card status is not Active. You can proceed with creating the sales order,
+              but the master card status may need to be updated before production can begin.
             </p>
           </div>
         </div>
@@ -711,47 +710,48 @@ const mcComponentsForDesign = ref([])
 // Computed properties
 const canProceed = computed(() => {
   // Allow proceeding if customer and master card are selected
-  // Approval status will be shown as warning but won't block the process
+  // Master Card status will be shown as info/warning but won't block the process
   return selectedCustomer.code && selectedMasterCard.seq
 })
 
-// Computed property to check if master card is approved
-// Treat MC with status 'Active' as approved even if mc_approval flag is missing
+// Computed property to check if master card is in an Active status
+// Treat MC status 'Active' or 'Act' as valid and ignore legacy approval flag
 const isMasterCardApproved = computed(() => {
-  const approvalFlag = (selectedMasterCard.approval || '').toString().toLowerCase()
   const statusFlag = (selectedMasterCard.status || '').toString().toLowerCase()
-  return approvalFlag === 'yes' || statusFlag === 'active'
+  return statusFlag === 'active' || statusFlag === 'act'
 })
 
-// Computed property to get approval status message
+// Computed property to get status message for the selected Master Card
 const approvalStatusMessage = computed(() => {
   if (!selectedMasterCard.seq) return ''
 
+  const status = selectedMasterCard.status || ''
+  const statusFlag = status.toString().toLowerCase()
+
   if (isMasterCardApproved.value) {
-    return ''
+    return { type: 'success', message: 'Master Card status: Active' }
   }
 
-  switch (selectedMasterCard.approval) {
-    case 'No':
-      return { type: 'warning', message: 'Master Card is not approved yet. You can proceed but approval may be required later.' }
-    default:
-      return { type: 'info', message: 'Master Card approval status is unknown' }
+  if (!statusFlag) {
+    return { type: 'info', message: 'Master Card status is unknown' }
   }
+
+  return { type: 'warning', message: `Master Card status is ${status}. Please review before use.` }
 })
 
 const dayOfWeek = computed(() => {
   if (!orderDetails.pOrderDate) return ''
 
   try {
-  const date = new Date(orderDetails.pOrderDate)
+    const date = new Date(orderDetails.pOrderDate)
 
     // Check if date is valid
     if (isNaN(date.getTime())) {
       return ''
     }
 
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  return days[date.getDay()]
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    return days[date.getDay()]
   } catch (err) {
     console.warn('Error calculating day of week:', err)
     return ''
@@ -1103,7 +1103,6 @@ const selectCustomer = async (customer) => {
   })
 
   showCustomerModal.value = false
-  success('Customer selected successfully')
 }
 
 const validateCustomer = async () => {
@@ -1212,7 +1211,7 @@ const selectMcs = (mc) => {
   const status = mc.status || mc.sts || ''
   const approval = mc.mc_approval || mc.approval || 'No'
   const partNo = mc.part || mc.part_no || mc.part_num || ''
-  const compNo = mc.comp || mc.comp_no || mc.component || ''
+  const compNo = mc.comp || mc.comp_no || mc.comp_num || mc.component || ''
   const pDesign = mc.p_design || mc.pd || ''
 
   selectedMasterCard.seq = String(seq)
@@ -1224,13 +1223,6 @@ const selectMcs = (mc) => {
   selectedMasterCard.pDesign = String(pDesign)
 
   showMcsTableModal.value = false
-
-  // Show appropriate message based on approval status
-  if (isMasterCardApproved.value) {
-    success('Master card selected successfully - Approved and ready for use')
-  } else {
-    success('Master card selected successfully - Not yet approved')
-  }
 }
 
 const validateMasterCard = async () => {
@@ -1249,11 +1241,12 @@ const validateMasterCard = async () => {
       selectedMasterCard.compNo = masterCard.comp_no || ''
       selectedMasterCard.pDesign = masterCard.p_design || ''
 
-      // Show appropriate message based on approval status
+      // Show message based on Master Card status
       if (isMasterCardApproved.value) {
-        success('Master card validated successfully - Approved and ready for use')
+        success('Master card validated successfully - Status: Active')
       } else {
-        success('Master card validated successfully - Not yet approved')
+        const statusLabel = selectedMasterCard.status || 'Unknown'
+        success(`Master card validated successfully - Status: ${statusLabel}`)
       }
     } else {
       error('Master card not found')
