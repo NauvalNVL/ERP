@@ -1,17 +1,19 @@
 <template>
     <AppLayout header="Copy & Paste User Access Permission">
         <Head title="Copy & Paste User Access" />
-        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
             <div class="max-w-5xl w-full mx-auto relative z-0">
                 <!-- Header Card -->
-                <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
-                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                        <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
-                            <CopyIcon class="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">Copy &amp; Paste Permissions</h1>
-                            <p class="text-xs sm:text-sm text-blue-100">Transfer user access permissions between users</p>
+                <div class="bg-white/80 shadow-lg rounded-2xl border border-white/40 mb-6 backdrop-blur-sm">
+                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-4 sm:px-6 sm:py-5">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                                <CopyIcon class="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                                <h1 class="text-lg sm:text-2xl font-bold leading-tight text-white">Copy &amp; Paste Permissions</h1>
+                                <p class="text-xs sm:text-sm text-indigo-100">Transfer user access permissions between users</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -24,8 +26,8 @@
                             <div class="flex items-start justify-between gap-3 mb-3">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-50">
-                                            <UserIcon class="h-4 w-4 text-blue-600" />
+                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50">
+                                            <UserIcon class="h-4 w-4 text-indigo-600" />
                                         </span>
                                         <span>Source User (Copy From)</span>
                                     </h3>
@@ -45,14 +47,14 @@
                                             id="copyFromUserId"
                                             v-model="form.copyFromUserId" 
                                             type="text"
-                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-indigo-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                             placeholder="Enter source User ID..."
                                             @keyup.enter="searchCopyFromUser"
                                         >
                                     </div>
                                     <button 
                                         @click="searchCopyFromUser"
-                                        class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                         :disabled="!form.copyFromUserId"
                                     >
                                         <SearchIcon class="h-4 w-4 mr-2" />
@@ -63,14 +65,14 @@
                         </div>
 
                         <!-- Display Copy From User Info -->
-                        <div v-if="copyFromUser" class="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 flex items-center gap-3">
-                            <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center text-white font-semibold text-sm">
+                        <div v-if="copyFromUser" class="rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3 flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-indigo-500/80 flex items-center justify-center text-white font-semibold text-sm">
                                 {{ ((copyFromUser.official_name || copyFromUser.user_id || '').charAt(0) || '').toUpperCase() }}
                             </div>
                             <div class="min-w-0">
-                                <p class="text-sm font-semibold text-blue-900 truncate">{{ copyFromUser.official_name || copyFromUser.user_id }}</p>
-                                <p class="text-xs text-blue-800 truncate">{{ copyFromUser.user_id }} • {{ copyFromUser.official_title || 'No Title' }}</p>
-                                <p class="text-[11px] text-blue-700 mt-0.5">Source user selected</p>
+                                <p class="text-sm font-semibold text-indigo-900 truncate">{{ copyFromUser.official_name || copyFromUser.user_id }}</p>
+                                <p class="text-xs text-indigo-800 truncate">{{ copyFromUser.user_id }} • {{ copyFromUser.official_title || 'No Title' }}</p>
+                                <p class="text-[11px] text-indigo-700 mt-0.5">Source user selected</p>
                             </div>
                         </div>
 
@@ -79,8 +81,8 @@
                             <div class="flex items-start justify-between gap-3 mb-3">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50">
-                                            <UserIcon class="h-4 w-4 text-emerald-600" />
+                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50">
+                                            <UserIcon class="h-4 w-4 text-indigo-600" />
                                         </span>
                                         <span>Target User (Paste To)</span>
                                     </h3>
@@ -100,14 +102,14 @@
                                             id="pasteToUserId"
                                             v-model="form.pasteToUserId" 
                                             type="text"
-                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            class="block w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-indigo-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                             placeholder="Enter target User ID..."
                                             @keyup.enter="searchPasteToUser"
                                         >
                                     </div>
                                     <button 
                                         @click="searchPasteToUser"
-                                        class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                         :disabled="!form.pasteToUserId"
                                     >
                                         <SearchIcon class="h-4 w-4 mr-2" />
@@ -133,7 +135,7 @@
                         <div class="flex justify-center pt-5 border-t border-gray-200">
                             <button 
                                 @click="confirmPaste"
-                                class="inline-flex items-center px-6 py-2.5 md:px-8 md:py-3 bg-emerald-600 text-white text-sm md:text-base font-medium rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="inline-flex items-center px-6 py-2.5 md:px-8 md:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm md:text-base font-medium rounded-lg shadow-sm hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="!copyFromUser || !pasteToUser || isProcessing"
                             >
                                 <CheckIcon class="h-5 w-5 mr-2" />
