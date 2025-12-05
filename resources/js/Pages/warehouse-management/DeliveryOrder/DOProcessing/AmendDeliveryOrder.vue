@@ -5,7 +5,7 @@
         <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
           <!-- Header with controls -->
           <div class="bg-blue-600 px-4 py-3 sm:px-6 border-b border-blue-700">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start">
               <div class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
                   <i class="fas fa-edit text-lg text-orange-100"></i>
@@ -14,29 +14,6 @@
                   <h1 class="text-lg sm:text-xl font-semibold text-white">Amend Delivery Order</h1>
                   <p class="text-xs text-blue-100">F2: DO Lookup • F3: Items • F4: Calendar • Ctrl+S: Save • F5: Refresh</p>
                 </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <button 
-                  @click="exitPage" 
-                  class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 text-red-100 transition-colors"
-                  title="Exit"
-                >
-                  <i class="fas fa-power-off text-sm"></i>
-                </button>
-                <button 
-                  @click="saveAmendedDeliveryOrder" 
-                  class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 text-green-100 transition-colors"
-                  title="Save Changes"
-                >
-                  <i class="fas fa-save text-sm"></i>
-                </button>
-                <button 
-                  @click="refreshPage" 
-                  class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 text-white transition-colors"
-                  title="Refresh (F5)"
-                >
-                  <i class="fas fa-sync-alt text-sm"></i>
-                </button>
               </div>
             </div>
           </div>
