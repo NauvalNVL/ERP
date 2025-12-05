@@ -172,8 +172,8 @@
                                             @click="handleDelete"
                                             class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium"
                                         >
-                                            <i class="fas fa-trash mr-2"></i>
-                                            Delete
+                                            <i class="fas fa-ban mr-2"></i>
+                                            Obsolete
                                         </button>
                                         <div v-else></div>
 
@@ -442,9 +442,9 @@ const handleSave = async () => {
     }
 };
 
-// Handle delete
+// Handle delete (mark as obsolete in UI wording, backend still deletes record)
 const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this tax index?')) {
+    if (!confirm('Are you sure you want to obsolete this tax index?')) {
         return;
     }
 
@@ -454,12 +454,12 @@ const handleDelete = async () => {
         );
 
         if (response.data.success) {
-            alert('Tax index deleted successfully!');
+            alert('Tax index obsoleted successfully!');
             handleCancel();
         }
     } catch (error) {
-        console.error('Error deleting:', error);
-        alert('Failed to delete: ' + (error.response?.data?.message || error.message));
+        console.error('Error obsoleting tax index:', error);
+        alert('Failed to obsolete tax index: ' + (error.response?.data?.message || error.message));
     }
 };
 

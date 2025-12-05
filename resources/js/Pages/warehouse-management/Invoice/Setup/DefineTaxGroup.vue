@@ -138,8 +138,8 @@
                                             @click="handleDelete"
                                             class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium"
                                         >
-                                            <i class="fas fa-trash-alt mr-2"></i>
-                                            Delete
+                                            <i class="fas fa-ban mr-2"></i>
+                                            Obsolete
                                         </button>
                                         <div v-else></div>
 
@@ -311,8 +311,8 @@
                                 @click="handleDeleteFromModal"
                                 class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium flex items-center"
                             >
-                                <i class="fas fa-trash-alt mr-2"></i>
-                                Delete
+                                <i class="fas fa-ban mr-2"></i>
+                                Obsolete
                             </button>
                             <div v-else class="w-24"></div>
                             <div class="flex space-x-3">
