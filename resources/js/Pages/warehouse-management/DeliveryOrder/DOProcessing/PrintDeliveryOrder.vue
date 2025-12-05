@@ -485,14 +485,29 @@ function formatPreviewText(rows) {
     }
 
     // Constants matching PDF coordinates
-    const LEFT = 0          // PDF left = 50pt
-    const RIGHT = 80        // PDF right = 545pt (approx 80 characters at 6.8pt per char)
-    const CENTER = 40       // PDF center = 297.5pt
-    const QTY_COL = 50      // PDF qtyColX = 385pt (right - 160)
-    const UNIT_COL = 80     // PDF unitColX = 545pt (right)
-    const DIM_POS = 25      // PDF dimensions at left + 100pt
+    const LEFT = 0
+    const RIGHT = 80
+    const CENTER = 40
+    const QTY_COL = 50
+    const UNIT_COL = 80
+    const DIM_POS = 25
 
     // Header Section - match PDF exactly
+    let rawStatus = String(header.status || header.STS || header.sts || header.DO_STS || '').trim().toUpperCase()
+    if (!rawStatus || rawStatus === '0') {
+      const statusCandidate = Object.values(header || {}).find(v =>
+        typeof v === 'string' && /CANCEL/i.test(v.trim())
+      )
+      if (statusCandidate) {
+        rawStatus = statusCandidate.trim().toUpperCase()
+      }
+    }
+    const isCancelled = rawStatus === 'CANCEL' || rawStatus === 'CANCELLED'
+
+    if (isCancelled) {
+      lines.push(' '.repeat(Math.max(0, RIGHT - 6)) + 'CANCEL')
+    }
+
     lines.push(`PT. MULTIBOX INDAH${' '.repeat(RIGHT - 18)}No. SJ    : ${doNum}`)
     lines.push(`Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo${' '.repeat(RIGHT - 47)}Tanggal   : ${doDate}`)
     lines.push(`Kec. Jawilan, Serang - Banten 42180${' '.repeat(RIGHT - 38)}Halaman   : 1`)
@@ -832,6 +847,28 @@ async function renderSuratJalan(doc, groupRows) {
   doc.setFont('courier', 'bold')
   doc.setFontSize(10)
   doc.text('PT. MULTIBOX INDAH', left, y)
+
+  // Detect cancelled status from possible status fields on header row
+  let rawStatus = String(header.status || header.STS || header.sts || header.DO_STS || '').trim().toUpperCase()
+  if (!rawStatus || rawStatus === '0') {
+    const statusCandidate = Object.values(header || {}).find(v =>
+      typeof v === 'string' && /CANCEL/i.test(v.trim())
+    )
+    if (statusCandidate) {
+      rawStatus = statusCandidate.trim().toUpperCase()
+    }
+  }
+  const isCancelled = rawStatus === 'CANCEL' || rawStatus === 'CANCELLED'
+
+  // When cancelled, show bold red CANCEL above No. SJ on the right
+  if (isCancelled) {
+    doc.setTextColor(255, 0, 0)
+    doc.setFontSize(14)
+    doc.text('CANCEL', right, y - 12, { align: 'right' })
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(10)
+  }
+
   doc.text(`No. SJ    : ${doNum}`, right, y, { align: 'right' })
   y += 12
 
