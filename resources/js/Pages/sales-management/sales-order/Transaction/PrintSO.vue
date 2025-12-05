@@ -824,6 +824,20 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   doc.setFont('courier', 'bold')
   doc.setFontSize(10)
   doc.text('PT. MULTIBOX INDAH', leftMargin, yPos)
+
+  // Detect cancelled status from possible status fields (status/STS/so_status)
+  const rawStatus = String(so.status || so.sts || so.STS || so.so_status || '').trim().toUpperCase()
+  const isCancelled = rawStatus === 'CANCEL' || rawStatus === 'CANCELLED'
+
+  // When cancelled, show bold red CANCEL above S/ORDER number on the right
+  if (isCancelled) {
+    doc.setTextColor(255, 0, 0)
+    doc.setFontSize(14)
+    doc.text('CANCEL', rightMargin, yPos - 12, { align: 'right' })
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(10)
+  }
+
   doc.text(`S/ORDER# : ${so.so_number || ''}`, rightMargin, yPos, { align: 'right' })
   yPos += 11
 
@@ -1307,6 +1321,15 @@ function renderSoReport(so, details, schedules) {
   }
 
   // Header
+  // Detect cancelled status from possible status fields (status/STS/so_status)
+  const rawStatus = String(so.status || so.sts || so.STS || so.so_status || '').trim().toUpperCase()
+  const isCancelled = rawStatus === 'CANCEL' || rawStatus === 'CANCELLED'
+
+  if (isCancelled) {
+    // Show CANCEL label aligned above the S/ORDER number in text preview
+    lines.push(pad('', 55) + 'CANCEL')
+  }
+
   lines.push(pad('PT. MULTIBOX INDAH', 60) + `S/ORDER# : ${so.so_number || ''}`)
   lines.push(pad('SALES ORDER', 60) + `S/O DATE : ${formatDate(so.po_date) || ''}`)
 
