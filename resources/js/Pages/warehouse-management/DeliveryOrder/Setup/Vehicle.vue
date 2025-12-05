@@ -494,23 +494,35 @@
               </div>
 
               <!-- Form Actions -->
-              <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 mt-4">
+              <div class="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 mt-4">
                 <button
+                  v-if="isEditing && editingVehicle"
                   type="button"
-                  @click="closeModal"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px"
+                  @click="deleteVehicle(editingVehicle, true)"
+                  class="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transform active:translate-y-px flex items-center"
                 >
-                  <i class="fas fa-times mr-2"></i>
-                  Cancel
+                  <i class="fas fa-ban mr-2"></i>
+                  Obsolete
                 </button>
-                <button
-                  type="submit"
-                  :disabled="saving"
-                  class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-px"
-                >
-                  <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>
-                  {{ isEditing ? 'Update' : 'Save' }} Vehicle
-                </button>
+                <div class="flex items-center gap-3 ml-auto">
+                  <button
+                    type="button"
+                    @click="closeModal"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px"
+                  >
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="saving"
+                    class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-px"
+                  >
+                    <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>
+                    <i v-else class="fas fa-save mr-2"></i>
+                    {{ isEditing ? 'Update' : 'Save' }} Vehicle
+                  </button>
+                </div>
               </div>
             </form>
             </div>
@@ -790,18 +802,22 @@ const saveVehicle = async () => {
   }
 }
 
-const deleteVehicle = async (vehicle) => {
-  if (!confirm(`Are you sure you want to delete vehicle ${vehicle.VEHICLE_NO}?`)) {
+const deleteVehicle = async (vehicle, fromModal = false) => {
+  if (!confirm(`Are you sure you want to obsolete vehicle ${vehicle.VEHICLE_NO}?`)) {
     return
   }
 
   try {
-    const response = await fetch(buildApiUrl(`/vehicles/${vehicle.id}`), {
-      method: 'DELETE',
+    const response = await fetch(buildApiUrl(`/vehicles/${vehicle.id}/status`), {
+      method: 'PUT',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
+      },
+      body: JSON.stringify({
+        VEHICLE_STATUS: 'O'
+      })
     })
 
     if (!response.ok) {
@@ -811,14 +827,17 @@ const deleteVehicle = async (vehicle) => {
 
     const data = await response.json()
 
-    if (data.success) {
-      addToast(data.message, 'success')
-      fetchVehicles()
-    } else {
-      addToast(data.message || 'Error deleting vehicle', 'error')
+    if (!data || !data.success) {
+      throw new Error(data?.message || 'Unknown error from server')
     }
+
+    addToast(`Vehicle ${vehicle.VEHICLE_NO} obsoleted successfully`, 'success')
+    if (fromModal) {
+      closeModal()
+    }
+    await fetchVehicles()
   } catch (error) {
-    addToast('Error deleting vehicle: ' + (error?.message || error), 'error')
+    addToast('Error obsoleting vehicle: ' + (error?.message || error), 'error')
   }
 }
 

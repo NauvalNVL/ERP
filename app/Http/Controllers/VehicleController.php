@@ -249,21 +249,26 @@ class VehicleController extends Controller
     }
 
     /**
-     * Delete a vehicle
+     * Delete a vehicle (soft delete via status)
      */
     public function apiDestroy(Vehicle $vehicle)
     {
         try {
-            $vehicle->delete();
+            // Soft delete: mark vehicle as obsolete instead of physically deleting the record
+            $vehicle->update([
+                'VEHICLE_STATUS' => 'O',
+                'STATUS' => 'O',
+            ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Vehicle deleted successfully'
+                'message' => 'Vehicle marked as obsolete successfully',
+                'data' => $vehicle->fresh()->load('vehicleClass'),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting vehicle: ' . $e->getMessage()
+                'message' => 'Error obsoleting vehicle: ' . $e->getMessage(),
             ], 500);
         }
     }
