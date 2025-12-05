@@ -1,25 +1,25 @@
 <template>
     <AppLayout header="View & Print User">
         <Head title="View & Print User" />
-        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto w-full relative z-0">
                 <!-- Header Card -->
-                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 mb-4">
+                    <div class="bg-blue-600 px-4 py-3 sm:px-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             <div class="flex items-center">
-                                <div class="bg-white/20 rounded-full p-4 mr-4">
-                                    <UsersIcon class="h-8 w-8 text-white" />
+                                <div class="bg-white/20 rounded-full p-3 mr-3">
+                                    <UsersIcon class="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                    <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">View & Print Users</h1>
-                                    <p class="text-blue-100">Comprehensive user information and printing</p>
+                                    <h1 class="text-lg md:text-xl font-semibold text-white leading-tight mb-1">View & Print Users</h1>
+                                    <p class="text-blue-100 text-xs md:text-sm">Comprehensive user information and printing</p>
                                 </div>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3 justify-start md:justify-end">
+                            <div class="flex flex-wrap items-center gap-2 justify-start md:justify-end">
                                 <button 
                                     @click="refreshData"
-                                    class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 bg-white/10 text-white font-semibold rounded-xl shadow hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                    class="inline-flex items-center px-3 py-2 bg-white/10 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Refresh Data"
                                 >
                                     <ArrowPathIcon class="h-5 w-5 mr-2" />
@@ -27,7 +27,7 @@
                                 </button>
                                 <button 
                                     @click="printUsers"
-                                    class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                    class="inline-flex items-center px-3 py-2 bg-emerald-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Print Users"
                                 >
                                     <PrinterIcon class="h-5 w-5 mr-2" />
@@ -35,7 +35,7 @@
                                 </button>
                                 <button 
                                     @click="exportUsers"
-                                    class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl shadow hover:from-indigo-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                    class="inline-flex items-center px-3 py-2 bg-indigo-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Export Users"
                                 >
                                     <DocumentArrowDownIcon class="h-5 w-5 mr-2" />
@@ -47,8 +47,8 @@
                 </div>
 
                 <!-- User Table -->
-                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
-                    <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4">
+                    <div class="bg-blue-600 px-4 py-3 sm:px-6">
                         <h2 class="text-lg md:text-xl font-semibold text-white flex items-center">
                             <div class="bg-white/20 rounded-full p-2 mr-3">
                                 <TableCellsIcon class="h-6 w-6 text-white" />
@@ -61,7 +61,7 @@
                         <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
                             <!-- Desktop / tablet table -->
                             <table class="hidden md:table min-w-full table-fixed divide-y divide-gray-200">
-                                <thead class="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
+                                <thead class="bg-gray-50 sticky top-0 z-10">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
@@ -105,20 +105,20 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white/50 md:divide-y divide-transparent md:divide-gray-200">
+                                <tbody class="bg-white divide-y divide-gray-100">
                                     <tr 
                                         v-for="(user, index) in users" 
                                         :key="user.userID"
                                         :class="[
-                                            'cursor-pointer transition-colors duration-150 hover:bg-white/80',
-                                            selectedUser && selectedUser.userID === user.userID ? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500' : ''
+                                            'cursor-pointer hover:bg-gray-50',
+                                            selectedUser && selectedUser.userID === user.userID ? 'bg-indigo-50 border-l-4 border-indigo-500' : ''
                                         ]"
                                         @click="selectUser(user)"
                                     >
                                         <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg px-3 py-2">
-                                                    <span class="text-white font-mono font-semibold text-sm">{{ user.userID }}</span>
+                                                <div class="rounded-md bg-blue-50 border border-blue-100 px-3 py-1.5">
+                                                    <span class="text-xs font-mono font-semibold text-blue-700">{{ user.userID }}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -164,47 +164,34 @@
                             </table>
 
                             <!-- Mobile card list -->
-                            <div class="md:hidden divide-y divide-gray-200 bg-white">
+                            <div class="md:hidden bg-white px-2 py-2">
                                 <div
                                     v-for="(user, index) in users"
                                     :key="user.userID"
                                     :class="[
-                                        'px-4 py-3 flex flex-col gap-2 cursor-pointer bg-white rounded-xl shadow-sm mb-3 border border-gray-100',
-                                        selectedUser && selectedUser.userID === user.userID ? 'ring-2 ring-indigo-400 border-indigo-400' : ''
+                                        'px-4 py-3 flex flex-col gap-2 cursor-pointer bg-white rounded-lg shadow-sm mb-3 border',
+                                        selectedUser && selectedUser.userID === user.userID ? 'border-indigo-400 ring-1 ring-indigo-300' : 'border-gray-200'
                                     ]"
                                     @click="selectUser(user)"
                                 >
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg px-3 py-2 mr-3">
-                                                <span class="text-white font-mono font-semibold text-sm">{{ user.userID }}</span>
-                                            </div>
-                                            <div>
-                                                <div class="text-sm font-semibold text-gray-900">{{ user.userName }}</div>
-                                                <div class="text-xs text-gray-500">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
+                                            <div class="bg-blue-50 border border-blue-100 rounded-md px-3 py-1.5 mr-3">
+                                                <span class="text-xs font-mono font-semibold text-blue-700">{{ user.userID }}</span>
                                             </div>
                                         </div>
-                                        <button
-                                            @click.stop="selectUser(user)"
-                                            class="ml-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[11px] font-medium rounded-lg shadow hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-                                        >
-                                            <DocumentTextIcon class="h-4 w-4 mr-1" />
-                                            View
-                                        </button>
-                                    </div>
-                                    <div class="text-[11px] text-gray-500 mb-0.5">Official Name</div>
-                                    <div class="text-sm font-medium text-gray-900 break-words mb-1">{{ user.officialName || 'No Official Name' }}</div>
-                                    <div class="text-[11px] text-gray-500 mb-0.5">Mobile</div>
-                                    <div class="text-sm text-gray-700 break-words mb-1">{{ user.mobileNumber || 'No mobile number' }}</div>
-                                    <div class="flex items-center justify-between mt-1">
-                                        <div class="flex items-center">
-                                            <div class="text-[11px] text-gray-500 mr-2">Position</div>
-                                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-[11px] font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300">
-                                                <BriefcaseIcon class="h-4 w-4 mr-1" />
-                                                {{ user.officialTitle || 'No Position' }}
-                                            </span>
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900">{{ user.userName }}</div>
+                                            <div class="text-xs text-gray-500">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
                                         </div>
                                     </div>
+                                    <button
+                                        @click.stop="selectUser(user)"
+                                        class="ml-2 inline-flex items-center px-3 py-1.5 bg-indigo-500 text-white text-[11px] font-medium rounded-md shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    >
+                                        <DocumentTextIcon class="h-4 w-4 mr-1" />
+                                        View
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -212,8 +199,8 @@
                 </div>
 
                 <!-- User Details Form -->
-                <div v-if="selectedUser" class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 640px; contain: content;">
-                    <div class="bg-emerald-600 md:bg-gradient-to-r md:from-emerald-600 md:to-teal-600 p-4 md:p-6">
+                <div v-if="selectedUser" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4">
+                    <div class="bg-emerald-600 px-4 py-4 sm:px-6">
                         <div class="flex items-center">
                             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
                                 {{ selectedUser.officialName ? selectedUser.officialName.charAt(0).toUpperCase() : selectedUser.userID.charAt(0).toUpperCase() }}
@@ -225,11 +212,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-8">
+                    <div class="p-4 sm:p-6">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                             <!-- Left Column -->
                             <div class="space-y-6">
-                                <div class="bg-white/80 rounded-xl p-4 md:p-6 border border-white/20">
+                                <div class="bg-white rounded-lg p-4 sm:p-5 border border-gray-200">
                                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                                         <UserIcon class="h-5 w-5 mr-2 text-emerald-600" />
                                         Personal Information
@@ -289,7 +276,7 @@
                                     </div>
                                 </div>
 
-                                <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                                <div class="bg-gray-50 rounded-lg p-4 sm:p-5 border border-gray-200">
                                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                                         <MapIcon class="h-5 w-5 mr-2 text-teal-600" />
                                         System Information
@@ -319,7 +306,7 @@
 
                             <!-- Right Column -->
                             <div class="space-y-6">
-                                <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                                <div class="bg-gray-50 rounded-lg p-4 sm:p-5 border border-gray-200">
                                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                                         <CheckCircleIcon class="h-5 w-5 mr-2 text-indigo-600" />
                                         Security Settings
@@ -360,7 +347,7 @@
                                     </div>
                                 </div>
 
-                                <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                                <div class="bg-gray-50 rounded-lg p-4 sm:p-5 border border-gray-200">
                                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                                         <BriefcaseIcon class="h-5 w-5 mr-2 text-purple-600" />
                                         Access Permissions
@@ -453,9 +440,9 @@
                 </div>
 
                 <!-- Back to User List -->
-                <div class="text-center">
-                    <Link href="/user" class="inline-flex items-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
-                        <ArrowLeftIcon class="h-6 w-6 mr-3" />
+                <div class="text-center mt-4">
+                    <Link href="/user" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        <ArrowLeftIcon class="h-5 w-5 mr-2" />
                         Back to User List
                     </Link>
                 </div>

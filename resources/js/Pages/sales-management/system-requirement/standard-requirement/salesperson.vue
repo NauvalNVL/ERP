@@ -10,14 +10,14 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
     <!-- Header Section -->
-    <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+    <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
         <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+            <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
                 <i class="fas fa-user-tie text-white text-lg"></i>
             </div>
             <div>
-                <h2 class="text-lg sm:text-xl font-semibold text-white leading-tight">Define Salesperson</h2>
-                <p class="text-xs sm:text-sm text-blue-100">Define salespersons for sales management</p>
+                <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Salesperson</h2>
+                <p class="text-xs sm:text-sm text-emerald-100">Define salespersons for sales management</p>
             </div>
         </div>
     </div>
