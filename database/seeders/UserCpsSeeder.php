@@ -5,12 +5,27 @@ namespace Database\Seeders;
 use App\Models\UserCps;
 use App\Models\UserPermission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserCpsSeeder extends Seeder
 {
     public function run()
     {
+        // Pastikan default salesperson untuk sample user tersedia agar FK usercps_sm_foreign tidak error
+        DB::table('salesperson')->updateOrInsert(
+            ['Code' => 'S101'],
+            [
+                'Name' => 'ABENG',
+                'Grup' => 'MBI',
+                'CodeGrup' => 'MBI001',
+                'TargetSales' => 1000000.00,
+                'Internal' => 'root',
+                'Email' => 'abeng@company.com',
+                'status' => 'Active',
+            ]
+        );
+
         // Data super admin
         // Hapus dulu semua permission yang terkait sebelum hapus user
         UserPermission::where('user_id', 'ADMIN001')->delete();
