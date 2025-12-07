@@ -98,7 +98,15 @@ class UserCps extends Authenticatable
         'official_tel',
         'status',
         'password_expiry_date',
-        'amend_expired_password'
+        'amend_expired_password',
+        'menu_type',
+        'access_unit_price',
+        'amend_mc',
+        'access_customer_ac',
+        'amend_mc_price',
+        'rc_rt_price',
+        'bp_rc_cost',
+        'slm_name'
     ];
 
     /**
@@ -308,19 +316,74 @@ class UserCps extends Authenticatable
     {
         $value = $this->attributes['EXPIRY_DATE'] ?? null;
 
-        if (! $value) {
-            return null;
+        if (! $value || $value === '' || $value === '0') {
+            return 0;
         }
 
+        // If value is numeric, it's already days
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        // Otherwise try to parse as date and calculate remaining days
         try {
-            return Carbon::parse($value)->format('Y-m-d');
+            $expiryDate = Carbon::parse($value);
+            $daysRemaining = Carbon::now()->startOfDay()->diffInDays($expiryDate->startOfDay(), false);
+            return max(0, (int) $daysRemaining);
         } catch (\Exception $e) {
-            return $value;
+            return 0;
         }
     }
 
     public function getAmendExpiredPasswordAttribute()
     {
         return $this->attributes['EXPIRED'] ?? null;
+    }
+
+    public function getMenuTypeAttribute()
+    {
+        $type = $this->attributes['TYPE'] ?? 'V';
+        return $type === 'W' ? 'W-Windows Menu' : 'V-View Tree';
+    }
+
+    public function getAccessUnitPriceAttribute()
+    {
+        $value = $this->attributes['U_PRICE'] ?? 'N';
+        return $value === 'Y' ? 'Yes' : 'No';
+    }
+
+    public function getAmendMcAttribute()
+    {
+        $value = $this->attributes['MC'] ?? 'N';
+        return $value === 'Y' ? 'Yes' : 'No';
+    }
+
+    public function getAccessCustomerAcAttribute()
+    {
+        $value = $this->attributes['AC'] ?? 'N';
+        return $value === 'Y' ? 'Yes' : 'No';
+    }
+
+    public function getAmendMcPriceAttribute()
+    {
+        $value = $this->attributes['MC_PRICE'] ?? 'N';
+        return $value === 'Y' ? 'Yes' : 'No';
+    }
+
+    public function getRcRtPriceAttribute()
+    {
+        $value = $this->attributes['PRICE'] ?? 'N';
+        return $value === 'Y' ? 'Yes' : 'No';
+    }
+
+    public function getBpRcCostAttribute()
+    {
+        $value = $this->attributes['COST'] ?? 'N';
+        return $value === 'Y' ? 'Yes' : 'No';
+    }
+
+    public function getSlmNameAttribute()
+    {
+        return $this->attributes['SM'] ?? '';
     }
 }

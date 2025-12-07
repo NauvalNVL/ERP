@@ -17,7 +17,7 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-2 justify-start md:justify-end">
-                                <button 
+                                <button
                                     @click="refreshData"
                                     class="inline-flex items-center px-3 py-2 bg-white/10 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Refresh Data"
@@ -25,7 +25,7 @@
                                     <ArrowPathIcon class="h-5 w-5 mr-2" />
                                     Refresh
                                 </button>
-                                <button 
+                                <button
                                     @click="printUsers"
                                     class="inline-flex items-center px-3 py-2 bg-emerald-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Print Users"
@@ -33,7 +33,7 @@
                                     <PrinterIcon class="h-5 w-5 mr-2" />
                                     Print
                                 </button>
-                                <button 
+                                <button
                                     @click="exportUsers"
                                     class="inline-flex items-center px-3 py-2 bg-indigo-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Export Users"
@@ -106,8 +106,8 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
-                                    <tr 
-                                        v-for="(user, index) in users" 
+                                    <tr
+                                        v-for="user in users"
                                         :key="user.userID"
                                         :class="[
                                             'cursor-pointer hover:bg-gray-50',
@@ -151,7 +151,7 @@
                                             </span>
                                         </td>
                                         <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-right text-xs md:text-sm font-medium">
-                                            <button 
+                                            <button
                                                 @click.stop="selectUser(user)"
                                                 class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
                                             >
@@ -166,7 +166,7 @@
                             <!-- Mobile card list -->
                             <div class="md:hidden bg-white px-2 py-2">
                                 <div
-                                    v-for="(user, index) in users"
+                                    v-for="user in users"
                                     :key="user.userID"
                                     :class="[
                                         'px-4 py-3 flex flex-col gap-2 cursor-pointer bg-white rounded-lg shadow-sm mb-3 border',
@@ -227,8 +227,8 @@
                                                 <IdentificationIcon class="h-4 w-4 mr-2 text-blue-500" />
                                                 Official Name
                                             </label>
-                                            <input 
-                                                v-model="selectedUser.officialName" 
+                                            <input
+                                                v-model="selectedUser.officialName"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
                                                 readonly
@@ -240,8 +240,8 @@
                                                 <BriefcaseIcon class="h-4 w-4 mr-2 text-purple-500" />
                                                 Official Title
                                             </label>
-                                            <input 
-                                                v-model="selectedUser.officialTitle" 
+                                            <input
+                                                v-model="selectedUser.officialTitle"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                 readonly
@@ -253,8 +253,8 @@
                                                 <PhoneIcon class="h-4 w-4 mr-2 text-green-500" />
                                                 Mobile Number
                                             </label>
-                                            <input 
-                                                v-model="selectedUser.mobileNumber" 
+                                            <input
+                                                v-model="selectedUser.mobileNumber"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                 readonly
@@ -266,8 +266,8 @@
                                                 <PhoneIcon class="h-4 w-4 mr-2 text-blue-500" />
                                                 Office Tel
                                             </label>
-                                            <input 
-                                                v-model="selectedUser.officeTel" 
+                                            <input
+                                                v-model="selectedUser.officeTel"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                 readonly
@@ -284,8 +284,8 @@
                                     <div class="space-y-4">
                                         <div class="flex flex-col">
                                             <label class="text-sm font-semibold text-gray-700 mb-2">SLM Name</label>
-                                            <input 
-                                                v-model="selectedUser.slmName" 
+                                            <input
+                                                v-model="selectedUser.slmName"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                 readonly
@@ -293,8 +293,8 @@
                                         </div>
                                         <div class="flex flex-col">
                                             <label class="text-sm font-semibold text-gray-700 mb-2">Menu Type</label>
-                                            <input 
-                                                v-model="selectedUser.menuType" 
+                                            <input
+                                                v-model="selectedUser.menuType"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                 readonly
@@ -315,8 +315,8 @@
                                         <div class="flex flex-col">
                                             <label class="text-sm font-semibold text-gray-700 mb-2">Password Expiry (Days)</label>
                                             <div class="flex items-center space-x-2">
-                                                <input 
-                                                    v-model="selectedUser.passwordExpiry" 
+                                                <input
+                                                    v-model="selectedUser.passwordExpiry"
                                                     type="text"
                                                     class="w-20 px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-center focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
                                                     readonly
@@ -327,8 +327,8 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">Password Expired</label>
-                                                <input 
-                                                    v-model="selectedUser.passwordExpired" 
+                                                <input
+                                                    v-model="selectedUser.passwordExpired"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
                                                     readonly
@@ -336,8 +336,8 @@
                                             </div>
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">Password Locked</label>
-                                                <input 
-                                                    v-model="selectedUser.passwordLocked" 
+                                                <input
+                                                    v-model="selectedUser.passwordLocked"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -356,8 +356,8 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">Access Unit Price</label>
-                                                <input 
-                                                    v-model="selectedUser.accessUnitPrice" 
+                                                <input
+                                                    v-model="selectedUser.accessUnitPrice"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -365,8 +365,8 @@
                                             </div>
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">Amend MC</label>
-                                                <input 
-                                                    v-model="selectedUser.amendMC" 
+                                                <input
+                                                    v-model="selectedUser.amendMC"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -376,8 +376,8 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">Access Customer A/C</label>
-                                                <input 
-                                                    v-model="selectedUser.accessCustomerAC" 
+                                                <input
+                                                    v-model="selectedUser.accessCustomerAC"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -385,8 +385,8 @@
                                             </div>
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">Amend MC Price</label>
-                                                <input 
-                                                    v-model="selectedUser.amendMCPrice" 
+                                                <input
+                                                    v-model="selectedUser.amendMCPrice"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -395,17 +395,8 @@
                                         </div>
                                         <div class="flex flex-col">
                                             <label class="text-sm font-semibold text-gray-700 mb-2">Amend Expired Password</label>
-                                            <input 
-                                                v-model="selectedUser.amendExpiredPassword" 
-                                                type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                                                readonly
-                                            >
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <label class="text-sm font-semibold text-gray-700 mb-2">WBMS Restricted Pass</label>
-                                            <input 
-                                                v-model="selectedUser.wbmsRestrictedPass" 
+                                            <input
+                                                v-model="selectedUser.amendExpiredPassword"
                                                 type="text"
                                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                 readonly
@@ -414,8 +405,8 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">RC + RT Price</label>
-                                                <input 
-                                                    v-model="selectedUser.rcRtPrice" 
+                                                <input
+                                                    v-model="selectedUser.rcRtPrice"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -423,8 +414,8 @@
                                             </div>
                                             <div class="flex flex-col">
                                                 <label class="text-sm font-semibold text-gray-700 mb-2">BP RC Cost</label>
-                                                <input 
-                                                    v-model="selectedUser.bpRcCost" 
+                                                <input
+                                                    v-model="selectedUser.bpRcCost"
                                                     type="text"
                                                     class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                                     readonly
@@ -455,6 +446,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
     UsersIcon,
     UserIcon,
@@ -509,29 +502,27 @@ export default {
                     userID: user.userID,
                     userName: user.userName,
                     status: user.status === 'A' ? 'Active' : 'Obsolete',
-                    userPrinter: user.userPrinter || '/VIEWER',
-                    route: user.route || 'Function to User',
-                    slm: user.slm || '',
+                    userPrinter: user.PRINTER || '/VIEWER',
+                    route: user.ROUTE || 'Function to User',
+                    slm: user.SM || '',
 
-                    // align with Define User table fields
-                    officialName: user.official_name ?? user.officialName ?? '',
-                    officialTitle: user.official_title ?? user.officialTitle ?? '',
-
-                    mobileNumber: user.mobileNumber,
-                    officeTel: user.officeTel,
-                    slmName: user.slmName || '',
-                    passwordExpiry: user.passwordExpiryDate || '0',
-                    passwordExpired: user.passwordExpired || 'No',
-                    passwordLocked: user.passwordLocked || 'No',
-                    menuType: user.menuType || 'V-View Tree',
-                    accessUnitPrice: user.accessUnitPrice || 'No',
-                    amendMC: user.amendMC || 'No',
-                    accessCustomerAC: user.accessCustomerAC || 'No',
-                    amendMCPrice: user.amendMCPrice || 'No',
-                    amendExpiredPassword: user.amendExpiredPassword || 'No',
-                    wbmsRestrictedPass: user.wbmsRestrictedPass || '',
-                    rcRtPrice: user.rcRtPrice || '',
-                    bpRcCost: user.bpRcCost || ''
+                    // Use snake_case from model accessors
+                    officialName: user.official_name || '',
+                    officialTitle: user.official_title || '',
+                    mobileNumber: user.mobile_number || '',
+                    officeTel: user.official_tel || '',
+                    slmName: user.slm_name || '',
+                    passwordExpiry: user.password_expiry_date || '0',
+                    passwordExpired: user.amend_expired_password || 'No',
+                    passwordLocked: 'No',
+                    menuType: user.menu_type || 'V-View Tree',
+                    accessUnitPrice: user.access_unit_price || 'No',
+                    amendMC: user.amend_mc || 'No',
+                    accessCustomerAC: user.access_customer_ac || 'No',
+                    amendMCPrice: user.amend_mc_price || 'No',
+                    amendExpiredPassword: user.amend_expired_password || 'No',
+                    rcRtPrice: user.rc_rt_price || 'No',
+                    bpRcCost: user.bp_rc_cost || 'No'
                 }));
             } catch (error) {
                 console.error('Error loading users:', error);
@@ -545,11 +536,49 @@ export default {
             this.selectedUser = null;
         },
         printUsers() {
-            window.print();
+            if (this.users.length === 0) { alert('No users to print'); return; }
+            const doc = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            doc.setFontSize(18);
+            doc.setTextColor(37, 99, 235);
+            doc.text('User Directory Report', pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 22, { align: 'center' });
+            const tableData = this.users.map((u, i) => [i + 1, u.userID || '-', u.userName || '-', u.officialName || '-', u.officialTitle || '-', u.status || '-', u.mobileNumber || '-', u.officeTel || '-']);
+            autoTable(doc, {
+                startY: 28,
+                head: [['No', 'User ID', 'Username', 'Official Name', 'Position', 'Status', 'Mobile', 'Office Tel']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', fontSize: 9 },
+                bodyStyles: { fontSize: 8 },
+                alternateRowStyles: { fillColor: [245, 247, 250] }
+            });
+            doc.autoPrint();
+            window.open(doc.output('bloburl'), '_blank');
         },
         exportUsers() {
-            // Export functionality can be implemented here
-            console.log('Export users');
+            if (this.users.length === 0) { alert('No users to export'); return; }
+            const doc = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            doc.setFontSize(18);
+            doc.setTextColor(37, 99, 235);
+            doc.text('User Directory Report', pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Exported: ${new Date().toLocaleString()}`, pageWidth / 2, 22, { align: 'center' });
+            const tableData = this.users.map((u, i) => [i + 1, u.userID || '-', u.userName || '-', u.officialName || '-', u.officialTitle || '-', u.status || '-', u.mobileNumber || '-', u.officeTel || '-']);
+            autoTable(doc, {
+                startY: 28,
+                head: [['No', 'User ID', 'Username', 'Official Name', 'Position', 'Status', 'Mobile', 'Office Tel']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', fontSize: 9 },
+                bodyStyles: { fontSize: 8 },
+                alternateRowStyles: { fillColor: [245, 247, 250] }
+            });
+            doc.save(`User_Directory_${new Date().toISOString().slice(0, 10)}.pdf`);
         }
     }
 }
@@ -586,24 +615,24 @@ tr.cursor-pointer:hover {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(-20px) scale(0.95); 
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
 @keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(-30px); 
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateX(0); 
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
@@ -741,19 +770,19 @@ button, a, input, select, textarea, .transition, .transition-all {
         margin: 0;
         padding: 0 1rem;
     }
-    
+
     .rounded-2xl {
         border-radius: 1rem;
     }
-    
+
     .p-8 {
         padding: 1.5rem;
     }
-    
+
     .text-3xl {
         font-size: 1.875rem;
     }
-    
+
     .grid-cols-1.lg\:grid-cols-2 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
     }
@@ -764,11 +793,11 @@ button, a, input, select, textarea, .transition, .transition-all {
     .bg-white\/80 {
         background-color: rgba(31, 41, 55, 0.8);
     }
-    
+
     .text-gray-800 {
         color: #f9fafb;
     }
-    
+
     .border-gray-200 {
         border-color: #374151;
     }
