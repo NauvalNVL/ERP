@@ -101,9 +101,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- Right Column - Quick Info -->
+                <!-- Right Column -->
                 <div class="lg:col-span-1 space-y-4">
-                    <!-- Color Info Card -->
                     <div class="bg-white shadow-sm rounded-xl border border-emerald-100">
                         <div class="px-4 py-3 sm:px-5 border-b border-emerald-100 flex items-center">
                             <div class="p-2 bg-emerald-500 rounded-lg mr-3">
@@ -111,7 +110,6 @@
                             </div>
                             <h3 class="text-sm sm:text-base font-semibold text-emerald-900">Color Information</h3>
                         </div>
-
                         <div class="px-4 py-4 sm:px-5">
                             <div class="space-y-4">
                                 <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
@@ -123,7 +121,6 @@
                                         <li>Any changes must be saved</li>
                                     </ul>
                                 </div>
-
                                 <div class="p-4 bg-sky-50 rounded-lg border border-sky-100">
                                     <h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Common Color Groups</h4>
                                     <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
@@ -149,50 +146,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Links -->
-                    <div class="bg-white shadow-sm rounded-xl border border-violet-100">
-                        <div class="px-4 py-3 sm:px-5 border-b border-violet-100 flex items-center">
-                            <div class="p-2 bg-violet-500 rounded-lg mr-3">
-                                <i class="fas fa-link text-white"></i>
-                            </div>
-                            <h3 class="text-sm sm:text-base font-semibold text-slate-800">Quick Links</h3>
-                        </div>
-
-                        <div class="px-4 py-4 sm:px-5">
-                            <div class="grid grid-cols-1 gap-3">
-                                <Link href="/color-group" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-100">
-                                    <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                        <i class="fas fa-layer-group text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-purple-900 text-sm">Color Groups</p>
-                                        <p class="text-xs text-purple-700">Manage color groups</p>
-                                    </div>
-                                </Link>
-
-                                <Link href="/finishing" class="flex items-center p-3 bg-sky-50 rounded-lg hover:bg-sky-100 transition-colors border border-sky-100">
-                                    <div class="p-2 bg-sky-500 rounded-full mr-3">
-                                        <i class="fas fa-th-list text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-sky-900 text-sm">Finishings</p>
-                                        <p class="text-xs text-sky-700">Manage finishings</p>
-                                    </div>
-                                </Link>
-
-                                <Link href="/color/view-print" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
-                                    <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                        <i class="fas fa-print text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-emerald-900 text-sm">Print List</p>
-                                        <p class="text-xs text-emerald-700">Print color list</p>
-                                    </div>
-                                </Link>
                             </div>
                         </div>
                     </div>

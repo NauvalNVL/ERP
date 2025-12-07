@@ -118,48 +118,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Quick Links -->
-                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-purple-500">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
-                            <i class="fas fa-link text-white"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link href="/sales-team" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-users text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-purple-900">Sales Teams</p>
-                                <p class="text-xs text-purple-700">Manage sales teams</p>
-                            </div>
-                        </Link>
-
-                        <Link href="/sales-person-team" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                <i class="fas fa-user-plus text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-blue-900">Salesperson Team</p>
-                                <p class="text-xs text-blue-700">Manage team assignments</p>
-                            </div>
-                        </Link>
-
-                        <Link href="/sales-person/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
-                                <i class="fas fa-print text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-green-900">Print List</p>
-                                <p class="text-xs text-green-700">Print salesperson list</p>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
             </div>
         </div>
         </div>

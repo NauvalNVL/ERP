@@ -17,7 +17,7 @@
 									Manage Salesperson Status
 								</h1>
 								<p class="text-xs sm:text-sm text-emerald-100">
-									Aktifkan/nonaktifkan salesperson dengan cepat dan mudah.
+									Activate or deactivate salespersons quickly and easily.
 								</p>
 							</div>
 						</div>

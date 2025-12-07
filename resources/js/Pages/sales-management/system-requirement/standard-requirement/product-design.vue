@@ -162,49 +162,6 @@
 								</div>
 							</div>
 						</div>
-
-						<!-- Quick Links -->
-						<div class="bg-white shadow-sm rounded-xl border border-emerald-100">
-							<div class="px-4 py-3 sm:px-5 border-b border-gray-100 flex items-center">
-								<div class="p-2 bg-emerald-500 rounded-lg mr-3">
-									<i class="fas fa-link text-white"></i>
-								</div>
-								<h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
-							</div>
-							<div class="px-4 py-4 sm:px-5">
-								<div class="grid grid-cols-1 gap-3">
-									<Link href="/product" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
-										<div class="p-2 bg-emerald-500 rounded-full mr-3">
-											<i class="fas fa-box text-white text-sm"></i>
-										</div>
-										<div>
-											<p class="font-medium text-emerald-900">Products</p>
-											<p class="text-xs text-emerald-700">Manage product categories</p>
-										</div>
-									</Link>
-
-									<a href="/product-group" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
-										<div class="p-2 bg-emerald-500 rounded-full mr-3">
-											<i class="fas fa-drafting-compass text-white text-sm"></i>
-										</div>
-										<div>
-											<p class="font-medium text-emerald-900">Product Groups</p>
-											<p class="text-xs text-emerald-700">Manage product groups</p>
-										</div>
-									</a>
-
-									<Link href="/product-design/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-100">
-										<div class="p-2 bg-green-500 rounded-full mr-3">
-											<i class="fas fa-print text-white text-sm"></i>
-										</div>
-										<div>
-											<p class="font-medium text-green-900">Print Designs</p>
-											<p class="text-xs text-green-700">Print design list</p>
-										</div>
-									</Link>
-								</div>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
