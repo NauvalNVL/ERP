@@ -164,12 +164,12 @@
                     <div class="flex gap-2">
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Issued by:</label>
-                            <input type="text" :value="selectedInvoice?.issued_by || ''" readonly 
+                            <input type="text" :value="selectedInvoice?.issued_by || ''" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Date:</label>
-                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.issued_date, selectedInvoice?.issued_time)" readonly 
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.issued_date, selectedInvoice?.issued_time)" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                     </div>
@@ -177,12 +177,12 @@
                     <div class="flex gap-2">
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Amended by:</label>
-                            <input type="text" :value="selectedInvoice?.amended_by || ''" readonly 
+                            <input type="text" :value="selectedInvoice?.amended_by || ''" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Date:</label>
-                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.amended_date, selectedInvoice?.amended_time)" readonly 
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.amended_date, selectedInvoice?.amended_time)" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                     </div>
@@ -190,12 +190,12 @@
                     <div class="flex gap-2">
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Printed by:</label>
-                            <input type="text" :value="selectedInvoice?.printed_by || ''" readonly 
+                            <input type="text" :value="selectedInvoice?.printed_by || ''" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Date:</label>
-                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.printed_date, selectedInvoice?.printed_time)" readonly 
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.printed_date, selectedInvoice?.printed_time)" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                     </div>
@@ -203,12 +203,12 @@
                     <div class="flex gap-2">
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Posted by:</label>
-                            <input type="text" :value="selectedInvoice?.posted_by || ''" readonly 
+                            <input type="text" :value="selectedInvoice?.posted_by || ''" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                         <div class="flex-1">
                             <label class="block text-gray-600 text-xs mb-1">Date:</label>
-                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.posted_date, selectedInvoice?.posted_time)" readonly 
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.posted_date, selectedInvoice?.posted_time)" readonly
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                     </div>
@@ -227,6 +227,7 @@
         <InvoiceTableModal
             :open="showTable"
             :initial-query="tableQuery"
+            :exclude-cancelled="true"
             @close="showTable = false"
             @select="selectForEdit"
             @zoom="zoom"
@@ -472,7 +473,7 @@ const saveInvoice = async () => {
         if (res.data && res.data.success) {
             console.log('✅ Invoice amended successfully:', res.data);
             toast.success(`Invoice ${selectedInvoice.value.invoice_no} amended successfully`);
-            
+
             // Reload invoice details to show updated audit trail
             const reloadRes = await axios.get(`/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}`);
             if (reloadRes.data) {
@@ -704,12 +705,12 @@ const formatPeriod = (invoiceNo) => {
 // ✅ Format audit trail date/time (CPS style: DD/MM/YYYY HH:MM)
 const formatAuditDateTime = (date, time) => {
     if (!date) return '';
-    
+
     // Combine date and time if both available
     if (time) {
         return `${date} ${time}`;
     }
-    
+
     return date;
 };
 
