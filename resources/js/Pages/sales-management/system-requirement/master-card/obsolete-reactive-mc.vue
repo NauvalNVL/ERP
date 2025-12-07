@@ -17,40 +17,40 @@
 
         <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
+
                 <!-- Left Column - Main Content (The Form) -->
                 <div>
                     <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-indigo-500">
-                        
+
                         <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
                             <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-4 shadow-md">
                                 <i class="fas fa-list-alt text-white"></i>
                             </div>
                             <h3 class="text-xl font-semibold text-gray-800">Selected Master Card</h3>
                         </div>
-                            
+
                         <!-- Form for Selection (CPS Style - Simple) -->
                         <div class="space-y-4 relative z-10">
                             <!-- Selected Master Card Section -->
                             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <h4 class="text-sm font-semibold text-gray-700 mb-3">Selected Master Card</h4>
-                                
+
                                 <!-- Initial View: Only AC# and MCS# (CPS Style) -->
                                 <div v-if="!form.mcs" class="space-y-3">
                                     <!-- AC# Field -->
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">AC#:</label>
                                         <div class="flex items-stretch border border-gray-300 rounded overflow-hidden bg-white">
-                                            <input 
-                                                type="text" 
-                                                v-model="form.ac" 
+                                            <input
+                                                type="text"
+                                                v-model="form.ac"
                                                 @input="onAcInput"
                                                 placeholder=""
                                                 class="flex-1 px-2 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                                             >
-                                            <button 
-                                                @click="openCustomerLookup" 
-                                                type="button" 
+                                            <button
+                                                @click="openCustomerLookup"
+                                                type="button"
                                                 class="px-2 py-1.5 bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
                                                 title="Browse"
                                             >
@@ -58,21 +58,21 @@
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- MCS# Field -->
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">MCS#:</label>
                                         <div class="flex items-stretch border border-gray-300 rounded overflow-hidden bg-white">
-                                            <input 
-                                                type="text" 
-                                                v-model="form.mcs" 
+                                            <input
+                                                type="text"
+                                                v-model="form.mcs"
                                                 readonly
                                                 placeholder=""
                                                 class="flex-1 px-2 py-1.5 text-sm text-gray-900 bg-gray-100"
                                             >
-                                            <button 
-                                                @click="openMcsLookup" 
-                                                type="button" 
+                                            <button
+                                                @click="openMcsLookup"
+                                                type="button"
                                                 class="px-2 py-1.5 bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
                                                 title="Browse"
                                             >
@@ -89,15 +89,15 @@
                                         <div>
                                             <label class="block text-xs font-medium text-gray-600 mb-1">AC#:</label>
                                             <div class="flex items-stretch border border-gray-300 rounded overflow-hidden bg-white">
-                                                <input 
-                                                    type="text" 
-                                                    v-model="form.ac" 
+                                                <input
+                                                    type="text"
+                                                    v-model="form.ac"
                                                     readonly
                                                     class="flex-1 px-2 py-1.5 text-sm text-gray-900 bg-gray-100"
                                                 >
-                                                <button 
-                                                    @click="openCustomerLookup" 
-                                                    type="button" 
+                                                <button
+                                                    @click="openCustomerLookup"
+                                                    type="button"
                                                     class="px-2 py-1.5 bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
                                                     title="Browse"
                                                 >
@@ -107,9 +107,9 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-medium text-gray-600 mb-1">&nbsp;</label>
-                                            <input 
-                                                type="text" 
-                                                v-model="mcDetails.customer_name" 
+                                            <input
+                                                type="text"
+                                                v-model="mcDetails.customer_name"
                                                 readonly
                                                 class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-gray-100"
                                             >
@@ -121,15 +121,15 @@
                                         <div>
                                             <label class="block text-xs font-medium text-gray-600 mb-1">MCS#:</label>
                                             <div class="flex items-stretch border border-gray-300 rounded overflow-hidden bg-white">
-                                                <input 
-                                                    type="text" 
-                                                    v-model="form.mcs" 
+                                                <input
+                                                    type="text"
+                                                    v-model="form.mcs"
                                                     readonly
                                                     class="flex-1 px-2 py-1.5 text-sm text-gray-900 bg-gray-100"
                                                 >
-                                                <button 
-                                                    @click="openMcsLookup" 
-                                                    type="button" 
+                                                <button
+                                                    @click="openMcsLookup"
+                                                    type="button"
                                                     class="px-2 py-1.5 bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
                                                     title="Browse"
                                                 >
@@ -139,9 +139,9 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-medium text-gray-600 mb-1">Model:</label>
-                                            <input 
-                                                type="text" 
-                                                v-model="mcDetails.model" 
+                                            <input
+                                                type="text"
+                                                v-model="mcDetails.model"
                                                 readonly
                                                 class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-gray-100"
                                             >
@@ -153,15 +153,15 @@
                                         <div>
                                             <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
                                             <div class="flex gap-2">
-                                                <input 
-                                                    type="text" 
-                                                    v-model="mcDetails.salesperson_code" 
+                                                <input
+                                                    type="text"
+                                                    v-model="mcDetails.salesperson_code"
                                                     readonly
                                                     class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded bg-gray-100"
                                                 >
-                                                <input 
-                                                    type="text" 
-                                                    v-model="mcDetails.salesperson_name" 
+                                                <input
+                                                    type="text"
+                                                    v-model="mcDetails.salesperson_name"
                                                     readonly
                                                     class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded bg-gray-100"
                                                 >
@@ -169,9 +169,9 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-medium text-gray-600 mb-1">Action:</label>
-                                            <input 
-                                                type="text" 
-                                                v-model="detectedAction" 
+                                            <input
+                                                type="text"
+                                                v-model="detectedAction"
                                                 readonly
                                                 :class="[
                                                     'w-full px-2 py-1.5 text-sm border rounded font-medium',
@@ -184,8 +184,8 @@
                                     <!-- Row 4: Reason -->
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Reason:</label>
-                                        <textarea 
-                                            v-model="form.reason" 
+                                        <textarea
+                                            v-model="form.reason"
                                             rows="3"
                                             placeholder="Enter reason for this action (mandatory)"
                                             class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
@@ -197,49 +197,49 @@
                             <!-- Last Update Log Section - Only show when MC selected -->
                             <div v-if="form.mcs" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <h4 class="text-sm font-semibold text-gray-700 mb-3">Last Update Log</h4>
-                                
+
                                 <div class="grid grid-cols-2 gap-3 text-sm">
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Status:</label>
-                                        <input 
-                                            type="text" 
-                                            v-model="lastUpdate.status" 
+                                        <input
+                                            type="text"
+                                            v-model="lastUpdate.status"
                                             readonly
                                             class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white"
                                         >
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">User ID:</label>
-                                        <input 
-                                            type="text" 
-                                            v-model="lastUpdate.user_id" 
+                                        <input
+                                            type="text"
+                                            v-model="lastUpdate.user_id"
                                             readonly
                                             class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white"
                                         >
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Date:</label>
-                                        <input 
-                                            type="text" 
-                                            v-model="lastUpdate.date" 
+                                        <input
+                                            type="text"
+                                            v-model="lastUpdate.date"
                                             readonly
                                             class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white"
                                         >
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Time:</label>
-                                        <input 
-                                            type="text" 
-                                            v-model="lastUpdate.time" 
+                                        <input
+                                            type="text"
+                                            v-model="lastUpdate.time"
                                             readonly
                                             class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white"
                                         >
                                     </div>
                                     <div class="col-span-2">
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Reason:</label>
-                                        <input 
-                                            type="text" 
-                                            v-model="lastUpdate.reason" 
+                                        <input
+                                            type="text"
+                                            v-model="lastUpdate.reason"
                                             readonly
                                             class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white"
                                         >
@@ -255,14 +255,14 @@
 
                             <!-- Save Button - Only show when MC selected -->
                             <div v-if="form.mcs" class="pt-2">
-                                <button 
-                                    @click="saveMcUpdate" 
+                                <button
+                                    @click="saveMcUpdate"
                                     type="button"
                                     :disabled="!canSave"
                                     :class="[
                                         'w-full px-4 py-3 font-semibold rounded-lg shadow-sm flex items-center justify-center space-x-2',
-                                        canSave 
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                                        canSave
+                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     ]"
                                 >
@@ -270,7 +270,7 @@
                                     <span>Save</span>
                                 </button>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -425,15 +425,15 @@
 
                     <!-- Footer -->
                     <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-                        <button 
-                            @click="cancelSave" 
+                        <button
+                            @click="cancelSave"
                             type="button"
                             class="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded hover:bg-gray-50 transition-colors"
                         >
                             Cancel
                         </button>
-                        <button 
-                            @click="confirmSave" 
+                        <button
+                            @click="confirmSave"
                             type="button"
                             class="px-6 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors"
                         >
@@ -515,7 +515,7 @@ const customerOptionRecordStatus = ref(['Active']);
 const showMcsTableModal = ref(false);
 const mcsSortOption = ref('mc_seq');
 const mcsSortOrder = ref('asc');
-const mcsStatusFilter = ref('Act');
+const mcsStatusFilter = ref('All'); // Show both Active and Obsolete for this menu
 const mcsSearchTerm = ref('');
 const mcsLoading = ref(false);
 const mcsError = ref(null);
@@ -536,11 +536,11 @@ const handleCustomerSelect = (customer) => {
     console.log('Customer selected:', customer);
     selectedCustomerAccount.value = customer;
     form.value.ac = customer.customer_code;
-    
+
     // Auto-fill customer name
     mcDetails.value.customer_name = customer.customer_name || customer.name || '';
     console.log('Customer name filled:', mcDetails.value.customer_name);
-    
+
     showCustomerAccountModal.value = false;
 };
 
@@ -565,11 +565,17 @@ const fetchMcsData = async () => {
     mcsError.value = null;
 
     try {
+        // For Obsolete & Reactive menu, show both Active and Obsolete records
+        let statusFilter = [mcsStatusFilter.value || 'Act'];
+        if (mcsStatusFilter.value === 'All') {
+            statusFilter = ['Act', 'Obsolete'];
+        }
+
         const params = {
             customer_code: form.value.ac,
             sortBy: mcsSortOption.value || 'mc_seq',
             sortOrder: mcsSortOrder.value || 'asc',
-            status: [mcsStatusFilter.value || 'Act'],
+            status: statusFilter,
             query: mcsSearchTerm.value || '',
             page: mcsCurrentPage.value || 1,
             per_page: 10,
@@ -577,9 +583,9 @@ const fetchMcsData = async () => {
 
         console.log('Fetching MCS data with params:', params);
         const response = await axios.get('/api/update-mc/master-cards', { params });
-        
+
         console.log('MCS API Response:', response.data);
-        
+
         if (response.data) {
             mcsMasterCards.value = response.data.data || response.data;
             mcsCurrentPage.value = response.data.current_page || 1;
@@ -599,7 +605,7 @@ const selectMcs = async (mcs) => {
     console.log('MCS selected:', mcs);
     form.value.mcs = mcs.seq;
     console.log('MCS# set to:', form.value.mcs);
-    
+
     showMcsTableModal.value = false;
     selectedMcs.value = null;
 
@@ -614,15 +620,15 @@ const loadMcDetails = async (mcsNum) => {
     try {
         console.log('Loading MC details for MCS#:', mcsNum);
         const response = await axios.get(`/api/mc/details/${mcsNum}`);
-        
+
         console.log('MC Details API Response:', response.data);
-        
+
         if (response.data) {
             const mc = response.data;
-            
+
             // Preserve existing customer_name if already filled
             const existingCustomerName = mcDetails.value.customer_name;
-            
+
             // Populate MC details - using MC table structure with salesperson
             mcDetails.value = {
                 customer_name: mc.AC_NAME || existingCustomerName || '',
@@ -631,20 +637,20 @@ const loadMcDetails = async (mcsNum) => {
                 salesperson_name: mc.salesperson_name || '',
                 current_status: mc.STS || 'ACTIVE',
             };
-            
+
             console.log('MC Details populated:', mcDetails.value);
 
             // Get last update log from MC_UPDATE_LOG table
             try {
                 const logResponse = await axios.get(`/api/mc/update-log/${mcsNum}`);
                 console.log('Update Log API Response:', logResponse.data);
-                
+
                 if (logResponse.data && logResponse.data.length > 0) {
                     const lastLog = logResponse.data[0];
-                    
+
                     // Format date and time
                     const createdDate = lastLog.created_at ? new Date(lastLog.created_at) : null;
-                    
+
                     lastUpdate.value = {
                         status: lastLog.status || '',
                         user_id: lastLog.user_id || '',
@@ -701,9 +707,9 @@ const handleSortOptionChange = (event) => {
 const detectedAction = computed(() => {
     const status = mcDetails.value.current_status;
     console.log('Detecting action for status:', status);
-    
+
     if (!status) return '';
-    
+
     // Check for ACTIVE status (case insensitive)
     if (status.toUpperCase() === 'ACTIVE' || status.toUpperCase() === 'ACT' || status.toUpperCase() === 'APPROVED') {
         console.log('Action detected: To Obsolete');
@@ -744,7 +750,7 @@ const saveMcUpdate = () => {
         showToast('Validation Error', 'Please complete all required fields.', 'error');
         return;
     }
-    
+
     // Show confirmation modal
     showConfirmModal.value = true;
 };
@@ -755,7 +761,7 @@ const resetFormToInitial = () => {
     form.value.ac = '';
     form.value.mcs = '';
     form.value.reason = '';
-    
+
     // Reset MC details
     mcDetails.value = {
         customer_name: '',
@@ -764,7 +770,7 @@ const resetFormToInitial = () => {
         salesperson_name: '',
         current_status: '',
     };
-    
+
     // Reset last update log
     lastUpdate.value = {
         status: '',
@@ -774,11 +780,11 @@ const resetFormToInitial = () => {
         reason: '',
         total_update: 0,
     };
-    
+
     // Clear selections
     selectedCustomerAccount.value = null;
     selectedMcs.value = null;
-    
+
     console.log('Form reset to initial state');
 };
 
@@ -791,9 +797,9 @@ const confirmSave = async () => {
         const action = detectedAction.value;
         const mcsNum = form.value.mcs;
         const reason = form.value.reason.trim();
-        
+
         let endpoint = '';
-        
+
         // Determine endpoint based on action
         if (action === 'To Obsolete') {
             endpoint = `/api/obsolete-reactive-mc/${mcsNum}/obsolete`;
@@ -810,27 +816,27 @@ const confirmSave = async () => {
 
         console.log('Sending request to:', endpoint);
         console.log('Payload:', payload);
-        
+
         const response = await axios.post(endpoint, payload);
         console.log('Response:', response.data);
-        
+
         console.log('Update successful, showing toast...');
-        
+
         // Show success message
         showToast('Success', response.data.message || 'Master Card updated successfully.', 'success');
-        
+
         console.log('Waiting 1.5 seconds...');
         // Wait a moment for user to see the toast
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
         console.log('Resetting form...');
         // Reset form back to initial state
         resetFormToInitial();
-        
+
         console.log('Showing info toast...');
         // Show additional success message
         showToast('Info', 'Form has been reset. You can now update another Master Card.', 'info');
-        
+
         console.log('confirmSave complete');
     } catch (error) {
         console.error('Save error:', error);
