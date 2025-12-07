@@ -1847,6 +1847,8 @@ class SalesOrderController extends Controller
             $query = DB::table('so')
                 ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE');
 
+            $query->where('so.COMP_Num', 'Main');
+
             // Filter by status: include typical outstanding statuses PLUS cancelled
             // so that cancelled SOs still appear in the table (frontend blocks selection)
             $query->where(function($q) {
@@ -2410,7 +2412,11 @@ class SalesOrderController extends Controller
             }
 
             if ($request->has('lot_number')) {
-                $updateData['LOT_NUM'] = $request->lot_number;
+                // Only update LOT_NUM when an explicit non-null value is provided.
+                // This avoids violating the NOT NULL constraint when frontend sends lot_number: null.
+                if ($request->lot_number !== null) {
+                    $updateData['LOT_NUM'] = $request->lot_number;
+                }
             }
 
             // Note: TAX column does not exist in SO table, skipping sales_tax update
@@ -2609,18 +2615,22 @@ class SalesOrderController extends Controller
                 'cancelled_by' => 'nullable|string',
             ]);
 
-            // Check if SO exists
-            $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
+            // Check if SO exists (including all components)
+            $salesOrders = DB::table('so')->where('SO_Num', $soNumber)->get();
 
-            if (!$salesOrder) {
+            if ($salesOrders->isEmpty()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sales order not found'
                 ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
             }
 
-            // Check if SO is already cancelled
-            if ($salesOrder->STS === 'CANCEL' || $salesOrder->STS === 'Cancelled') {
+            // Check if all components for this SO are already cancelled
+            $allCancelled = $salesOrders->every(function ($order) {
+                return $order->STS === 'CANCEL' || $order->STS === 'Cancelled';
+            });
+
+            if ($allCancelled) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sales order is already cancelled'

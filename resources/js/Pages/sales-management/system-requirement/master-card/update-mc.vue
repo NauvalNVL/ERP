@@ -314,6 +314,7 @@
                                         />
                                         <button
                                             type="button"
+                                            @click="fetchStatusLog"
                                             class="inline-flex items-center px-3 py-2 border border-gray-300 bg-purple-500 text-white rounded-r-md shadow-md hover:bg-purple-600 transition-colors text-sm"
                                         >
                                             Status Log
@@ -374,7 +375,7 @@
                         <div class="mt-6 flex flex-wrap gap-4 justify-between">
                             <button
                                 type="button"
-                                @click="showMaintenanceLogModal = true"
+                                @click="fetchMaintenanceLog"
                                 class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors"
                             >
                                 Maintenance Log
@@ -700,6 +701,21 @@
         <MasterCardMaintenanceLogModal
             :show="showMaintenanceLogModal"
             @close="showMaintenanceLogModal = false"
+        />
+
+        <!-- MC Log Modals -->
+        <McLogModal
+            :show="showMaintenanceLogModal"
+            title="Zoom Master Card Maintenance Log"
+            :logs="maintenanceLogs"
+            @close="showMaintenanceLogModal = false"
+        />
+
+        <McLogModal
+            :show="showStatusLogModal"
+            title="Master Card Status Log"
+            :logs="statusLogs"
+            @close="showStatusLogModal = false"
         />
 
         <!-- Zoom Modals (for dropdown selection) -->
@@ -1319,6 +1335,7 @@ import { useToast } from "@/Composables/useToast";
 const CustomerAccountModal = defineAsyncComponent(() => import("@/Components/customer-account-modal.vue"));
 const UpdateMcModal = defineAsyncComponent(() => import("@/Components/UpdateMcModal.vue"));
 const MasterCardMaintenanceLogModal = defineAsyncComponent(() => import("@/Components/MasterCardMaintenanceLogModal.vue"));
+const McLogModal = defineAsyncComponent(() => import("@/Components/McLogModal.vue"));
 const MasterCardZoomModal = defineAsyncComponent(() => import("@/Components/MasterCardZoomModal.vue"));
 const MasterCardCurrentPriceModal = defineAsyncComponent(() => import("@/Components/MasterCardCurrentPriceModal.vue"));
 const MasterCardStandByPriceModal = defineAsyncComponent(() => import("@/Components/MasterCardStandByPriceModal.vue"));
@@ -1601,6 +1618,13 @@ const mcsStatusFilter = ref("Act");
 
 // New state for Maintenance Log Modal
 const showMaintenanceLogModal = ref(false);
+const maintenanceLogs = ref([]);
+const maintenanceLogsLoading = ref(false);
+
+// New state for Status Log Modal
+const showStatusLogModal = ref(false);
+const statusLogs = ref([]);
+const statusLogsLoading = ref(false);
 
 // New states for Zoom Dropdown
 const zoomOption = ref("");
@@ -2692,6 +2716,66 @@ const handleNextSetup = async () => {
 
     // Show Setup MC Component modal
     showSetupMcModal.value = true;
+};
+
+// Fetch Maintenance Log
+const fetchMaintenanceLog = async () => {
+    if (!form.value.mcs) {
+        toast.error('Please select an MCS first');
+        return;
+    }
+
+    maintenanceLogsLoading.value = true;
+    try {
+        const mcsEnc = encodeURIComponent(form.value.mcs);
+        const res = await fetch(`/api/update-mc/maintenance-log/${mcsEnc}`, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            maintenanceLogs.value = data;
+            showMaintenanceLogModal.value = true;
+        } else {
+            toast.error('Failed to load maintenance log');
+        }
+    } catch (e) {
+        console.error('Error fetching maintenance log:', e);
+        toast.error('Error loading maintenance log');
+    } finally {
+        maintenanceLogsLoading.value = false;
+    }
+};
+
+// Fetch Status Log
+const fetchStatusLog = async () => {
+    if (!form.value.mcs) {
+        toast.error('Please select an MCS first');
+        return;
+    }
+
+    statusLogsLoading.value = true;
+    try {
+        const mcsEnc = encodeURIComponent(form.value.mcs);
+        const res = await fetch(`/api/update-mc/status-log/${mcsEnc}`, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            statusLogs.value = data;
+            showStatusLogModal.value = true;
+        } else {
+            toast.error('Failed to load status log');
+        }
+    } catch (e) {
+        console.error('Error fetching status log:', e);
+        toast.error('Error loading status log');
+    } finally {
+        statusLogsLoading.value = false;
+    }
 };
 
 const selectComponent = (component, index) => {

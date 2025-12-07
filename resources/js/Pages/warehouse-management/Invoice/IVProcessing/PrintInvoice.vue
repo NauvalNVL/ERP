@@ -59,6 +59,12 @@
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Invoice#</label>
                         <input type="text" :value="selectedInvoice.invoice_no" readonly class="w-full border-gray-300 rounded-md bg-white px-3 py-2 text-gray-700 font-medium cursor-not-allowed" />
+                        <div
+                            v-if="isSelectedInvoiceCancelled"
+                            class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-semibold uppercase tracking-wide"
+                        >
+                            CANCEL
+                        </div>
                     </div>
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Invoice Date</label>
@@ -273,6 +279,24 @@ const printOptions = ref({
     updatePrintAudit: true
 });
 
+// Derived flag: whether selected invoice is cancelled
+const isSelectedInvoiceCancelled = computed(() => {
+    const inv = selectedInvoice.value;
+    if (!inv) return false;
+
+    let rawStatus = String(inv.inv_sts || inv.status || '').trim().toUpperCase();
+    if (!rawStatus || rawStatus === '0') {
+        const statusCandidate = Object.values(inv || {}).find((v) =>
+            typeof v === 'string' && /CANCEL/i.test(v.trim())
+        );
+        if (statusCandidate) {
+            rawStatus = statusCandidate.trim().toUpperCase();
+        }
+    }
+
+    return rawStatus === 'CANCEL' || rawStatus === 'CANCELLED';
+});
+
 // Format currency helper
 const formatCurrency = (value) => {
     if (!value) return '0.00';
@@ -370,12 +394,6 @@ const selectInvoice = async (invoice) => {
         const res = await axios.get(`/api/invoices/${encodeURIComponent(invoice.invoice_no)}`);
 
         if (res.data) {
-            // Check if invoice can be printed
-            if (res.data.status === 'Cancelled') {
-                toast.error('Cannot print cancelled invoice');
-                return;
-            }
-
             // Set selected invoice header
             selectedInvoice.value = {
                 invoice_no: res.data.invoice_no,
@@ -390,6 +408,7 @@ const selectInvoice = async (invoice) => {
                 due_date: res.data.due_date,
                 tax_invoice_no: res.data.tax_invoice_no,
                 status: res.data.status,
+                inv_sts: res.data.inv_sts,
                 total_amount: res.data.total_amount,
                 tax_amount: res.data.tax_amount,
                 net_amount: res.data.net_amount,
@@ -520,7 +539,30 @@ const generateInvoicePDF = (invoice) => {
     // ==== INVOICE INFO (Top Right) ====
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
-    const rightX = 140;
+    // Shift header info block slightly to the right
+    const rightX = 155;
+
+    let rawStatus = String(invoice.inv_sts || invoice.status || '').trim().toUpperCase();
+    if (!rawStatus || rawStatus === '0') {
+        const statusCandidate = Object.values(invoice || {}).find(v =>
+            typeof v === 'string' && /CANCEL/i.test(v.trim())
+        );
+        if (statusCandidate) {
+            rawStatus = statusCandidate.trim().toUpperCase();
+        }
+    }
+    const isCancelled = rawStatus === 'CANCEL' || rawStatus === 'CANCELLED';
+
+    if (isCancelled) {
+        doc.setTextColor(255, 0, 0);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        // Keep CANCEL aligned near the right margin while header block shifts right
+        doc.text('CANCEL', rightX + 40, 11, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+    }
 
     const paymentTermText =
       invoice.payment_term !== undefined && invoice.payment_term !== null

@@ -1996,6 +1996,14 @@ class InvoiceController extends Controller
                 $query->where('IV_NUM', 'like', '%' . $request->seq . '%');
             }
 
+            // Exclude cancelled invoices if requested (for Amend/Cancel Invoice pages)
+            if ($request->boolean('exclude_cancelled', false)) {
+                $query->where(function ($q) {
+                    $q->whereNull('IV_STS')
+                      ->orWhere('IV_STS', '!=', 'Cancelled');
+                });
+            }
+
             // Get column list to check which columns exist
             $columns = DB::getSchemaBuilder()->getColumnListing('INV');
 

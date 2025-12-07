@@ -57,7 +57,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Right Column for Log Buttons -->
           <div class="md:col-span-1 flex flex-col justify-start items-end space-y-2">
             <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 w-full max-w-[150px]" @click="showLog('status')">Status Log</button>
@@ -266,7 +266,7 @@
               <label class="w-28 font-medium">Rotary D/Cut:</label>
               <input type="checkbox" :checked="mc.rotary_d_cut" class="form-checkbox h-5 w-5 text-blue-600" disabled />
             </div>
-            
+
             <div class="flex items-center">
               <label class="w-28 font-medium">D/Cut Sheet:</label>
               <input type="checkbox" :checked="mc.d_cut_sheet" class="form-checkbox h-5 w-5 text-blue-600" disabled />
@@ -487,20 +487,17 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID 2</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr v-if="logData.length === 0">
-                  <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No records found.</td>
+                  <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No records found.</td>
                 </tr>
                 <tr v-for="(entry, index) in logData" :key="index">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.no }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.date }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.time }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.user_id }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.user_id_2 }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.action }}</td>
                 </tr>
               </tbody>
@@ -704,9 +701,9 @@ const mockLogs = {
     { date: '18/10/2018', time: '13:06:25', user_id: 'mc02', action: 'Approve' },
   ],
   maintenance: [
-    { date: '01/11/2018', time: '08:43:09', user_id: 'mc01', user_id_2: 'mcs', action: 'Amend M/Card' },
-    { date: '31/10/2018', time: '15:56:34', user_id: 'mc01', user_id_2: 'mcs', action: 'Amend M/Card' },
-    { date: '18/10/2018', time: '13:00:48', user_id: 'mc02', user_id_2: 'mcs', action: 'New M/Card' },
+    { date: '01/11/2018', time: '08:43:09', user_id: 'mc01', action: 'Amend M/Card' },
+    { date: '31/10/2018', time: '15:56:34', user_id: 'mc01', action: 'Amend M/Card' },
+    { date: '18/10/2018', time: '13:00:48', user_id: 'mc02', action: 'New M/Card' },
   ],
 };
 
@@ -840,4 +837,4 @@ input[type="text"][readonly] {
   background-color: #f3f4f6; /* Tailwind gray-100 */
   cursor: default;
 }
-</style> 
+</style>
