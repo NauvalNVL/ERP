@@ -48,9 +48,6 @@
                                 User ID
                             </th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                User ID 2
-                            </th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Action
                             </th>
                         </tr>
@@ -70,9 +67,6 @@
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {{ log.user_id }}
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                {{ log.user_id_2 || '-' }}
-                            </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span
                                     class="px-2 py-1 text-xs font-semibold rounded-full"
@@ -87,7 +81,7 @@
                             </td>
                         </tr>
                         <tr v-if="filteredLogs.length === 0">
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
                                 <i class="fas fa-inbox text-3xl mb-2"></i>
                                 <p>No log entries found</p>
                             </td>
