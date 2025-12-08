@@ -1183,7 +1183,7 @@ class InvoiceController extends Controller
                         'YYYY' => $yyyy,
                         'MM' => $mm,
                         'IV_NUM' => $ivNum,
-                        'IV_STS' => 'Prepared',
+                        'IV_STS' => 'Active',
                         'IV_DMY' => $invoiceDate,
 
                         // Payment terms and references
