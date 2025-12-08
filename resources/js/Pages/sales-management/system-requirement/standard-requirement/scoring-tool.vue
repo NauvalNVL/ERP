@@ -145,58 +145,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Quick Links -->
-                        <div class="bg-white shadow-sm rounded-xl border border-emerald-100">
-                            <div class="px-4 py-3 sm:px-5 border-b border-gray-100 flex items-center">
-                                <div class="p-2 bg-emerald-500 rounded-lg mr-3">
-                                    <i class="fas fa-link text-white"></i>
-                                </div>
-                                <h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
-                            </div>
-                            <div class="px-4 py-4 sm:px-5">
-                                <div class="grid grid-cols-1 gap-3">
-                                    <Link
-                                        href="/paper-quality"
-                                        class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100"
-                                    >
-                                        <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                            <i class="fas fa-cogs text-white text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-emerald-900">Paper Quality</p>
-                                            <p class="text-xs text-emerald-700">Manage paper quality</p>
-                                        </div>
-                                    </Link>
-
-                                    <Link
-                                        href="/paper-flute"
-                                        class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100"
-                                    >
-                                        <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                            <i class="fas fa-cog text-white text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-emerald-900">Paper Flute</p>
-                                            <p class="text-xs text-emerald-700">Manage paper flute</p>
-                                        </div>
-                                    </Link>
-
-                                    <Link
-                                        href="/scoring-tool/view-print"
-                                        class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-100"
-                                    >
-                                        <div class="p-2 bg-green-500 rounded-full mr-3">
-                                            <i class="fas fa-print text-white text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-green-900">Print List</p>
-                                            <p class="text-xs text-green-700">Print scoring tool list</p>
-                                        </div>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

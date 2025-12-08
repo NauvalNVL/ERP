@@ -122,48 +122,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Quick Links -->
-                <div class="bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-violet-100">
-                    <div class="flex items-center mb-4 pb-2 border-b border-violet-100">
-                        <div class="p-2.5 bg-violet-500 rounded-xl mr-3">
-                            <i class="fas fa-link text-white"></i>
-                        </div>
-                        <h3 class="text-base sm:text-lg font-semibold text-slate-800">Quick Links</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link href="/bundling-string" class="flex items-center p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors border border-purple-100">
-                            <div class="p-2.5 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-ribbon text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-purple-900 text-sm">Bundling String</p>
-                                <p class="text-xs text-purple-700">Manage bundling strings</p>
-                            </div>
-                        </Link>
-
-                        <Link href="/stitch-wire" class="flex items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors border border-sky-100">
-                            <div class="p-2.5 bg-sky-500 rounded-full mr-3">
-                                <i class="fas fa-link text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-sky-900 text-sm">Stitch Wire</p>
-                                <p class="text-xs text-sky-700">Manage stitch wire types</p>
-                            </div>
-                        </Link>
-
-                        <Link href="/wrapping-material/view-print" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-print text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-purple-900">Print List</p>
-                                <p class="text-xs text-purple-700">Print Wrapping Material list</p>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

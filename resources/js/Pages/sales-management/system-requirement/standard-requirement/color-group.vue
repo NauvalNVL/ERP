@@ -139,62 +139,18 @@
                                             <span>S-Offset</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <span class="w-7 h-7 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2 text-xs">X</span>
-                                            <span>X-Flexo</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Links -->
-                    <div class="bg-white shadow-sm rounded-xl border border-violet-100">
-                        <div class="px-4 py-3 sm:px-5 border-b border-violet-100 flex items-center">
-                            <div class="p-2 bg-violet-500 rounded-lg mr-3">
-                                <i class="fas fa-link text-white"></i>
-                            </div>
-                            <h3 class="text-sm sm:text-base font-semibold text-slate-800">Quick Links</h3>
-                        </div>
-
-                        <div class="px-4 py-4 sm:px-5">
-                            <div class="grid grid-cols-1 gap-3">
-                                <Link href="/color" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-100">
-                                    <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                        <i class="fas fa-palette text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-purple-900 text-sm">Colors</p>
-                                        <p class="text-xs text-purple-700">Manage individual colors</p>
-                                    </div>
-                                </Link>
-
-                                <a href="/finishing" class="flex items-center p-3 bg-sky-50 rounded-lg hover:bg-sky-100 transition-colors border border-sky-100">
-                                    <div class="p-2 bg-sky-500 rounded-full mr-3">
-                                        <i class="fas fa-th-list text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-sky-900 text-sm">Finishings</p>
-                                        <p class="text-xs text-sky-700">Manage finishings</p>
-                                    </div>
-                                </a>
-
-                                <Link href="/color-group/view-print" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-100">
-                                    <div class="p-2 bg-emerald-500 rounded-full mr-3">
-                                        <i class="fas fa-print text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-emerald-900 text-sm">Print List</p>
-                                        <p class="text-xs text-emerald-700">Print color group list</p>
-                                    </div>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                            											<span class="w-7 h-7 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2 text-xs">X</span>
+											<span>X-Flexo</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
     <!-- Modal for Color Group Table -->
     <ColorGroupModal

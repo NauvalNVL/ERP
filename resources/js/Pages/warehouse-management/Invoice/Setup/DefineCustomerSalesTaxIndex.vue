@@ -172,8 +172,8 @@
                                             @click="handleDelete"
                                             class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium"
                                         >
-                                            <i class="fas fa-trash mr-2"></i>
-                                            Delete
+                                            <i class="fas fa-ban mr-2"></i>
+                                            Obsolete
                                         </button>
                                         <div v-else></div>
 
@@ -286,6 +286,7 @@ import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 import TaxGroupModal from '@/Components/TaxGroupModal.vue';
 import CustomerSalesTaxorSalesTaxExemptionTable from '@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // Record modes
 const recordMode = ref('select'); // 'select', 'add', 'review'
@@ -339,7 +340,11 @@ const loadCustomerAccounts = async () => {
         }
     } catch (error) {
         console.error('Error loading customer accounts:', error);
-        alert('Failed to load customer accounts: ' + (error.response?.data?.message || error.message));
+        await Swal.fire({
+            icon: 'error',
+            title: 'Failed to Load Customers',
+            text: 'Failed to load customer accounts: ' + (error.response?.data?.message || error.message)
+        });
     }
 };
 
@@ -373,9 +378,13 @@ const checkCustomerIndices = async () => {
 };
 
 // Open index table modal
-const openIndexTableModal = () => {
+const openIndexTableModal = async () => {
     if (!form.value.customer_code) {
-        alert('Please select a customer first.');
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Customer Required',
+            text: 'Please select a customer first.'
+        });
         return;
     }
     showIndexTableModal.value = true;
@@ -411,21 +420,42 @@ const selectTaxGroup = (taxGroup) => {
 const handleSave = async () => {
     // Validation
     if (!form.value.customer_code) {
-        alert('Please select a customer.');
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Customer Required',
+            text: 'Please select a customer.'
+        });
         return;
     }
 
     if (!form.value.index_number || form.value.index_number < 1) {
-        alert('Please enter a valid index number.');
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Index Number',
+            text: 'Please enter a valid index number.'
+        });
         return;
     }
 
     if (!form.value.tax_group_code) {
-        alert('Please select a tax group.');
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Tax Group Required',
+            text: 'Please select a tax group.'
+        });
         return;
     }
 
-    if (!confirm('Confirm Saving / Updating ?')) {
+    const confirmResult = await Swal.fire({
+        icon: 'question',
+        title: 'Confirm Save',
+        text: 'Confirm Saving / Updating ?',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+    });
+
+    if (!confirmResult.isConfirmed) {
         return;
     }
 
@@ -433,18 +463,40 @@ const handleSave = async () => {
         const response = await axios.post('/api/invoices/customer-tax-indices', form.value);
 
         if (response.data.success) {
-            alert('Customer sales tax index saved successfully!');
+            await Swal.fire({
+                icon: 'success',
+                title: 'Saved',
+                text: 'Customer sales tax index saved successfully!'
+            });
             recordMode.value = 'review';
         }
     } catch (error) {
         console.error('Error saving:', error);
-        alert('Failed to save: ' + (error.response?.data?.message || error.message));
+        await Swal.fire({
+            icon: 'error',
+            title: 'Save Failed',
+            text: 'Failed to save: ' + (error.response?.data?.message || error.message)
+        });
     }
 };
 
-// Handle delete
+// Handle delete (mark as obsolete in UI wording, backend still deletes record)
 const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this tax index?')) {
+<<<<<<< HEAD
+    const confirmResult = await Swal.fire({
+        icon: 'warning',
+        title: 'Confirm Delete',
+        text: 'Are you sure you want to delete this tax index?',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it',
+        cancelButtonText: 'Cancel'
+    });
+
+    if (!confirmResult.isConfirmed) {
+=======
+    if (!confirm('Are you sure you want to obsolete this tax index?')) {
+>>>>>>> 382db43783ab3609c34179ae915cb487038fee98
         return;
     }
 
@@ -454,12 +506,29 @@ const handleDelete = async () => {
         );
 
         if (response.data.success) {
-            alert('Tax index deleted successfully!');
+<<<<<<< HEAD
+            await Swal.fire({
+                icon: 'success',
+                title: 'Deleted',
+                text: 'Tax index deleted successfully!'
+            });
             handleCancel();
         }
     } catch (error) {
         console.error('Error deleting:', error);
-        alert('Failed to delete: ' + (error.response?.data?.message || error.message));
+        await Swal.fire({
+            icon: 'error',
+            title: 'Delete Failed',
+            text: 'Failed to delete: ' + (error.response?.data?.message || error.message)
+        });
+=======
+            alert('Tax index obsoleted successfully!');
+            handleCancel();
+        }
+    } catch (error) {
+        console.error('Error obsoleting tax index:', error);
+        alert('Failed to obsolete tax index: ' + (error.response?.data?.message || error.message));
+>>>>>>> 382db43783ab3609c34179ae915cb487038fee98
     }
 };
 

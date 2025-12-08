@@ -153,49 +153,6 @@
 								</div>
 							</div>
 						</div>
-
-						<!-- Quick Links -->
-						<div class="bg-white shadow-sm rounded-xl border border-gray-200">
-							<div class="px-4 py-3 sm:px-5 border-b border-gray-100 flex items-center">
-								<div class="p-2 bg-emerald-500 rounded-lg mr-3">
-									<i class="fas fa-link text-white"></i>
-								</div>
-								<h3 class="text-sm font-semibold text-gray-800">Quick Links</h3>
-							</div>
-							<div class="px-4 py-4 sm:px-5">
-								<div class="grid grid-cols-1 gap-3">
-									<Link href="/color" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-										<div class="p-2 bg-emerald-500 rounded-full mr-3">
-											<i class="fas fa-palette text-white text-sm"></i>
-										</div>
-										<div>
-											<p class="font-medium text-emerald-900">Colors</p>
-											<p class="text-xs text-emerald-700">Manage colors</p>
-										</div>
-									</Link>
-
-									<Link href="/geo" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-										<div class="p-2 bg-emerald-500 rounded-full mr-3">
-											<i class="fas fa-globe-americas text-white text-sm"></i>
-										</div>
-										<div>
-											<p class="font-medium text-emerald-900">Geo</p>
-											<p class="text-xs text-emerald-700">Manage geographical data</p>
-										</div>
-									</Link>
-
-									<Link href="/industry/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-										<div class="p-2 bg-green-600 rounded-full mr-3">
-											<i class="fas fa-print text-white text-sm"></i>
-										</div>
-										<div>
-											<p class="font-medium text-green-900">Print List</p>
-											<p class="text-xs text-green-700">Print industry list</p>
-										</div>
-									</Link>
-								</div>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -276,8 +233,8 @@
 									@click="deleteIndustry"
 									class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium flex items-center"
 							>
-								<i class="fas fa-trash-alt mr-2"></i>
-								Delete
+								<i class="fas fa-ban mr-2"></i>
+								Obsolete
 							</button>
 							<div v-else class="w-24"></div>
 							<div class="flex space-x-3">

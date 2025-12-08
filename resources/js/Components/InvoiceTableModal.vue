@@ -158,6 +158,10 @@ const props = defineProps({
     initialQuery: {
         type: Object,
         default: () => ({ part1: '', part2: '', part3: '' })
+    },
+    excludeCancelled: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -199,6 +203,11 @@ const fetchInvoices = async () => {
         if (localQuery.value.part1) params.append('mm', localQuery.value.part1);
         if (localQuery.value.part2) params.append('yyyy', localQuery.value.part2);
         if (localQuery.value.part3) params.append('seq', localQuery.value.part3);
+
+        // Exclude cancelled invoices if prop is set (for Amend/Cancel Invoice pages)
+        if (props.excludeCancelled) {
+            params.append('exclude_cancelled', '1');
+        }
 
         console.log('🔍 Fetching invoices from API:', `/api/invoices?${params.toString()}`);
 
@@ -252,12 +261,12 @@ const closeModal = () => {
 // ✅ Format audit trail date/time (CPS style: DD/MM/YYYY HH:MM)
 const formatAuditDateTime = (date, time) => {
     if (!date) return '';
-    
+
     // Combine date and time if both available
     if (time) {
         return `${date} ${time}`;
     }
-    
+
     return date;
 };
 </script>

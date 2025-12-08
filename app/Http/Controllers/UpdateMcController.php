@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\MasterCard;
 use App\Models\Mc;
-use App\Models\McUpdateLog;
+use App\Models\McLog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +60,32 @@ class UpdateMcController extends Controller
         }
 
         return 'SYSTEM';
+    }
+
+    /**
+     * Create a log entry in MC_LOG table
+     */
+    private function createMcLog($mcsNum, $action, $acNum = null, $acName = null, $model = null, $reason = null)
+    {
+        $now = now();
+        $userId = $this->getCurrentUserId();
+
+        // Generate unique log number
+        $logNo = 'LOG-' . $now->format('YmdHis') . '-' . substr(md5($mcsNum . $userId), 0, 6);
+
+        McLog::create([
+            'NO' => $logNo,
+            'DATE' => $now->format('Y-m-d'),
+            'TIME' => $now->format('H:i:s'),
+            'ACTION' => $action,
+            'UID' => $userId,
+            'UID2' => null,
+            'AC_NUM' => $acNum,
+            'AC_NAME' => $acName,
+            'MCS_NUM' => $mcsNum,
+            'MODEL' => $model,
+            'DateSK' => (int)$now->format('Ymd'),
+        ]);
     }
 
     /**
@@ -1398,6 +1424,29 @@ class UpdateMcController extends Controller
                 $normalized
             );
 
+            // Log the create/update action to MC_LOG (Status Log)
+            $action = $existing ? 'UPDATE' : 'CREATE';
+            $this->createMcLog(
+                $normalized['MCS_Num'],
+                $action,
+                $normalized['AC_NUM'],
+                $normalized['AC_NAME'] ?? null,
+                $normalized['MODEL'] ?? null,
+                null
+            );
+
+            // Also log to Maintenance Log when updating an existing MC
+            if ($existing) {
+                $this->createMcLog(
+                    $normalized['MCS_Num'],
+                    'MAINTENANCE',
+                    $normalized['AC_NUM'],
+                    $normalized['AC_NAME'] ?? null,
+                    $normalized['MODEL'] ?? null,
+                    null
+                );
+            }
+
             // Build a minimal response reflecting MC values stored
             $responseData = [
                 'mc_seq' => $validated['mc_seq'],
@@ -1794,8 +1843,8 @@ class UpdateMcController extends Controller
 
     public function getUpdateLog($mcsNum)
     {
-        $logs = McUpdateLog::where('MCS_Num', $mcsNum)
-            ->orderBy('created_at', 'desc')
+        $logs = McLog::where('MCS_NUM', $mcsNum)
+            ->orderByRaw('CAST(DateSK AS INT) DESC, TIME DESC')
             ->get();
 
         return response()->json($logs);
@@ -1815,14 +1864,16 @@ class UpdateMcController extends Controller
 
         DB::table('MC')
             ->where('MCS_Num', $mcsNum)
-            ->update(['STS' => 'OBSOLETE']);
+            ->update(['STS' => 'Obsolete']);
 
-        McUpdateLog::create([
-            'MCS_Num' => $mcsNum,
-            'status' => 'OBSOLETE',
-            'reason' => $validated['reason'] ?? 'No reason provided',
-            'user_id' => $this->getCurrentUserId(),
-        ]);
+        $this->createMcLog(
+            $mcsNum,
+            'OBSOLETE',
+            $masterCard->AC_NUM,
+            $masterCard->AC_NAME,
+            $masterCard->MODEL,
+            $validated['reason'] ?? 'No reason provided'
+        );
 
         return response()->json([
             'message' => 'Master Card has been marked as obsolete',
@@ -1844,14 +1895,16 @@ class UpdateMcController extends Controller
 
         DB::table('MC')
             ->where('MCS_Num', $mcsNum)
-            ->update(['STS' => 'ACTIVE']);
+            ->update(['STS' => 'Active']);
 
-        McUpdateLog::create([
-            'MCS_Num' => $mcsNum,
-            'status' => 'ACTIVE',
-            'reason' => $validated['reason'] ?? 'No reason provided',
-            'user_id' => $this->getCurrentUserId(),
-        ]);
+        $this->createMcLog(
+            $mcsNum,
+            'REACTIVE',
+            $masterCard->AC_NUM,
+            $masterCard->AC_NAME,
+            $masterCard->MODEL,
+            $validated['reason'] ?? 'No reason provided'
+        );
 
         return response()->json([
             'message' => 'Master Card has been reactivated',
@@ -1873,15 +1926,20 @@ class UpdateMcController extends Controller
 
         DB::table('MC')
             ->whereIn('MCS_Num', $mcsNums)
-            ->update(['STS' => 'OBSOLETE']);
+            ->update(['STS' => 'Obsolete']);
 
         foreach ($mcsNums as $num) {
-            McUpdateLog::create([
-                'MCS_Num' => $num,
-                'status' => 'OBSOLETE',
-                'reason' => $reason,
-                'user_id' => $userId,
-            ]);
+            $mc = DB::table('MC')->where('MCS_Num', $num)->first();
+            if ($mc) {
+                $this->createMcLog(
+                    $num,
+                    'OBSOLETE',
+                    $mc->AC_NUM,
+                    $mc->AC_NAME,
+                    $mc->MODEL,
+                    $reason
+                );
+            }
         }
 
         return response()->json([
@@ -1904,15 +1962,20 @@ class UpdateMcController extends Controller
 
         DB::table('MC')
             ->whereIn('MCS_Num', $mcsNums)
-            ->update(['STS' => 'ACTIVE']);
+            ->update(['STS' => 'Active']);
 
         foreach ($mcsNums as $num) {
-            McUpdateLog::create([
-                'MCS_Num' => $num,
-                'status' => 'ACTIVE',
-                'reason' => $reason,
-                'user_id' => $userId,
-            ]);
+            $mc = DB::table('MC')->where('MCS_Num', $num)->first();
+            if ($mc) {
+                $this->createMcLog(
+                    $num,
+                    'REACTIVE',
+                    $mc->AC_NUM,
+                    $mc->AC_NAME,
+                    $mc->MODEL,
+                    $reason
+                );
+            }
         }
 
         return response()->json([
@@ -1969,5 +2032,49 @@ class UpdateMcController extends Controller
     public function viewAndPrintMcMaintenanceLog()
     {
         return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log');
+    }
+
+    /**
+     * Get maintenance log for a specific MCS number
+     */
+    public function getMaintenanceLog($mcsNum)
+    {
+        $logs = McLog::where('MCS_NUM', $mcsNum)
+            ->where('ACTION', 'MAINTENANCE')
+            ->orderByRaw('CAST(DateSK AS INT) DESC, TIME DESC')
+            ->get()
+            ->map(function($log) {
+                return [
+                    'date' => $log->DATE,
+                    'time' => $log->TIME,
+                    'user_id' => $log->UID,
+                    'user_id_2' => $log->UID2,
+                    'action' => $log->ACTION,
+                ];
+            });
+
+        return response()->json($logs);
+    }
+
+    /**
+     * Get status log for a specific MCS number (OBSOLETE, REACTIVE, UPDATE)
+     */
+    public function getStatusLog($mcsNum)
+    {
+        $logs = McLog::where('MCS_NUM', $mcsNum)
+            ->whereIn('ACTION', ['OBSOLETE', 'REACTIVE', 'UPDATE', 'CREATE'])
+            ->orderByRaw('CAST(DateSK AS INT) DESC, TIME DESC')
+            ->get()
+            ->map(function($log) {
+                return [
+                    'date' => $log->DATE,
+                    'time' => $log->TIME,
+                    'user_id' => $log->UID,
+                    'user_id_2' => $log->UID2,
+                    'action' => $log->ACTION,
+                ];
+            });
+
+        return response()->json($logs);
     }
 }

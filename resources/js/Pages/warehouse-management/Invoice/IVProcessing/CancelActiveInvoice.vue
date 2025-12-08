@@ -142,6 +142,7 @@
         <InvoiceTableModal
             :open="showInvoiceTable"
             :initial-query="tableQuery"
+            :exclude-cancelled="true"
             @close="showInvoiceTable = false"
             @select="selectInvoice"
             @zoom="handleZoom"

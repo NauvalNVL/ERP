@@ -245,40 +245,60 @@
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:max-h-64 md:overflow-y-auto">
                                             <!-- Basic Define Permissions -->
                                             <label class="flex items-center">
-                                                <input type="checkbox" v-model="form.permissions.define_sales_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                <span class="ml-3 text-xs text-gray-700">Define Sales Team</span>
-                                            </label>
-                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_salesperson" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Salesperson</span>
                                             </label>
                                             <label class="flex items-center">
-                                                <input type="checkbox" v-model="form.permissions.define_salesperson_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                <span class="ml-3 text-xs text-gray-700">Define Salesperson Team</span>
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_salesperson" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Salesperson</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_industry" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Industry</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_industry" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Industry</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_geo" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Geo</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_geo" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Geo</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_product_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Product Group</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_product_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Product Group</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_product" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Product</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_product" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Product</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_product_design" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Product Design</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_product_design" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Product Design</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_scoring_tool" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Scoring Tool</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_scoring_tool" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Scoring Tool</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_paper_quality" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -293,52 +313,96 @@
                                                 <span class="ml-3 text-xs text-gray-700">Define Paper Flute</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_paper_flute" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Paper Flute</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_paper_size" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Paper Size</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_paper_size" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Paper Size</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_color_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Color Group</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_color_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Color Group</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_color" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Color</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_color" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Color</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Finishing</span>
                                             </label>
                                             <label class="flex items-center">
-                                                <input type="checkbox" v-model="form.permissions.define_analysis_code" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                <span class="ml-3 text-xs text-gray-700">Define Analysis Code</span>
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Finishing</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_stitch_wire" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Stitch Wire</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_stitch_wire" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Stitch Wire</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_chemical_coat" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Chemical Coat</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_chemical_coat" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Chemical Coat</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_reinforcement_tape" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Reinforcement Tape</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_reinforcement_tape" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Reinforcement Tape</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_bundling_string" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Bundling String</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_bundling_string" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Bundling String</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_wrapping_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Wrapping Material</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_wrapping_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Wrapping Material</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_glueing_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Glueing Material</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_glueing_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Glueing Material</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_machine" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Machine</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_machine" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Machine</span>
                                             </label>
                                             
                                             <!-- View & Print Permissions -->
@@ -347,16 +411,8 @@
                                                     <h6 class="text-xs font-medium text-gray-600 mb-2">View & Print Permissions</h6>
                                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                         <label class="flex items-center">
-                                                            <input type="checkbox" v-model="form.permissions.view_print_sales_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                            <span class="ml-3 text-xs text-gray-600">View & Print Sales Team</span>
-                                                        </label>
-                                                        <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_salesperson" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Salesperson</span>
-                                                        </label>
-                                                        <label class="flex items-center">
-                                                            <input type="checkbox" v-model="form.permissions.view_print_salesperson_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                            <span class="ml-3 text-xs text-gray-600">View & Print Salesperson Team</span>
                                                         </label>
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_industry" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -401,10 +457,6 @@
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_color" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Color</span>
-                                                        </label>
-                                                        <label class="flex items-center">
-                                                            <input type="checkbox" v-model="form.permissions.view_print_analysis_code" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                            <span class="ml-3 text-xs text-gray-600">View & Print Analysis Code</span>
                                                         </label>
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -464,10 +516,6 @@
                                                 <input type="checkbox" v-model="form.permissions.define_customer_alternate_address" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Customer Alternate Address</span>
                                             </label>
-                                            <label class="flex items-center">
-                                                <input type="checkbox" v-model="form.permissions.define_customer_sales_type" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                <span class="ml-3 text-xs text-gray-700">Define Customer Sales Type</span>
-                                            </label>
                                         </div>
                                         
                                         <!-- Customer View & Print -->
@@ -485,14 +533,6 @@
                                                 <label class="flex items-center">
                                                     <input type="checkbox" v-model="form.permissions.view_print_customer_alternate_address" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                     <span class="ml-3 text-xs text-gray-600">View & Print Customer Alt. Address</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.view_print_customer_sales_type" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-600">View & Print Customer Sales Type</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.view_print_non_active_customer" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-600">View & Print Non-Active Customer</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -819,36 +859,50 @@ export default {
                     'reactive_unobsolete_user': false,
                     'view_print_user': false,
                     'sales_management': false,
-                    // Standard Requirement
-                    'define_sales_team': false,
+                    // Standard Requirement (sync dengan sidebar)
                     'define_salesperson': false,
-                    'define_salesperson_team': false,
+                    'obsolete_unobsolete_salesperson': false,
                     'define_industry': false,
+                    'obsolete_unobsolete_industry': false,
                     'define_geo': false,
+                    'obsolete_unobsolete_geo': false,
                     'define_product_group': false,
+                    'obsolete_unobsolete_product_group': false,
                     'define_product': false,
+                    'obsolete_unobsolete_product': false,
                     'define_product_design': false,
+                    'obsolete_unobsolete_product_design': false,
                     'define_scoring_tool': false,
+                    'obsolete_unobsolete_scoring_tool': false,
                     'define_paper_quality': false,
                     'obsolete_unobsolete_paper_quality': false,
                     'define_paper_flute': false,
+                    'obsolete_unobsolete_paper_flute': false,
                     'define_paper_size': false,
+                    'obsolete_unobsolete_paper_size': false,
                     'define_color_group': false,
+                    'obsolete_unobsolete_color_group': false,
                     'define_color': false,
+                    'obsolete_unobsolete_color': false,
                     'define_finishing': false,
-                    'define_analysis_code': false,
+                    'obsolete_unobsolete_finishing': false,
                     'define_stitch_wire': false,
+                    'obsolete_unobsolete_stitch_wire': false,
                     'define_chemical_coat': false,
+                    'obsolete_unobsolete_chemical_coat': false,
                     'define_reinforcement_tape': false,
+                    'obsolete_unobsolete_reinforcement_tape': false,
                     'define_bundling_string': false,
+                    'obsolete_unobsolete_bundling_string': false,
                     'define_wrapping_material': false,
+                    'obsolete_unobsolete_wrapping_material': false,
                     'define_glueing_material': false,
+                    'obsolete_unobsolete_glueing_material': false,
                     'define_machine': false,
+                    'obsolete_unobsolete_machine': false,
                     
                     // View & Print Standard Requirement
-                    'view_print_sales_team': false,
                     'view_print_salesperson': false,
-                    'view_print_salesperson_team': false,
                     'view_print_industry': false,
                     'view_print_geo': false,
                     'view_print_product_group': false,
@@ -860,7 +914,6 @@ export default {
                     'view_print_scoring_tool': false,
                     'view_print_color_group': false,
                     'view_print_color': false,
-                    'view_print_analysis_code': false,
                     'view_print_finishing': false,
                     'view_print_stitch_wire': false,
                     'view_print_chemical_coat': false,
@@ -873,12 +926,9 @@ export default {
                     'update_customer_account': false,
                     'obsolete_reactive_customer_ac': false,
                     'define_customer_alternate_address': false,
-                    'define_customer_sales_type': false,
                     'view_print_customer_group': false,
                     'view_print_customer_account': false,
                     'view_print_customer_alternate_address': false,
-                    'view_print_customer_sales_type': false,
-                    'view_print_non_active_customer': false,
                     'update_mc': false,
                     'approve_mc': false,
                     'release_approved_mc': false,
@@ -1031,8 +1081,42 @@ export default {
                     if (data.permissions) {
                         this.isLoadingPermissions = true;
                         try {
+                            const permissionSet = new Set(data.permissions);
+
+                            // Set all known permissions berdasarkan data dari backend
                             Object.keys(this.form.permissions).forEach(key => {
-                                this.form.permissions[key] = data.permissions.includes(key);
+                                this.form.permissions[key] = permissionSet.has(key);
+                            });
+
+                            // Untuk permission obsolete/unobsolete baru, aktifkan otomatis
+                            // jika pasangan define_* sudah aktif tetapi obsolete_* belum ada
+                            const obsoletePairs = [
+                                ['define_salesperson', 'obsolete_unobsolete_salesperson'],
+                                ['define_industry', 'obsolete_unobsolete_industry'],
+                                ['define_geo', 'obsolete_unobsolete_geo'],
+                                ['define_product_group', 'obsolete_unobsolete_product_group'],
+                                ['define_product', 'obsolete_unobsolete_product'],
+                                ['define_product_design', 'obsolete_unobsolete_product_design'],
+                                ['define_scoring_tool', 'obsolete_unobsolete_scoring_tool'],
+                                ['define_paper_quality', 'obsolete_unobsolete_paper_quality'],
+                                ['define_paper_flute', 'obsolete_unobsolete_paper_flute'],
+                                ['define_paper_size', 'obsolete_unobsolete_paper_size'],
+                                ['define_color_group', 'obsolete_unobsolete_color_group'],
+                                ['define_color', 'obsolete_unobsolete_color'],
+                                ['define_finishing', 'obsolete_unobsolete_finishing'],
+                                ['define_stitch_wire', 'obsolete_unobsolete_stitch_wire'],
+                                ['define_chemical_coat', 'obsolete_unobsolete_chemical_coat'],
+                                ['define_reinforcement_tape', 'obsolete_unobsolete_reinforcement_tape'],
+                                ['define_bundling_string', 'obsolete_unobsolete_bundling_string'],
+                                ['define_wrapping_material', 'obsolete_unobsolete_wrapping_material'],
+                                ['define_glueing_material', 'obsolete_unobsolete_glueing_material'],
+                                ['define_machine', 'obsolete_unobsolete_machine'],
+                            ];
+
+                            obsoletePairs.forEach(([defineKey, obsoleteKey]) => {
+                                if (this.form.permissions[defineKey] && !permissionSet.has(obsoleteKey)) {
+                                    this.form.permissions[obsoleteKey] = true;
+                                }
                             });
                         } finally {
                             // Use nextTick to ensure watchers don't fire on the immediate updates

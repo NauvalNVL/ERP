@@ -648,10 +648,12 @@ Route::put('/update-customer-account/{id}', [App\Http\Controllers\UpdateCustomer
 
 // Update MC API Routes
 Route::prefix('update-mc')->group(function () {
-Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
-Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
-Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
-Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
+    Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
+    Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
+    Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
+    Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
+    Route::get('/maintenance-log/{mcsNum}', [UpdateMcController::class, 'getMaintenanceLog']);
+    Route::get('/status-log/{mcsNum}', [UpdateMcController::class, 'getStatusLog']);
 });
 
 // Delivery Order API Routes
