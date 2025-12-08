@@ -100,6 +100,7 @@
                                             <input 
                                                 type="number" 
                                                 v-model="row.pDay" 
+                                                min="0"
                                                 class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
                                             >
                                         </td>
@@ -108,6 +109,7 @@
                                                 <input 
                                                     type="number" 
                                                     v-model="row.noUp1" 
+                                                    min="0"
                                                     :disabled="!row.mchCode"
                                                     class="w-12 px-1 py-1 border border-gray-300 rounded text-sm text-center"
                                                     :class="{ 'bg-gray-100 cursor-not-allowed': !row.mchCode }"
@@ -116,6 +118,7 @@
                                                 <input 
                                                     type="number" 
                                                     v-model="row.noUp2" 
+                                                    min="0"
                                                     :disabled="!row.mchCode"
                                                     class="w-12 px-1 py-1 border border-gray-300 rounded text-sm text-center"
                                                     :class="{ 'bg-gray-100 cursor-not-allowed': !row.mchCode }"
@@ -126,6 +129,7 @@
                                             <input 
                                                 type="number" 
                                                 v-model="row.setupMin" 
+                                                min="0"
                                                 class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
                                             >
                                         </td>
@@ -133,6 +137,7 @@
                                             <input 
                                                 type="number" 
                                                 v-model="row.setupAdjust" 
+                                                min="0"
                                                 class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
                                             >
                                         </td>
@@ -148,6 +153,7 @@
                                             <input 
                                                 type="number" 
                                                 v-model="row.targetSpeed" 
+                                                min="0"
                                                 class="w-20 px-2 py-1 border border-gray-300 rounded text-sm text-center"
                                             >
                                         </td>
@@ -155,6 +161,7 @@
                                             <input 
                                                 type="number" 
                                                 v-model="row.speedAdjust" 
+                                                min="0"
                                                 class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
                                             >
                                         </td>
@@ -347,16 +354,52 @@ const totalConv2 = computed(() => {
         .reduce((sum, row) => sum + (parseInt(row.noUp2) || 0), 0);
 });
 
+const clampNonNegative = (value) => {
+    const num = parseFloat(value);
+    if (isNaN(num) || num < 0) {
+        return 0;
+    }
+    return num;
+};
+
 // Watch for changes in setup and speed to calculate net values
 watch(mspRows, (newRows) => {
     newRows.forEach(row => {
+        // Clamp base numeric fields to minimum 0
+        if (row.pDay !== null && row.pDay !== undefined) {
+            row.pDay = clampNonNegative(row.pDay);
+        }
+        if (row.noUp1 !== null && row.noUp1 !== undefined) {
+            row.noUp1 = clampNonNegative(row.noUp1);
+        }
+        if (row.noUp2 !== null && row.noUp2 !== undefined) {
+            row.noUp2 = clampNonNegative(row.noUp2);
+        }
+        if (row.setupMin !== null && row.setupMin !== undefined) {
+            row.setupMin = clampNonNegative(row.setupMin);
+        }
+        if (row.setupAdjust !== null && row.setupAdjust !== undefined) {
+            row.setupAdjust = clampNonNegative(row.setupAdjust);
+        }
+        if (row.targetSpeed !== null && row.targetSpeed !== undefined) {
+            row.targetSpeed = clampNonNegative(row.targetSpeed);
+        }
+        if (row.speedAdjust !== null && row.speedAdjust !== undefined) {
+            row.speedAdjust = clampNonNegative(row.speedAdjust);
+        }
+
         // Calculate Net Min
         if (row.setupMin !== null && row.setupAdjust !== null) {
-            row.netMin = (parseFloat(row.setupMin) || 0) + (parseFloat(row.setupAdjust) || 0);
+            const setupMinVal = clampNonNegative(row.setupMin);
+            const setupAdjustVal = clampNonNegative(row.setupAdjust);
+            row.netMin = setupMinVal + setupAdjustVal;
         }
+
         // Calculate Net Speed
         if (row.targetSpeed !== null && row.speedAdjust !== null) {
-            row.netSpeed = (parseFloat(row.targetSpeed) || 0) + (parseFloat(row.speedAdjust) || 0);
+            const targetSpeedVal = clampNonNegative(row.targetSpeed);
+            const speedAdjustVal = clampNonNegative(row.speedAdjust);
+            row.netSpeed = targetSpeedVal + speedAdjustVal;
         }
     });
 }, { deep: true });
