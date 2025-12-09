@@ -681,16 +681,10 @@ const salesManagementItems = [
     title: 'Sales Order',
     icon: 'fas fa-file-invoice-dollar',
     children: [
-      {
-        title: 'Transaction',
-        icon: 'fas fa-exchange-alt',
-        children: [
-          { title: 'Prepare MC SO', icon: 'fas fa-file-invoice', route: '/sales-order/transaction/prepare-mc-so' },
-          { title: 'Print SO', icon: 'fas fa-print', route: '/sales-order/transaction/print-so' },
-          { title: 'Cancel SO', icon: 'fas fa-times-circle', route: '/sales-order/transaction/cancel-so' },
-          { title: 'Amend SO', icon: 'fas fa-edit', route: '/sales-order/transaction/amend-so' },
-        ]
-      },
+      { title: 'Prepare MC SO', icon: 'fas fa-file-invoice', route: '/sales-order/transaction/prepare-mc-so' },
+      { title: 'Print SO', icon: 'fas fa-print', route: '/sales-order/transaction/print-so' },
+      { title: 'Cancel SO', icon: 'fas fa-times-circle', route: '/sales-order/transaction/cancel-so' },
+      { title: 'Amend SO', icon: 'fas fa-edit', route: '/sales-order/transaction/amend-so' },
     ]
   },
     {
