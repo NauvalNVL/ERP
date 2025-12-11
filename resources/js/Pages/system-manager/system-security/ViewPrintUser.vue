@@ -87,6 +87,14 @@
                                                 Position
                                             </div>
                                         </th>
+                                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                            <div class="flex items-center">
+                                                <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
+                                                    <CheckCircleIcon class="h-4 w-4 text-white" />
+                                                </div>
+                                                Status
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
@@ -132,6 +140,20 @@
                                             <span class="inline-flex items-center px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300 shadow-md">
                                                 <BriefcaseIcon class="h-4 w-4 mr-2" />
                                                 {{ user.officialTitle || 'No Position' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
+                                            <span
+                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm"
+                                                :class="user.status === 'Active'
+                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                                    : 'bg-rose-50 text-rose-700 border-rose-300'"
+                                            >
+                                                <span
+                                                    class="inline-block w-2 h-2 rounded-full mr-2"
+                                                    :class="user.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'"
+                                                />
+                                                {{ user.status }}
                                             </span>
                                         </td>
                                     </tr>
