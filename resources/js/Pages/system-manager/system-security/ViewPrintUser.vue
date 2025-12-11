@@ -33,14 +33,6 @@
                                     <PrinterIcon class="h-5 w-5 mr-2" />
                                     Print
                                 </button>
-                                <button
-                                    @click="exportUsers"
-                                    class="inline-flex items-center px-3 py-2 bg-indigo-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Export Users"
-                                >
-                                    <DocumentArrowDownIcon class="h-5 w-5 mr-2" />
-                                    Export
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -95,14 +87,6 @@
                                                 Position
                                             </div>
                                         </th>
-                                        <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                            <div class="flex items-center justify-end">
-                                                <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
-                                                    <DocumentTextIcon class="h-4 w-4 text-white" />
-                                                </div>
-                                                Actions
-                                            </div>
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
@@ -149,15 +133,6 @@
                                                 <BriefcaseIcon class="h-4 w-4 mr-2" />
                                                 {{ user.officialTitle || 'No Position' }}
                                             </span>
-                                        </td>
-                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-right text-xs md:text-sm font-medium">
-                                            <button
-                                                @click.stop="selectUser(user)"
-                                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-                                            >
-                                                <DocumentTextIcon class="h-4 w-4 mr-2" />
-                                                View Details
-                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>
