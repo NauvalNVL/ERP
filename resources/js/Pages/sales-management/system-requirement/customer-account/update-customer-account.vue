@@ -31,7 +31,7 @@
 					</div>
 					<h3 class="text-base sm:text-lg font-semibold text-gray-800">Find Customer</h3>
 				</div>
-				
+
 				<!-- Search Section -->
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 					<div class="md:col-span-2">
@@ -70,7 +70,7 @@
 				  </div>
 				  <h3 class="text-sm sm:text-base font-semibold text-gray-800">Information</h3>
 				</div>
-				
+
 				<div class="text-gray-700 mb-4 text-sm">
 				  Use this form to update customer account data. Make sure all information entered is correct and complete.
 				</div>
@@ -85,7 +85,7 @@
 				  </ul>
 				</div>
 			  </div>
-			
+
 			  <!-- Quick Links Card -->
 			  <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-4 sm:p-5">
 				<div class="flex items-center mb-3 pb-2 border-b border-violet-100">
@@ -1109,32 +1109,38 @@ const saveCustomerAccount = async () => {
             showNotification('Customer account saved successfully', 'success')
             showEditModal.value = false
 
-            // Reload customer accounts to get the latest data
             await loadCustomerAccounts()
         } else {
             throw new Error(response.data?.message || 'No data returned from the server')
         }
     } catch (error) {
         console.error('Error saving customer account:', error)
-        let errorMessage = 'Failed to save customer account'
+        let errorMessage = 'Failed to save customer account.'
 
         if (error.response) {
-            // Handle validation errors
-            if (error.response.status === 422 && error.response.data.errors) {
-                // Log detailed validation errors for debugging
-                console.error('Validation errors:', error.response.data.errors)
+            if (error.response.status === 422) {
+                const errors = error.response.data?.errors
+                const prioritizedFields = ['salesperson_code', 'industrial_code', 'geographical', 'grouping_code']
+                for (const field of prioritizedFields) {
+                    const msg = errors?.[field]?.[0]
+                    if (msg) {
+                        errorMessage = msg
+                        break
+                    }
+                }
 
-                // Format validation errors for display
-                const validationErrors = Object.entries(error.response.data.errors).map(([field, messages]) => {
-                    return `${field}: ${messages.join(', ')}`;
-                });
-
-                errorMessage += ': ' + validationErrors.join(' | ')
-            } else if (error.response.data.message) {
-                errorMessage += ': ' + error.response.data.message
+                if (errorMessage === 'Failed to save customer account.' && errors && Object.keys(errors).length > 0) {
+                    const firstField = Object.keys(errors)[0]
+                    const firstMsg = errors[firstField]?.[0]
+                    if (firstMsg) errorMessage = firstMsg
+                } else if (errorMessage === 'Failed to save customer account.' && error.response.data?.message) {
+                    errorMessage = error.response.data.message
+                }
+            } else if (error.response.data?.message) {
+                errorMessage = error.response.data.message
             }
         } else if (error.message) {
-            errorMessage += ': ' + error.message
+            errorMessage = error.message
         }
 
         showNotification(errorMessage, 'error')
@@ -1145,7 +1151,8 @@ const saveCustomerAccount = async () => {
 
 // Save new customer account function
 const saveNewCustomerAccount = async () => {
-    // Basic validation
+    // ...
+
     if (!newCustomerForm.customer_code.trim()) {
         showNotification('Customer code is required', 'warning')
         return
@@ -1156,7 +1163,6 @@ const saveNewCustomerAccount = async () => {
         return
     }
 
-    // Email validation if provided
     if (newCustomerForm.co_email && newCustomerForm.co_email.trim()) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(newCustomerForm.co_email)) {
@@ -1165,7 +1171,6 @@ const saveNewCustomerAccount = async () => {
         }
     }
 
-    // Check if customer code already exists
     const existingCustomer = customers.value.find(c => c.customer_code === newCustomerForm.customer_code.trim())
     if (existingCustomer) {
         showNotification('Customer code already exists. Please use a different code.', 'warning')
@@ -1175,30 +1180,24 @@ const saveNewCustomerAccount = async () => {
     isSaving.value = true
 
     try {
-        // Create a copy of the form data to send to the API
+        // ...
         const customerData = { ...newCustomerForm }
 
-        // Ensure numeric fields are properly formatted
         if (customerData.credit_limit) {
-            customerData.credit_limit = parseFloat(customerData.credit_limit);
+            customerData.credit_limit = parseFloat(customerData.credit_limit)
         }
 
         if (customerData.credit_terms) {
-            customerData.credit_terms = parseInt(customerData.credit_terms);
+            customerData.credit_terms = parseInt(customerData.credit_terms)
         }
 
-        console.log('Creating new customer:', customerData);
-
-        const response = await axios.post('/api/customer-accounts', customerData);
+        const response = await axios.post('/api/customer-accounts', customerData)
 
         if (response.data && response.status >= 200 && response.status < 300) {
             showNotification('New customer account created successfully', 'success')
             closeAddNewCustomerModal()
-
-            // Reload customer accounts to get the latest data
             await loadCustomerAccounts()
 
-            // Clear the form
             Object.assign(newCustomerForm, {
                 customer_code: '',
                 customer_name: '',
@@ -1227,25 +1226,32 @@ const saveNewCustomerAccount = async () => {
         }
     } catch (error) {
         console.error('Error creating new customer account:', error)
-        let errorMessage = 'Failed to create new customer account'
+        let errorMessage = 'Failed to create new customer account.'
 
         if (error.response) {
-            // Handle validation errors
-            if (error.response.status === 422 && error.response.data.errors) {
-                // Log detailed validation errors for debugging
-                console.error('Validation errors:', error.response.data.errors)
+            if (error.response.status === 422) {
+                const errors = error.response.data?.errors
+                const prioritizedFields = ['salesperson_code', 'industrial_code', 'geographical', 'grouping_code']
+                for (const field of prioritizedFields) {
+                    const msg = errors?.[field]?.[0]
+                    if (msg) {
+                        errorMessage = msg
+                        break
+                    }
+                }
 
-                // Format validation errors for display
-                const validationErrors = Object.entries(error.response.data.errors).map(([field, messages]) => {
-                    return `${field}: ${messages.join(', ')}`;
-                });
-
-                errorMessage += ': ' + validationErrors.join(' | ')
-            } else if (error.response.data.message) {
-                errorMessage += ': ' + error.response.data.message
+                if (errorMessage === 'Failed to create new customer account.' && errors && Object.keys(errors).length > 0) {
+                    const firstField = Object.keys(errors)[0]
+                    const firstMsg = errors[firstField]?.[0]
+                    if (firstMsg) errorMessage = firstMsg
+                } else if (errorMessage === 'Failed to create new customer account.' && error.response.data?.message) {
+                    errorMessage = error.response.data.message
+                }
+            } else if (error.response.data?.message) {
+                errorMessage = error.response.data.message
             }
         } else if (error.message) {
-            errorMessage += ': ' + error.message
+            errorMessage = error.message
         }
 
         showNotification(errorMessage, 'error')
