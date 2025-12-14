@@ -318,24 +318,32 @@ const updateMillimeters = () => {
     }
 };
 
-// Watch for changes in search query to help user find a size
+// Watch for changes in search query to filter/select data
+// Catatan: jangan mengubah kembali nilai searchQuery di sini,
+// supaya user tetap bisa menghapus / mengedit teks secara bebas.
 watch(searchQuery, (newQuery) => {
-    // If user clears the field, also clear current selection
-    if (!newQuery) {
-        selectedSize.value = null;
+    if (!newQuery || paperSizes.value.length === 0) {
+        // Jika input dikosongkan, jangan paksa pilih apa pun
         return;
     }
 
-    if (paperSizes.value.length > 0) {
-        const foundSize = paperSizes.value.find(size =>
-            String(size.id).includes(newQuery) ||
-            String(size.millimeter).includes(newQuery)
-        );
+    const query = String(newQuery).toLowerCase();
 
-        if (foundSize) {
-            // Only update selectedSize so input value remains under user control
-            selectedSize.value = foundSize;
-        }
+    const foundSize = paperSizes.value.find((size) => {
+        const idStr = String(size.id);
+        const mmStr = String(size.millimeter ?? '').toLowerCase();
+        const codeStr = `PS${idStr.padStart(3, '0')}`.toLowerCase();
+
+        return (
+            idStr.includes(query) ||
+            mmStr.includes(query) ||
+            codeStr.includes(query)
+        );
+    });
+
+    if (foundSize) {
+        // Hanya update selectedSize, biarkan teks yang diketik user tetap apa adanya
+        selectSize(foundSize);
     }
 });
 
@@ -371,16 +379,22 @@ onMounted(() => {
 });
 
 const onPaperSizeSelected = (size) => {
-    selectSize(size);
+    // Dari modal: update selection + isi textbox dengan nilai yang dipilih
+    selectSize(size, { updateSearch: true });
     showModal.value = false;
 
     // Automatically open the edit modal for the selected row
     editSelectedSize();
 };
 
-const selectSize = (size) => {
+const selectSize = (size, options = {}) => {
+    const { updateSearch = false } = options;
+
     selectedSize.value = size;
-    searchQuery.value = size.millimeter;
+
+    if (updateSearch) {
+        searchQuery.value = String(size.millimeter ?? '');
+    }
 };
 
 const editSelectedSize = () => {
@@ -454,11 +468,11 @@ const savePaperSize = async () => {
         // Show success notification
         if (isCreating.value) {
             showNotification('Paper size created successfully', 'success');
-            // Find and select the newly created size
+            // Find and select the newly created size, serta isi textbox dengan kode barunya
             if (result.id) {
                 const newSize = paperSizes.value.find(s => s.id === result.id);
                 if (newSize) {
-                    selectSize(newSize);
+                    selectSize(newSize, { updateSearch: true });
                 }
             }
         } else {
