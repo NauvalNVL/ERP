@@ -803,6 +803,11 @@ Route::get('/warehouse-management/invoice/iv-processing/view-print-invoice-log',
 return Inertia::render('warehouse-management/Invoice/IVProcessing/InvoiceLog');
 })->name('vue.warehouse-management.invoice.iv-processing.view-print-invoice-log');
 
+// Warehouse Management - Invoice - Tax DJP - Input No Faktur
+Route::get('/warehouse-management/invoice/tax-djp/input-no-faktur', function () {
+return Inertia::render('warehouse-management/Invoice/TaxDJP/InputNoFaktur');
+})->name('vue.warehouse-management.invoice.tax-djp.input-no-faktur');
+
 // Warehouse Management - Invoice - Tax DJP - Export to Coretax
 Route::get('/warehouse-management/invoice/tax-djp/export-to-coretax', function () {
 return Inertia::render('warehouse-management/Invoice/TaxDJP/ExportToCoretax');

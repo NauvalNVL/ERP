@@ -246,7 +246,9 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_glueing_material' ||
     menuKey === 'obsolete_unobsolete_tax_type' ||
     menuKey === 'obsolete_unobsolete_tax_group' ||
-    menuKey === 'obsolete_unobsolete_customer_sales_tax_index'
+    menuKey === 'obsolete_unobsolete_customer_sales_tax_index' ||
+    menuKey === 'input_no_faktur' ||
+    menuKey === 'export_to_coretax'
   ) {
     return true;
   }
@@ -524,6 +526,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Invoice Log': 'view_print_invoice_log',
 
     // Warehouse Management - Tax DJP
+    'Input No Faktur': 'input_no_faktur',
     'Export to Coretax': 'export_to_coretax'
   };
 
@@ -764,6 +767,7 @@ const warehouseManagementItems = [
         title: 'Tax DJP',
         icon: 'fas fa-file-export',
         children: [
+          { title: 'Input No Faktur', icon: 'fas fa-receipt', route: '/warehouse-management/invoice/tax-djp/input-no-faktur' },
           { title: 'Export to Coretax', icon: 'fas fa-cloud-upload-alt', route: '/warehouse-management/invoice/tax-djp/export-to-coretax' },
         ]
       },

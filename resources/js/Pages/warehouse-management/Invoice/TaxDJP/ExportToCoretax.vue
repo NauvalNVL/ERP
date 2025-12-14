@@ -21,7 +21,7 @@
 
     <!-- Step Indicator -->
     <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between max-w-2xl mx-auto">
         <div :class="['flex items-center gap-2', currentStep >= 1 ? 'text-emerald-600' : 'text-gray-400']">
           <div :class="['w-8 h-8 rounded-full flex items-center justify-center font-bold', currentStep >= 1 ? 'bg-emerald-600 text-white' : 'bg-gray-200']">1</div>
           <span class="font-medium">Select Invoices</span>
@@ -31,13 +31,6 @@
         </div>
         <div :class="['flex items-center gap-2', currentStep >= 2 ? 'text-emerald-600' : 'text-gray-400']">
           <div :class="['w-8 h-8 rounded-full flex items-center justify-center font-bold', currentStep >= 2 ? 'bg-emerald-600 text-white' : 'bg-gray-200']">2</div>
-          <span class="font-medium">Fill Tax Data</span>
-        </div>
-        <div class="flex-1 h-1 mx-4 bg-gray-200">
-          <div :class="['h-full transition-all', currentStep >= 3 ? 'bg-emerald-600' : 'bg-gray-200']" :style="`width: ${currentStep >= 3 ? '100%' : '0%'}`"></div>
-        </div>
-        <div :class="['flex items-center gap-2', currentStep >= 3 ? 'text-emerald-600' : 'text-gray-400']">
-          <div :class="['w-8 h-8 rounded-full flex items-center justify-center font-bold', currentStep >= 3 ? 'bg-emerald-600 text-white' : 'bg-gray-200']">3</div>
           <span class="font-medium">Preview & Export</span>
         </div>
       </div>
@@ -165,244 +158,25 @@
           <span class="font-semibold">{{ selectedInvoices.length }}</span> invoice(s) selected
         </p>
         <button
-          @click="proceedToTaxData"
-          :disabled="selectedInvoices.length === 0"
+          @click="proceedToPreview"
+          :disabled="selectedInvoices.length === 0 || loading"
           class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Next: Fill Tax Data
-          <i class="fas fa-arrow-right" />
+          <i v-if="loading" class="fas fa-spinner fa-spin" />
+          <i v-else class="fas fa-file-code" />
+          {{ loading ? 'Generating...' : 'Generate XML' }}
         </button>
       </div>
     </div>
 
-    <!-- Step 2: Tax Data Form -->
-    <div v-show="currentStep === 2" class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <i class="fas fa-file-alt text-emerald-600" />
-        Step 2: Fill Tax Invoice Data
-      </h3>
-
-      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-        <div class="flex items-start gap-3">
-          <i class="fas fa-info-circle text-blue-600 mt-1" />
-          <div class="text-sm text-blue-800">
-            <p class="font-medium mb-1">Filling Options:</p>
-            <ul class="list-disc ml-5 space-y-1">
-              <li><strong>Apply to All:</strong> Fill data once and apply to all {{ selectedInvoices.length }} selected invoices</li>
-              <li><strong>Per Invoice:</strong> Customize data for each invoice individually (click "Customize Per Invoice" button)</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Global Tax Form -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Tax Invoice Date <span class="text-red-500">*</span>
-          </label>
-          <input
-            v-model="globalTaxData.TaxInvoiceDate"
-            type="date"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            required
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Tax Invoice Option <span class="text-red-500">*</span>
-          </label>
-          <select v-model="globalTaxData.TaxInvoiceOpt" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-            <option value="1">1 - Normal</option>
-            <option value="2">2 - Pembetulan</option>
-            <option value="3">3 - Retur</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Transaction Code <span class="text-red-500">*</span>
-          </label>
-          <select v-model="globalTaxData.TrxCode" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-            <option value="01">01 - Penyerahan kepada selain pemungut PPN</option>
-            <option value="02">02 - Penyerahan kepada pemungut bendaharawan</option>
-            <option value="03">03 - Penyerahan kepada pemungut lainnya</option>
-            <option value="04">04 - DPP nilai lain</option>
-            <option value="05">05 - Penyerahan yang PPN-nya tidak dipungut</option>
-            <option value="06">06 - Penyerahan yang PPN-nya dibebaskan</option>
-            <option value="07">07 - Penyerahan aktiva pasal 16D (tidak dipungut PPN)</option>
-            <option value="08">08 - Penyerahan untuk dibebaskan PPN</option>
-            <option value="09">09 - Penyerahan aktiva (pasal 16D) UU PPN</option>
-          </select>
-        </div>
-
-        <div class="md:col-span-2 lg:col-span-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Additional Information
-          </label>
-          <input
-            v-model="globalTaxData.AddInfo"
-            type="text"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="Optional additional information"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Custom Document Number
-          </label>
-          <input
-            v-model="globalTaxData.CustomDoc"
-            type="text"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="e.g., BC 2.0 number"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Custom Doc Month/Year
-          </label>
-          <input
-            v-model="globalTaxData.CustomDocMonthYear"
-            type="text"
-            maxlength="6"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="MMYYYY (e.g., 122024)"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Reference Description
-          </label>
-          <input
-            v-model="globalTaxData.RefDesc"
-            type="text"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="Reference"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Facility Stamp
-          </label>
-          <input
-            v-model="globalTaxData.FacilityStamp"
-            type="text"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="Stamp code"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Buyer Email
-          </label>
-          <input
-            v-model="globalTaxData.BuyerEmail"
-            type="email"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="customer@email.com"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Seller IDTKU
-          </label>
-          <input
-            v-model="globalTaxData.SellerIDTKU"
-            type="text"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-            placeholder="Seller ID TKU"
-          />
-        </div>
-      </div>
-
-      <!-- Goods/Service Default Settings -->
-      <div class="border-t pt-6 mb-6">
-        <h4 class="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <i class="fas fa-box text-emerald-600" />
-          Goods/Service Default Settings
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              VAT Rate (%)
-            </label>
-            <input
-              v-model.number="globalTaxData.VATRate"
-              type="number"
-              step="0.01"
-              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-              placeholder="11"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              STLG Rate (%)
-            </label>
-            <input
-              v-model.number="globalTaxData.STLGRate"
-              type="number"
-              step="0.01"
-              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-              placeholder="0"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Goods/Service Opt
-            </label>
-            <select v-model="globalTaxData.GoodsOpt" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-              <option value="1">1 - Barang</option>
-              <option value="2">2 - Jasa</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-between items-center">
-        <button
-          @click="currentStep = 1"
-          class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
-        >
-          <i class="fas fa-arrow-left" />
-          Back
-        </button>
-        <div class="flex gap-3">
-          <button
-            @click="showPerInvoiceModal = true"
-            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <i class="fas fa-edit" />
-            Customize Per Invoice
-          </button>
-          <button
-            @click="proceedToPreview"
-            class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 flex items-center gap-2"
-          >
-            Generate XML
-            <i class="fas fa-arrow-right" />
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Preview & Export -->
-    <div v-show="currentStep === 3" class="space-y-6">
+    <!-- Step 2: Preview & Export -->
+    <div v-show="currentStep === 2" class="space-y-6">
       <!-- Summary Card -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <i class="fas fa-clipboard-check text-emerald-600" />
-            Step 3: Preview & Export XML
+            Step 2: Preview & Export XML
           </h3>
           <div class="flex gap-3">
             <button
@@ -455,11 +229,11 @@
 
         <div class="flex justify-between items-center mt-6">
           <button
-            @click="currentStep = 2"
+            @click="currentStep = 1"
             class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
           >
             <i class="fas fa-arrow-left" />
-            Back to Edit
+            Back to Selection
           </button>
           <button
             @click="resetAll"
@@ -643,9 +417,14 @@ const fetchInvoices = async () => {
     if (filters.value.customerCode) params.append('customer_code', filters.value.customerCode);
     if (filters.value.status) params.append('status', filters.value.status);
 
-    const response = await fetch(`/api/invoices/tax-export?${params.toString()}`);
+    const response = await fetch(`/api/invoices/coretax/invoices?${params.toString()}`);
     const data = await response.json();
-    invoices.value = data.data || data;
+    
+    if (data.success) {
+      invoices.value = data.data || [];
+    } else {
+      showMessage(data.message || 'Error fetching invoices', 'error');
+    }
   } catch (error) {
     console.error('Error fetching invoices:', error);
     showMessage('Error fetching invoices', 'error');
@@ -683,13 +462,42 @@ const proceedToTaxData = () => {
   currentStep.value = 2;
 };
 
-const proceedToPreview = () => {
-  if (!globalTaxData.value.TaxInvoiceDate) {
-    showMessage('Please fill Tax Invoice Date', 'error');
+const proceedToPreview = async () => {
+  if (selectedInvoices.value.length === 0) {
+    showMessage('Please select at least one invoice', 'error');
     return;
   }
-  generateXML();
-  currentStep.value = 3;
+  
+  loading.value = true;
+  try {
+    // Call backend to generate XML automatically from invoice data
+    const invoiceNumbers = selectedInvoices.value.map(inv => inv.IV_NUM);
+    const response = await fetch('/api/invoices/coretax/generate-xml', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        invoice_numbers: invoiceNumbers
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      generatedXML.value = data.data.xml;
+      showMessage(`XML generated successfully for ${data.data.invoice_count} invoice(s)`, 'success');
+      currentStep.value = 2;
+    } else {
+      showMessage(data.message || 'Failed to generate XML', 'error');
+    }
+  } catch (error) {
+    console.error('Error generating XML:', error);
+    showMessage('Error generating XML', 'error');
+  } finally {
+    loading.value = false;
+  }
 };
 
 const getInvoiceTaxData = (invoiceNum) => {
@@ -709,67 +517,10 @@ const applyPerInvoiceCustomization = () => {
   showMessage('Customizations applied', 'success');
 };
 
+// XML generation is now handled by backend ExportToCoretaxController
+// This function is kept for reference but no longer used
 const generateXML = () => {
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<TaxInvoiceBulk>\n';
-  xml += `  <TIN>${globalTaxData.value.TIN || ''}</TIN>\n`;
-  xml += '  <ListOfTaxInvoice>\n';
-
-  selectedInvoices.value.forEach(invoice => {
-    const taxData = perInvoiceTaxData.value[invoice.IV_NUM] || globalTaxData.value;
-    const customer = invoice.customer || {};
-    
-    xml += '    <TaxInvoice>\n';
-    xml += `      <TaxInvoiceDate>${taxData.TaxInvoiceDate}</TaxInvoiceDate>\n`;
-    xml += `      <TaxInvoiceOpt>${taxData.TaxInvoiceOpt}</TaxInvoiceOpt>\n`;
-    xml += `      <TrxCode>${taxData.TrxCode}</TrxCode>\n`;
-    xml += `      <AddInfo>${taxData.AddInfo || ''}</AddInfo>\n`;
-    xml += `      <CustomDoc>${taxData.CustomDoc || ''}</CustomDoc>\n`;
-    xml += `      <CustomDocMonthYear>${taxData.CustomDocMonthYear || ''}</CustomDocMonthYear>\n`;
-    xml += `      <RefDesc>${taxData.RefDesc || invoice.IV_SECOND_REF || ''}</RefDesc>\n`;
-    xml += `      <FacilityStamp>${taxData.FacilityStamp || ''}</FacilityStamp>\n`;
-    xml += `      <SellerIDTKU>${taxData.SellerIDTKU || ''}</SellerIDTKU>\n`;
-    xml += `      <BuyerTin>${customer.NPWP || ''}</BuyerTin>\n`;
-    xml += `      <BuyerDocument>NPWP</BuyerDocument>\n`;
-    xml += `      <BuyerCountry>ID</BuyerCountry>\n`;
-    xml += `      <BuyerDocumentNumber>${customer.NPWP || ''}</BuyerDocumentNumber>\n`;
-    xml += `      <BuyerName>${invoice.AC_NAME || ''}</BuyerName>\n`;
-    xml += `      <BuyerAdress>${[customer.ADDRESS1, customer.ADDRESS2, customer.ADDRESS3].filter(Boolean).join(', ')}</BuyerAdress>\n`;
-    xml += `      <BuyerEmail>${taxData.BuyerEmail || customer.EMAIL || ''}</BuyerEmail>\n`;
-    xml += `      <BuyerIDTKU></BuyerIDTKU>\n`;
-    xml += '      <ListOfGoodService>\n';
-
-    // Add invoice line item
-    const amount = parseFloat(invoice.IV_TRAN_AMT) || 0;
-    const qty = parseFloat(invoice.IV_QTY) || 1;
-    const price = parseFloat(invoice.IV_UNIT_PRICE) || amount / qty;
-    const vatRate = taxData.VATRate || parseFloat(invoice.IV_TAX_PERCENT) || 11;
-    const vat = amount * vatRate / 100;
-
-    xml += '        <GoodService>\n';
-    xml += `          <Opt>${taxData.GoodsOpt}</Opt>\n`;
-    xml += `          <Code>${invoice.PRODUCT || ''}</Code>\n`;
-    xml += `          <Name>${invoice.MODEL || ''}</Name>\n`;
-    xml += `          <Unit>${invoice.UNIT || 'PCS'}</Unit>\n`;
-    xml += `          <Price>${price.toFixed(2)}</Price>\n`;
-    xml += `          <Qty>${qty}</Qty>\n`;
-    xml += `          <TotalDiscount>0</TotalDiscount>\n`;
-    xml += `          <TaxBase>${amount.toFixed(2)}</TaxBase>\n`;
-    xml += `          <OtherTaxBase>0</OtherTaxBase>\n`;
-    xml += `          <VATRate>${vatRate}</VATRate>\n`;
-    xml += `          <VAT>${vat.toFixed(2)}</VAT>\n`;
-    xml += `          <STLGRate>${taxData.STLGRate || 0}</STLGRate>\n`;
-    xml += `          <STLG>0</STLG>\n`;
-    xml += '        </GoodService>\n';
-
-    xml += '      </ListOfGoodService>\n';
-    xml += '    </TaxInvoice>\n';
-  });
-
-  xml += '  </ListOfTaxInvoice>\n';
-  xml += '</TaxInvoiceBulk>';
-
-  generatedXML.value = xml;
+  console.log('XML generation is now handled by backend');
 };
 
 const downloadXML = () => {
