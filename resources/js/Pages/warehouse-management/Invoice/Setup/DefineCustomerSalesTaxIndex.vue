@@ -482,7 +482,6 @@ const handleSave = async () => {
 
 // Handle delete (mark as obsolete in UI wording, backend still deletes record)
 const handleDelete = async () => {
-<<<<<<< HEAD
     const confirmResult = await Swal.fire({
         icon: 'warning',
         title: 'Confirm Delete',
@@ -494,9 +493,6 @@ const handleDelete = async () => {
     });
 
     if (!confirmResult.isConfirmed) {
-=======
-    if (!confirm('Are you sure you want to obsolete this tax index?')) {
->>>>>>> 382db43783ab3609c34179ae915cb487038fee98
         return;
     }
 
@@ -506,11 +502,10 @@ const handleDelete = async () => {
         );
 
         if (response.data.success) {
-<<<<<<< HEAD
+
             await Swal.fire({
                 icon: 'success',
                 title: 'Deleted',
-                text: 'Tax index deleted successfully!'
             });
             handleCancel();
         }
@@ -521,18 +516,10 @@ const handleDelete = async () => {
             title: 'Delete Failed',
             text: 'Failed to delete: ' + (error.response?.data?.message || error.message)
         });
-=======
+
             alert('Tax index obsoleted successfully!');
             handleCancel();
         }
-    } catch (error) {
-        console.error('Error obsoleting tax index:', error);
-        alert('Failed to obsolete tax index: ' + (error.response?.data?.message || error.message));
->>>>>>> 382db43783ab3609c34179ae915cb487038fee98
-    }
-};
-
-// Handle cancel
 const handleCancel = () => {
     form.value = {
         customer_code: '',

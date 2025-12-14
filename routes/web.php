@@ -803,6 +803,11 @@ Route::get('/warehouse-management/invoice/iv-processing/view-print-invoice-log',
 return Inertia::render('warehouse-management/Invoice/IVProcessing/InvoiceLog');
 })->name('vue.warehouse-management.invoice.iv-processing.view-print-invoice-log');
 
+// Warehouse Management - Invoice - Tax DJP - Export to Coretax
+Route::get('/warehouse-management/invoice/tax-djp/export-to-coretax', function () {
+return Inertia::render('warehouse-management/Invoice/TaxDJP/ExportToCoretax');
+})->name('vue.warehouse-management.invoice.tax-djp.export-to-coretax');
+
 // Backward-compatibility alias (old menu path)
 Route::get('/warehouse-management/invoice/iv-processing/prepare-do-current', function () {
 return redirect()->route('vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period');

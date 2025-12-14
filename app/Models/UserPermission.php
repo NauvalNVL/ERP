@@ -1081,6 +1081,15 @@ class UserPermission extends Model
                 'route' => '/warehouse-management/invoice/iv-processing/view-print-invoice-log',
                 'category' => 'warehouse_management',
                 'parent' => 'warehouse_management'
+            ],
+            
+            // Tax DJP
+            [
+                'key' => 'export_to_coretax',
+                'name' => 'Export to Coretax',
+                'route' => '/warehouse-management/invoice/tax-djp/export-to-coretax',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
             ]
         ];
     }

@@ -2859,4 +2859,119 @@ class InvoiceController extends Controller
         ];
     }
 
+    /**
+     * Get invoices for tax export (Coretax XML generation)
+     * Fetches invoices with customer details including NPWP and address
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getInvoicesForTaxExport(Request $request)
+    {
+        try {
+            $month = $request->input('month');
+            $year = $request->input('year');
+            $customerCode = $request->input('customer_code');
+            $status = $request->input('status');
+
+            Log::info('Tax Export Invoice Request', [
+                'month' => $month,
+                'year' => $year,
+                'customer_code' => $customerCode,
+                'status' => $status
+            ]);
+
+            // Build query with customer join
+            $query = DB::table('INV')
+                ->leftJoin('CUSTOMER', 'INV.AC_NUM', '=', 'CUSTOMER.CODE')
+                ->select([
+                    'INV.*',
+                    'CUSTOMER.NPWP',
+                    'CUSTOMER.ADDRESS1',
+                    'CUSTOMER.ADDRESS2',
+                    'CUSTOMER.ADDRESS3',
+                    'CUSTOMER.EMAIL',
+                    'CUSTOMER.TEL_NO',
+                    'CUSTOMER.FAX_NO'
+                ]);
+
+            // Apply filters
+            if ($month) {
+                $query->where('INV.MM', str_pad($month, 2, '0', STR_PAD_LEFT));
+            }
+
+            if ($year) {
+                $query->where('INV.YYYY', $year);
+            }
+
+            if ($customerCode) {
+                $query->where('INV.AC_NUM', $customerCode);
+            }
+
+            if ($status) {
+                $query->where('INV.IV_STS', $status);
+            }
+
+            // Get invoices
+            $invoices = $query->orderBy('INV.IV_NUM', 'DESC')->get();
+
+            // Transform data for frontend
+            $invoices = $invoices->map(function ($invoice) {
+                return [
+                    'IV_NUM' => $invoice->IV_NUM,
+                    'YYYY' => $invoice->YYYY,
+                    'MM' => $invoice->MM,
+                    'IV_DMY' => $invoice->IV_DMY,
+                    'IV_STS' => $invoice->IV_STS,
+                    'AC_NUM' => $invoice->AC_NUM,
+                    'AC_NAME' => $invoice->AC_NAME,
+                    'IV_SECOND_REF' => $invoice->IV_SECOND_REF,
+                    'SO_NUM' => $invoice->SO_NUM,
+                    'PO_NUM' => $invoice->PO_NUM,
+                    'MODEL' => $invoice->MODEL,
+                    'PRODUCT' => $invoice->PRODUCT,
+                    'UNIT' => $invoice->UNIT,
+                    'IV_QTY' => $invoice->IV_QTY,
+                    'IV_UNIT_PRICE' => $invoice->IV_UNIT_PRICE,
+                    'IV_TRAN_AMT' => $invoice->IV_TRAN_AMT,
+                    'IV_BASE_AMT' => $invoice->IV_BASE_AMT,
+                    'IV_TAX_CODE' => $invoice->IV_TAX_CODE,
+                    'IV_TAX_PERCENT' => $invoice->IV_TAX_PERCENT,
+                    'IV_REMARK' => $invoice->IV_REMARK,
+                    'CURR' => $invoice->CURR,
+                    'EX_RATE' => $invoice->EX_RATE,
+                    'customer' => [
+                        'NPWP' => $invoice->NPWP,
+                        'ADDRESS1' => $invoice->ADDRESS1,
+                        'ADDRESS2' => $invoice->ADDRESS2,
+                        'ADDRESS3' => $invoice->ADDRESS3,
+                        'EMAIL' => $invoice->EMAIL,
+                        'TEL_NO' => $invoice->TEL_NO,
+                        'FAX_NO' => $invoice->FAX_NO,
+                    ]
+                ];
+            });
+
+            Log::info('Tax Export Invoices Retrieved', [
+                'count' => $invoices->count()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $invoices
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching invoices for tax export: ' . $e->getMessage(), [
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to fetch invoices for tax export',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

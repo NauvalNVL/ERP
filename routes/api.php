@@ -239,6 +239,9 @@ Route::prefix('invoices')->group(function () {
         Route::put('/{invoiceNo}', [InvoiceController::class, 'update']); // Update invoice (Amend Invoice)
     });
 
+    // Tax export endpoint for Coretax XML generation
+    Route::get('/tax-export', [InvoiceController::class, 'getInvoicesForTaxExport']);
+
 // Tax Type API routes (CPS-style Define Tax Type) - MUST be before wildcard routes
 Route::get('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);
 Route::post('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'store']);
