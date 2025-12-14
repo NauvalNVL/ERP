@@ -370,30 +370,47 @@ onMounted(() => {
 
 // Search for industry code
 const searchIndustryCode = () => {
-    if (!industryCode.value) {
+    const input = String(industryCode.value || '').trim();
+
+    if (!input) {
         searchResult.value = '';
+        selectedIndustry.value = null;
         return;
     }
 
+    const normalized = input.toUpperCase();
+
+    // Auto-detect EXACT code match (active only). Do not overwrite the textbox.
+    const exact = industries.value.find(ind =>
+        String(ind.code || '').toUpperCase() === normalized &&
+        (!ind.status || ind.status === 'Act')
+    );
+
+    if (exact) {
+        selectedIndustry.value = exact;
+        searchResult.value = `
+            <div class="p-3 bg-green-100 rounded-lg mt-2">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm text-green-800">Data found: <span class="font-semibold">${exact.code}</span> - ${exact.name}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Search matches (active only)
     const matches = industries.value.filter(industry =>
-        industry.code.toLowerCase().includes(industryCode.value.toLowerCase()) ||
-        industry.name.toLowerCase().includes(industryCode.value.toLowerCase())
+        (!industry.status || industry.status === 'Act') &&
+        (
+            (industry.code && industry.code.toLowerCase().includes(input.toLowerCase())) ||
+            (industry.name && industry.name.toLowerCase().includes(input.toLowerCase()))
+        )
     );
 
     if (matches.length > 0) {
-        if (matches.length === 1 && matches[0].code.toLowerCase() === industryCode.value.toLowerCase()) {
-            // Exact match - show details and edit button
-            searchResult.value = `
-                <div class="p-3 bg-green-100 rounded-lg mt-2">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm text-green-800">Data found: <span class="font-semibold">${matches[0].code}</span> - ${matches[0].name}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            selectedIndustry.value = matches[0];
-        } else if (matches.length <= 5) {
+        if (matches.length <= 5) {
             // Multiple matches (up to 5) - show list
             let html = `<div class="p-3 bg-blue-100 rounded-lg mt-2">
                 <p class="text-sm text-blue-800 mb-2">Multiple codes found:</p>
@@ -422,7 +439,7 @@ const searchIndustryCode = () => {
         searchResult.value = `
             <div class="p-3 bg-red-100 rounded-lg mt-2">
                 <div class="flex justify-between items-start">
-                    <p class="text-sm text-red-800">No industry code "${industryCode.value}" found. Check the code or create new data.</p>
+                    <p class="text-sm text-red-800">No industry code "${input}" found. Check the code or create new data.</p>
                 </div>
             </div>
         `;
@@ -431,11 +448,12 @@ const searchIndustryCode = () => {
 
 // Handle search and create functionality when pressing Enter on industry code input
 const handleSearchAndCreate = async () => {
-    if (!industryCode.value) return;
+    const input = String(industryCode.value || '').trim();
+    if (!input) return;
 
     saving.value = true;
     try {
-        const res = await fetch(`/api/industry/search/${industryCode.value.toUpperCase()}`, {
+        const res = await fetch(`/api/industry/search/${input.toUpperCase()}`, {
             headers: {
                 'Accept': 'application/json'
             }
@@ -443,10 +461,19 @@ const handleSearchAndCreate = async () => {
 
         const data = await res.json();
 
+        if (data.exists && data.status === 'Obs') {
+            searchResult.value = `
+                <div class="p-3 bg-yellow-100 rounded-lg mt-2">
+                    <p class="text-sm text-yellow-800">Industry code "${input.toUpperCase()}" exists but is obsolete. Please activate it in Manage Industry Status.</p>
+                </div>
+            `;
+            return;
+        }
+
         if (data.exists) {
-            // Industry exists, find it and select it
+            // Industry exists and is active (or treated as active)
             const industry = industries.value.find(
-                i => i.code.toUpperCase() === industryCode.value.toUpperCase()
+                i => i.code.toUpperCase() === input.toUpperCase() && (!i.status || i.status === 'Act')
             );
 
             if (industry) {
@@ -465,7 +492,7 @@ const handleSearchAndCreate = async () => {
             // Industry doesn't exist, show create form
             isCreating.value = true;
             editForm.value = {
-                code: industryCode.value.toUpperCase(),
+                code: input.toUpperCase(),
                 name: ''
             };
             showEditModal.value = true;

@@ -595,45 +595,6 @@
                         </div>
                     </div>
 
-                    <!-- Quick Links -->
-                    <div
-                        class="bg-white shadow-sm rounded-xl border border-violet-100 p-4 sm:p-5"
-                    >
-
-                        <div
-                            class="flex items-center mb-3 pb-2 border-b border-violet-100"
-                        >
-                            <div
-                                class="p-2 bg-violet-500 rounded-lg mr-3"
-                            >
-                                <i class="fas fa-link text-white"></i>
-                            </div>
-                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
-                                Quick Links
-                            </h3>
-                        </div>
-
-                        <div class="space-y-2">
-                            <a
-                                href="#"
-                                class="group block p-2 hover:bg-gray-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors"
-                            >
-                                <span class="inline-flex items-center">
-                                    <span
-                                        class="inline-flex items-center justify-center w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full mr-2 shadow-sm transition-all duration-300 group-hover:scale-110"
-                                    >
-                                        <i
-                                            class="fas fa-history text-white text-xs"
-                                        ></i>
-                                    </span>
-                                    <span
-                                        class="transition-all duration-300 group-hover:translate-x-1"
-                                        >MC Maintenance Log</span
-                                    >
-                                </span>
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

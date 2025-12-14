@@ -95,43 +95,6 @@
                 </ul>
               </div>
             </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
-              <div class="flex items-center mb-3 pb-2 border-b border-gray-100">
-                <div class="p-2.5 bg-blue-500 rounded-lg mr-3">
-                  <i class="fas fa-link text-white"></i>
-                </div>
-                <h3 class="text-sm sm:text-base font-semibold text-gray-900">Quick Links</h3>
-              </div>
-
-              <div class="grid grid-cols-1 gap-3">
-                <Link
-                  href="/warehouse-management/delivery-order/setup/vehicle"
-                  class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100"
-                >
-                  <div class="p-2.5 bg-blue-500 rounded-full mr-3">
-                    <i class="fas fa-truck text-white text-sm"></i>
-                  </div>
-                  <div>
-                    <p class="font-medium text-blue-900 text-sm">Define Vehicle</p>
-                    <p class="text-xs text-blue-700">Manage vehicles linked to these classes</p>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/warehouse-management/delivery-order/setup/vehicle-class/view-print"
-                  class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100"
-                >
-                  <div class="p-2.5 bg-blue-500 rounded-full mr-3">
-                    <i class="fas fa-print text-white text-sm"></i>
-                  </div>
-                  <div>
-                    <p class="font-medium text-blue-900 text-sm">View &amp; Print Vehicle Class</p>
-                    <p class="text-xs text-blue-700">Print vehicle class list</p>
-                  </div>
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </div>

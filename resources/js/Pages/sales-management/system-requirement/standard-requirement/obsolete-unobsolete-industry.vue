@@ -259,7 +259,7 @@ const fetchIndustries = async (page = 1) => {
     loading.value = true;
     
     try {
-        const response = await fetch(`/api/industry?page=${page}`, {
+        const response = await fetch(`/api/industry?all_status=1&page=${page}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
