@@ -12,20 +12,6 @@ class UserCpsSeeder extends Seeder
 {
     public function run()
     {
-        // Pastikan default salesperson untuk sample user tersedia agar FK usercps_sm_foreign tidak error
-        DB::table('salesperson')->updateOrInsert(
-            ['Code' => 'S101'],
-            [
-                'Name' => 'ABENG',
-                'Grup' => 'MBI',
-                'CodeGrup' => 'MBI001',
-                'TargetSales' => 1000000.00,
-                'Internal' => 'root',
-                'Email' => 'abeng@company.com',
-                'status' => 'Active',
-            ]
-        );
-
         // Data super admin
         // Hapus dulu semua permission yang terkait sebelum hapus user
         UserPermission::where('user_id', 'ADMIN001')->delete();
@@ -71,7 +57,6 @@ class UserCpsSeeder extends Seeder
             'status' => 'A',
             'password_expiry_date' => 30,
             'amend_expired_password' => 'No',
-            'salesperson_code' => 'S101',
         ]);
 
         // Create full permissions for sample user

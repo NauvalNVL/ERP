@@ -118,11 +118,10 @@ class SalespersonSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear the table before seeding (cannot TRUNCATE because of FK references)
-        DB::table('salesperson')->delete();
-
-        // Insert data without timestamps (table doesn't have timestamp columns)
-        DB::table('salesperson')->insert($this->salespersons);
+        // Intentionally left blank: we no longer seed dummy salesperson data.
+        // If you need initial salesperson records, please insert them manually
+        // via the Define Salesperson screen or create a dedicated seeder
+        // for real/master data instead of hardcoded dummy values.
     }
 
     /**
