@@ -105,35 +105,6 @@
                   </ul>
                 </div>
               </div>
-              <!-- Quick Links Card -->
-              <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-4 sm:p-5">
-                <div class="flex items-center mb-3 pb-2 border-b border-violet-100">
-                  <div class="inline-flex items-center justify-center w-9 h-9 bg-violet-500 rounded-lg mr-3">
-                    <i class="fas fa-link text-white text-lg"></i>
-                  </div>
-                  <h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
-                </div>
-                <div class="space-y-3 mt-3">
-                  <a href="#" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
-                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
-                      <i class="fas fa-print text-white text-base"></i>
-                    </span>
-                    <div>
-                      <div class="font-bold text-green-800 text-sm">View & Print</div>
-                      <div class="text-xs text-green-700">Print group list</div>
-                    </div>
-                  </a>
-                  <a href="#" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
-                    <span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
-                      <i class="fas fa-users text-white text-base"></i>
-                    </span>
-                    <div>
-                      <div class="font-bold text-blue-800 text-sm">Customer List</div>
-                      <div class="text-xs text-blue-700">Manage customers in group</div>
-                    </div>
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </div>

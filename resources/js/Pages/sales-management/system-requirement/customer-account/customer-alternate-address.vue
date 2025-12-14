@@ -377,60 +377,6 @@
                         </ul>
                     </div>
                 </div>
-                <!-- Quick Links Card -->
-                <div
-                    class="bg-white rounded-xl shadow-md border-t-4 border-blue-500 p-6"
-                >
-                    <div class="flex items-center mb-2">
-                        <div
-                            class="inline-flex items-center justify-center w-10 h-10 bg-blue-500 rounded-lg mr-3"
-                        >
-                            <i class="fas fa-link text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800">
-                            Quick Links
-                        </h3>
-                    </div>
-                    <hr class="my-2 border-blue-100" />
-                    <div class="space-y-3 mt-4">
-                        <a
-                            href="#"
-                            class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition"
-                        >
-                            <span
-                                class="inline-flex items-center justify-center w-9 h-9 bg-blue-500 rounded-lg mr-3"
-                            >
-                                <i class="fas fa-print text-white text-xl"></i>
-                            </span>
-                            <div>
-                                <div class="font-bold text-blue-800">
-                                    View & Print
-                                </div>
-                                <div class="text-xs text-blue-700">
-                                    Print customer list
-                                </div>
-                            </div>
-                        </a>
-                        <a
-                            href="#"
-                            class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition"
-                        >
-                            <span
-                                class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3"
-                            >
-                                <i class="fas fa-users text-white text-xl"></i>
-                            </span>
-                            <div>
-                                <div class="font-bold text-blue-800">
-                                    Customer Groups
-                                </div>
-                                <div class="text-xs text-blue-700">
-                                    Manage customer groups
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
             </div>
                 </div>
             </div>

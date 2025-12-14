@@ -184,44 +184,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Quick Links -->
-                <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-4 sm:p-5">
-                    <div class="flex items-center mb-3 pb-2 border-b border-violet-100">
-                        <div class="inline-flex items-center justify-center w-9 h-9 bg-violet-500 rounded-lg mr-3">
-                            <i class="fas fa-link text-white text-lg"></i>
-                        </div>
-                        <h3 class="text-sm sm:text-base font-semibold text-gray-800">Quick Links</h3>
-                    </div>
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link href="/update-customer-account" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                <i class="fas fa-user-edit text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-blue-900">Update Customer</p>
-                                <p class="text-xs text-blue-700">Modify customer details</p>
-                            </div>
-                        </Link>
-                        <Link href="/customer-group" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-users text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-purple-900">Customer Groups</p>
-                                <p class="text-xs text-purple-700">Manage customer groups</p>
-                            </div>
-                        </Link>
-                        <Link href="/customer-alternate-address" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
-                                <i class="fas fa-map-marker-alt text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-green-900">Alternate Addresses</p>
-                                <p class="text-xs text-green-700">Manage delivery addresses</p>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
