@@ -742,6 +742,21 @@
                                                         </label>
                                                     </div>
                                                 </div>
+
+                                                <!-- Tax DJP -->
+                                                <div class="pl-2 border-t border-gray-100 pt-2">
+                                                    <h6 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Tax DJP</h6>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.input_no_faktur" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Input No Faktur</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.export_to_coretax" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Export to Coretax</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

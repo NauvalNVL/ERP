@@ -31,6 +31,7 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\DeliveryOrderController;
 use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
+use App\Http\Controllers\WarehouseManagement\Invoice\ExportToCoretaxController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\PaperSizeController;
@@ -238,6 +239,13 @@ Route::prefix('invoices')->group(function () {
         Route::post('/{invoiceNo}/print', [InvoiceController::class, 'updatePrintAudit']); // Update print audit trail
         Route::put('/{invoiceNo}', [InvoiceController::class, 'update']); // Update invoice (Amend Invoice)
     });
+
+    // Tax export endpoint for Coretax XML generation
+    Route::get('/tax-export', [InvoiceController::class, 'getInvoicesForTaxExport']);
+    
+    // Export to Coretax endpoints - Automatic XML generation from invoices
+    Route::get('/coretax/invoices', [ExportToCoretaxController::class, 'getInvoicesForExport']);
+    Route::post('/coretax/generate-xml', [ExportToCoretaxController::class, 'generateXml']);
 
 // Tax Type API routes (CPS-style Define Tax Type) - MUST be before wildcard routes
 Route::get('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);

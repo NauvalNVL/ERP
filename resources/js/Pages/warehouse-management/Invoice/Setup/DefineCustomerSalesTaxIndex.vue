@@ -505,7 +505,6 @@ const handleDelete = async () => {
             await Swal.fire({
                 icon: 'success',
                 title: 'Deleted',
-                text: 'Tax index deleted successfully!'
             });
             handleCancel();
         }

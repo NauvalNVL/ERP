@@ -246,7 +246,9 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_glueing_material' ||
     menuKey === 'obsolete_unobsolete_tax_type' ||
     menuKey === 'obsolete_unobsolete_tax_group' ||
-    menuKey === 'obsolete_unobsolete_customer_sales_tax_index'
+    menuKey === 'obsolete_unobsolete_customer_sales_tax_index' ||
+    menuKey === 'input_no_faktur' ||
+    menuKey === 'export_to_coretax'
   ) {
     return true;
   }
@@ -521,7 +523,11 @@ const getPermissionKeyFromTitle = (title) => {
     'Print Invoice': 'print_invoice',
     'Amend Invoice': 'amend_invoice',
     'Cancel Active Invoice': 'cancel_active_invoice',
-    'View & Print Invoice Log': 'view_print_invoice_log'
+    'View & Print Invoice Log': 'view_print_invoice_log',
+
+    // Warehouse Management - Tax DJP
+    'Input No Faktur': 'input_no_faktur',
+    'Export to Coretax': 'export_to_coretax'
   };
 
   return titleMap[title] || title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
@@ -755,6 +761,14 @@ const warehouseManagementItems = [
           { title: 'Amend Invoice', icon: 'fas fa-edit', route: '/warehouse-management/invoice/iv-processing/amend-invoice' },
           { title: 'Cancel Active Invoice', icon: 'fas fa-times-circle', route: '/warehouse-management/invoice/iv-processing/cancel-active-invoice' },
           { title: 'View & Print Invoice Log', icon: 'fas fa-history', route: '/warehouse-management/invoice/iv-processing/view-print-invoice-log' },
+        ]
+      },
+      {
+        title: 'Tax DJP',
+        icon: 'fas fa-file-export',
+        children: [
+          { title: 'Input No Faktur', icon: 'fas fa-receipt', route: '/warehouse-management/invoice/tax-djp/input-no-faktur' },
+          { title: 'Export to Coretax', icon: 'fas fa-cloud-upload-alt', route: '/warehouse-management/invoice/tax-djp/export-to-coretax' },
         ]
       },
     ]
