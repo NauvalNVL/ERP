@@ -33,14 +33,6 @@
                                     <PrinterIcon class="h-5 w-5 mr-2" />
                                     Print
                                 </button>
-                                <button
-                                    @click="exportUsers"
-                                    class="inline-flex items-center px-3 py-2 bg-indigo-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Export Users"
-                                >
-                                    <DocumentArrowDownIcon class="h-5 w-5 mr-2" />
-                                    Export
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -95,12 +87,12 @@
                                                 Position
                                             </div>
                                         </th>
-                                        <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                            <div class="flex items-center justify-end">
+                                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                            <div class="flex items-center">
                                                 <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
-                                                    <DocumentTextIcon class="h-4 w-4 text-white" />
+                                                    <CheckCircleIcon class="h-4 w-4 text-white" />
                                                 </div>
-                                                Actions
+                                                Status
                                             </div>
                                         </th>
                                     </tr>
@@ -150,14 +142,19 @@
                                                 {{ user.officialTitle || 'No Position' }}
                                             </span>
                                         </td>
-                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-right text-xs md:text-sm font-medium">
-                                            <button
-                                                @click.stop="selectUser(user)"
-                                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
+                                            <span
+                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm"
+                                                :class="user.status === 'Active'
+                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                                    : 'bg-rose-50 text-rose-700 border-rose-300'"
                                             >
-                                                <DocumentTextIcon class="h-4 w-4 mr-2" />
-                                                View Details
-                                            </button>
+                                                <span
+                                                    class="inline-block w-2 h-2 rounded-full mr-2"
+                                                    :class="user.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'"
+                                                />
+                                                {{ user.status }}
+                                            </span>
                                         </td>
                                     </tr>
                                 </tbody>

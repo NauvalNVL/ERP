@@ -782,8 +782,8 @@ const obsoleteProduct = async (productId) => {
         console.log('Obsolete API response:', result);
         
         if (result.success) {
-            // Remove the item from the local array (since obsoleted items shouldn't appear)
-            products.value = products.value.filter(product => product.id !== productId);
+            // Refresh products from server so Define Product view always matches database state
+            await fetchProducts();
             
             if (selectedRow.value && selectedRow.value.id === productId) {
                 selectedRow.value = null;
