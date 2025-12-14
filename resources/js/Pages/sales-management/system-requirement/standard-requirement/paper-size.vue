@@ -318,16 +318,23 @@ const updateMillimeters = () => {
     }
 };
 
-// Watch for changes in search query to filter the data
+// Watch for changes in search query to help user find a size
 watch(searchQuery, (newQuery) => {
-    if (newQuery && paperSizes.value.length > 0) {
+    // If user clears the field, also clear current selection
+    if (!newQuery) {
+        selectedSize.value = null;
+        return;
+    }
+
+    if (paperSizes.value.length > 0) {
         const foundSize = paperSizes.value.find(size =>
             String(size.id).includes(newQuery) ||
             String(size.millimeter).includes(newQuery)
         );
 
         if (foundSize) {
-            selectSize(foundSize);
+            // Only update selectedSize so input value remains under user control
+            selectedSize.value = foundSize;
         }
     }
 });
