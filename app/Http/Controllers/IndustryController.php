@@ -116,8 +116,18 @@ class IndustryController extends Controller
      */
     public function search($code)
     {
-        $exists = Industry::where('code', strtoupper($code))->exists();
-        return response()->json(['exists' => $exists]);
+        $industry = Industry::select('status')
+            ->where('code', strtoupper($code))
+            ->first();
+
+        if (!$industry) {
+            return response()->json(['exists' => false]);
+        }
+
+        return response()->json([
+            'exists' => true,
+            'status' => $industry->status ?? 'Act',
+        ]);
     }
 
     /**
@@ -129,7 +139,10 @@ class IndustryController extends Controller
     {
         try {
             $industries = Industry::select('code', 'name', 'status')
-                ->where('status', 'Act')
+                ->where(function ($q) {
+                    $q->whereNull('status')
+                        ->orWhere('status', 'Act');
+                })
                 ->orderBy('code')
                 ->get();
 
@@ -203,18 +216,22 @@ class IndustryController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            // Only return active industries for modal display
-            $industries = Industry::where('status', 'Act')
-                ->orderBy('code')
-                ->get()
-                ->map(function ($industry) {
-                    // Ensure all fields have values
-                    $industry->status = $industry->status ?? 'Act';
-                    return $industry;
+            $query = Industry::orderBy('code');
+
+            if (!$request->has('all_status') || !$request->all_status) {
+                $query->where(function ($q) {
+                    $q->whereNull('status')
+                        ->orWhere('status', 'Act');
                 });
+            }
+
+            $industries = $query->get()->map(function ($industry) {
+                $industry->status = $industry->status ?? 'Act';
+                return $industry;
+            });
 
             return response()->json($industries, 200, [], JSON_PRETTY_PRINT);
         } catch (\Exception $e) {

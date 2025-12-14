@@ -122,6 +122,13 @@ class SalespersonSeeder extends Seeder
         // If you need initial salesperson records, please insert them manually
         // via the Define Salesperson screen or create a dedicated seeder
         // for real/master data instead of hardcoded dummy values.
+
+        foreach ($this->salespersons as $salesperson) {
+            DB::table('salesperson')->updateOrInsert(
+                ['Code' => $salesperson['Code']],
+                $salesperson
+            );
+        }
     }
 
     /**

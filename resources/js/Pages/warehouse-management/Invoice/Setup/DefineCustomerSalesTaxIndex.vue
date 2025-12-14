@@ -502,7 +502,6 @@ const handleDelete = async () => {
         );
 
         if (response.data.success) {
-
             await Swal.fire({
                 icon: 'success',
                 title: 'Deleted',
@@ -516,10 +515,10 @@ const handleDelete = async () => {
             title: 'Delete Failed',
             text: 'Failed to delete: ' + (error.response?.data?.message || error.message)
         });
+    }
+};
 
-            alert('Tax index obsoleted successfully!');
-            handleCancel();
-        }
+// Handle cancel
 const handleCancel = () => {
     form.value = {
         customer_code: '',

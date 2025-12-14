@@ -9,6 +9,7 @@ use App\Models\Geo;
 use App\Models\Salesperson;
 use App\Models\CustomerGroup;
 use Inertia\Inertia;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
 class UpdateCustomerAccountController extends Controller
@@ -41,11 +42,16 @@ class UpdateCustomerAccountController extends Controller
             'ac_type' => 'required|string|in:Y-Foreign,N-Local',
             'currency_code' => 'nullable|string|max:50',
             'sales_type' => 'nullable|string|max:50',
-            'salesperson_code' => 'nullable|string|max:50',
-            'industrial_code' => 'nullable|string|max:50',
-            'geographical' => 'nullable|string|max:50',
-            'grouping_code' => 'nullable|string|max:50',
+            'salesperson_code' => 'nullable|string|max:50|exists:salesperson,Code',
+            'industrial_code' => 'nullable|string|max:50|exists:industry,code',
+            'geographical' => 'nullable|string|max:50|exists:GEO,CODE',
+            'grouping_code' => 'nullable|string|max:50|exists:CUST_GROUP,Group_ID',
             'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
+        ], [
+            'salesperson_code.exists' => 'Invalid salesperson code. Please select an existing salesperson.',
+            'industrial_code.exists' => 'Invalid industrial code. Please select an existing industry.',
+            'geographical.exists' => 'Invalid geographical code. Please select an existing geographical area.',
+            'grouping_code.exists' => 'Invalid grouping code. Please select an existing customer group.',
         ]);
 
         // Map frontend data to CUSTOMER table structure
@@ -64,25 +70,65 @@ class UpdateCustomerAccountController extends Controller
             'TERM' => $validated['credit_terms'] ?? 0,
             'TYPE' => $validated['ac_type'],
             'CURRENCY' => $validated['currency_code'] ?? '',
-            'SLM' => $validated['salesperson_code'] ?? '',
-            'AREA' => $validated['geographical'] ?? '',
-            'IND' => $validated['industrial_code'] ?? '',
-            'GROUP_' => $validated['grouping_code'] ?? '',
+            'SLM' => !empty($validated['salesperson_code']) ? $validated['salesperson_code'] : null,
+            'AREA' => !empty($validated['geographical']) ? $validated['geographical'] : null,
+            'IND' => !empty($validated['industrial_code']) ? $validated['industrial_code'] : null,
+            'GROUP_' => !empty($validated['grouping_code']) ? $validated['grouping_code'] : null,
             'NPWP' => '',
             'CUST_TYPE' => $validated['sales_type'] ?? ''
         ];
 
         // Check if customer with this code already exists
         $existingCustomer = Customer::where('CODE', $validated['customer_code'])->first();
-        
-        if ($existingCustomer) {
-            // Update existing customer
-            $existingCustomer->update($customerData);
-            return response()->json(['success' => true, 'message' => 'Customer updated successfully']);
-        } else {
-            // Create new customer
+
+        try {
+            if ($existingCustomer) {
+                $existingCustomer->update($customerData);
+                return response()->json(['success' => true, 'message' => 'Customer updated successfully']);
+            }
+
             Customer::create($customerData);
             return response()->json(['success' => true, 'message' => 'Customer created successfully']);
+        } catch (QueryException $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'customer_slm_foreign') !== false) {
+                return response()->json([
+                    'message' => 'Invalid salesperson code. Please select an existing salesperson.',
+                    'errors' => [
+                        'salesperson_code' => ['Invalid salesperson code. Please select an existing salesperson.'],
+                    ],
+                ], 422);
+            }
+
+
+            if (stripos($msg, 'customer_ind_foreign') !== false || stripos($msg, 'dbo.industry') !== false) {
+                return response()->json([
+                    'message' => 'Invalid industrial code. Please select an existing industry.',
+                    'errors' => [
+                        'industrial_code' => ['Invalid industrial code. Please select an existing industry.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_area_foreign') !== false || stripos($msg, 'dbo.GEO') !== false) {
+                return response()->json([
+                    'message' => 'Invalid geographical code. Please select an existing geographical area.',
+                    'errors' => [
+                        'geographical' => ['Invalid geographical code. Please select an existing geographical area.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_group__foreign') !== false || stripos($msg, 'dbo.CUST_GROUP') !== false) {
+                return response()->json([
+                    'message' => 'Invalid grouping code. Please select an existing customer group.',
+                    'errors' => [
+                        'grouping_code' => ['Invalid grouping code. Please select an existing customer group.'],
+                    ],
+                ], 422);
+            }
+
+            throw $e;
         }
     }
 
@@ -125,7 +171,7 @@ class UpdateCustomerAccountController extends Controller
 
             $customers = $query->get();
             Log::info('Found ' . $customers->count() . ' customers with applied filters');
-            
+
             // Transform data to ensure consistent format with expected fields
             $formatted = $customers->map(function($customer) {
                 return [
@@ -155,12 +201,12 @@ class UpdateCustomerAccountController extends Controller
                     'status' => $customer->AC_STS ?? 'A'
                 ];
             });
-            
+
             Log::info('API response data structure check:', [
                 'sample' => $formatted->first() ? json_encode($formatted->first()) : 'No data',
                 'count' => $formatted->count()
             ]);
-            
+
             return response()->json(['data' => $formatted]);
         } catch (\Exception $e) {
             Log::error('Error in CustomerAccount API:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
@@ -172,7 +218,7 @@ class UpdateCustomerAccountController extends Controller
     {
         try {
             Log::info('API Store Customer Request:', ['data' => $request->all()]);
-            
+
             $validated = $request->validate([
                 'customer_code' => 'required|string|max:50',
                 'customer_name' => 'required|string|max:250',
@@ -190,13 +236,18 @@ class UpdateCustomerAccountController extends Controller
                 'currency_code' => 'nullable|string|max:50',
                 'npwp' => 'nullable|string|max:50',
                 'sales_type' => 'nullable|string|max:50',
-                'salesperson_code' => 'nullable|string|max:50',
-                'industrial_code' => 'nullable|string|max:50',
-                'geographical' => 'nullable|string|max:50',
-                'grouping_code' => 'nullable|string|max:50',
+                'salesperson_code' => 'nullable|string|max:50|exists:salesperson,Code',
+                'industrial_code' => 'nullable|string|max:50|exists:industry,code',
+                'geographical' => 'nullable|string|max:50|exists:GEO,CODE',
+                'grouping_code' => 'nullable|string|max:50|exists:CUST_GROUP,Group_ID',
                 'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
+            ], [
+                'salesperson_code.exists' => 'Invalid salesperson code. Please select an existing salesperson.',
+                'industrial_code.exists' => 'Invalid industrial code. Please select an existing industry.',
+                'geographical.exists' => 'Invalid geographical code. Please select an existing geographical area.',
+                'grouping_code.exists' => 'Invalid grouping code. Please select an existing customer group.',
             ]);
-            
+
             Log::info('Validated data:', $validated);
 
             // Additional email validation if not empty
@@ -223,17 +274,17 @@ class UpdateCustomerAccountController extends Controller
                 'TERM' => $validated['credit_terms'] ?? 0,
                 'TYPE' => $validated['ac_type'],
                 'CURRENCY' => $validated['currency_code'] ?? '',
-                'SLM' => $validated['salesperson_code'] ?? '',
-                'AREA' => $validated['geographical'] ?? '',
-                'IND' => $validated['industrial_code'] ?? '',
-                'GROUP_' => $validated['grouping_code'] ?? '',
+                'SLM' => !empty($validated['salesperson_code']) ? $validated['salesperson_code'] : null,
+                'AREA' => !empty($validated['geographical']) ? $validated['geographical'] : null,
+                'IND' => !empty($validated['industrial_code']) ? $validated['industrial_code'] : null,
+                'GROUP_' => !empty($validated['grouping_code']) ? $validated['grouping_code'] : null,
                 'NPWP' => $validated['npwp'] ?? '',
                 'CUST_TYPE' => $validated['sales_type'] ?? ''
             ];
 
             // Check if customer with this code already exists
             $existingCustomer = Customer::where('CODE', $validated['customer_code'])->first();
-            
+
             if ($existingCustomer) {
                 // Update existing customer
                 Log::info('Updating existing customer:', ['code' => $existingCustomer->CODE]);
@@ -257,69 +308,169 @@ class UpdateCustomerAccountController extends Controller
                 'message' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
+        } catch (QueryException $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'customer_slm_foreign') !== false) {
+                return response()->json([
+                    'message' => 'Invalid salesperson code. Please select an existing salesperson.',
+                    'errors' => [
+                        'salesperson_code' => ['Invalid salesperson code. Please select an existing salesperson.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_ind_foreign') !== false || stripos($msg, 'dbo.industry') !== false) {
+                return response()->json([
+                    'message' => 'Invalid industrial code. Please select an existing industry.',
+                    'errors' => [
+                        'industrial_code' => ['Invalid industrial code. Please select an existing industry.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_area_foreign') !== false || stripos($msg, 'dbo.GEO') !== false) {
+                return response()->json([
+                    'message' => 'Invalid geographical code. Please select an existing geographical area.',
+                    'errors' => [
+                        'geographical' => ['Invalid geographical code. Please select an existing geographical area.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_group__foreign') !== false || stripos($msg, 'dbo.CUST_GROUP') !== false) {
+                return response()->json([
+                    'message' => 'Invalid grouping code. Please select an existing customer group.',
+                    'errors' => [
+                        'grouping_code' => ['Invalid grouping code. Please select an existing customer group.'],
+                    ],
+                ], 422);
+            }
+
+            Log::error('Database error saving customer account:', ['error' => $msg, 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'message' => 'Failed to save customer account due to a database error.'
+            ], 500);
         } catch (\Exception $e) {
             Log::error('Error saving customer account:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
-                'message' => 'Failed to save customer account: ' . $e->getMessage()
+                'message' => 'Failed to save customer account.'
             ], 500);
         }
     }
 
     public function apiUpdate(Request $request, $id)
     {
-        $customer = Customer::where('CODE', $id)->firstOrFail();
+        try {
+            $customer = Customer::where('CODE', $id)->firstOrFail();
 
-        $validated = $request->validate([
-            'customer_code' => 'required|string|max:50',
-            'customer_name' => 'required|string|max:250',
-            'short_name' => 'nullable|string|max:50',
-            'address' => 'nullable|string',
-            'address2' => 'nullable|string',
-            'address3' => 'nullable|string',
-            'contact_person' => 'nullable|string|max:50',
-            'telephone_no' => 'nullable|string|max:100',
-            'fax_no' => 'nullable|string|max:50',
-            'co_email' => 'nullable|string|max:50',
-            'credit_limit' => 'nullable|numeric',
-            'credit_terms' => 'nullable|numeric',
-            'ac_type' => 'required|string|in:Y-Foreign,N-Local',
-            'currency_code' => 'nullable|string|max:50',
-            'npwp' => 'nullable|string|max:50',
-            'sales_type' => 'nullable|string|max:50',
-            'salesperson_code' => 'nullable|string|max:50',
-            'industrial_code' => 'nullable|string|max:50',
-            'geographical' => 'nullable|string|max:50',
-            'grouping_code' => 'nullable|string|max:50',
-            'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
-        ]);
+            $validated = $request->validate([
+                'customer_code' => 'required|string|max:50',
+                'customer_name' => 'required|string|max:250',
+                'short_name' => 'nullable|string|max:50',
+                'address' => 'nullable|string',
+                'address2' => 'nullable|string',
+                'address3' => 'nullable|string',
+                'contact_person' => 'nullable|string|max:50',
+                'telephone_no' => 'nullable|string|max:100',
+                'fax_no' => 'nullable|string|max:50',
+                'co_email' => 'nullable|string|max:50',
+                'credit_limit' => 'nullable|numeric',
+                'credit_terms' => 'nullable|numeric',
+                'ac_type' => 'required|string|in:Y-Foreign,N-Local',
+                'currency_code' => 'nullable|string|max:50',
+                'npwp' => 'nullable|string|max:50',
+                'sales_type' => 'nullable|string|max:50',
+                'salesperson_code' => 'nullable|string|max:50|exists:salesperson,Code',
+                'industrial_code' => 'nullable|string|max:50|exists:industry,code',
+                'geographical' => 'nullable|string|max:50|exists:GEO,CODE',
+                'grouping_code' => 'nullable|string|max:50|exists:CUST_GROUP,Group_ID',
+                'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
+            ], [
+                'salesperson_code.exists' => 'Invalid salesperson code. Please select an existing salesperson.',
+                'industrial_code.exists' => 'Invalid industrial code. Please select an existing industry.',
+                'geographical.exists' => 'Invalid geographical code. Please select an existing geographical area.',
+                'grouping_code.exists' => 'Invalid grouping code. Please select an existing customer group.',
+            ]);
 
-        // Map frontend data to CUSTOMER table structure
-        $customerData = [
-            'CODE' => $validated['customer_code'],
-            'AC_STS' => 'A', // Active status
-            'NAME' => $validated['customer_name'],
-            'SHORT_NAME' => $validated['short_name'] ?? '',
-            'ADDRESS1' => $validated['address'] ?? '',
-            'ADDRESS2' => $validated['address2'] ?? '',
-            'ADDRESS3' => $validated['address3'] ?? '',
-            'PERSON_CONTACT' => $validated['contact_person'] ?? '',
-            'TEL_NO' => $validated['telephone_no'] ?? '',
-            'FAX_NO' => $validated['fax_no'] ?? '',
-            'EMAIL' => $validated['co_email'] ?? '',
-            'CREDIT_LIMIT' => $validated['credit_limit'] ?? 0,
-            'TERM' => $validated['credit_terms'] ?? 0,
-            'TYPE' => $validated['ac_type'],
-            'CURRENCY' => $validated['currency_code'] ?? '',
-            'SLM' => $validated['salesperson_code'] ?? '',
-            'AREA' => $validated['geographical'] ?? '',
-            'IND' => $validated['industrial_code'] ?? '',
-            'GROUP_' => $validated['grouping_code'] ?? '',
-            'NPWP' => $validated['npwp'] ?? '',
-            'CUST_TYPE' => $validated['sales_type'] ?? ''
-        ];
+            $customerData = [
+                'CODE' => $validated['customer_code'],
+                'AC_STS' => 'A',
+                'NAME' => $validated['customer_name'],
+                'SHORT_NAME' => $validated['short_name'] ?? '',
+                'ADDRESS1' => $validated['address'] ?? '',
+                'ADDRESS2' => $validated['address2'] ?? '',
+                'ADDRESS3' => $validated['address3'] ?? '',
+                'PERSON_CONTACT' => $validated['contact_person'] ?? '',
+                'TEL_NO' => $validated['telephone_no'] ?? '',
+                'FAX_NO' => $validated['fax_no'] ?? '',
+                'EMAIL' => $validated['co_email'] ?? '',
+                'CREDIT_LIMIT' => $validated['credit_limit'] ?? 0,
+                'TERM' => $validated['credit_terms'] ?? 0,
+                'TYPE' => $validated['ac_type'],
+                'CURRENCY' => $validated['currency_code'] ?? '',
+                'SLM' => !empty($validated['salesperson_code']) ? $validated['salesperson_code'] : null,
+                'AREA' => !empty($validated['geographical']) ? $validated['geographical'] : null,
+                'IND' => !empty($validated['industrial_code']) ? $validated['industrial_code'] : null,
+                'GROUP_' => !empty($validated['grouping_code']) ? $validated['grouping_code'] : null,
+                'NPWP' => $validated['npwp'] ?? '',
+                'CUST_TYPE' => $validated['sales_type'] ?? ''
+            ];
 
-        $customer->update($customerData);
-        return response()->json($customer);
+            $customer->update($customerData);
+            return response()->json($customer);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (QueryException $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'customer_slm_foreign') !== false) {
+                return response()->json([
+                    'message' => 'Invalid salesperson code. Please select an existing salesperson.',
+                    'errors' => [
+                        'salesperson_code' => ['Invalid salesperson code. Please select an existing salesperson.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_ind_foreign') !== false || stripos($msg, 'dbo.industry') !== false) {
+                return response()->json([
+                    'message' => 'Invalid industrial code. Please select an existing industry.',
+                    'errors' => [
+                        'industrial_code' => ['Invalid industrial code. Please select an existing industry.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_area_foreign') !== false || stripos($msg, 'dbo.GEO') !== false) {
+                return response()->json([
+                    'message' => 'Invalid geographical code. Please select an existing geographical area.',
+                    'errors' => [
+                        'geographical' => ['Invalid geographical code. Please select an existing geographical area.'],
+                    ],
+                ], 422);
+            }
+
+            if (stripos($msg, 'customer_group__foreign') !== false || stripos($msg, 'dbo.CUST_GROUP') !== false) {
+                return response()->json([
+                    'message' => 'Invalid grouping code. Please select an existing customer group.',
+                    'errors' => [
+                        'grouping_code' => ['Invalid grouping code. Please select an existing customer group.'],
+                    ],
+                ], 422);
+            }
+
+            Log::error('Database error updating customer account:', ['error' => $msg, 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'message' => 'Failed to save customer account due to a database error.'
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Error updating customer account:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'message' => 'Failed to save customer account.'
+            ], 500);
+        }
     }
 
     /**
@@ -330,9 +481,9 @@ class UpdateCustomerAccountController extends Controller
         try {
             Log::info('Fetching single customer', ['id' => $id]);
             $customer = Customer::where('CODE', $id)->firstOrFail();
-            
+
             Log::info('Found customer', ['customer_code' => $customer->CODE]);
-            
+
             // Transform data to match frontend expectations
             $formatted = [
                 'id' => $customer->CODE,
@@ -360,7 +511,7 @@ class UpdateCustomerAccountController extends Controller
                 'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No',
                 'status' => $customer->AC_STS ?? 'A'
             ];
-            
+
             return response()->json($formatted);
         } catch (\Exception $e) {
             Log::error('Error fetching customer', [
@@ -368,7 +519,7 @@ class UpdateCustomerAccountController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'message' => 'Customer not found: ' . $e->getMessage()
             ], 404);
@@ -398,7 +549,7 @@ class UpdateCustomerAccountController extends Controller
             ]);
 
             $customerAccount = Customer::where('CODE', $customer_code)->first();
-            
+
             if (!$customerAccount) {
                 return response()->json([
                     'success' => false,
@@ -411,11 +562,11 @@ class UpdateCustomerAccountController extends Controller
             if (request()->user()) {
                 $username = request()->user()->name;
             }
-            
+
             // Update AC_STS (Account Status) - correct column name in CUSTOMER table
             $customerAccount->AC_STS = $request->active === 'Y' ? 'Active' : 'Inactive';
             $customerAccount->save();
-            
+
             // Log status change with reason
             Log::info('Customer account status changed', [
                 'customer_code' => $customer_code,

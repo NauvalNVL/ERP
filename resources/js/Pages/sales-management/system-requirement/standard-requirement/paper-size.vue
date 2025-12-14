@@ -318,17 +318,41 @@ const updateMillimeters = () => {
     }
 };
 
-// Watch for changes in search query to filter the data
+// Watch for changes in search query to select matching paper size
 watch(searchQuery, (newQuery) => {
-    if (newQuery && paperSizes.value.length > 0) {
-        const foundSize = paperSizes.value.find(size =>
-            String(size.id).includes(newQuery) ||
-            String(size.millimeter).includes(newQuery)
-        );
+    // Jika input dikosongkan, hapus pilihan saat ini
+    if (!newQuery) {
+        selectedSize.value = null;
+        return;
+    }
 
-        if (foundSize) {
-            selectSize(foundSize);
-        }
+    if (paperSizes.value.length === 0) {
+        return;
+    }
+
+    const rawQuery = String(newQuery).trim();
+    const lowerQuery = rawQuery.toLowerCase();
+    // Ambil hanya karakter angka & titik untuk pencarian numerik
+    const numericQuery = rawQuery.replace(/[^0-9.]/g, '');
+
+    const foundSize = paperSizes.value.find((size) => {
+        const idCode = `PS${String(size.id).padStart(3, '0')}`.toLowerCase();
+        const idStr = String(size.id).toLowerCase();
+        const mmStr = String(size.millimeter ?? '').toLowerCase();
+
+        return (
+            // Cari dengan kode seperti PS001
+            idCode.includes(lowerQuery) ||
+            // Cari berdasarkan ID numerik
+            (idStr && numericQuery && idStr.includes(numericQuery.toLowerCase())) ||
+            // Cari berdasarkan nilai millimeter
+            (mmStr && numericQuery && mmStr.includes(numericQuery.toLowerCase()))
+        );
+    });
+
+    if (foundSize) {
+        // Hanya ubah pilihan, jangan timpa kembali nilai yang sedang diketik user
+        selectedSize.value = foundSize;
     }
 });
 
@@ -365,6 +389,8 @@ onMounted(() => {
 
 const onPaperSizeSelected = (size) => {
     selectSize(size);
+    // Tampilkan nilai millimeter yang dipilih pada textbox kode
+    searchQuery.value = size.millimeter;
     showModal.value = false;
 
     // Automatically open the edit modal for the selected row
@@ -373,13 +399,12 @@ const onPaperSizeSelected = (size) => {
 
 const selectSize = (size) => {
     selectedSize.value = size;
-    searchQuery.value = size.millimeter;
 };
 
 const editSelectedSize = () => {
     if (selectedSize.value) {
-    isCreating.value = false;
-    form.value = {
+        isCreating.value = false;
+        form.value = {
             id: selectedSize.value.id,
             millimeter: selectedSize.value.millimeter,
             inches: selectedSize.value.inches

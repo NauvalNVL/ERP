@@ -9,11 +9,17 @@ class CustomerSeeder extends Seeder
 {
     public function run()
     {
+        $validSlmCodes = array_values(array_filter(array_map(
+            fn ($salesperson) => $salesperson['Code'] ?? null,
+            (new SalespersonSeeder())->getSeederData()
+        )));
+        $defaultSlmCode = $validSlmCodes[0] ?? null;
+
         $customers = [
             [
                 'CODE' => '000211-08',
                 'NAME' => 'ABDULLAH, BPK',
-                'SLM' => 'S111',
+                'SLM' => 'S101',
                 'TYPE' => 'N-Local',
                 'CURRENCY' => 'IDR',
                 'AC_STS' => 'A',
@@ -33,7 +39,7 @@ class CustomerSeeder extends Seeder
             [
                 'CODE' => '000680-06',
                 'NAME' => 'ACEP SUNANDAR, BPK',
-                'SLM' => 'S140',
+                'SLM' => 'S102',
                 'TYPE' => 'N-Local',
                 'CURRENCY' => 'IDR',
                 'AC_STS' => 'A',
@@ -113,7 +119,7 @@ class CustomerSeeder extends Seeder
             [
                 'CODE' => '000507',
                 'NAME' => 'ADIKARYA GEMILANG',
-                'SLM' => 'S140',
+                'SLM' => 'S101',
                 'TYPE' => 'N-Local',
                 'CURRENCY' => 'IDR',
                 'AC_STS' => 'A',
@@ -133,7 +139,7 @@ class CustomerSeeder extends Seeder
             [
                 'CODE' => '000581',
                 'NAME' => 'AGEL LANGGENG, PT',
-                'SLM' => 'S143',
+                'SLM' => 'S103',
                 'TYPE' => 'N-Local',
                 'CURRENCY' => 'IDR',
                 'AC_STS' => 'A',
@@ -153,7 +159,7 @@ class CustomerSeeder extends Seeder
             [
                 'CODE' => '000004',
                 'NAME' => 'AGILITY INTERNATIONAL, PT',
-                'SLM' => 'S118',
+                'SLM' => 'S103',
                 'TYPE' => 'Y-Foreign',
                 'CURRENCY' => 'USD',
                 'AC_STS' => 'A',
@@ -173,7 +179,7 @@ class CustomerSeeder extends Seeder
             [
                 'CODE' => '000676',
                 'NAME' => 'AGRINDO MAJU LESTARI, PT',
-                'SLM' => 'S142',
+                'SLM' => 'S102',
                 'TYPE' => 'N-Local',
                 'CURRENCY' => 'IDR',
                 'AC_STS' => 'A',
@@ -193,7 +199,7 @@ class CustomerSeeder extends Seeder
             [
                 'CODE' => '000839',
                 'NAME' => 'AGRO MEGA PERKASA, PT',
-                'SLM' => 'S111',
+                'SLM' => 'S101',
                 'TYPE' => 'N-Local',
                 'CURRENCY' => 'IDR',
                 'AC_STS' => 'A',
@@ -213,6 +219,10 @@ class CustomerSeeder extends Seeder
         ];
 
         foreach ($customers as $customer) {
+            if (!empty($customer['SLM']) && !in_array($customer['SLM'], $validSlmCodes, true)) {
+                $customer['SLM'] = $defaultSlmCode;
+            }
+
             Customer::updateOrCreate(
                 ['CODE' => $customer['CODE']],
                 $customer

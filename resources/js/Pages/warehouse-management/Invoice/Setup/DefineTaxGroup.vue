@@ -233,87 +233,6 @@
             @close="showTaxItemScreen = false"
         />
 
-<<<<<<< HEAD
-        <!-- Create Tax Group Modal -->
-        <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg">
-                <!-- Modal Header -->
-                <div class="bg-blue-600 text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-layer-group"></i>
-                        <h3 class="text-sm font-semibold">Create Tax Group</h3>
-                    </div>
-                    <button type="button" @click="closeCreateModal" class="text-white/90 hover:text-white">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-4 space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tax Group Code</label>
-                        <input
-                            v-model.trim="createForm.code"
-                            type="text"
-                            placeholder="Enter tax group code"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
-                        />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tax Group Name</label>
-                        <input
-                            v-model.trim="createForm.name"
-                            type="text"
-                            placeholder="Enter tax group name"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
-                        />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Sales Tax Applied</label>
-                        <div class="flex gap-6">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    v-model="createForm.sales_tax_applied"
-                                    value="Y"
-                                    class="w-4 h-4 text-blue-600"
-                                />
-                                <span class="text-sm">Y-Yes</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    v-model="createForm.sales_tax_applied"
-                                    value="N"
-                                    class="w-4 h-4 text-blue-600"
-                                />
-                                <span class="text-sm">N-No</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="flex justify-end items-center gap-3 px-4 py-3 bg-gray-100 border-t border-gray-200 rounded-b-lg">
-                    <button
-                        type="button"
-                        @click="closeCreateModal"
-                        class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium border border-gray-300 flex items-center"
-                    >
-                        <i class="fas fa-times mr-2"></i>
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        @click="saveNewTaxGroup"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center"
-                    >
-                        <i class="fas fa-save mr-2"></i>
-                        Save
-                    </button>
-=======
         <!-- Create/Edit Tax Group Modal -->
         <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
             <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
@@ -414,7 +333,6 @@
                             </div>
                         </div>
                     </form>
->>>>>>> 382db43783ab3609c34179ae915cb487038fee98
                 </div>
             </div>
         </div>
@@ -461,7 +379,6 @@ import axios from 'axios';
 // UI State
 const showTableModal = ref(false);
 const showTaxItemScreen = ref(false);
-const showCreateModal = ref(false);
 const loading = ref(false);
 const saving = ref(false);
 const recordMode = ref('select'); // 'select', 'add', 'review'
@@ -483,11 +400,6 @@ const form = ref({
     name: '',
     sales_tax_applied: 'Y',
     status: 'A'
-});
-const createForm = ref({
-    code: '',
-    name: '',
-    sales_tax_applied: 'Y'
 });
 const originalCode = ref(''); // Track original code for updates
 
@@ -531,71 +443,17 @@ const openTableModal = () => {
 };
 
 const handleNew = () => {
-<<<<<<< HEAD
-    // Open Create Tax Group modal
-    createForm.value = {
-=======
     isCreating.value = true;
     editForm.value = {
->>>>>>> 382db43783ab3609c34179ae915cb487038fee98
         code: '',
         name: '',
-        sales_tax_applied: 'Y'
+        sales_tax_applied: 'Y',
+        status: 'A'
     };
-<<<<<<< HEAD
-    showCreateModal.value = true;
-};
-
-const closeCreateModal = () => {
-    showCreateModal.value = false;
-};
-
-const saveNewTaxGroup = async () => {
-    if (!createForm.value.code || !createForm.value.name) {
-        showNotification('Tax Group Code and Name are required.', 'error');
-        return;
-    }
-
-    saving.value = true;
-    try {
-        const payload = {
-            code: createForm.value.code.toUpperCase(),
-            name: createForm.value.name,
-            sales_tax_applied: createForm.value.sales_tax_applied || 'Y'
-        };
-
-        const response = await axios.post('/api/invoices/tax-groups', payload);
-        const result = response.data;
-        if (result.success) {
-            showNotification('Tax group created successfully!', 'success');
-            await fetchTaxGroups();
-
-            const newGroup = result.data || payload;
-            form.value = {
-                code: newGroup.code || payload.code,
-                name: newGroup.name || payload.name,
-                sales_tax_applied: newGroup.sales_tax_applied || payload.sales_tax_applied || 'Y',
-                status: newGroup.status || 'A'
-            };
-            originalCode.value = form.value.code.toUpperCase();
-            recordMode.value = 'review';
-            showCreateModal.value = false;
-        } else {
-            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
-        }
-    } catch (e) {
-        const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
-        console.error('Error creating tax group:', e);
-        showNotification(`Error creating tax group: ${errorMessage}`, 'error');
-    } finally {
-        saving.value = false;
-    }
-=======
     form.value = { ...editForm.value };
     originalCode.value = '';
     recordMode.value = 'add';
     showEditModal.value = true;
->>>>>>> 382db43783ab3609c34179ae915cb487038fee98
 };
 
 const handleCodeInput = () => {
