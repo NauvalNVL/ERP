@@ -145,7 +145,7 @@ const fetchPaperSizes = async () => {
     loading.value = true;
     
     try {
-        const response = await fetch('/api/paper-sizes', {
+        const response = await fetch('/api/paper-sizes?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

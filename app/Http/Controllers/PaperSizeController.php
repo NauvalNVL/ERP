@@ -208,8 +208,13 @@ class PaperSizeController extends Controller
     public function vueIndex()
     {
         try {
-            // Ambil data paper size
-            $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
+            // Ambil hanya data paper size yang masih aktif (status Act atau belum di-set)
+            $paperSizes = PaperSize::where(function ($q) {
+                    $q->whereNull('status')
+                      ->orWhere('status', 'Act');
+                })
+                ->orderBy('millimeter', 'asc')
+                ->get();
 
             // Konversi data untuk format yang benar di frontend
             $formattedPaperSizes = $paperSizes->map(function ($size) {
@@ -292,9 +297,13 @@ class PaperSizeController extends Controller
         try {
             $query = PaperSize::orderBy('millimeter', 'asc');
             
-            // Filter by active status by default, unless all_status=1 is passed
+            // Secara default hanya ambil size yang aktif (status Act atau NULL),
+            // kecuali jika parameter all_status=1 dikirim
             if (!$request->has('all_status') || !$request->all_status) {
-                $query->where('status', 'Act');
+                $query->where(function ($q) {
+                    $q->whereNull('status')
+                      ->orWhere('status', 'Act');
+                });
             }
             
             $paperSizes = $query->get();

@@ -318,32 +318,41 @@ const updateMillimeters = () => {
     }
 };
 
-// Watch for changes in search query to filter/select data
-// Catatan: jangan mengubah kembali nilai searchQuery di sini,
-// supaya user tetap bisa menghapus / mengedit teks secara bebas.
+// Watch for changes in search query to select matching paper size
 watch(searchQuery, (newQuery) => {
-    if (!newQuery || paperSizes.value.length === 0) {
-        // Jika input dikosongkan, jangan paksa pilih apa pun
+    // Jika input dikosongkan, hapus pilihan saat ini
+    if (!newQuery) {
+        selectedSize.value = null;
         return;
     }
 
-    const query = String(newQuery).toLowerCase();
+    if (paperSizes.value.length === 0) {
+        return;
+    }
+
+    const rawQuery = String(newQuery).trim();
+    const lowerQuery = rawQuery.toLowerCase();
+    // Ambil hanya karakter angka & titik untuk pencarian numerik
+    const numericQuery = rawQuery.replace(/[^0-9.]/g, '');
 
     const foundSize = paperSizes.value.find((size) => {
-        const idStr = String(size.id);
+        const idCode = `PS${String(size.id).padStart(3, '0')}`.toLowerCase();
+        const idStr = String(size.id).toLowerCase();
         const mmStr = String(size.millimeter ?? '').toLowerCase();
-        const codeStr = `PS${idStr.padStart(3, '0')}`.toLowerCase();
 
         return (
-            idStr.includes(query) ||
-            mmStr.includes(query) ||
-            codeStr.includes(query)
+            // Cari dengan kode seperti PS001
+            idCode.includes(lowerQuery) ||
+            // Cari berdasarkan ID numerik
+            (idStr && numericQuery && idStr.includes(numericQuery.toLowerCase())) ||
+            // Cari berdasarkan nilai millimeter
+            (mmStr && numericQuery && mmStr.includes(numericQuery.toLowerCase()))
         );
     });
 
     if (foundSize) {
-        // Hanya update selectedSize, biarkan teks yang diketik user tetap apa adanya
-        selectSize(foundSize);
+        // Hanya ubah pilihan, jangan timpa kembali nilai yang sedang diketik user
+        selectedSize.value = foundSize;
     }
 });
 
@@ -379,28 +388,23 @@ onMounted(() => {
 });
 
 const onPaperSizeSelected = (size) => {
-    // Dari modal: update selection + isi textbox dengan nilai yang dipilih
-    selectSize(size, { updateSearch: true });
+    selectSize(size);
+    // Tampilkan nilai millimeter yang dipilih pada textbox kode
+    searchQuery.value = size.millimeter;
     showModal.value = false;
 
     // Automatically open the edit modal for the selected row
     editSelectedSize();
 };
 
-const selectSize = (size, options = {}) => {
-    const { updateSearch = false } = options;
-
+const selectSize = (size) => {
     selectedSize.value = size;
-
-    if (updateSearch) {
-        searchQuery.value = String(size.millimeter ?? '');
-    }
 };
 
 const editSelectedSize = () => {
     if (selectedSize.value) {
-    isCreating.value = false;
-    form.value = {
+        isCreating.value = false;
+        form.value = {
             id: selectedSize.value.id,
             millimeter: selectedSize.value.millimeter,
             inches: selectedSize.value.inches
@@ -468,11 +472,11 @@ const savePaperSize = async () => {
         // Show success notification
         if (isCreating.value) {
             showNotification('Paper size created successfully', 'success');
-            // Find and select the newly created size, serta isi textbox dengan kode barunya
+            // Find and select the newly created size
             if (result.id) {
                 const newSize = paperSizes.value.find(s => s.id === result.id);
                 if (newSize) {
-                    selectSize(newSize, { updateSearch: true });
+                    selectSize(newSize);
                 }
             }
         } else {
