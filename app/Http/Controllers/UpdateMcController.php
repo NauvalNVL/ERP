@@ -720,11 +720,78 @@ class UpdateMcController extends Controller
         }
 
         try {
+            $requestKeys = array_keys($request->all());
+            $allowedSpecialOnlyKeys = ['mc_seq', 'customer_code', 'comp_no', 'specialInstructions'];
+            $isSpecialOnly = $request->has('specialInstructions')
+                && empty(array_diff($requestKeys, $allowedSpecialOnlyKeys));
+
+            if ($isSpecialOnly) {
+                return DB::transaction(function () use ($validated) {
+                    $comp = $validated['comp_no'] ?? 'Main';
+
+                    $existing = DB::table('MC')
+                        ->where('MCS_Num', $validated['mc_seq'])
+                        ->where('AC_NUM', $validated['customer_code'])
+                        ->where('COMP', $comp)
+                        ->first();
+
+                    if (!$existing) {
+                        return response()->json([
+                            'message' => 'Please save Master Card details first before saving Special Instructions.',
+                            'errors' => [
+                                'specialInstructions' => ['Please save Master Card details first before saving Special Instructions.'],
+                            ],
+                        ], 422);
+                    }
+
+                    $rows = is_array($validated['specialInstructions'] ?? null) ? $validated['specialInstructions'] : [];
+                    $rows = array_slice($rows, 0, 4);
+
+                    $inst = [];
+                    for ($i = 0; $i < 4; $i++) {
+                        $v = $rows[$i] ?? null;
+                        $v = is_string($v) ? trim($v) : (is_null($v) ? null : (string) $v);
+                        $inst[$i] = ($v === '') ? null : $v;
+                    }
+
+                    DB::table('MC')
+                        ->where('MCS_Num', $validated['mc_seq'])
+                        ->where('AC_NUM', $validated['customer_code'])
+                        ->where('COMP', $comp)
+                        ->update([
+                            'MC_SPECIAL_INST1' => $inst[0],
+                            'MC_SPECIAL_INST2' => $inst[1],
+                            'MC_SPECIAL_INST3' => $inst[2],
+                            'MC_SPECIAL_INST4' => $inst[3],
+                        ]);
+
+                    $this->createMcLog(
+                        $validated['mc_seq'],
+                        'UPDATE',
+                        $validated['customer_code'],
+                        $existing->AC_NAME ?? null,
+                        $existing->MODEL ?? null,
+                        null
+                    );
+
+                    return response()->json([
+                        'message' => 'Special Instructions saved successfully.',
+                        'data' => [
+                            'mc_seq' => $validated['mc_seq'],
+                            'customer_code' => $validated['customer_code'],
+                            'comp_no' => $comp,
+                            'specialInstructions' => $inst,
+                        ],
+                    ], 200);
+                });
+            }
+
             return DB::transaction(function () use ($validated) {
             // Load existing MC row to preserve unchanged fields on partial updates
             $existing = DB::table('MC')
                 ->where('MCS_Num', $validated['mc_seq'])
                 ->where('AC_NUM', $validated['customer_code'])
+                ->where('COMP', $validated['comp_no'] ?? 'Main')
                 ->first();
 
             // Helper to keep existing value when incoming is empty
@@ -837,14 +904,14 @@ class UpdateMcController extends Controller
                 // Preserve existing STS on partial updates; allow missing status key
                 'STS' => $validated['status'] ?? ($existing->STS ?? null),
                 'COMP' => $validated['comp_no'] ?? 'Main', // Default to 'Main' if not specified
-                'P_DESIGN' => $pDesignCode,
+                'P_DESIGN' => $keep('P_DESIGN', $pDesignCode),
                 'MCS_Num' => $validated['mc_seq'],
-                'MODEL' => $validated['mc_model'] ?? null,
-                'PART_NO' => $validated['part_no'] ?? null,
+                'MODEL' => $keep('MODEL', $validated['mc_model'] ?? null),
+                'PART_NO' => $keep('PART_NO', $validated['part_no'] ?? null),
                 // Get CURRENCY from customer table
-                'CURRENCY' => $currency,
+                'CURRENCY' => $keep('CURRENCY', $currency),
                 // Get UNIT from product_designs -> products table
-                'UNIT' => $unit,
+                'UNIT' => $keep('UNIT', $unit),
             ];
 
             Log::info('Legacy COMP value set to', [
@@ -884,64 +951,25 @@ class UpdateMcController extends Controller
             };
 
             // Colors and additional PD setup fields
-            $pd = $validated['pd_setup'] ?? [];
+            $pd = $validated['pd_setup'] ?? null;
+            $hasNonEmpty = function ($v) use (&$hasNonEmpty) {
+                if (is_array($v)) {
+                    foreach ($v as $vv) {
+                        if ($hasNonEmpty($vv)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return !($v === null || $v === '');
+            };
+            $hasPdPayload = is_array($pd) && $hasNonEmpty($pd);
 
-            // If no pd_setup array, build from direct request fields
-            if (empty($pd)) {
-                $pd = [
-                    'selectedProductDesign' => $validated['selectedProductDesign'] ?? null,
-                    'selectedPaperFlute' => $validated['selectedPaperFlute'] ?? null,
-                    'selectedChemicalCoat' => $validated['selectedChemicalCoat'] ?? null,
-                    'selectedReinforcementTape' => $validated['selectedReinforcementTape'] ?? null,
-                    'selectedPaperSize' => $validated['selectedPaperSize'] ?? null,
-                    'selectedScoringToolCode' => $validated['selectedScoringToolCode'] ?? null,
-                    'printColorCodes' => $validated['printColorCodes'] ?? [],
-                    'scoreL' => $validated['scoreL'] ?? [],
-                    'scoreW' => $validated['scoreW'] ?? [],
-                    'sheetLength' => $validated['sheetLength'] ?? null,
-                    'sheetWidth' => $validated['sheetWidth'] ?? null,
-                    'conOut' => $validated['conOut'] ?? null,
-                    'convDuctX2' => $validated['convDuctX2'] ?? null,
-                    'pcsToJoint' => $validated['pcsToJoint'] ?? null,
-                    'id' => $validated['id'] ?? [],
-                    'ed' => $validated['ed'] ?? [],
-                    'pcsPerSet' => $validated['pcsPerSet'] ?? null,
-                    'creaseValue' => $validated['creaseValue'] ?? null,
-                    'nestSlot' => $validated['nestSlot'] ?? null,
-                    'dcutSheet' => $validated['dcutSheet'] ?? [],
-                    'dcutMould' => $validated['dcutMould'] ?? [],
-                    'dcutBlockNo' => $validated['dcutBlockNo'] ?? null,
-                    'pitBlockNo' => $validated['pitBlockNo'] ?? null,
-                    'stitchWirePieces' => $validated['stitchWirePieces'] ?? null,
-                    'bdlPerPallet' => $validated['bdlPerPallet'] ?? null,
-                    'peelOffPercent' => $validated['peelOffPercent'] ?? null,
-                    'itemRemark' => $validated['itemRemark'] ?? null,
-                    'handHole' => $validated['handHole'] ?? false,
-                    'rotaryDCut' => $validated['rotaryDCut'] ?? false,
-                    'fullBlockPrint' => $validated['fullBlockPrint'] ?? false,
-                    'selectedFinishingCode' => $validated['selectedFinishingCode'] ?? null,
-                    'selectedStitchWireCode' => $validated['selectedStitchWireCode'] ?? null,
-                    'selectedBundlingStringCode' => $validated['selectedBundlingStringCode'] ?? null,
-                    'bundlingStringQty' => $validated['bundlingStringQty'] ?? null,
-                    'selectedGlueingCode' => $validated['selectedGlueingCode'] ?? null,
-                    'selectedWrappingCode' => $validated['selectedWrappingCode'] ?? null,
-                    'soValues' => $validated['soValues'] ?? [],
-                    'woValues' => $validated['woValues'] ?? [],
-                    'specialInstructions' => $validated['specialInstructions'] ?? [],
-                    'moreDescriptions' => $validated['moreDescriptions'] ?? [],
-                    'mcSpecialInst1' => $validated['mcSpecialInst1'] ?? null,
-                    'mcSpecialInst2' => $validated['mcSpecialInst2'] ?? null,
-                    'mcSpecialInst3' => $validated['mcSpecialInst3'] ?? null,
-                    'mcSpecialInst4' => $validated['mcSpecialInst4'] ?? null,
-                    'mcMoreDescription1' => $validated['mcMoreDescription1'] ?? null,
-                    'mcMoreDescription2' => $validated['mcMoreDescription2'] ?? null,
-                    'mcMoreDescription3' => $validated['mcMoreDescription3'] ?? null,
-                    'mcMoreDescription4' => $validated['mcMoreDescription4'] ?? null,
-                    'mcMoreDescription5' => $validated['mcMoreDescription5'] ?? null,
-                ];
+            if (!$hasPdPayload) {
+                $pd = [];
             }
 
-            if (is_array($pd)) {
+            if (is_array($pd) && $hasPdPayload) {
                 // Colors can come as array of codes or objects with code
                 $colors = $pd['printColorCodes'] ?? $pd['colors'] ?? [];
                 $colorCount = 0; // Track number of non-empty colors

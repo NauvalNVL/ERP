@@ -2,602 +2,662 @@
     <AppLayout :header="'Update MC'">
         <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
-        <!-- Header Section with animated elements -->
-        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
-            <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
-                        <i class="fas fa-id-card text-white text-sm"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-lg sm:text-xl font-semibold leading-tight">
-                            Update Master Card
-                        </h2>
-                        <p class="text-xs sm:text-sm text-blue-100">
-                            Manage and update master card information in the system
-                        </p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-xs text-blue-100">
-                    <i class="fas fa-info-circle text-sm"></i>
-                    <span>Search or update Master Card by AC# and MCS#.</span>
-                </div>
-            </div>
-        </div>
-
-        <div
-            class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-5 mb-4"
-        >
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left Column - Main Content -->
-                <div class="lg:col-span-2">
+                <!-- Header Section with animated elements -->
+                <div
+                    class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4"
+                >
                     <div
-                        class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-100"
+                        class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                     >
-                        <div
-                            class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10"
-                        >
+                        <div class="flex items-center gap-3">
                             <div
-                                class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-md"
+                                class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center"
                             >
-                                <i class="fas fa-edit text-white"></i>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800">
-                                Master Card Management
-                            </h3>
-                        </div>
-
-                        <!-- Form content -->
-                        <form @submit.prevent="saveRecord" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label
-                                        for="ac"
-                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm"
-                                        >
-                                            <i
-                                                class="fas fa-building text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        AC#:
-                                    </label>
-                                    <div class="relative flex group">
-                                        <span
-                                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors"
-                                        >
-                                            <i class="fas fa-hashtag"></i>
-                                        </span>
-                                        <input
-                                            type="text"
-                                            id="ac"
-                                            v-model="form.ac"
-                                            @input="handleAcInput"
-                                            class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
-                                            :class="{ filled: form.ac }"
-                                        />
-                                        <button
-                                            type="button"
-                                            @click="openCustomerAccountModal"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
-                                        >
-                                            <span
-                                                class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
-                                            ></span>
-                                            <i
-                                                class="fas fa-search relative z-10"
-                                            ></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div
-                                    class="flex items-end"
-                                    v-if="!showDetailedMcInfo"
-                                >
-                                    <!-- Remove Add New button as per the screenshots -->
-                                </div>
-                            </div>
-
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label
-                                        for="mcs"
-                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mr-2 shadow-sm"
-                                        >
-                                            <i
-                                                class="fas fa-barcode text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        MCS#:
-                                    </label>
-                                    <div class="relative flex group">
-                                        <span
-                                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors"
-                                        >
-                                            <i class="fas fa-barcode"></i>
-                                        </span>
-                                        <input
-                                            type="text"
-                                            id="mcs"
-                                            v-model="form.mcs"
-                                            @input="handleMcsInput"
-                                            class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
-                                            :class="{ filled: form.mcs }"
-                                        />
-                                        <button
-                                            type="button"
-                                            @click="searchMcs"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
-                                        >
-                                            <span
-                                                class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
-                                            ></span>
-                                            <i
-                                                class="fas fa-search relative z-10"
-                                            ></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-end">
-                                    <!-- Proceed button removed as per requirement -->
-                                </div>
-                            </div>
-
-                            <!-- Fields yang hanya muncul setelah proceed -->
-                            <div
-                                v-if="showDetailedMcInfo"
-                                class="grid grid-cols-1 md:grid-cols-3 gap-6"
-                            >
-                                <div>
-                                    <label
-                                        for="customer_name"
-                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-2 shadow-sm"
-                                        >
-                                            <i
-                                                class="fas fa-user text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        AC Name:
-                                    </label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                        >
-                                            <i
-                                                class="fas fa-user-circle text-gray-400"
-                                            ></i>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            id="customer_name"
-                                            v-model="form.customer_name"
-                                            readonly
-                                            class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 bg-gray-50 form-input"
-                                            :class="{
-                                                filled: form.customer_name,
-                                            }"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label
-                                        for="mc_model"
-                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mr-2 shadow-sm"
-                                        >
-                                            <i
-                                                class="fas fa-box text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        MC Model:
-                                    </label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                        >
-                                            <i
-                                                class="fas fa-box text-gray-400"
-                                            ></i>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            id="mc_model"
-                                            v-model="form.mc_model"
-                                            :readonly="
-                                                recordMode === 'existing'
-                                            "
-                                            :class="{
-                                                'bg-gray-50':
-                                                    recordMode === 'existing',
-                                                'bg-white':
-                                                    recordMode !== 'existing',
-                                                filled: form.mc_model,
-                                                empty:
-                                                    !form.mc_model &&
-                                                    showDetailedMcInfo,
-                                            }"
-                                            class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-amber-500 focus:border-amber-500 form-input"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label
-                                        for="mc_short_model"
-                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mr-2 shadow-sm"
-                                        >
-                                            <i
-                                                class="fas fa-tag text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        MC Short Model:
-                                    </label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                        >
-                                            <i
-                                                class="fas fa-tag text-gray-400"
-                                            ></i>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            id="mc_short_model"
-                                            v-model="form.mc_short_model"
-                                            :readonly="
-                                                recordMode === 'existing'
-                                            "
-                                            :class="{
-                                                'bg-gray-50':
-                                                    recordMode === 'existing',
-                                                'bg-white':
-                                                    recordMode !== 'existing',
-                                                filled: form.mc_short_model,
-                                                empty:
-                                                    !form.mc_short_model &&
-                                                    showDetailedMcInfo,
-                                            }"
-                                            class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500 form-input"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Status fields yang hanya muncul setelah proceed -->
-                            <div
-                                v-if="showDetailedMcInfo"
-                                class="grid grid-cols-1 md:grid-cols-2 gap-6"
-                            >
-                                <div>
-                                    <label
-                                        for="mc_status"
-                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm"
-                                        >
-                                            <i
-                                                class="fas fa-toggle-on text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        MC Status:
-                                    </label>
-                                    <div class="relative flex group">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                        >
-                                            <i
-                                                class="fas fa-info-circle text-gray-400"
-                                            ></i>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            id="mc_status"
-                                            v-model="form.mc_status"
-                                            readonly
-                                            class="flex-1 min-w-0 w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50"
-                                        />
-                                        <button
-                                            type="button"
-                                            @click="fetchStatusLog"
-                                            class="inline-flex items-center px-3 py-2 border border-gray-300 bg-purple-500 text-white rounded-r-md shadow-md hover:bg-purple-600 transition-colors text-sm"
-                                        >
-                                            Status Log
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Extra status field removed as per requirement -->
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Detailed MC Info Section -->
-                    <div
-                        v-if="showDetailedMcInfo"
-                        class="mt-4 bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5"
-                    >
-
-                        <div
-                            class="flex items-center mb-4 pb-2 border-b border-gray-100"
-                        >
-                            <div
-                                class="p-2 bg-blue-500 rounded-lg mr-3"
-                            >
-                                <i class="fas fa-info-circle text-white"></i>
-                            </div>
-                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
-                                Detailed Master Card Information
-                            </h3>
-                        </div>
-
-                        <div
-                            class="grid grid-cols-2 gap-4 text-sm"
-                        >
-                            <div>
-                                <label class="block text-gray-600"
-                                    >Last MCS#:</label
-                                >
-                                <input
-                                    type="text"
-                                    :value="mcDetails.last_mcs"
-                                    readonly
-                                    class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
-                                />
+                                <i
+                                    class="fas fa-id-card text-white text-sm"
+                                ></i>
                             </div>
                             <div>
-                                <label class="block text-gray-600"
-                                    >Last Updated Seq#:</label
+                                <h2
+                                    class="text-lg sm:text-xl font-semibold leading-tight"
                                 >
-                                <input
-                                    type="text"
-                                    :value="mcDetails.last_updated_seq"
-                                    readonly
-                                    class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
-                                />
+                                    Update Master Card
+                                </h2>
+                                <p class="text-xs sm:text-sm text-blue-100">
+                                    Manage and update master card information in
+                                    the system
+                                </p>
                             </div>
                         </div>
-
-                        <div class="mt-6 flex flex-wrap gap-4 justify-between">
-                            <button
-                                type="button"
-                                @click="fetchMaintenanceLog"
-                                class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors"
-                            >
-                                Maintenance Log
-                            </button>
-                            <button
-                                type="button"
-                                @click="handleNextSetup"
-                                class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors"
-                            >
-                                Next Setup
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Right Column - Quick Info -->
-                <div class="lg:col-span-1">
-                    <!-- Info Card -->
-                    <div
-                        class="bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5 mb-4"
-                    >
-
                         <div
-                            class="flex items-center mb-3 pb-2 border-b border-gray-100"
+                            class="flex items-center gap-2 text-xs text-blue-100"
                         >
-                            <div
-                                class="p-2 bg-blue-500 rounded-lg mr-3"
-                            >
-                                <i class="fas fa-info-circle text-white"></i>
-                            </div>
-                            <h3 class="text-base sm:text-lg font-semibold text-gray-800">
-                                Master Card Info
-                            </h3>
-
-                            <!-- Loading indicator for small actions -->
+                            <i class="fas fa-info-circle text-sm"></i>
                             <span
-                                v-if="isProcessing"
-                                class="inline-flex items-center ml-2 animate-pulse"
+                                >Search or update Master Card by AC# and
+                                MCS#.</span
                             >
-                                <span
-                                    class="h-2 w-2 bg-teal-500 rounded-full mr-1"
-                                ></span>
-                                <span
-                                    class="h-2 w-2 bg-teal-500 rounded-full mr-1 animation-delay-100"
-                                ></span>
-                                <span
-                                    class="h-2 w-2 bg-teal-500 rounded-full animation-delay-200"
-                                ></span>
-                                <span class="text-sm text-teal-500 ml-1"
-                                    >Processing</span
-                                >
-                            </span>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="space-y-4">
-                            <div class="p-3 bg-teal-50 rounded-lg">
-                                <h4
-                                    class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2 flex items-center"
-                                >
-                                    <span
-                                        class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mr-2 shadow-sm"
-                                    >
-                                        <i
-                                            class="fas fa-book text-white text-xs"
-                                        ></i>
-                                    </span>
-                                    Instructions
-                                </h4>
-                                <ul class="text-sm text-gray-600 space-y-2">
-                                    <li class="flex items-start">
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5"
-                                        >
-                                            <i
-                                                class="fas fa-building text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        <span
-                                            ><strong>Step 1:</strong> Select
-                                            Customer Account (AC#) first</span
-                                        >
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5"
-                                        >
-                                            <i
-                                                class="fas fa-search text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        <span
-                                            ><strong>Step 2:</strong> Search
-                                            existing MCS or enter new
-                                            number</span
-                                        >
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mr-2 shadow-sm mt-0.5"
-                                        >
-                                            <i
-                                                class="fas fa-play text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        <span
-                                            ><strong>Step 3:</strong> Click
-                                            "Proceed" to continue</span
-                                        >
-                                    </li>
-                                    <li
-                                        v-if="showDetailedMcInfo"
-                                        class="flex items-start"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5"
-                                        >
-                                            <i
-                                                class="fas fa-edit text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        <span
-                                            ><strong>Step 4:</strong> Fill MC
-                                            Model for new records</span
-                                        >
-                                    </li>
-                                    <li
-                                        v-if="showDetailedMcInfo"
-                                        class="flex items-start"
-                                    >
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-400 to-rose-400 rounded-full mr-2 shadow-sm mt-0.5"
-                                        >
-                                            <i
-                                                class="fas fa-cogs text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        <span
-                                            ><strong>Step 5:</strong> Use Next
-                                            Setup to configure components</span
-                                        >
-                                    </li>
-                                </ul>
+                <div
+                    class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-5 mb-4"
+                >
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left Column - Main Content -->
+                        <div class="lg:col-span-2">
+                            <div
+                                class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-100"
+                            >
                                 <div
-                                    class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md"
+                                    class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10"
                                 >
-                                    <p
-                                        class="text-xs text-yellow-800 font-medium"
+                                    <div
+                                        class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-md"
                                     >
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Master Cards are linked to specific
-                                        Customer Accounts. Only MCs belonging to
-                                        the selected customer will be shown.
-                                    </p>
+                                        <i class="fas fa-edit text-white"></i>
+                                    </div>
+                                    <h3
+                                        class="text-xl font-semibold text-gray-800"
+                                    >
+                                        Master Card Management
+                                    </h3>
                                 </div>
+
+                                <!-- Form content -->
+                                <form
+                                    @submit.prevent="saveRecord"
+                                    class="space-y-4"
+                                >
+                                    <div
+                                        class="grid grid-cols-1 md:grid-cols-2 gap-6"
+                                    >
+                                        <div>
+                                            <label
+                                                for="ac"
+                                                class="flex items-center text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm"
+                                                >
+                                                    <i
+                                                        class="fas fa-building text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                AC#:
+                                            </label>
+                                            <div class="relative flex group">
+                                                <span
+                                                    class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors"
+                                                >
+                                                    <i
+                                                        class="fas fa-hashtag"
+                                                    ></i>
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    id="ac"
+                                                    v-model="form.ac"
+                                                    @input="handleAcInput"
+                                                    class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
+                                                    :class="{ filled: form.ac }"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    @click="
+                                                        openCustomerAccountModal
+                                                    "
+                                                    class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                                >
+                                                    <span
+                                                        class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
+                                                    ></span>
+                                                    <i
+                                                        class="fas fa-search relative z-10"
+                                                    ></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="flex items-end"
+                                            v-if="!showDetailedMcInfo"
+                                        >
+                                            <!-- Remove Add New button as per the screenshots -->
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="grid grid-cols-1 md:grid-cols-2 gap-6"
+                                    >
+                                        <div>
+                                            <label
+                                                for="mcs"
+                                                class="flex items-center text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mr-2 shadow-sm"
+                                                >
+                                                    <i
+                                                        class="fas fa-barcode text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                MCS#:
+                                            </label>
+                                            <div class="relative flex group">
+                                                <span
+                                                    class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors"
+                                                >
+                                                    <i
+                                                        class="fas fa-barcode"
+                                                    ></i>
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    id="mcs"
+                                                    v-model="form.mcs"
+                                                    @input="handleMcsInput"
+                                                    class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
+                                                    :class="{
+                                                        filled: form.mcs,
+                                                    }"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    @click="searchMcs"
+                                                    class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                                >
+                                                    <span
+                                                        class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
+                                                    ></span>
+                                                    <i
+                                                        class="fas fa-search relative z-10"
+                                                    ></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-end">
+                                            <!-- Proceed button removed as per requirement -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Fields yang hanya muncul setelah proceed -->
+                                    <div
+                                        v-if="showDetailedMcInfo"
+                                        class="grid grid-cols-1 md:grid-cols-3 gap-6"
+                                    >
+                                        <div>
+                                            <label
+                                                for="customer_name"
+                                                class="flex items-center text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-2 shadow-sm"
+                                                >
+                                                    <i
+                                                        class="fas fa-user text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                AC Name:
+                                            </label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                                                >
+                                                    <i
+                                                        class="fas fa-user-circle text-gray-400"
+                                                    ></i>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    id="customer_name"
+                                                    v-model="form.customer_name"
+                                                    readonly
+                                                    class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 bg-gray-50 form-input"
+                                                    :class="{
+                                                        filled: form.customer_name,
+                                                    }"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label
+                                                for="mc_model"
+                                                class="flex items-center text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mr-2 shadow-sm"
+                                                >
+                                                    <i
+                                                        class="fas fa-box text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                MC Model:
+                                            </label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                                                >
+                                                    <i
+                                                        class="fas fa-box text-gray-400"
+                                                    ></i>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    id="mc_model"
+                                                    v-model="form.mc_model"
+                                                    :readonly="
+                                                        recordMode ===
+                                                        'existing'
+                                                    "
+                                                    :class="{
+                                                        'bg-gray-50':
+                                                            recordMode ===
+                                                            'existing',
+                                                        'bg-white':
+                                                            recordMode !==
+                                                            'existing',
+                                                        filled: form.mc_model,
+                                                        empty:
+                                                            !form.mc_model &&
+                                                            showDetailedMcInfo,
+                                                    }"
+                                                    class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-amber-500 focus:border-amber-500 form-input"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label
+                                                for="mc_short_model"
+                                                class="flex items-center text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mr-2 shadow-sm"
+                                                >
+                                                    <i
+                                                        class="fas fa-tag text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                MC Short Model:
+                                            </label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                                                >
+                                                    <i
+                                                        class="fas fa-tag text-gray-400"
+                                                    ></i>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    id="mc_short_model"
+                                                    v-model="
+                                                        form.mc_short_model
+                                                    "
+                                                    :readonly="
+                                                        recordMode ===
+                                                        'existing'
+                                                    "
+                                                    :class="{
+                                                        'bg-gray-50':
+                                                            recordMode ===
+                                                            'existing',
+                                                        'bg-white':
+                                                            recordMode !==
+                                                            'existing',
+                                                        filled: form.mc_short_model,
+                                                        empty:
+                                                            !form.mc_short_model &&
+                                                            showDetailedMcInfo,
+                                                    }"
+                                                    class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500 form-input"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status fields yang hanya muncul setelah proceed -->
+                                    <div
+                                        v-if="showDetailedMcInfo"
+                                        class="grid grid-cols-1 md:grid-cols-2 gap-6"
+                                    >
+                                        <div>
+                                            <label
+                                                for="mc_status"
+                                                class="flex items-center text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm"
+                                                >
+                                                    <i
+                                                        class="fas fa-toggle-on text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                MC Status:
+                                            </label>
+                                            <div class="relative flex group">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                                                >
+                                                    <i
+                                                        class="fas fa-info-circle text-gray-400"
+                                                    ></i>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    id="mc_status"
+                                                    v-model="form.mc_status"
+                                                    readonly
+                                                    class="flex-1 min-w-0 w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    @click="fetchStatusLog"
+                                                    class="inline-flex items-center px-3 py-2 border border-gray-300 bg-purple-500 text-white rounded-r-md shadow-md hover:bg-purple-600 transition-colors text-sm"
+                                                >
+                                                    Status Log
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Extra status field removed as per requirement -->
+                                    </div>
+                                </form>
                             </div>
 
-                            <div class="p-3 bg-blue-50 rounded-lg">
-                                <h4
-                                    class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2 flex items-center"
+                            <!-- Detailed MC Info Section -->
+                            <div
+                                v-if="showDetailedMcInfo"
+                                class="mt-4 bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5"
+                            >
+                                <div
+                                    class="flex items-center mb-4 pb-2 border-b border-gray-100"
                                 >
-                                    <span
-                                        class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm"
+                                    <div
+                                        class="p-2 bg-blue-500 rounded-lg mr-3"
                                     >
                                         <i
-                                            class="fas fa-info-circle text-white text-xs"
+                                            class="fas fa-info-circle text-white"
                                         ></i>
-                                    </span>
-                                    Status
-                                </h4>
-                                <div class="space-y-3">
-                                    <div class="flex items-start">
-                                        <span
-                                            class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-gray-400 to-slate-500 rounded-full mr-2 shadow-sm mt-0.5 flex-shrink-0"
+                                    </div>
+                                    <h3
+                                        class="text-base sm:text-lg font-semibold text-gray-800"
+                                    >
+                                        Detailed Master Card Information
+                                    </h3>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <label class="block text-gray-600"
+                                            >Last MCS#:</label
                                         >
-                                            <i
-                                                class="fas fa-info-circle text-white text-xs"
-                                            ></i>
-                                        </span>
-                                        <div>
-                                            <p
-                                                v-if="!showDetailedMcInfo"
-                                                class="text-xs text-gray-600"
+                                        <input
+                                            type="text"
+                                            :value="mcDetails.last_mcs"
+                                            readonly
+                                            class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-600"
+                                            >Last Updated Seq#:</label
+                                        >
+                                        <input
+                                            type="text"
+                                            :value="mcDetails.last_updated_seq"
+                                            readonly
+                                            class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="mt-6 flex flex-wrap gap-4 justify-between"
+                                >
+                                    <button
+                                        type="button"
+                                        @click="fetchMaintenanceLog"
+                                        class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors"
+                                    >
+                                        Maintenance Log
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="handleNextSetup"
+                                        class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors"
+                                    >
+                                        Next Setup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Quick Info -->
+                        <div class="lg:col-span-1">
+                            <!-- Info Card -->
+                            <div
+                                class="bg-white shadow-sm rounded-xl border border-blue-100 p-4 sm:p-5 mb-4"
+                            >
+                                <div
+                                    class="flex items-center mb-3 pb-2 border-b border-gray-100"
+                                >
+                                    <div
+                                        class="p-2 bg-blue-500 rounded-lg mr-3"
+                                    >
+                                        <i
+                                            class="fas fa-info-circle text-white"
+                                        ></i>
+                                    </div>
+                                    <h3
+                                        class="text-base sm:text-lg font-semibold text-gray-800"
+                                    >
+                                        Master Card Info
+                                    </h3>
+
+                                    <!-- Loading indicator for small actions -->
+                                    <span
+                                        v-if="isProcessing"
+                                        class="inline-flex items-center ml-2 animate-pulse"
+                                    >
+                                        <span
+                                            class="h-2 w-2 bg-teal-500 rounded-full mr-1"
+                                        ></span>
+                                        <span
+                                            class="h-2 w-2 bg-teal-500 rounded-full mr-1 animation-delay-100"
+                                        ></span>
+                                        <span
+                                            class="h-2 w-2 bg-teal-500 rounded-full animation-delay-200"
+                                        ></span>
+                                        <span class="text-sm text-teal-500 ml-1"
+                                            >Processing</span
+                                        >
+                                    </span>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="p-3 bg-teal-50 rounded-lg">
+                                        <h4
+                                            class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2 flex items-center"
+                                        >
+                                            <span
+                                                class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mr-2 shadow-sm"
                                             >
-                                                Ready to start
-                                            </p>
-                                            <p
-                                                v-else
-                                                class="text-xs text-gray-600"
+                                                <i
+                                                    class="fas fa-book text-white text-xs"
+                                                ></i>
+                                            </span>
+                                            Instructions
+                                        </h4>
+                                        <ul
+                                            class="text-sm text-gray-600 space-y-2"
+                                        >
+                                            <li class="flex items-start">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5"
+                                                >
+                                                    <i
+                                                        class="fas fa-building text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                <span
+                                                    ><strong>Step 1:</strong>
+                                                    Select Customer Account
+                                                    (AC#) first</span
+                                                >
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5"
+                                                >
+                                                    <i
+                                                        class="fas fa-search text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                <span
+                                                    ><strong>Step 2:</strong>
+                                                    Search existing MCS or enter
+                                                    new number</span
+                                                >
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mr-2 shadow-sm mt-0.5"
+                                                >
+                                                    <i
+                                                        class="fas fa-play text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                <span
+                                                    ><strong>Step 3:</strong>
+                                                    Click "Proceed" to
+                                                    continue</span
+                                                >
+                                            </li>
+                                            <li
+                                                v-if="showDetailedMcInfo"
+                                                class="flex items-start"
                                             >
-                                                {{
-                                                    recordMode === "existing"
-                                                        ? "Existing Master Card"
-                                                        : "New Master Card"
-                                                }}
-                                            </p>
-                                            <p
-                                                v-if="!showDetailedMcInfo"
-                                                class="text-xs text-gray-400 mt-1"
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5"
+                                                >
+                                                    <i
+                                                        class="fas fa-edit text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                <span
+                                                    ><strong>Step 4:</strong>
+                                                    Fill MC Model for new
+                                                    records</span
+                                                >
+                                            </li>
+                                            <li
+                                                v-if="showDetailedMcInfo"
+                                                class="flex items-start"
                                             >
-                                                Enter AC# and MCS# to proceed
-                                            </p>
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-400 to-rose-400 rounded-full mr-2 shadow-sm mt-0.5"
+                                                >
+                                                    <i
+                                                        class="fas fa-cogs text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                <span
+                                                    ><strong>Step 5:</strong>
+                                                    Use Next Setup to configure
+                                                    components</span
+                                                >
+                                            </li>
+                                        </ul>
+                                        <div
+                                            class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md"
+                                        >
                                             <p
-                                                v-else
-                                                class="text-xs text-gray-400 mt-1"
+                                                class="text-xs text-yellow-800 font-medium"
                                             >
-                                                {{
-                                                    recordMode === "existing"
-                                                        ? "Ready for modifications"
-                                                        : "Fill in master card details and save"
-                                                }}
+                                                <i
+                                                    class="fas fa-info-circle mr-1"
+                                                ></i>
+                                                Master Cards are linked to
+                                                specific Customer Accounts. Only
+                                                MCs belonging to the selected
+                                                customer will be shown.
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 bg-blue-50 rounded-lg">
+                                        <h4
+                                            class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2 flex items-center"
+                                        >
+                                            <span
+                                                class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm"
+                                            >
+                                                <i
+                                                    class="fas fa-info-circle text-white text-xs"
+                                                ></i>
+                                            </span>
+                                            Status
+                                        </h4>
+                                        <div class="space-y-3">
+                                            <div class="flex items-start">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-gray-400 to-slate-500 rounded-full mr-2 shadow-sm mt-0.5 flex-shrink-0"
+                                                >
+                                                    <i
+                                                        class="fas fa-info-circle text-white text-xs"
+                                                    ></i>
+                                                </span>
+                                                <div>
+                                                    <p
+                                                        v-if="
+                                                            !showDetailedMcInfo
+                                                        "
+                                                        class="text-xs text-gray-600"
+                                                    >
+                                                        Ready to start
+                                                    </p>
+                                                    <p
+                                                        v-else
+                                                        class="text-xs text-gray-600"
+                                                    >
+                                                        {{
+                                                            recordMode ===
+                                                            "existing"
+                                                                ? "Existing Master Card"
+                                                                : "New Master Card"
+                                                        }}
+                                                    </p>
+                                                    <p
+                                                        v-if="
+                                                            !showDetailedMcInfo
+                                                        "
+                                                        class="text-xs text-gray-400 mt-1"
+                                                    >
+                                                        Enter AC# and MCS# to
+                                                        proceed
+                                                    </p>
+                                                    <p
+                                                        v-else
+                                                        class="text-xs text-gray-400 mt-1"
+                                                    >
+                                                        {{
+                                                            recordMode ===
+                                                            "existing"
+                                                                ? "Ready for modifications"
+                                                                : "Fill in master card details and save"
+                                                        }}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </div>
-        </div>
             </div>
         </div>
 
@@ -654,7 +714,16 @@
             @openPaperQualityModal="openPaperQualityModal"
             @openWoPaperQualityModal="openWoPaperQualityModal"
             @requestClearSoWo="clearSoWo"
-            @requestSetSoWo="({ so, wo }) => { soValues.value = Array.isArray(so) ? so : ['', '', '', '', '']; woValues.value = Array.isArray(wo) ? wo : ['', '', '', '', '']; }"
+            @requestSetSoWo="
+                ({ so, wo }) => {
+                    soValues.value = Array.isArray(so)
+                        ? so
+                        : ['', '', '', '', ''];
+                    woValues.value = Array.isArray(wo)
+                        ? wo
+                        : ['', '', '', '', ''];
+                }
+            "
             @saveMasterCard="saveMasterCardFromModal"
         />
 
@@ -740,9 +809,7 @@
                     class="bg-blue-600 text-white px-4 py-3 sm:px-6 rounded-t-lg flex justify-between items-center"
                 >
                     <div class="flex items-center space-x-3">
-                        <div
-                            class="bg-white bg-opacity-20 p-2 rounded-lg"
-                        >
+                        <div class="bg-white bg-opacity-20 p-2 rounded-lg">
                             <i class="fas fa-users text-xl"></i>
                         </div>
                         <h3 class="text-lg sm:text-xl font-semibold">
@@ -758,23 +825,17 @@
                 </div>
 
                 <!-- Search and Filter Bar -->
-                <div
-                    class="p-4 border-b bg-white"
-                >
+                <div class="p-4 border-b bg-white">
                     <div class="flex flex-col md:flex-row gap-4">
                         <!-- Search Input -->
-                        <div
-                            class="relative flex-grow"
-                        >
+                        <div class="relative flex-grow">
                             <input
                                 type="text"
                                 v-model="searchTerm"
                                 placeholder="Search by customer code or name..."
                                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
                             />
-                            <div
-                                class="absolute left-3 top-2.5 text-gray-400"
-                            >
+                            <div class="absolute left-3 top-2.5 text-gray-400">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
@@ -831,9 +892,7 @@
                 </div>
 
                 <!-- Customer List with Enhanced Styling -->
-                <div
-                    class="flex-1 overflow-y-auto p-4 bg-white"
-                >
+                <div class="flex-1 overflow-y-auto p-4 bg-white">
                     <!-- Loading State -->
                     <div
                         v-if="isLoadingCustomers"
@@ -900,12 +959,13 @@
                                     v-for="(
                                         customer, index
                                     ) in filteredCustomers"
-                                    :key="customer.customer_code"
+                                    :key="customer.customer_code || index"
                                     class="hover:bg-blue-50 cursor-pointer transition-colors"
                                     :class="{
                                         'bg-blue-100':
-                                            selectedCustomer?.customer_code ===
-                                            customer.customer_code
+                                            selectedCustomer &&
+                                            selectedCustomer.customer_code ===
+                                                customer.customer_code,
                                     }"
                                     @click="selectCustomer(customer)"
                                 >
@@ -926,9 +986,7 @@
                                             "
                                             class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                         >
-                                            <i
-                                                class="fas fa-check mr-1.5"
-                                            ></i>
+                                            <i class="fas fa-check mr-1.5"></i>
                                             Select
                                         </button>
                                     </td>
@@ -993,13 +1051,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch, defineAsyncComponent } from 'vue';
+import {
+    ref,
+    computed,
+    onMounted,
+    nextTick,
+    watch,
+    defineAsyncComponent,
+} from "vue";
 
 const selectedMcsFull = ref(null);
 // Reset SO/WO paper quality arrays to empty values
 const clearSoWo = () => {
-    soValues.value = ['', '', '', '', ''];
-    woValues.value = ['', '', '', '', ''];
+    soValues.value = ["", "", "", "", ""];
+    woValues.value = ["", "", "", "", ""];
 };
 
 // Reset whole Update MC page to its initial state (similar to refreshing the page)
@@ -1074,7 +1139,10 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
 
         // Normalize moreDescriptions to a plain array for backend
         let normalizedMoreDescriptions = [];
-        if (pdRoot.moreDescriptions && Array.isArray(pdRoot.moreDescriptions.value)) {
+        if (
+            pdRoot.moreDescriptions &&
+            Array.isArray(pdRoot.moreDescriptions.value)
+        ) {
             normalizedMoreDescriptions = [...pdRoot.moreDescriptions.value];
         } else if (Array.isArray(pdRoot.moreDescriptions)) {
             normalizedMoreDescriptions = [...pdRoot.moreDescriptions];
@@ -1082,45 +1150,57 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         pdRoot.moreDescriptions = normalizedMoreDescriptions;
 
         // Ensure SO/WO arrays are always present at root for backend mapping
-        pdRoot.soValues = Array.isArray(soValues.value) ? [...soValues.value] : [];
-        pdRoot.woValues = Array.isArray(woValues.value) ? [...woValues.value] : [];
+        pdRoot.soValues = Array.isArray(soValues.value)
+            ? [...soValues.value]
+            : [];
+        pdRoot.woValues = Array.isArray(woValues.value)
+            ? [...woValues.value]
+            : [];
 
         // Get selected component name (Main, Fit1, Fit2, etc.)
         // Use form.comp_no directly as it's already updated by selectComponent
-        const componentName = form.value.comp_no || 'Main';
-        const selectedComponent = mcComponents.value.find(c => c.c_num === componentName);
+        const componentName = form.value.comp_no || "Main";
+        const selectedComponent = mcComponents.value.find(
+            (c) => c.c_num === componentName
+        );
 
-        console.log('🔍 Save Master Card - Component Info:', {
+        console.log("🔍 Save Master Card - Component Info:", {
             selectedComponent: selectedComponent,
             componentName: componentName,
             form_comp_no: form.value.comp_no,
-            all_components: mcComponents.value.map(c => ({ name: c.c_num, selected: c.selected }))
+            all_components: mcComponents.value.map((c) => ({
+                name: c.c_num,
+                selected: c.selected,
+            })),
         });
 
         // Ensure status is valid (Active or Obsolete)
-        let validStatus = 'Active';
-        if (form.value.mc_status === 'Active' || form.value.mc_status === 'Obsolete') {
+        let validStatus = "Active";
+        if (
+            form.value.mc_status === "Active" ||
+            form.value.mc_status === "Obsolete"
+        ) {
             validStatus = form.value.mc_status;
-        } else if (form.value.mc_status === 'Act') {
-            validStatus = 'Active';
+        } else if (form.value.mc_status === "Act") {
+            validStatus = "Active";
         }
 
         const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
-            customer_name: form.value.customer_name || '', // Pass customer name to backend
-            mc_model: form.value.mc_model || '',
-            mc_short_model: form.value.mc_short_model || '',
+            customer_name: form.value.customer_name || "", // Pass customer name to backend
+            mc_model: form.value.mc_model || "",
+            mc_short_model: form.value.mc_short_model || "",
             status: validStatus,
-            part_no: '',
+            part_no: "",
             comp_no: componentName, // Use selected component (Main, Fit1, Fit2, etc.)
-            p_design: '',
-            ext_dim_1: mcDetails.value.ext_dim_1 || '',
-            ext_dim_2: mcDetails.value.ext_dim_2 || '',
-            ext_dim_3: mcDetails.value.ext_dim_3 || '',
-            int_dim_1: mcDetails.value.int_dim_1 || '',
-            int_dim_2: mcDetails.value.int_dim_2 || '',
-            int_dim_3: mcDetails.value.int_dim_3 || '',
+            p_design: "",
+            ext_dim_1: mcDetails.value.ext_dim_1 || "",
+            ext_dim_2: mcDetails.value.ext_dim_2 || "",
+            ext_dim_3: mcDetails.value.ext_dim_3 || "",
+            int_dim_1: mcDetails.value.int_dim_1 || "",
+            int_dim_2: mcDetails.value.int_dim_2 || "",
+            int_dim_3: mcDetails.value.int_dim_3 || "",
             detailed_master_card: {
                 mc_details: mcDetails.value,
             },
@@ -1132,7 +1212,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             moreDescriptions: normalizedMoreDescriptions,
         };
 
-        console.log('📤 Payload being sent:', {
+        console.log("📤 Payload being sent:", {
             mc_seq: payload.mc_seq,
             customer_code: payload.customer_code,
             comp_no: payload.comp_no,
@@ -1143,19 +1223,23 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         });
 
         // Get CSRF token from meta tag or cookie
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
 
-        const res = await axios.post('/api/update-mc/master-cards', payload, {
+        const res = await axios.post("/api/update-mc/master-cards", payload, {
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+            },
         });
 
         if (res.data) {
-            toast.success(`Master Card saved successfully for component: ${componentName}`);
+            toast.success(
+                `Master Card saved successfully for component: ${componentName}`
+            );
             // After successful save from Setup MC, PD, close PD modal only
             // so the user returns to the Setup MC, Component modal instead of the main page.
             showSetupPdModal.value = false;
@@ -1167,57 +1251,83 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             if (form.value.mcs && form.value.ac) {
                 const mcsSeqEnc = encodeURIComponent(form.value.mcs);
                 const custEnc = encodeURIComponent(form.value.ac);
-                const refRes = await axios.get(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
-                    headers: { 'Accept': 'application/json' }
-                });
+                const refRes = await axios.get(
+                    `/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`,
+                    {
+                        headers: { Accept: "application/json" },
+                    }
+                );
                 if (refRes.data) {
                     selectedMcsFull.value = refRes.data;
                     // Mark this MC as existing so UpdateMcModal receives mcLoaded
-                    recordMode.value = 'existing';
+                    recordMode.value = "existing";
                     showDetailedMcInfo.value = true;
                     recordSelected.value = true;
                 }
             }
         } catch (e) {
-            console.error('Failed to refresh full MC after save:', e);
+            console.error("Failed to refresh full MC after save:", e);
         }
     } catch (e) {
-        console.error('=== SAVE MASTERCARD ERROR ===');
-        console.error('Full Error:', e);
-        console.error('Error Response:', e.response?.data);
+        console.error("=== SAVE MASTERCARD ERROR ===");
+        console.error("Full Error:", e);
+        console.error("Error Response:", e.response?.data);
 
         // Handle CSRF token mismatch specifically
         if (e.response?.status === 419) {
-            toast.error('Session expired. Please refresh the page and try again.');
+            toast.error(
+                "Session expired. Please refresh the page and try again."
+            );
             return;
         }
 
         // Display detailed error information
         if (e.response?.data?.errors) {
-            console.error('=== VALIDATION ERRORS ===');
+            console.error("=== VALIDATION ERRORS ===");
             console.table(e.response.data.errors);
-            Object.keys(e.response.data.errors).forEach(field => {
-                console.error(`Field "${field}":`, e.response.data.errors[field]);
+            Object.keys(e.response.data.errors).forEach((field) => {
+                console.error(
+                    `Field "${field}":`,
+                    e.response.data.errors[field]
+                );
             });
         }
 
         if (e.response?.data?.debug) {
-            console.error('=== DEBUG INFO ===');
-            console.error('Received Fields Count:', e.response.data.debug.received_fields?.length);
-            console.error('Received Fields:', e.response.data.debug.received_fields);
-            console.error('Missing Validations Count:', e.response.data.debug.missing_validations?.length);
-            console.error('Missing Validations:', e.response.data.debug.missing_validations);
+            console.error("=== DEBUG INFO ===");
+            console.error(
+                "Received Fields Count:",
+                e.response.data.debug.received_fields?.length
+            );
+            console.error(
+                "Received Fields:",
+                e.response.data.debug.received_fields
+            );
+            console.error(
+                "Missing Validations Count:",
+                e.response.data.debug.missing_validations?.length
+            );
+            console.error(
+                "Missing Validations:",
+                e.response.data.debug.missing_validations
+            );
 
             // Show which fields are missing validation
-            if (Array.isArray(e.response.data.debug.missing_validations) && e.response.data.debug.missing_validations.length > 0) {
-                console.error('⚠️ FIELDS WITHOUT VALIDATION RULES:');
-                e.response.data.debug.missing_validations.forEach(field => {
+            if (
+                Array.isArray(e.response.data.debug.missing_validations) &&
+                e.response.data.debug.missing_validations.length > 0
+            ) {
+                console.error("⚠️ FIELDS WITHOUT VALIDATION RULES:");
+                e.response.data.debug.missing_validations.forEach((field) => {
                     console.error(`  - ${field}`);
                 });
             }
         }
 
-        const errorMsg = e.response?.data?.message || e.message || 'Failed to save Master Card';
+        const errorMsg =
+            e.response?.data?.message ||
+            e.message ||
+            "Failed to save Master Card";
         toast.error(errorMsg);
     }
 };
@@ -1225,16 +1335,20 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
 const saveSpecialInstructions = async (rows) => {
     try {
         if (!form.value.ac || !form.value.mcs) {
-            toast.error('Please select AC and MCS before saving Special Instructions.');
+            toast.error(
+                "Please select AC and MCS before saving Special Instructions."
+            );
             return;
         }
 
-        const componentName = form.value.comp_no || 'Main';
+        const componentName = "Main";
         const specialInstructions = Array.isArray(rows)
-            ? rows.slice(0, 4).map((v) => (v ?? '') + '')
-            : ['', '', '', ''];
+            ? rows.slice(0, 4).map((v) => (v ?? "") + "")
+            : ["", "", "", ""];
 
-        if (!window.confirm('Save Special Instructions for this Master Card?')) {
+        if (
+            !window.confirm("Save Special Instructions for this Master Card?")
+        ) {
             return;
         }
 
@@ -1247,21 +1361,21 @@ const saveSpecialInstructions = async (rows) => {
 
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content');
+            ?.getAttribute("content");
 
-        console.log('📤 Saving Special Instructions only:', payload);
+        console.log("📤 Saving Special Instructions only:", payload);
 
-        const res = await axios.post('/api/update-mc/master-cards', payload, {
+        const res = await axios.post("/api/update-mc/master-cards", payload, {
             headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest',
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
             },
         });
 
         if (res.data) {
-            toast.success('Special Instructions saved successfully.');
+            toast.success("Special Instructions saved successfully.");
         }
 
         try {
@@ -1271,7 +1385,7 @@ const saveSpecialInstructions = async (rows) => {
                 const refRes = await axios.get(
                     `/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`,
                     {
-                        headers: { Accept: 'application/json' },
+                        headers: { Accept: "application/json" },
                     }
                 );
                 if (refRes.data) {
@@ -1279,13 +1393,18 @@ const saveSpecialInstructions = async (rows) => {
                 }
             }
         } catch (e) {
-            console.error('Failed to refresh full MC after saving Special Instructions:', e);
+            console.error(
+                "Failed to refresh full MC after saving Special Instructions:",
+                e
+            );
         }
     } catch (e) {
-        console.error('Save Special Instructions error:', e);
-        console.error('Error Response:', e.response?.data);
+        console.error("Save Special Instructions error:", e);
+        console.error("Error Response:", e.response?.data);
         const errorMsg =
-            e.response?.data?.message || e.message || 'Failed to save Special Instructions';
+            e.response?.data?.message ||
+            e.message ||
+            "Failed to save Special Instructions";
         toast.error(errorMsg);
     }
 };
@@ -1293,16 +1412,36 @@ import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import axios from "axios";
 import { useToast } from "@/Composables/useToast";
-const CustomerAccountModal = defineAsyncComponent(() => import("@/Components/customer-account-modal.vue"));
-const UpdateMcModal = defineAsyncComponent(() => import("@/Components/UpdateMcModal.vue"));
-const MasterCardMaintenanceLogModal = defineAsyncComponent(() => import("@/Components/MasterCardMaintenanceLogModal.vue"));
-const McLogModal = defineAsyncComponent(() => import("@/Components/McLogModal.vue"));
-const MasterCardZoomModal = defineAsyncComponent(() => import("@/Components/MasterCardZoomModal.vue"));
-const MasterCardCurrentPriceModal = defineAsyncComponent(() => import("@/Components/MasterCardCurrentPriceModal.vue"));
-const MasterCardStandByPriceModal = defineAsyncComponent(() => import("@/Components/MasterCardStandByPriceModal.vue"));
-const SecondPasswordAccessModal = defineAsyncComponent(() => import("@/Components/SecondPasswordAccessModal.vue"));
-const PaperQualityModal = defineAsyncComponent(() => import("@/Components/paper-quality-modal.vue"));
-const ChemicalCoatModal = defineAsyncComponent(() => import("@/Components/chemical-coat-modal.vue"));
+const CustomerAccountModal = defineAsyncComponent(() =>
+    import("@/Components/customer-account-modal.vue")
+);
+const UpdateMcModal = defineAsyncComponent(() =>
+    import("@/Components/UpdateMcModal.vue")
+);
+const MasterCardMaintenanceLogModal = defineAsyncComponent(() =>
+    import("@/Components/MasterCardMaintenanceLogModal.vue")
+);
+const McLogModal = defineAsyncComponent(() =>
+    import("@/Components/McLogModal.vue")
+);
+const MasterCardZoomModal = defineAsyncComponent(() =>
+    import("@/Components/MasterCardZoomModal.vue")
+);
+const MasterCardCurrentPriceModal = defineAsyncComponent(() =>
+    import("@/Components/MasterCardCurrentPriceModal.vue")
+);
+const MasterCardStandByPriceModal = defineAsyncComponent(() =>
+    import("@/Components/MasterCardStandByPriceModal.vue")
+);
+const SecondPasswordAccessModal = defineAsyncComponent(() =>
+    import("@/Components/SecondPasswordAccessModal.vue")
+);
+const PaperQualityModal = defineAsyncComponent(() =>
+    import("@/Components/paper-quality-modal.vue")
+);
+const ChemicalCoatModal = defineAsyncComponent(() =>
+    import("@/Components/chemical-coat-modal.vue")
+);
 
 const toast = useToast();
 
@@ -1333,15 +1472,20 @@ const customerSortOption = ref("customer_code"); // Default sort by customer cod
 
 // Computed Properties for Customer Account
 const filteredCustomers = computed(() => {
-    if (!searchTerm.value) {
-        return customersList.value;
+    const list = Array.isArray(customersList.value) ? customersList.value : [];
+    const safeList = list.filter((c) => c && typeof c === "object");
+
+    const q = (searchTerm.value || "").toString().trim();
+    if (!q) {
+        return safeList;
     }
-    const searchLower = searchTerm.value.toLowerCase();
-    return customersList.value.filter(
-        (customer) =>
-            customer.customer_code.toLowerCase().includes(searchLower) ||
-            customer.customer_name.toLowerCase().includes(searchLower)
-    );
+
+    const searchLower = q.toLowerCase();
+    return safeList.filter((customer) => {
+        const code = (customer.customer_code ?? "").toString().toLowerCase();
+        const name = (customer.customer_name ?? "").toString().toLowerCase();
+        return code.includes(searchLower) || name.includes(searchLower);
+    });
 });
 
 // Methods for Customer Account
@@ -1445,10 +1589,10 @@ const selectCustomer = async (customer) => {
     await nextTick();
     isProgrammaticUpdate.value = false; // Re-enable input handlers
 
-    console.log('Customer selected:', {
+    console.log("Customer selected:", {
         ac: form.value.ac,
         customer_name: form.value.customer_name,
-        selectedCustomer: customer
+        selectedCustomer: customer,
     });
 
     // Close the modal
@@ -1621,22 +1765,25 @@ const chemicalCoatLoading = ref(false);
 const loadChemicalCoats = async () => {
     try {
         chemicalCoatLoading.value = true;
-        const response = await fetch('/api/chemical-coats', {
+        const response = await fetch("/api/chemical-coats", {
             headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
         });
 
         if (response.ok) {
             const data = await response.json();
             chemicalCoats.value = data;
         } else {
-            console.error('Failed to load chemical coats:', response.statusText);
+            console.error(
+                "Failed to load chemical coats:",
+                response.statusText
+            );
             chemicalCoats.value = [];
         }
     } catch (error) {
-        console.error('Error loading chemical coats:', error);
+        console.error("Error loading chemical coats:", error);
         chemicalCoats.value = [];
     } finally {
         chemicalCoatLoading.value = false;
@@ -1666,15 +1813,36 @@ const normalize5 = (arr) => {
 };
 const extractPerComponentSoWo = (pd, idx) => {
     if (!pd) return { so: [], wo: [] };
-    const desiredLabels = ['Main','Fit1','Fit2','Fit3','Fit4','Fit5','Fit6','Fit7','Fit8','Fit9'];
-    const label = desiredLabels[idx] || 'Main';
+    const desiredLabels = [
+        "Main",
+        "Fit1",
+        "Fit2",
+        "Fit3",
+        "Fit4",
+        "Fit5",
+        "Fit6",
+        "Fit7",
+        "Fit8",
+        "Fit9",
+    ];
+    const label = desiredLabels[idx] || "Main";
     const fromNumberedKeys = (obj, baseKey) => {
-        if (!obj || typeof obj !== 'object') return [];
+        if (!obj || typeof obj !== "object") return [];
         const entries = [];
         for (let i = 1; i <= 5; i++) {
-            const variants = [`${baseKey}${i}`, `${baseKey}_${i}`, `${baseKey}${i}`.toUpperCase(), `${baseKey}_${i}`.toUpperCase()];
-            let found = '';
-            for (const k of Object.keys(obj)) { if (variants.includes(k)) { found = obj[k] ?? ''; break; } }
+            const variants = [
+                `${baseKey}${i}`,
+                `${baseKey}_${i}`,
+                `${baseKey}${i}`.toUpperCase(),
+                `${baseKey}_${i}`.toUpperCase(),
+            ];
+            let found = "";
+            for (const k of Object.keys(obj)) {
+                if (variants.includes(k)) {
+                    found = obj[k] ?? "";
+                    break;
+                }
+            }
             entries.push(found);
         }
         return entries;
@@ -1683,17 +1851,37 @@ const extractPerComponentSoWo = (pd, idx) => {
     if (Array.isArray(pd.components)) {
         const comp = pd.components[idx] || null;
         if (comp) {
-            const soArr = Array.isArray(comp.soValues) ? comp.soValues : (Array.isArray(comp.so) ? comp.so : fromNumberedKeys(comp, 'so'));
-            const woArr = Array.isArray(comp.woValues) ? comp.woValues : (Array.isArray(comp.wo) ? comp.wo : fromNumberedKeys(comp, 'wo'));
+            const soArr = Array.isArray(comp.soValues)
+                ? comp.soValues
+                : Array.isArray(comp.so)
+                ? comp.so
+                : fromNumberedKeys(comp, "so");
+            const woArr = Array.isArray(comp.woValues)
+                ? comp.woValues
+                : Array.isArray(comp.wo)
+                ? comp.wo
+                : fromNumberedKeys(comp, "wo");
             return { so: soArr, wo: woArr };
         }
     }
     // Map components
-    if (pd.components && typeof pd.components === 'object' && !Array.isArray(pd.components)) {
+    if (
+        pd.components &&
+        typeof pd.components === "object" &&
+        !Array.isArray(pd.components)
+    ) {
         const comp = pd.components[label];
         if (comp) {
-            const soArr = Array.isArray(comp.soValues) ? comp.soValues : (Array.isArray(comp.so) ? comp.so : fromNumberedKeys(comp, 'so'));
-            const woArr = Array.isArray(comp.woValues) ? comp.woValues : (Array.isArray(comp.wo) ? comp.wo : fromNumberedKeys(comp, 'wo'));
+            const soArr = Array.isArray(comp.soValues)
+                ? comp.soValues
+                : Array.isArray(comp.so)
+                ? comp.so
+                : fromNumberedKeys(comp, "so");
+            const woArr = Array.isArray(comp.woValues)
+                ? comp.woValues
+                : Array.isArray(comp.wo)
+                ? comp.wo
+                : fromNumberedKeys(comp, "wo");
             return { so: soArr, wo: woArr };
         }
     }
@@ -2181,11 +2369,13 @@ const handleMcsInput = () => {
         // Require AC selection before showing detailed form for a new MC
         if (!form.value.ac) {
             showDetailedMcInfo.value = false;
-            toast.error("Please select Customer Account (AC#) first before creating a new Master Card");
+            toast.error(
+                "Please select Customer Account (AC#) first before creating a new Master Card"
+            );
             openCustomerAccountModal();
         } else {
             // Only then allow the detailed form to open
-        showDetailedMcInfo.value = true;
+            showDetailedMcInfo.value = true;
         }
     } else if (!form.value.mcs) {
         // Hide detailed MC info when MCS input is cleared
@@ -2206,7 +2396,10 @@ const handleAcInput = () => {
     }
 
     // Reset MCS data when AC# is manually changed
-    if (!form.value.ac || form.value.ac !== (selectedCustomer.value?.customer_code || "")) {
+    if (
+        !form.value.ac ||
+        form.value.ac !== (selectedCustomer.value?.customer_code || "")
+    ) {
         selectedMcs.value = null;
         mcsMasterCards.value = [];
         form.value.mcs = "";
@@ -2235,7 +2428,9 @@ const handleAcInput = () => {
 const addNewRecord = () => {
     // Guard: AC must be selected first
     if (!form.value.ac) {
-        toast.error("Please select Customer Account (AC#) first before creating a new Master Card");
+        toast.error(
+            "Please select Customer Account (AC#) first before creating a new Master Card"
+        );
         openCustomerAccountModal();
         return;
     }
@@ -2308,24 +2503,24 @@ const saveRecord = async () => {
 
         // Get selected component name (Main, Fit1, Fit2, etc.)
         // Use form.comp_no directly as it's already updated by selectComponent
-        const componentName = form.value.comp_no || 'Main';
+        const componentName = form.value.comp_no || "Main";
 
         const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
-            customer_name: form.value.customer_name || '', // Pass customer name to backend
-            mc_model: form.value.mc_model || '',
-            mc_short_model: form.value.mc_short_model || '',
-            status: form.value.mc_status || 'Active',
-            part_no: '',
+            customer_name: form.value.customer_name || "", // Pass customer name to backend
+            mc_model: form.value.mc_model || "",
+            mc_short_model: form.value.mc_short_model || "",
+            status: form.value.mc_status || "Active",
+            part_no: "",
             comp_no: componentName, // Use selected component (Main, Fit1, Fit2, etc.)
-            p_design: '',
-            ext_dim_1: mcDetails.value.ext_dim_1 || '',
-            ext_dim_2: mcDetails.value.ext_dim_2 || '',
-            ext_dim_3: mcDetails.value.ext_dim_3 || '',
-            int_dim_1: mcDetails.value.int_dim_1 || '',
-            int_dim_2: mcDetails.value.int_dim_2 || '',
-            int_dim_3: mcDetails.value.int_dim_3 || '',
+            p_design: "",
+            ext_dim_1: mcDetails.value.ext_dim_1 || "",
+            ext_dim_2: mcDetails.value.ext_dim_2 || "",
+            ext_dim_3: mcDetails.value.ext_dim_3 || "",
+            int_dim_1: mcDetails.value.int_dim_1 || "",
+            int_dim_2: mcDetails.value.int_dim_2 || "",
+            int_dim_3: mcDetails.value.int_dim_3 || "",
             detailed_master_card: {
                 mc_details: mcDetails.value,
             },
@@ -2333,31 +2528,41 @@ const saveRecord = async () => {
         };
 
         // Get CSRF token from meta tag or cookie
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
 
-        const response = await axios.post('/api/update-mc/master-cards', payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
+        const response = await axios.post(
+            "/api/update-mc/master-cards",
+            payload,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
             }
-        });
+        );
 
         toast.dismiss(loadingToast);
 
         if (response.data) {
-            toast.success(`Master Card saved successfully for component: ${componentName}`);
-            console.log('Master Card saved:', response.data);
+            toast.success(
+                `Master Card saved successfully for component: ${componentName}`
+            );
+            console.log("Master Card saved:", response.data);
         }
     } catch (error) {
-        console.error('Error saving master card:', error);
+        console.error("Error saving master card:", error);
         if (error.response?.status === 419) {
-            toast.error('Session expired. Please refresh the page and try again.');
+            toast.error(
+                "Session expired. Please refresh the page and try again."
+            );
         } else if (error.response?.data?.message) {
             toast.error(error.response.data.message);
         } else {
-            toast.error('Failed to save master card. Please try again.');
+            toast.error("Failed to save master card. Please try again.");
         }
     }
 };
@@ -2435,11 +2640,11 @@ const selectMcs = async (mcs) => {
     await nextTick();
     isProgrammaticUpdate.value = false; // Re-enable input handlers
 
-    console.log('Master Card selected:', {
+    console.log("Master Card selected:", {
         mcs: form.value.mcs,
         mc_model: form.value.mc_model,
         mc_short_model: form.value.mc_short_model,
-        selectedMcs: mcs
+        selectedMcs: mcs,
     });
 
     // Update MC details in sync with form
@@ -2460,47 +2665,66 @@ const selectMcs = async (mcs) => {
 
     // Fetch full MC with details + PD setup to hydrate modals
     try {
-        const res = await fetch(`/api/update-mc/master-cards/${encodeURIComponent(mcsSeq)}?customer_code=${encodeURIComponent(form.value.ac)}`, {
-            headers: { 'Accept': 'application/json' },
-            credentials: 'same-origin'
-        });
+        const res = await fetch(
+            `/api/update-mc/master-cards/${encodeURIComponent(
+                mcsSeq
+            )}?customer_code=${encodeURIComponent(form.value.ac)}`,
+            {
+                headers: { Accept: "application/json" },
+                credentials: "same-origin",
+            }
+        );
         if (res.ok) {
             const full = await res.json();
             // Keep a local copy to pass into child modals
             selectedMcsFull.value = full;
 
-            console.log('✅ Loaded full MC data:', {
+            console.log("✅ Loaded full MC data:", {
                 mcs: mcsSeq,
                 has_pd_setup: !!full.pd_setup,
                 has_components: !!full.components,
                 components_in_pd_setup: full.pd_setup?.components?.length || 0,
                 components_at_root: full.components?.length || 0,
-                component_list: full.components?.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })) || []
+                component_list:
+                    full.components?.map((c) => ({
+                        c_num: c.c_num,
+                        pd: c.pd,
+                        pcs_set: c.pcs_set,
+                    })) || [],
             });
 
             // Hydrate SO/WO for currently selected component and prefill PD code
             try {
                 hydrateSoWoFromFull(selectedMcsFull.value);
-                const compName = (mcComponents.value.find(c => c.selected) || mcComponents.value[0]).c_num;
+                const compName = (
+                    mcComponents.value.find((c) => c.selected) ||
+                    mcComponents.value[0]
+                ).c_num;
                 const pd = full.pd_setup || {};
                 let compEntry = null;
                 if (Array.isArray(pd.components)) {
-                    compEntry = pd.components.find(x => (x.c_num || x.component || '').toLowerCase() === compName.toLowerCase());
-                } else if (pd.components && typeof pd.components === 'object') {
+                    compEntry = pd.components.find(
+                        (x) =>
+                            (x.c_num || x.component || "").toLowerCase() ===
+                            compName.toLowerCase()
+                    );
+                } else if (pd.components && typeof pd.components === "object") {
                     compEntry = pd.components[compName];
                 } else if (pd[compName]) {
                     compEntry = pd[compName];
                 }
                 if (compEntry && compEntry.pd) {
-                    const target = mcComponents.value.find(c => c.c_num === compName);
+                    const target = mcComponents.value.find(
+                        (c) => c.c_num === compName
+                    );
                     if (target) target.pd = compEntry.pd;
                 }
             } catch (e) {
-                console.error('Error hydrating component data:', e);
+                console.error("Error hydrating component data:", e);
             }
         }
     } catch (e) {
-        console.error('Error fetching full MC data:', e);
+        console.error("Error fetching full MC data:", e);
     }
 
     // Show confirmation toast
@@ -2543,7 +2767,9 @@ const fetchMcsData = async (page = 1) => {
         }
 
         // Filter by customer account - REQUIRED
-        const customerFilter = `&customer_code=${encodeURIComponent(form.value.ac)}`;
+        const customerFilter = `&customer_code=${encodeURIComponent(
+            form.value.ac
+        )}`;
 
         // Make API call using fetch for more control
         const response = await fetch(
@@ -2604,14 +2830,21 @@ const fetchMcsData = async (page = 1) => {
             try {
                 const currentSeq = form.value.mcs;
                 if (currentSeq) {
-                    const found = mcsMasterCards.value.find(x => (x.seq || x.mc_seq || '').toString() === currentSeq.toString());
+                    const found = mcsMasterCards.value.find(
+                        (x) =>
+                            (x.seq || x.mc_seq || "").toString() ===
+                            currentSeq.toString()
+                    );
                     if (found) {
                         const mcsSeqEnc = encodeURIComponent(currentSeq);
                         const custEnc = encodeURIComponent(form.value.ac);
-                        const resFull = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
-                            headers: { 'Accept': 'application/json' },
-                            credentials: 'same-origin'
-                        });
+                        const resFull = await fetch(
+                            `/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`,
+                            {
+                                headers: { Accept: "application/json" },
+                                credentials: "same-origin",
+                            }
+                        );
                         if (resFull.ok) {
                             selectedMcsFull.value = await resFull.json();
                             hydrateSoWoFromFull(selectedMcsFull.value);
@@ -2656,22 +2889,25 @@ const handleNextSetup = async () => {
             if (form.value.mcs && form.value.ac) {
                 const mcsSeqEnc = encodeURIComponent(form.value.mcs);
                 const custEnc = encodeURIComponent(form.value.ac);
-                const res = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
-                    headers: { 'Accept': 'application/json' },
-                    credentials: 'same-origin'
-                });
+                const res = await fetch(
+                    `/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`,
+                    {
+                        headers: { Accept: "application/json" },
+                        credentials: "same-origin",
+                    }
+                );
                 if (res.ok) {
                     const full = await res.json();
                     selectedMcsFull.value = full;
-                    console.log('✅ Loaded full MC data with components:', {
+                    console.log("✅ Loaded full MC data with components:", {
                         mcs: form.value.mcs,
                         components_count: full.components?.length || 0,
-                        components: full.components?.map(c => c.c_num) || []
+                        components: full.components?.map((c) => c.c_num) || [],
                     });
                 }
             }
         } catch (e) {
-            console.error('Failed to load full MC data:', e);
+            console.error("Failed to load full MC data:", e);
         }
     }
 
@@ -2682,7 +2918,7 @@ const handleNextSetup = async () => {
 // Fetch Maintenance Log
 const fetchMaintenanceLog = async () => {
     if (!form.value.mcs) {
-        toast.error('Please select an MCS first');
+        toast.error("Please select an MCS first");
         return;
     }
 
@@ -2690,8 +2926,8 @@ const fetchMaintenanceLog = async () => {
     try {
         const mcsEnc = encodeURIComponent(form.value.mcs);
         const res = await fetch(`/api/update-mc/maintenance-log/${mcsEnc}`, {
-            headers: { 'Accept': 'application/json' },
-            credentials: 'same-origin'
+            headers: { Accept: "application/json" },
+            credentials: "same-origin",
         });
 
         if (res.ok) {
@@ -2699,11 +2935,11 @@ const fetchMaintenanceLog = async () => {
             maintenanceLogs.value = data;
             showMaintenanceLogModal.value = true;
         } else {
-            toast.error('Failed to load maintenance log');
+            toast.error("Failed to load maintenance log");
         }
     } catch (e) {
-        console.error('Error fetching maintenance log:', e);
-        toast.error('Error loading maintenance log');
+        console.error("Error fetching maintenance log:", e);
+        toast.error("Error loading maintenance log");
     } finally {
         maintenanceLogsLoading.value = false;
     }
@@ -2712,7 +2948,7 @@ const fetchMaintenanceLog = async () => {
 // Fetch Status Log
 const fetchStatusLog = async () => {
     if (!form.value.mcs) {
-        toast.error('Please select an MCS first');
+        toast.error("Please select an MCS first");
         return;
     }
 
@@ -2720,8 +2956,8 @@ const fetchStatusLog = async () => {
     try {
         const mcsEnc = encodeURIComponent(form.value.mcs);
         const res = await fetch(`/api/update-mc/status-log/${mcsEnc}`, {
-            headers: { 'Accept': 'application/json' },
-            credentials: 'same-origin'
+            headers: { Accept: "application/json" },
+            credentials: "same-origin",
         });
 
         if (res.ok) {
@@ -2729,21 +2965,21 @@ const fetchStatusLog = async () => {
             statusLogs.value = data;
             showStatusLogModal.value = true;
         } else {
-            toast.error('Failed to load status log');
+            toast.error("Failed to load status log");
         }
     } catch (e) {
-        console.error('Error fetching status log:', e);
-        toast.error('Error loading status log');
+        console.error("Error fetching status log:", e);
+        toast.error("Error loading status log");
     } finally {
         statusLogsLoading.value = false;
     }
 };
 
 const selectComponent = (component, index) => {
-    console.log('🔧 selectComponent called:', {
+    console.log("🔧 selectComponent called:", {
         component: component,
         index: index,
-        component_c_num: component?.c_num
+        component_c_num: component?.c_num,
     });
 
     // Reset all selections
@@ -2754,10 +2990,13 @@ const selectComponent = (component, index) => {
     // Update form comp_no with selected component name
     if (form.value) {
         form.value.comp_no = component.c_num; // Main, Fit1, Fit2, etc.
-        console.log('✅ Component selected:', {
+        console.log("✅ Component selected:", {
             component_name: component.c_num,
             form_comp_no: form.value.comp_no,
-            mcComponents_state: mcComponents.value.map(c => ({ name: c.c_num, selected: c.selected }))
+            mcComponents_state: mcComponents.value.map((c) => ({
+                name: c.c_num,
+                selected: c.selected,
+            })),
         });
     }
 };
@@ -2765,7 +3004,7 @@ const selectComponent = (component, index) => {
 const setupPD = () => {
     console.log("Setup PD clicked");
     // Ensure PD modal opens fresh when creating a new MC
-    if (recordMode.value === 'new') {
+    if (recordMode.value === "new") {
         selectedMcsFull.value = null;
         // For new MC, use current local arrays as-is
         showSetupPdModal.value = true;
@@ -2778,15 +3017,18 @@ const setupPD = () => {
         try {
             const mcsSeqEnc = encodeURIComponent(form.value.mcs);
             const custEnc = encodeURIComponent(form.value.ac);
-            const res = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
-                headers: { 'Accept': 'application/json' },
-                credentials: 'same-origin'
-            });
+            const res = await fetch(
+                `/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`,
+                {
+                    headers: { Accept: "application/json" },
+                    credentials: "same-origin",
+                }
+            );
             if (res.ok) {
                 selectedMcsFull.value = await res.json();
             }
         } catch (e) {
-            console.error('Failed to load full MC for PD setup:', e);
+            console.error("Failed to load full MC for PD setup:", e);
         }
     };
 
@@ -2794,9 +3036,20 @@ const setupPD = () => {
         const full = selectedMcsFull.value;
         if (!full || !full.pd_setup) return;
         const pd = full.pd_setup;
-        const rootSo = Array.isArray(pd.soValues) ? pd.soValues : (Array.isArray(pd.so) ? pd.so : []);
-        const rootWo = Array.isArray(pd.woValues) ? pd.woValues : (Array.isArray(pd.wo) ? pd.wo : []);
-        const normalize5 = (arr) => (Array.isArray(arr) ? arr.slice(0,5) : []).concat(["","","","",""]).slice(0,5);
+        const rootSo = Array.isArray(pd.soValues)
+            ? pd.soValues
+            : Array.isArray(pd.so)
+            ? pd.so
+            : [];
+        const rootWo = Array.isArray(pd.woValues)
+            ? pd.woValues
+            : Array.isArray(pd.wo)
+            ? pd.wo
+            : [];
+        const normalize5 = (arr) =>
+            (Array.isArray(arr) ? arr.slice(0, 5) : [])
+                .concat(["", "", "", "", ""])
+                .slice(0, 5);
         soValues.value = normalize5(rootSo);
         woValues.value = normalize5(rootWo);
     };
