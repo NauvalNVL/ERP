@@ -348,7 +348,31 @@ class InvoiceController extends Controller
                     $q->whereNull('Status')
                       ->orWhere('Status', '!=', 'Invoiced')
                       ->orWhere('Status', '!=', 'Completed');
+                })
+                ->where(function ($q) {
+                    // Exclude SO_Type containing 'NonSales' AND 'N1'/'N2'/'N3'/'N4'
+                    // Pattern examples: 'N1-NonSales', 'N2-NonSales', etc.
+                    $q->where(function($subQ) {
+                        // NOT (NonSales AND (N1 OR N2 OR N3 OR N4))
+                        $subQ->where('SO_Type', 'NOT LIKE', '%NonSales%')
+                             ->orWhere(function($innerQ) {
+                                 $innerQ->where('SO_Type', 'LIKE', '%NonSales%')
+                                        ->where('SO_Type', 'NOT LIKE', '%N1%')
+                                        ->where('SO_Type', 'NOT LIKE', '%N2%')
+                                        ->where('SO_Type', 'NOT LIKE', '%N3%')
+                                        ->where('SO_Type', 'NOT LIKE', '%N4%');
+                             });
+                    });
                 });
+
+            // Debug logging
+            Log::info('🔍 Invoice currentPeriodDo - Filter applied for NonSales N1-N4', [
+                'year' => $yyyy,
+                'month' => $mm,
+                'customer_code' => $customerCode,
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings()
+            ]);
 
             // Filter by customer if provided
             if ($customerCode) {
@@ -1790,6 +1814,31 @@ class InvoiceController extends Controller
                 $query->where('DOMM', str_pad($periodMonth, 2, '0', STR_PAD_LEFT))
                       ->where('DOYYYY', $periodYear);
             }
+
+            // Exclude SO_Type containing 'NonSales' AND 'N1'/'N2'/'N3'/'N4'
+            // Pattern examples: 'N1-NonSales', 'N2-NonSales', etc.
+            $query->where(function ($q) {
+                // NOT (NonSales AND (N1 OR N2 OR N3 OR N4))
+                $q->where(function($subQ) {
+                    $subQ->where('SO_Type', 'NOT LIKE', '%NonSales%')
+                         ->orWhere(function($innerQ) {
+                             $innerQ->where('SO_Type', 'LIKE', '%NonSales%')
+                                    ->where('SO_Type', 'NOT LIKE', '%N1%')
+                                    ->where('SO_Type', 'NOT LIKE', '%N2%')
+                                    ->where('SO_Type', 'NOT LIKE', '%N3%')
+                                    ->where('SO_Type', 'NOT LIKE', '%N4%');
+                         });
+                });
+            });
+
+            // Debug logging
+            Log::info('🔍 Invoice getDeliveryOrders - Filter applied for NonSales N1-N4', [
+                'customer_code' => $customerCode,
+                'period_month' => $periodMonth,
+                'period_year' => $periodYear,
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings()
+            ]);
 
             // Get delivery orders with aggregated item count and additional fields
             // IMPORTANT: Group by DO header only (one row per DO_Num), not per component line
