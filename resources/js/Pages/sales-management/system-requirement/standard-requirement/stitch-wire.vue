@@ -99,7 +99,7 @@
                             <div v-else class="mt-3 bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
                                 <p class="text-sm font-semibold text-emerald-800">Data available: {{ stitchWires.length }} stitch wires found.</p>
                                 <p v-if="selectedRow" class="text-xs text-emerald-700 mt-1">
-                                    Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.description }}</p>
+                                    Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }}</p>
                             </div>
                         </div>
                     </div>
