@@ -189,29 +189,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Quick Links -->
-                        <div class="bg-white shadow-sm rounded-xl border border-violet-100">
-                            <div class="px-4 py-3 sm:px-5 border-b border-violet-100 flex items-center">
-                                <div class="p-2 bg-violet-500 rounded-lg mr-3">
-                                    <i class="fas fa-link text-white"></i>
-                                </div>
-                                <h3 class="text-sm sm:text-base font-semibold text-slate-800">Quick Links</h3>
-                            </div>
-                            <div class="px-4 py-4 sm:px-5">
-                                <div class="grid grid-cols-1 gap-3">
-                                    <a href="/warehouse-management/invoice/setup/print-tax-group" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100">
-                                        <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                            <i class="fas fa-print text-white text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-blue-900 text-sm">View & Print</p>
-                                            <p class="text-xs text-blue-700">Print tax group list</p>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
