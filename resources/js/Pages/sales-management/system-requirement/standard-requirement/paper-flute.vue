@@ -362,18 +362,33 @@ const fetchFlutes = async () => {
 
 onMounted(fetchFlutes);
 
-// Watch for changes in search query to filter the data
-watch(searchQuery, (newQuery) => {
-    if (newQuery && flutes.value.length > 0) {
-        const foundFlute = flutes.value.find(flute => 
-            flute.Flute?.toLowerCase().includes(newQuery.toLowerCase()) ||
-            flute.Descr?.toLowerCase().includes(newQuery.toLowerCase())
-        );
-        
-        if (foundFlute) {
-            selectedRow.value = foundFlute;
-        }
+const isActiveFlute = (flute) => {
+    const status = flute?.status;
+    return status === undefined || status === null || status === 'Act' || status === 'Active';
+};
+
+const normalizeFluteCode = (value) => {
+    return (value ?? '').toString().trim().toLowerCase();
+};
+
+const tryAutoDetectFluteByCode = (query) => {
+    const q = normalizeFluteCode(query);
+
+    if (!q) {
+        selectedRow.value = null;
+        return;
     }
+
+    const match = flutes.value.find((flute) => {
+        return isActiveFlute(flute) && normalizeFluteCode(flute.Flute) === q;
+    });
+
+    selectedRow.value = match ?? null;
+};
+
+// Watch for changes in search query to filter the data
+watch([searchQuery, flutes], ([newQuery]) => {
+    tryAutoDetectFluteByCode(newQuery);
 });
 
 const onFluteSelected = (flute) => {
