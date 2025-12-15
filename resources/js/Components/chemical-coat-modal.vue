@@ -121,7 +121,7 @@ const filteredCoats = computed(() => {
 });
 
 const isLoading = computed(() => {
-	return props.loading || (props.items.length === 0 && !props.loading);
+	return props.loading;
 });
 
 function selectRow(coat) {
