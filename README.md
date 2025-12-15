@@ -74,4 +74,4 @@ ERP System adalah solusi manajemen enterprise yang dirancang untuk membantu orga
 git clone https://github.com/NauvalNVL/ERP.git
 cd ERP
 test
-nauval sayang anisah
+bahlil etanol
