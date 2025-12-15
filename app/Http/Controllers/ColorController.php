@@ -22,16 +22,30 @@ class ColorController extends Controller
     {
         try {
             // Get only colors (not color groups) from COLOR table
-            $colors = Color::whereNotNull('GroupCode')
+            $colorsQuery = Color::whereNotNull('GroupCode')
                 ->whereRaw('GroupCode != Color_Code')
-                ->orderBy('Color_Code', 'asc')
-                ->get();
+                ->orderBy('Color_Code', 'asc');
 
             // Get color groups for dropdown
-            $colorGroups = Color::whereNull('GroupCode')
+            $colorGroupsQuery = Color::whereNull('GroupCode')
                 ->orWhereRaw('GroupCode = Color_Code')
-                ->orderBy('Color_Code', 'asc')
-                ->get();
+                ->orderBy('Color_Code', 'asc');
+
+            // By default only return active records unless explicitly asked for all statuses
+            if (!$request->has('all_status') || !$request->all_status) {
+                $colorsQuery->where(function ($q) {
+                    $q->whereNull('status')
+                      ->orWhere('status', 'Act');
+                });
+
+                $colorGroupsQuery->where(function ($q) {
+                    $q->whereNull('status')
+                      ->orWhere('status', 'Act');
+                });
+            }
+
+            $colors = $colorsQuery->get();
+            $colorGroups = $colorGroupsQuery->get();
 
             // Transform data to match Vue component expected format
             $colorsTransformed = $colors->map(function($color) {
@@ -40,6 +54,7 @@ class ColorController extends Controller
                     'color_name' => $color->Color_Name,
                     'color_group_id' => $color->GroupCode,
                     'cg_type' => $color->Group,
+                    'status' => $color->status,
                 ];
             });
 
@@ -47,7 +62,8 @@ class ColorController extends Controller
                 return [
                     'cg' => $group->Color_Code,
                     'cg_name' => $group->Color_Name,
-                    'cg_type' => $group->Group
+                    'cg_type' => $group->Group,
+                    'status' => $group->status
                 ];
             });
 

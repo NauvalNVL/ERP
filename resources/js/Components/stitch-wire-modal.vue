@@ -147,6 +147,10 @@ const fetchStitchWires = async () => {
 const filteredItems = computed(() => {
     const query = searchQuery.value.toLowerCase();
     let list = stitchWires.value || [];
+
+    // Only show active stitch wires (hide obsolete ones) in selection modal
+    list = list.filter(it => !it.status || it.status === 'Act' || it.status === 'Active');
+
     if (query) {
         list = list.filter(it =>
             (it.code || '').toLowerCase().includes(query) ||

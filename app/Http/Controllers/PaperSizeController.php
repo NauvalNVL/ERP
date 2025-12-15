@@ -12,6 +12,13 @@ use Database\Seeders\PaperSizeSeeder;
 
 class PaperSizeController extends Controller
 {
+    private function ensureSeeded(): void
+    {
+        if (PaperSize::count() === 0) {
+            $this->seedData();
+        }
+    }
+
     public function index()
     {
         try {
@@ -208,6 +215,7 @@ class PaperSizeController extends Controller
     public function vueIndex()
     {
         try {
+            $this->ensureSeeded();
             // Ambil hanya data paper size yang masih aktif (status Act atau belum di-set)
             $paperSizes = PaperSize::where(function ($q) {
                     $q->whereNull('status')
@@ -260,6 +268,7 @@ class PaperSizeController extends Controller
     public function vueManageStatus()
     {
         try {
+            $this->ensureSeeded();
             $paperSizes = PaperSize::orderBy('millimeter', 'asc')->paginate(15);
 
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-size', [
@@ -305,8 +314,21 @@ class PaperSizeController extends Controller
                       ->orWhere('status', 'Act');
                 });
             }
-            
+
             $paperSizes = $query->get();
+            if ($paperSizes->isEmpty()) {
+                $this->ensureSeeded();
+
+                $query = PaperSize::orderBy('millimeter', 'asc');
+                if (!$request->has('all_status') || !$request->all_status) {
+                    $query->where(function ($q) {
+                        $q->whereNull('status')
+                          ->orWhere('status', 'Act');
+                    });
+                }
+                $paperSizes = $query->get();
+            }
+
             return response()->json($paperSizes);
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@apiIndex: ' . $e->getMessage());

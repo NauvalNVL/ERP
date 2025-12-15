@@ -351,19 +351,32 @@ const filteredColorGroups = computed(() => {
     });
 });
 
-// Watch for changes in search query to filter the data
-watch(searchQuery, (newQuery) => {
-    if (newQuery && colorGroups.value.length > 0) {
-        const foundGroup = colorGroups.value.find(group => 
-            group.cg.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_name.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_type.toLowerCase().includes(newQuery.toLowerCase())
-        );
-        
-        if (foundGroup) {
-            selectGroup(foundGroup);
-        }
+const isActiveColorGroup = (group) => {
+    const status = group?.status;
+    return status === undefined || status === null || status === 'Act' || status === 'Active';
+};
+
+const normalizeColorGroupCode = (value) => {
+    return (value ?? '').toString().trim().toLowerCase();
+};
+
+const tryAutoDetectColorGroupByCode = (query) => {
+    const q = normalizeColorGroupCode(query);
+
+    if (!q) {
+        selectedGroup.value = null;
+        return;
     }
+
+    const match = colorGroups.value.find((group) => {
+        return isActiveColorGroup(group) && normalizeColorGroupCode(group.cg) === q;
+    });
+
+    selectedGroup.value = match ?? null;
+};
+
+watch([searchQuery, colorGroups], ([newQuery]) => {
+    tryAutoDetectColorGroupByCode(newQuery);
 });
 
 const fetchColorGroups = async () => {

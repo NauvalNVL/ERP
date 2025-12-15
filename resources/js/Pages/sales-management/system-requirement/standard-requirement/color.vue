@@ -218,11 +218,14 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-tag"></i>
                                 </span>
-                                <input
+                                <select
                                     v-model="editForm.cg_type"
-                                    type="text"
                                     class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                                 >
+                                    <option value="X-Flexo">X-Flexo</option>
+                                    <option value="C-Coating">C-Coating</option>
+                                    <option value="S-Offset">S-Offset</option>
+                                </select>
                             </div>
                         </div>
                     </div>
