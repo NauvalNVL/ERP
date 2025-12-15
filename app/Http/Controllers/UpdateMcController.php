@@ -62,18 +62,88 @@ class UpdateMcController extends Controller
         return 'SYSTEM';
     }
 
+    private function insertMcUpdateLog($mcsNum, $status, $reason): void
+    {
+        $nowWib = now()->timezone('Asia/Jakarta');
+
+        $basePayload = [
+            'status' => $status,
+            'user_id' => $this->getCurrentUserId(),
+            'reason' => '',
+        ];
+
+        $payloadWithTimestamps = array_merge($basePayload, [
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $payloadLegacyDateTime = array_merge($basePayload, [
+            'DATE' => $nowWib->format('Y-m-d'),
+            'TIME' => $nowWib->format('H:i:s'),
+            'DateSK' => (int) $nowWib->format('Ymd'),
+        ]);
+
+        $variants = [
+            ['mcs_col' => 'MCS_Num', 'payload' => $payloadWithTimestamps],
+            ['mcs_col' => 'MCS_NUM', 'payload' => $payloadWithTimestamps],
+            ['mcs_col' => 'MCS_Num', 'payload' => $basePayload],
+            ['mcs_col' => 'MCS_NUM', 'payload' => $basePayload],
+            ['mcs_col' => 'MCS_Num', 'payload' => $payloadLegacyDateTime],
+            ['mcs_col' => 'MCS_NUM', 'payload' => $payloadLegacyDateTime],
+        ];
+
+        foreach ($variants as $v) {
+            try {
+                DB::table('MC_UPDATE_LOG')->insert(array_merge([$v['mcs_col'] => $mcsNum], $v['payload']));
+                return;
+            } catch (\Exception $e) {
+                // try next variant
+            }
+        }
+    }
+
+    private function fetchMcUpdateLogRows($mcsNum)
+    {
+        $candidates = [
+            ['mcs_col' => 'MCS_Num', 'order' => ['created_at' => 'desc']],
+            ['mcs_col' => 'MCS_NUM', 'order' => ['created_at' => 'desc']],
+            ['mcs_col' => 'MCS_Num', 'order' => ['CREATED_AT' => 'desc']],
+            ['mcs_col' => 'MCS_NUM', 'order' => ['CREATED_AT' => 'desc']],
+            ['mcs_col' => 'MCS_Num', 'order' => ['DateSK' => 'desc', 'TIME' => 'desc']],
+            ['mcs_col' => 'MCS_NUM', 'order' => ['DateSK' => 'desc', 'TIME' => 'desc']],
+            ['mcs_col' => 'MCS_Num', 'order' => ['DATE' => 'desc', 'TIME' => 'desc']],
+            ['mcs_col' => 'MCS_NUM', 'order' => ['DATE' => 'desc', 'TIME' => 'desc']],
+        ];
+
+        foreach ($candidates as $c) {
+            try {
+                $q = DB::table('MC_UPDATE_LOG')->where($c['mcs_col'], $mcsNum);
+
+                foreach ($c['order'] as $col => $dir) {
+                    $q->orderBy($col, $dir);
+                }
+
+                return $q->get();
+            } catch (\Exception $e) {
+                // try next candidate
+            }
+        }
+
+        return collect();
+    }
+
     /**
      * Create a log entry in MC_LOG table
      */
     private function createMcLog($mcsNum, $action, $acNum = null, $acName = null, $model = null, $reason = null)
     {
-        $now = now();
+        $now = now()->timezone('Asia/Jakarta');
         $userId = $this->getCurrentUserId();
 
         // Generate unique log number
         $logNo = 'LOG-' . $now->format('YmdHis') . '-' . substr(md5($mcsNum . $userId), 0, 6);
 
-        McLog::create([
+        $data = [
             'NO' => $logNo,
             'DATE' => $now->format('Y-m-d'),
             'TIME' => $now->format('H:i:s'),
@@ -85,7 +155,9 @@ class UpdateMcController extends Controller
             'MCS_NUM' => $mcsNum,
             'MODEL' => $model,
             'DateSK' => (int)$now->format('Ymd'),
-        ]);
+        ];
+
+        McLog::create($data);
     }
 
     /**
@@ -1655,14 +1727,8 @@ class UpdateMcController extends Controller
                 $userId = $user->name ?? $user->user_id ?? $user->userID ?? 'system';
             }
 
-            DB::table('MC_UPDATE_LOG')->insert([
-                'MCS_Num' => $mcsNum,
-                'status' => $newStatus,
-                'user_id' => $userId,
-                'reason' => $reason,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Insert to MC_UPDATE_LOG (try both MCS_Num and MCS_NUM column variants)
+            $this->insertMcUpdateLog($mcsNum, $newStatus, $reason);
 
             return response()->json([
                 'success' => true,
@@ -1869,13 +1935,93 @@ class UpdateMcController extends Controller
         }
     }
 
+    /**
+     * Get update log for Obsolete & Reactive MC menu
+     * Returns logs from MC_UPDATE_LOG table with WIB timezone
+     */
     public function getUpdateLog($mcsNum)
     {
-        $logs = McLog::where('MCS_NUM', $mcsNum)
-            ->orderByRaw('CAST(DateSK AS INT) DESC, TIME DESC')
-            ->get();
+        try {
+            $rows = $this->fetchMcUpdateLogRows($mcsNum);
 
-        return response()->json($logs);
+            $logs = $rows->map(function($log) {
+                $rawCreatedAt = $log->created_at ?? $log->CREATED_AT ?? null;
+                $rawDate = $log->DATE ?? null;
+                $rawTime = $log->TIME ?? null;
+
+                $status = $log->status ?? $log->STS ?? $log->Status ?? null;
+                $userId = $log->user_id ?? $log->UID ?? $log->User_ID ?? $log->USER_ID ?? null;
+                $reason = $log->reason ?? $log->REASON ?? $log->Reason ?? null;
+
+                $formattedDate = '';
+                $formattedTime = '';
+
+                if (!empty($rawCreatedAt)) {
+                    try {
+                        $createdAt = \Carbon\Carbon::parse($rawCreatedAt)->timezone('Asia/Jakarta');
+                        $formattedDate = $createdAt->format('Y-m-d');
+                        $formattedTime = $createdAt->format('H:i:s') . ' WIB';
+                    } catch (\Exception $e) {
+                        $formattedDate = '';
+                        $formattedTime = '';
+                    }
+                } elseif (!empty($rawDate) || !empty($rawTime)) {
+                    $formattedDate = $rawDate ?? '';
+                    $formattedTime = $rawTime ? ($rawTime . ' WIB') : '';
+                }
+
+                return [
+                    'status' => $status,
+                    'user_id' => $userId,
+                    'date' => $formattedDate,
+                    'time' => $formattedTime,
+                    'reason' => $reason,
+                    'created_at' => $rawCreatedAt,
+                ];
+            });
+
+            if ($logs->count() > 0) {
+                return response()->json($logs);
+            }
+        } catch (\Exception $e) {
+            Log::warning('getUpdateLog: MC_UPDATE_LOG not available, fallback to MC_LOG', [
+                'mcs_num' => $mcsNum,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Fallback: use MC_LOG (legacy) for last status change
+        try {
+            $fallbackLogs = McLog::where('MCS_NUM', $mcsNum)
+                ->whereIn('ACTION', ['OBSOLETE', 'REACTIVE'])
+                ->orderBy('DateSK', 'desc')
+                ->orderBy('TIME', 'desc')
+                ->get()
+                ->map(function($log) {
+                    $status = $log->ACTION === 'OBSOLETE' ? 'Obsolete' : 'Active';
+                    $date = $log->DATE ?? '';
+                    $time = $log->TIME ? ($log->TIME . ' WIB') : '';
+                    $reason = $log->REASON ?? $log->reason ?? $log->Reason ?? '';
+
+                    return [
+                        'status' => $status,
+                        'user_id' => $log->UID,
+                        'date' => $date,
+                        'time' => $time,
+                        'reason' => $reason,
+                        'created_at' => null,
+                    ];
+                });
+
+            return response()->json($fallbackLogs);
+        } catch (\Exception $e) {
+            Log::warning('getUpdateLog fallback failed', [
+                'mcs_num' => $mcsNum,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return response()->json([]);
     }
 
     public function obsolate(Request $request, $mcsNum)
@@ -1894,13 +2040,17 @@ class UpdateMcController extends Controller
             ->where('MCS_Num', $mcsNum)
             ->update(['STS' => 'Obsolete']);
 
+        $reason = $validated['reason'] ?? 'No reason provided';
+
+        $this->insertMcUpdateLog($mcsNum, 'Obsolete', $reason);
+
         $this->createMcLog(
             $mcsNum,
             'OBSOLETE',
             $masterCard->AC_NUM,
             $masterCard->AC_NAME,
             $masterCard->MODEL,
-            $validated['reason'] ?? 'No reason provided'
+            $reason
         );
 
         return response()->json([
@@ -1925,13 +2075,17 @@ class UpdateMcController extends Controller
             ->where('MCS_Num', $mcsNum)
             ->update(['STS' => 'Active']);
 
+        $reason = $validated['reason'] ?? 'No reason provided';
+
+        $this->insertMcUpdateLog($mcsNum, 'Active', $reason);
+
         $this->createMcLog(
             $mcsNum,
             'REACTIVE',
             $masterCard->AC_NUM,
             $masterCard->AC_NAME,
             $masterCard->MODEL,
-            $validated['reason'] ?? 'No reason provided'
+            $reason
         );
 
         return response()->json([
@@ -1959,6 +2113,8 @@ class UpdateMcController extends Controller
         foreach ($mcsNums as $num) {
             $mc = DB::table('MC')->where('MCS_Num', $num)->first();
             if ($mc) {
+                $this->insertMcUpdateLog($num, 'Obsolete', $reason);
+
                 $this->createMcLog(
                     $num,
                     'OBSOLETE',
@@ -1995,6 +2151,8 @@ class UpdateMcController extends Controller
         foreach ($mcsNums as $num) {
             $mc = DB::table('MC')->where('MCS_Num', $num)->first();
             if ($mc) {
+                $this->insertMcUpdateLog($num, 'Active', $reason);
+
                 $this->createMcLog(
                     $num,
                     'REACTIVE',
@@ -2064,20 +2222,35 @@ class UpdateMcController extends Controller
 
     /**
      * Get maintenance log for a specific MCS number
+     * Shows when MC was created and amended
      */
     public function getMaintenanceLog($mcsNum)
     {
         $logs = McLog::where('MCS_NUM', $mcsNum)
-            ->where('ACTION', 'MAINTENANCE')
+            ->whereIn('ACTION', ['CREATE', 'UPDATE'])
             ->orderByRaw('CAST(DateSK AS INT) DESC, TIME DESC')
             ->get()
             ->map(function($log) {
+                // Parse date and time, convert to WIB (UTC+7)
+                try {
+                    $dateTimeString = $log->DATE . ' ' . $log->TIME;
+                    $dateTime = \Carbon\Carbon::parse($dateTimeString)->timezone('Asia/Jakarta');
+                    $formattedDate = $dateTime->format('Y-m-d');
+                    $formattedTime = $dateTime->format('H:i:s') . ' WIB';
+                } catch (\Exception $e) {
+                    $formattedDate = $log->DATE;
+                    $formattedTime = $log->TIME;
+                }
+
                 return [
-                    'date' => $log->DATE,
-                    'time' => $log->TIME,
+                    'date' => $formattedDate,
+                    'time' => $formattedTime,
                     'user_id' => $log->UID,
                     'user_id_2' => $log->UID2,
-                    'action' => $log->ACTION,
+                    'action' => $log->ACTION === 'UPDATE' ? 'AMEND' : $log->ACTION,
+                    'ac_num' => $log->AC_NUM,
+                    'ac_name' => $log->AC_NAME,
+                    'model' => $log->MODEL,
                 ];
             });
 
@@ -2085,21 +2258,36 @@ class UpdateMcController extends Controller
     }
 
     /**
-     * Get status log for a specific MCS number (OBSOLETE, REACTIVE, UPDATE)
+     * Get status log for a specific MCS number
+     * Shows when MC status changed (OBSOLETE, REACTIVE)
      */
     public function getStatusLog($mcsNum)
     {
         $logs = McLog::where('MCS_NUM', $mcsNum)
-            ->whereIn('ACTION', ['OBSOLETE', 'REACTIVE', 'UPDATE', 'CREATE'])
+            ->whereIn('ACTION', ['OBSOLETE', 'REACTIVE'])
             ->orderByRaw('CAST(DateSK AS INT) DESC, TIME DESC')
             ->get()
             ->map(function($log) {
+                // Parse date and time, convert to WIB (UTC+7)
+                try {
+                    $dateTimeString = $log->DATE . ' ' . $log->TIME;
+                    $dateTime = \Carbon\Carbon::parse($dateTimeString)->timezone('Asia/Jakarta');
+                    $formattedDate = $dateTime->format('Y-m-d');
+                    $formattedTime = $dateTime->format('H:i:s') . ' WIB';
+                } catch (\Exception $e) {
+                    $formattedDate = $log->DATE;
+                    $formattedTime = $log->TIME;
+                }
+
                 return [
-                    'date' => $log->DATE,
-                    'time' => $log->TIME,
+                    'date' => $formattedDate,
+                    'time' => $formattedTime,
                     'user_id' => $log->UID,
                     'user_id_2' => $log->UID2,
                     'action' => $log->ACTION,
+                    'ac_num' => $log->AC_NUM,
+                    'ac_name' => $log->AC_NAME,
+                    'model' => $log->MODEL,
                 ];
             });
 

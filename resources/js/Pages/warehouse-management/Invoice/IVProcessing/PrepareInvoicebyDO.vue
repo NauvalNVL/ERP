@@ -2,32 +2,12 @@
   <AppLayout :header="openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)'">
     <div class="space-y-6" v-page-transition>
       <!-- Hero header -->
-      <div class="px-2 sm:px-0">
-        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-2xl shadow-lg overflow-hidden relative px-6 py-5 sm:px-8 sm:py-6">
-          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-lg"></div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative z-10">
-            <div class="flex items-start gap-3">
-              <div class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/15 shadow-inner">
-                <i class="fa fa-file-invoice-dollar text-white text-xl"></i>
-              </div>
-              <div>
-                <h2 class="text-lg sm:text-xl font-bold text-white">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</h2>
-                <p class="text-xs sm:text-sm text-cyan-100">
-                  Follow CPS flow: select customer &amp; tax index, choose delivery orders, review items, then confirm invoice.
-                </p>
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-2 text-right">
-              <div class="hidden sm:flex items-center gap-2 text-xs text-cyan-50">
-                <i class="fa fa-calendar-day"></i>
-                <span>Today {{ new Date().toLocaleDateString('en-GB') }}</span>
-              </div>
-              <div class="flex flex-wrap gap-2 text-[11px] sm:text-xs justify-end">
-                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 1: Customer &amp; Tax</span>
-                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 2: Delivery Orders</span>
-                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 3: Items &amp; Tax</span>
-                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 4: Invoice</span>
-              </div>
+      <div class="mx-auto w-full max-w-5xl">
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-xl shadow-sm">
+          <div class="px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-sm">
+              <i class="fa fa-file-invoice-dollar text-white"></i>
+              <span class="font-semibold text-white">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</span>
             </div>
           </div>
         </div>
