@@ -383,6 +383,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // State
 const loading = ref(false);
@@ -516,7 +517,7 @@ const previewFaktur = () => {
   showMessage(`Preview: ${withFaktur.length} invoice(s) ready to save`, 'info');
 };
 
-const saveFakturNumbers = () => {
+const saveFakturNumbers = async () => {
   const withFaktur = selectedInvoices.value.filter(inv => inv.FAKTUR_NO_INPUT);
   
   if (withFaktur.length === 0) {
@@ -524,8 +525,65 @@ const saveFakturNumbers = () => {
     return;
   }
 
-  // TODO: Implement API call to save faktur numbers
-  showMessage('Save functionality will be implemented soon', 'info');
+  const confirm = await Swal.fire({
+    title: 'Simpan Faktur?',
+    text: `Anda akan menyimpan ${withFaktur.length} nomor faktur ke database.`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, simpan',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#16a34a',
+    cancelButtonColor: '#9ca3af'
+  });
+
+  if (!confirm.isConfirmed) {
+    return;
+  }
+
+  loading.value = true;
+  try {
+    const payload = {
+      invoices: withFaktur.map(inv => ({
+        IV_NUM: inv.IV_NUM,
+        FAKTUR_NO_INPUT: inv.FAKTUR_NO_INPUT
+      }))
+    };
+
+    const res = await fetch('/api/invoices/coretax/save-faktur', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]')?.content || '',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.success === false) {
+      const msg = data.message || data.error || `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+
+    showMessage(`Saved ${data.saved_count || withFaktur.length} faktur number(s)`, 'success');
+    await Swal.fire({
+      title: 'Berhasil',
+      text: `Berhasil menyimpan ${data.saved_count || withFaktur.length} nomor faktur.`,
+      icon: 'success',
+      confirmButtonColor: '#16a34a'
+    });
+    // Refresh list and reset selection
+    await fetchInvoices();
+    selectedInvoices.value = [];
+    globalFakturNumber.value = '';
+  } catch (error) {
+    console.error('Failed to save faktur numbers:', error);
+    showMessage(error.message || 'Failed to save faktur numbers', 'error');
+  } finally {
+    loading.value = false;
+  }
 };
 
 const formatDate = (date) => {

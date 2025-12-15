@@ -1027,7 +1027,7 @@ async function prepareInvoices(){
         customer_code: customerCode.value,
         tax_index_no: taxIndexNo.value,
         tax_code: finalTaxData.value?.taxCode || selectedTaxCode.value || null, // ✅ Pass tax code explicitly (from Final Screen or Check Sales Tax)
-        tax_percent: finalTaxData.value?.taxPercent || null, // ✅ ADDED: Pass tax percent from Final Screen
+        tax_percent: finalTaxData.value?.taxPercent ?? null, // ✅ Preserve 0% tax instead of converting to null
         invoice_date: invoiceDate.value,
         second_ref: secondRef.value,
         remark: remark.value,

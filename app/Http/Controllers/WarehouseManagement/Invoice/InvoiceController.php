@@ -893,7 +893,7 @@ class InvoiceController extends Controller
                 // IMPORTANT: Only count Main component lines to avoid double-counting Fit components
                 /** @var float $invoicedQty */
                 $invoicedQty = DB::table('INV')
-                    ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
+                    ->where('IV_SECOND_REF', $doNumber) // ✅ Track invoicing per DO number to avoid cross-DO mixing under the same SO
                     ->where('IV_STS', '!=', 'Cancelled')
                     ->where(function ($q) {
                         $q->whereNull('COMP')
@@ -901,6 +901,20 @@ class InvoiceController extends Controller
                           ->orWhere('COMP', 'Main');
                     })
                     ->sum('IV_QTY');
+
+                // Backward compatibility: legacy data without IV_SECOND_REF uses SO_NUM. Only use this if DO-level sum is zero.
+                if ($invoicedQty == 0) {
+                    $invoicedQty = DB::table('INV')
+                        ->whereNull('IV_SECOND_REF')
+                        ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
+                        ->where('IV_STS', '!=', 'Cancelled')
+                        ->where(function ($q) {
+                            $q->whereNull('COMP')
+                              ->orWhere('COMP', '')
+                              ->orWhere('COMP', 'Main');
+                        })
+                        ->sum('IV_QTY');
+                }
 
                 /** @var float $doQty */
                 $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
@@ -1278,9 +1292,18 @@ class InvoiceController extends Controller
                 try {
                     // Calculate new invoiced quantity after this invoice
                     $newInvoicedQty = DB::table('INV')
-                        ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
+                        ->where('IV_SECOND_REF', $doNumber)
                         ->where('IV_STS', '!=', 'Cancelled')
                         ->sum('IV_QTY');
+
+                    // Backward compatibility for legacy records without IV_SECOND_REF
+                    if ($newInvoicedQty == 0) {
+                        $newInvoicedQty = DB::table('INV')
+                            ->whereNull('IV_SECOND_REF')
+                            ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
+                            ->where('IV_STS', '!=', 'Cancelled')
+                            ->sum('IV_QTY');
+                    }
 
                     $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
                     $newRemainingQty = $doQty - ($newInvoicedQty ?? 0);
