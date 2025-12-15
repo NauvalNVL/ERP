@@ -4,46 +4,34 @@
 
 		<!-- Header & Main Layout -->
 		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
-			<div class="max-w-7xl mx-auto">
+			<div class="max-w-6xl mx-auto">
 				<!-- Header Section -->
 				<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
-					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-						<div class="flex items-center gap-3">
-							<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
-								<i class="fas fa-drafting-compass text-white text-sm"></i>
-							</div>
-							<div>
-								<h2 class="text-lg sm:text-xl font-semibold leading-tight">
-									Define Product Design
-								</h2>
-								<p class="text-xs sm:text-sm text-emerald-100">
-									Define product designs for specific product categories.
-								</p>
-							</div>
+					<div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+						<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+							<i class="fas fa-drafting-compass text-white text-lg"></i>
 						</div>
-						<div class="flex items-center gap-2 text-xs text-emerald-100">
-							<i class="fas fa-info-circle text-sm"></i>
-							<span>Search, create, and maintain product designs.</span>
+						<div>
+							<h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Product Design</h2>
+							<p class="text-xs sm:text-sm text-emerald-100">Define product designs for specific product categories. Search, create, and maintain product designs.</p>
 						</div>
 					</div>
 				</div>
 
-				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					<!-- Left Column -->
-					<div class="lg:col-span-2 space-y-4">
-						<div class="bg-white shadow-sm rounded-xl border border-gray-200">
-							<div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
-								<div class="p-2 bg-emerald-500 rounded-lg mr-3">
-									<i class="fas fa-edit text-white"></i>
+				<div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+					<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						<!-- Left Column -->
+						<div class="lg:col-span-2">
+							<div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-emerald-500">
+								<div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+									<div class="p-2 bg-emerald-500 rounded-lg mr-3">
+										<i class="fas fa-edit text-white"></i>
+									</div>
+									<h3 class="text-xl font-semibold text-gray-800">Product Design Management</h3>
 								</div>
-								<div>
-									<h3 class="text-sm sm:text-base font-semibold text-gray-800">Product Design Management</h3>
-									<p class="text-xs text-gray-500">Search, create, and maintain product designs.</p>
-								</div>
-							</div>
-							<div class="px-4 py-4 sm:px-6">
+
 								<!-- Search Section -->
-								<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+								<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
 									<div class="col-span-2">
 										<label class="block text-sm font-medium text-gray-700 mb-1">Design Code:</label>
 										<div class="relative flex">
@@ -53,12 +41,12 @@
 											<input
 												type="text"
 												v-model="searchQuery"
-												class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-colors"
+												class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
 											/>
 											<button
 												type="button"
 												@click="showModal = true"
-												class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-600 hover:bg-emerald-700 text-white rounded-r-md text-sm"
+												class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
 											>
 												<i class="fas fa-table"></i>
 											</button>
@@ -69,15 +57,15 @@
 										<button
 											type="button"
 											@click="openModalForCreate"
-											class="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-semibold shadow-sm"
+											class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded transition-colors transform active:translate-y-px"
 										>
-											<i class="fas fa-plus-circle mr-2"></i>
-											Add New
+											<i class="fas fa-plus-circle mr-2"></i> Add New
 										</button>
 									</div>
 								</div>
+
 								<!-- Data Status Information -->
-								<div v-if="loading" class="mt-3 bg-yellow-50 border border-yellow-100 p-3 rounded-lg">
+								<div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
 									<div class="flex items-center">
 										<div class="mr-3">
 											<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
@@ -85,37 +73,36 @@
 										<p class="text-sm font-medium text-yellow-800">Loading product design data...</p>
 									</div>
 								</div>
-								<div v-else-if="designs.length === 0" class="mt-3 bg-yellow-50 border border-yellow-100 p-3 rounded-lg">
+								<div v-else-if="designs.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
 									<p class="text-sm font-medium text-yellow-800">No product design data available.</p>
 									<p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-									<div class="mt-2 flex items-center space-x-3">
-										<button @click="fetchDesigns" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">Reload Data</button>
+									<div class="mt-2">
+										<button @click="fetchDesigns" class="inline-flex items-center px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded transition-colors transform active:translate-y-px">Reload Data</button>
 									</div>
 								</div>
-								<div v-else class="mt-3 bg-emerald-50 border border-emerald-100 p-3 rounded-lg">
-									<p class="text-sm font-medium text-emerald-800">Data available: {{ designs.length }} designs found.</p>
-									<p v-if="selectedRow" class="text-xs text-emerald-700 mt-1 flex items-center">
-										Selected: <span class="font-semibold ml-1">{{ selectedRow.pd_code }}</span> - {{ selectedRow.pd_name }}
+								<div v-else class="mt-4 bg-green-100 p-3 rounded">
+									<p class="text-sm font-medium text-green-800">Data available: {{ designs.length }} designs found.</p>
+									<p v-if="selectedRow" class="text-xs text-green-700 mt-1">
+										Selected: <span class="font-semibold">{{ selectedRow.pd_code }}</span> - {{ selectedRow.pd_name }}
 									</p>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<!-- Right Column - Quick Info -->
-					<div class="lg:col-span-1 space-y-4">
-						<!-- Product Design Info Card -->
-						<div class="bg-white shadow-sm rounded-xl border border-emerald-100">
-							<div class="px-4 py-3 sm:px-5 border-b border-emerald-100 flex items-center">
-								<div class="p-2 bg-emerald-500 rounded-lg mr-3">
-									<i class="fas fa-info-circle text-white"></i>
+						<!-- Right Column - Quick Info -->
+						<div class="lg:col-span-1">
+							<!-- Product Design Info Card -->
+							<div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-teal-500 mb-6">
+								<div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+									<div class="p-2 bg-teal-500 rounded-lg mr-3">
+										<i class="fas fa-info-circle text-white"></i>
+									</div>
+									<h3 class="text-lg font-semibold text-gray-800">Product Design Info</h3>
 								</div>
-								<h3 class="text-sm sm:text-base font-semibold text-gray-800">Product Design Info</h3>
-							</div>
-							<div class="px-4 py-4 sm:px-5">
+
 								<div class="space-y-4">
-									<div class="p-4 bg-emerald-50 rounded-lg">
-										<h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Instructions</h4>
+									<div class="p-4 bg-teal-50 rounded-lg">
+										<h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
 										<ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
 											<li>Product design code must be unique</li>
 											<li>Use the <span class="font-medium">search</span> button to select a design</li>
@@ -125,42 +112,41 @@
 									</div>
 
 									<div
-										class="p-4 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-										:class="{ 'cursor-pointer': selectedRow }"
-										@click="selectedRow ? showModal = true : null"
-									>
-										<div class="flex justify-between items-center mb-2">
-											<h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider">Design Information</h4>
-											<button
-												v-if="selectedRow"
-												@click.stop="showModal = true"
-												class="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-200"
-											>
-												<i class="fas fa-edit"></i>
-											</button>
-										</div>
-										<div class="space-y-2 text-sm">
-											<div v-if="selectedRow" class="grid grid-cols-2 gap-2">
-												<div class="font-medium text-gray-700">Code:</div>
-												<div>{{ selectedRow.pd_code }}</div>
-												<div class="font-medium text-gray-700">Name:</div>
-												<div>{{ selectedRow.pd_name }}</div>
-												<div class="font-medium text-gray-700">Product:</div>
-												<div>{{ selectedRow.product }}</div>
-												<div class="font-medium text-gray-700">IDC:</div>
-												<div>{{ selectedRow.idc }}</div>
+											class="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+											:class="{ 'cursor-pointer': selectedRow }"
+											@click="selectedRow ? showModal = true : null"
+										>
+											<div class="flex justify-between items-center mb-2">
+												<h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider">Design Information</h4>
+												<button
+													v-if="selectedRow"
+													@click.stop="showModal = true"
+													class="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-200"
+												>
+													<i class="fas fa-edit"></i>
+												</button>
 											</div>
-											<div v-else class="text-gray-500 italic">
-												Select a design to view details
+											<div class="space-y-2 text-sm">
+												<div v-if="selectedRow" class="grid grid-cols-2 gap-2">
+													<div class="font-medium text-gray-700">Code:</div>
+													<div>{{ selectedRow.pd_code }}</div>
+													<div class="font-medium text-gray-700">Name:</div>
+													<div>{{ selectedRow.pd_name }}</div>
+													<div class="font-medium text-gray-700">Product:</div>
+													<div>{{ selectedRow.product }}</div>
+													<div class="font-medium text-gray-700">IDC:</div>
+													<div>{{ selectedRow.idc }}</div>
+												</div>
+												<div v-else class="text-gray-500 italic">
+													Select a design to view details
+												</div>
 											</div>
-										</div>
-										<div v-if="selectedRow" class="mt-3 text-xs text-emerald-600 flex items-center">
-											<i class="fas fa-info-circle mr-1"></i>
-											Click the browse button to edit this design
-										</div>
+											<div v-if="selectedRow" class="mt-3 text-xs text-blue-600 flex items-center">
+												<i class="fas fa-info-circle mr-1"></i>
+												Click the browse button to edit this design
+											</div>
 									</div>
 								</div>
-							</div>
 						</div>
 					</div>
 				</div>

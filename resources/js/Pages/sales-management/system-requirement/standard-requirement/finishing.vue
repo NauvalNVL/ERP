@@ -8,116 +8,88 @@
     </form>
     <!-- Header Section -->
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-6xl mx-auto">
             <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
-                <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
-                            <i class="fas fa-tools text-white text-sm"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-lg sm:text-xl font-semibold leading-tight">
-                                Define Finishing
-                            </h2>
-                            <p class="text-xs sm:text-sm text-emerald-100">
-                                Define finishing methods for product manufacturing.
-                            </p>
-                        </div>
+                <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <i class="fas fa-tools text-white text-lg"></i>
                     </div>
-                    <div class="flex items-center gap-2 text-xs text-emerald-100">
-                        <i class="fas fa-info-circle text-sm"></i>
-                        <span>Use finishing codes to manage production processes.</span>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Finishing</h2>
+                        <p class="text-xs sm:text-sm text-emerald-100">Define finishing methods for product manufacturing.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                <!-- Left Column -->
-                <div class="lg:col-span-2 space-y-4">
-                    <div class="bg-white shadow-sm rounded-xl border border-gray-200">
-                        <div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
-                            <div class="p-2 bg-emerald-500 rounded-lg mr-3 text-white">
-                                <i class="fas fa-edit"></i>
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-emerald-500">
+                            <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+                                <div class="p-2 bg-emerald-500 rounded-lg mr-3">
+                                    <i class="fas fa-edit text-white"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800">Finishing Management</h3>
                             </div>
-                            <div>
-                                <h3 class="text-sm sm:text-base font-semibold text-slate-800">Finishing Management</h3>
-                                <p class="text-xs text-slate-500">Search, create, and maintain your finishing methods.</p>
-                            </div>
-                        </div>
-                        <div class="px-4 py-4 sm:px-6">
+
                             <!-- Search Section -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                                 <div class="col-span-2">
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Finishing Code</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Finishing Code:</label>
                                     <div class="relative flex">
-                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
+                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fas fa-tools"></i>
                                         </span>
-                                        <input
-                                            type="text"
-                                            v-model="searchQuery"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500 text-slate-800 placeholder-slate-400 text-sm transition-colors"
-                                            placeholder="Search or type finishing code"
-                                        >
-                                        <button
-                                            type="button"
-                                            @click="showModal = true"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-600 hover:bg-emerald-700 text-white rounded-r-md text-sm"
-                                        >
+                                        <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type finishing code">
+                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="col-span-1">
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
-                                    <button
-                                        type="button"
-                                        @click="createNewFinishing"
-                                        class="w-full flex items-center justify-center px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm"
-                                    >
-                                        <i class="fas fa-plus-circle mr-2"></i>
-                                        Add New
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                                    <button type="button" @click="createNewFinishing" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded transition-colors transform active:translate-y-px">
+                                        <i class="fas fa-plus-circle mr-2"></i> Add New
                                     </button>
                                 </div>
                             </div>
+
                             <!-- Data Status Information -->
-                            <div v-if="loading" class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-center space-x-3 text-sm">
+                            <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                                 <div class="flex items-center">
                                     <div class="mr-3">
-                                        <div class="animate-spin rounded-full h-6 w-6 border-2 border-amber-300 border-t-amber-600"></div>
+                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                                     </div>
-                                    <p class="font-medium text-amber-800">Loading finishing data...</p>
+                                    <p class="text-sm font-medium text-yellow-800">Loading finishing data...</p>
                                 </div>
                             </div>
-                            <div v-else-if="finishings.length === 0" class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-lg">
-                                <p class="text-sm font-semibold text-amber-800">No finishing data available.</p>
-                                <p class="text-xs text-amber-700 mt-1">Data will be automatically loaded when available.</p>
+                            <div v-else-if="finishings.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
+                                <p class="text-sm font-medium text-yellow-800">No finishing data available.</p>
+                                <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
                             </div>
-                            <div v-else class="mt-3 bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
-                                <p class="text-sm font-semibold text-emerald-800">Data available: {{ finishings.length }} finishing methods found.</p>
-                                <p v-if="selectedRow" class="text-xs text-emerald-700 mt-1">
+                            <div v-else class="mt-4 bg-green-100 p-3 rounded">
+                                <p class="text-sm font-medium text-green-800">Data available: {{ finishings.length }} finishing methods found.</p>
+                                <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
                                     Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.description }}
                                 </p>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- Right Column - Quick Info -->
-                <div class="lg:col-span-1 space-y-4">
-                    <!-- Finishing Info Card -->
-                    <div class="bg-white shadow-sm rounded-xl border border-emerald-100">
-                        <div class="px-4 py-3 sm:px-5 border-b border-emerald-100 flex items-center">
-                            <div class="p-2 bg-emerald-500 rounded-lg mr-3">
-                                <i class="fas fa-info-circle text-white"></i>
+                    <!-- Right Column - Quick Info -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border-t-4 border-teal-500 mb-6">
+                            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                                <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                                    <i class="fas fa-info-circle text-white"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-800">Finishing Information</h3>
                             </div>
-                            <h3 class="text-sm sm:text-base font-semibold text-emerald-900">Finishing Information</h3>
-                        </div>
 
-                        <div class="px-4 py-4 sm:px-5">
                             <div class="space-y-4">
-                                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                                    <h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-2">Instructions</h4>
-                                    <ul class="list-disc pl-5 text-xs sm:text-sm text-slate-600 space-y-1">
+                                <div class="p-4 bg-teal-50 rounded-lg">
+                                    <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
+                                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                         <li>Finishing code must be unique and cannot be changed</li>
                                         <li>Use the <span class="font-medium">search</span> button to find finishing methods</li>
                                         <li>Enter a new code and press Add New to create a new finishing</li>
@@ -125,27 +97,27 @@
                                     </ul>
                                 </div>
 
-                                <div class="p-4 bg-sky-50 rounded-lg border border-sky-100">
-                                    <h4 class="text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">Common Finishing Methods</h4>
-                                    <div class="grid grid-cols-1 gap-2 text-xs sm:text-sm">
+                                <div class="p-4 bg-blue-50 rounded-lg">
+                                    <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Finishing Methods</h4>
+                                    <div class="grid grid-cols-1 gap-2 text-sm">
                                         <div class="flex items-center">
-                                            <span class="w-7 h-7 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">G</span>
+                                            <span class="w-6 h-6 flex items-center justify-center bg-emerald-600 text-white rounded-full font-bold mr-2">G</span>
                                             <span>Glue Application</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <span class="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">S</span>
+                                            <span class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2">S</span>
                                             <span>Stitching</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <span class="w-7 h-7 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">A</span>
+                                            <span class="w-6 h-6 flex items-center justify-center bg-purple-600 text-white rounded-full font-bold mr-2">A</span>
                                             <span>Assembly</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <span class="w-7 h-7 flex items-center justify-center bg-red-500 text-white rounded-full font-bold mr-2">H</span>
+                                            <span class="w-6 h-6 flex items-center justify-center bg-red-600 text-white rounded-full font-bold mr-2">H</span>
                                             <span>Heat Treatment</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <span class="w-7 h-7 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">W</span>
+                                            <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">W</span>
                                             <span>Wrapping</span>
                                         </div>
                                     </div>

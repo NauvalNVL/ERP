@@ -10,14 +10,12 @@
 					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 						<div class="flex items-center gap-3">
 							<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
-								<i class="fas fa-sync-alt text-white text-sm"></i>
+								<i class="fas fa-industry text-white text-sm"></i>
 							</div>
 							<div>
-								<h1 class="text-lg sm:text-xl font-semibold leading-tight">
-									Manage Industry Status (Obsolete/Unobsolete)
-								</h1>
+								<h1 class="text-lg sm:text-xl font-semibold leading-tight">Manage Industry Status</h1>
 								<p class="text-xs sm:text-sm text-emerald-100">
-									Toggle the active status of industries.
+									Activate or deactivate industries quickly and easily.
 								</p>
 							</div>
 						</div>
@@ -28,7 +26,7 @@
 							<input
 								v-model="searchQuery"
 								type="text"
-								placeholder="Search industries..."
+								placeholder="Cari industry (code, nama)..."
 								class="block w-full rounded-md border border-gray-200 bg-white py-1.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
 							/>
 						</div>
@@ -157,7 +155,7 @@
 										</td>
 									</tr>
 									<tr v-if="filteredIndustries.length === 0">
-										<td colspan="5" class="px-4 py-10 text-center text-sm text-gray-500">
+										<td colspan="4" class="px-4 py-10 text-center text-sm text-gray-500">
 											No industries found.
 										</td>
 									</tr>
