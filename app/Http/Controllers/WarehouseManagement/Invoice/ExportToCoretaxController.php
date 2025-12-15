@@ -27,9 +27,12 @@ class ExportToCoretaxController extends Controller
                     // 1. Tanggal Faktur
                     'INV.IV_DMY as FK_TANGGAL_FAKTUR',
                     
-                    // 2. Kode Transaksi - Default '10' untuk Kawasan Berikat/KITE
-                    // MBI memiliki fasilitas KITE, jadi semua penyerahan menggunakan kode 10
-                    DB::raw("'10' AS FK_KD_JENIS_TRANSAKSI"),
+                    // 2. Logika Penentuan Kode Transaksi (07 vs 01)
+                    // '07' jika NIL tax, '01' untuk transaksi normal
+                    DB::raw("CASE 
+                        WHEN INV.IV_TAX_CODE = 'NIL' AND INV.IV_TAX_PERCENT = '0' THEN '07' 
+                        ELSE '01' 
+                    END AS FK_KD_JENIS_TRANSAKSI"),
                     
                     // 3. Referensi Faktur (Menambah Prefix 'IV/')
                     DB::raw("'IV/' + INV.IV_NUM AS FK_REFERENSI"),
@@ -51,7 +54,7 @@ class ExportToCoretaxController extends Controller
                     'CUSTOMER.NPWP AS FK_NPWP',
                     'CUSTOMER.CUST_TYPE',
                     
-                    // Additional fields for XML generation
+                    // 8. Additional fields for XML generation
                     'INV.IV_NUM',
                     'INV.AC_NUM',
                     'INV.AC_NAME',
@@ -148,7 +151,10 @@ class ExportToCoretaxController extends Controller
                             WHEN CUSTOMER.ADDRESS3 = '00000' THEN '' 
                             ELSE CUSTOMER.ADDRESS3 
                         END AS FK_ALAMAT_LENGKAP"),
-                    DB::raw("'10' AS FK_KD_JENIS_TRANSAKSI"),
+                    DB::raw("CASE 
+                        WHEN INV.IV_TAX_CODE = 'NIL' AND INV.IV_TAX_PERCENT = '0' THEN '07' 
+                        ELSE '01' 
+                    END AS FK_KD_JENIS_TRANSAKSI"),
                     DB::raw("'IV/' + INV.IV_NUM AS FK_REFERENSI")
                 )
                 ->whereIn('INV.IV_NUM', $invoiceNums)
@@ -191,6 +197,95 @@ class ExportToCoretaxController extends Controller
                 'message' => 'Failed to generate XML: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Save faktur numbers into TAX table
+     */
+    public function saveFakturNumbers(Request $request)
+    {
+        $payload = $request->validate([
+            'invoices' => 'required|array|min:1',
+            'invoices.*.IV_NUM' => 'required|string|max:50',
+            'invoices.*.FAKTUR_NO_INPUT' => 'required|string|max:50',
+        ]);
+
+        $rows = [];
+        $invoiceNums = [];
+
+        foreach ($payload['invoices'] as $item) {
+            $ivNum = $item['IV_NUM'];
+            $fakturNo = $item['FAKTUR_NO_INPUT'];
+
+            $invoice = DB::table('INV as inv')
+                ->leftJoin('CUSTOMER as c', 'inv.AC_NUM', '=', 'c.CODE')
+                ->select(
+                    'inv.IV_NUM',
+                    'inv.AC_NUM',
+                    'inv.AC_NAME',
+                    'inv.IV_DMY',
+                    'inv.IV_TAX_CODE',
+                    'inv.IV_TAX_PERCENT',
+                    'inv.CURR',
+                    'inv.MODEL',
+                    'inv.PRODUCT',
+                    'c.NPWP'
+                )
+                ->where('inv.IV_NUM', $ivNum)
+                ->orderBy('inv.ITEM')
+                ->first();
+
+            if (!$invoice) {
+                Log::warning('Faktur save skipped, invoice not found', ['iv_num' => $ivNum]);
+                continue;
+            }
+
+            // Sum amount for this invoice (all components except cancelled)
+            $dpp = DB::table('INV')
+                ->where('IV_NUM', $ivNum)
+                ->where('IV_STS', '!=', 'Cancelled')
+                ->sum('IV_TRAN_AMT');
+
+            $rate = $invoice->IV_TAX_PERCENT ?? 0;
+            $ppn = round($dpp * ((float) $rate / 100), 2);
+
+            $invoiceNums[] = $ivNum;
+
+            $rows[] = [
+                'AC_Num' => $invoice->AC_NUM,
+                'AC_Name' => $invoice->AC_NAME,
+                'NPWP' => $invoice->NPWP,
+                'No_Faktur' => $fakturNo,
+                'Tgl_Faktur' => $invoice->IV_DMY,
+                'Typ' => $invoice->IV_TAX_CODE,
+                'INV_Num' => $invoice->IV_NUM,
+                'Currency' => $invoice->CURR ?? 'IDR',
+                'DPP' => $dpp,
+                'PPN' => $ppn,
+                'Rate' => (string) $rate,
+                'Jenis_Barang' => $invoice->PRODUCT ?? $invoice->MODEL,
+                'Nama_Bank' => null,
+                'DateSK' => $this->toDateSk($invoice->IV_DMY),
+            ];
+        }
+
+        if (empty($rows)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No valid invoices to save',
+            ], 400);
+        }
+
+        DB::transaction(function () use ($rows, $invoiceNums) {
+            DB::table('TAX')->whereIn('INV_Num', $invoiceNums)->delete();
+            DB::table('TAX')->insert($rows);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Faktur numbers saved',
+            'saved_count' => count($rows),
+        ]);
     }
 
     /**
@@ -257,12 +352,24 @@ class ExportToCoretaxController extends Controller
             $tanggalfaktur = $row->IV_DMY;
             $jenisfaktur = 'Normal';
             
-            // Kawasan Berikat/KITE - Fasilitas Tidak Dipungut PPN
-            // MBI memiliki fasilitas KITE untuk semua penyerahan
-            $kodetransaksi = '10'; // Penyerahan dari Kawasan Berikat
-            $keterangantambahan = 'TD.00502'; // Kode fasilitas tidak dipungut
-            $capfasilitas = 'TD.01101'; // Cap fasilitas
-            $dokumenpendukung = $row->IV_SECOND_REF ?? ''; // Dokumen pendukung (jika ada)
+            // Logika Penentuan Kode Transaksi berdasarkan SQL
+            $kodetransaksi = $row->FK_KD_JENIS_TRANSAKSI ?? '01'; // '07' untuk NIL tax, '01' untuk normal
+            
+            // Conditional logic berdasarkan kode transaksi
+            if ($kodetransaksi == '07') {
+                // Jika NIL tax (kode 07)
+                $keterangantambahan = 'TD.00502';
+                $dokumenpendukung = $row->IV_SECOND_REF ?? '';
+                // Transform: 07 → 10 dengan cap fasilitas
+                $capfasilitas = 'TD.01101';
+                $kodetransaksi = '10'; // Penyerahan dari Kawasan Berikat
+            } else {
+                // Jika transaksi normal (kode 01)
+                $keterangantambahan = '';
+                $dokumenpendukung = ''; // Reset ke kosong
+                $capfasilitas = '';
+                $kodetransaksi = '04'; // Penyerahan yang PPN-nya harus dipungut sendiri
+            }
             
             // Referensi
             $referensi = '';
@@ -275,18 +382,17 @@ class ExportToCoretaxController extends Controller
             $npwppembeli = $row->FK_NPWP ?? '';
             
             // Jenis ID Pembeli (Logika PT vs Perorangan)
-            if ($cust_type == 'PT' || empty($cust_type)) {
+            if ($cust_type == 'PT' || $cust_type == '' || $cust_type == NULL) {
                 // Badan Usaha (PT)
                 $jenisidpembeli = 'TIN';
                 $nodokpembeli = '-';
-                $idtkupembeli = ($row->FK_NPWP ?? '') . '000000';
                 // $npwppembeli tetap dari FK_NPWP (sudah diset di atas)
             } else {
                 // Orang Pribadi (Perorangan)
                 $jenisidpembeli = 'National ID';
                 $nodokpembeli = $npwppembeli; // NPWP asli (NIK disimpan di kolom NPWP)
                 $npwppembeli = '0000000000000000'; // NPWP di-nol-kan jika pakai NIK
-                $idtkupembeli = '000000'; // IDTKU di-nol-kan untuk perorangan
+                $idtkupembeli = '000000'; // IDTKU di-nol-kan untuk perorangan (akan di-override dibawah)
             }
             
             $namapembeli = str_replace(
@@ -295,6 +401,9 @@ class ExportToCoretaxController extends Controller
                 $row->FK_NAMA ?? $row->AC_NAME ?? ''
             );
             $alamatpembeli = $row->FK_ALAMAT_LENGKAP ?? '';
+            
+            // Set IDTKU pembeli (override nilai sebelumnya untuk semua tipe customer)
+            $idtkupembeli = ($row->FK_NPWP ?? '') . '000000';
             
             // Start Tax Invoice
             $xml->startElement('TaxInvoice');
@@ -399,5 +508,30 @@ class ExportToCoretaxController extends Controller
         }
         
         return date('Y-m-d');
+    }
+
+    /**
+     * Convert dd/mm/yyyy to yyyymmdd integer for DateSK
+     */
+    private function toDateSk($date): ?int
+    {
+        if (empty($date)) {
+            return null;
+        }
+
+        if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $date, $matches)) {
+            return (int) ($matches[3] . $matches[2] . $matches[1]);
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return (int) str_replace('-', '', $date);
+        }
+
+        $timestamp = strtotime($date);
+        if ($timestamp !== false) {
+            return (int) date('Ymd', $timestamp);
+        }
+
+        return null;
     }
 }

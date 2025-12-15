@@ -246,6 +246,7 @@ Route::prefix('invoices')->group(function () {
     // Export to Coretax endpoints - Automatic XML generation from invoices
     Route::get('/coretax/invoices', [ExportToCoretaxController::class, 'getInvoicesForExport']);
     Route::post('/coretax/generate-xml', [ExportToCoretaxController::class, 'generateXml']);
+    Route::post('/coretax/save-faktur', [ExportToCoretaxController::class, 'saveFakturNumbers']);
 
 // Tax Type API routes (CPS-style Define Tax Type) - MUST be before wildcard routes
 Route::get('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);
