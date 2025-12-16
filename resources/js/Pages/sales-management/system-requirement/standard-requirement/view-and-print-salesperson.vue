@@ -2,22 +2,29 @@
     <AppLayout :header="'View & Print Salespersons'">
     <Head title="View & Print Salespersons" />
 
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-print mr-3"></i> View & Print Salespersons
-        </h2>
-        <p class="text-emerald-100">Preview and print salesperson data</p>
-    </div>
+        <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+            <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-print text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Salespersons</h2>
+                    <p class="text-xs sm:text-sm text-emerald-100">Preview and print salesperson data</p>
+                </div>
+            </div>
+        </div>
 
-    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-lg shadow-lg p-6 mb-6">
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="exportPDF" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <button @click="exportPDF" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                     <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
-                <Link href="/sales-person" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <Link href="/sales-person" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md flex items-center space-x-2 border border-gray-200">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Salespersons
                 </Link>
             </div>
@@ -28,7 +35,7 @@
                 <input
                     type="text"
                     v-model="searchQuery"
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Search salespersons..."
                 >
             </div>
@@ -38,7 +45,7 @@
         <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
+                <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
                             <i class="fas fa-user-tie text-3xl"></i>
@@ -138,12 +145,14 @@
                 <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
-    </div>
-    </AppLayout>
-</template>
+        </div>
+     </div>
+     </div>
+     </AppLayout>
+ </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue';
+ <script setup>
+ import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import jsPDF from 'jspdf';

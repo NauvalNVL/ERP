@@ -2,137 +2,146 @@
     <AppLayout :header="'View & Print Finishing'">
     <Head title="View & Print Finishings" />
 
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-print mr-3"></i> View & Print Finishings
-        </h2>
-        <p class="text-emerald-100">Preview and print finishing data</p>
-    </div>
-
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
-        <!-- Actions Bar -->
-        <div class="flex flex-wrap items-center justify-between mb-6">
-            <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
-                </button>
-                <Link href="/finishing" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Finishings
-                </Link>
-            </div>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header Section -->
+            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+                <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <i class="fas fa-tools text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Finishings</h2>
+                        <p class="text-xs sm:text-sm text-emerald-100">Preview and print finishing data</p>
+                    </div>
                 </div>
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search finishings..."
-                >
             </div>
-        </div>
 
-        <!-- Table Section -->
-        <div class="overflow-x-auto">
-            <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <!-- Table Header -->
-                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
-                    <div class="flex items-center">
-                        <div class="mr-4">
-                            <i class="fas fa-tools text-3xl"></i>
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+                <!-- Actions Bar -->
+                <div class="flex flex-wrap items-center justify-between mb-6">
+                    <div class="flex items-center space-x-2 mb-3 sm:mb-0">
+                        <button @click="printTable" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                            <i class="fas fa-file-pdf mr-2"></i> Print PDF
+                        </button>
+                        <Link href="/finishing" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md flex items-center space-x-2 border border-gray-200">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Finishings
+                        </Link>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
                         </div>
-                        <div>
-                            <h2 class="text-xl font-bold">FINISHING LIST</h2>
-                            <p class="text-sm opacity-80">View and print finishing data</p>
-                        </div>
+                        <input 
+                            type="text" 
+                            v-model="searchQuery" 
+                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="Search finishings..."
+                        >
                     </div>
                 </div>
 
-                <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th @click="sortTable('id')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                ID <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Code <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Description <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Created At <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Updated At <i class="fas fa-sort ml-1"></i>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                <!-- Table Section -->
+                <div class="overflow-x-auto">
+                    <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                        <!-- Table Header -->
+                        <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
+                            <div class="flex items-center">
+                                <div class="mr-4">
+                                    <i class="fas fa-tools text-3xl"></i>
                                 </div>
-                                <p class="mt-2">Loading finishing data...</p>
-                            </td>
-                        </tr>
-                        <tr v-else-if="filteredFinishings.length === 0" class="hover:bg-gray-50">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                No finishings found.
-                                <template v-if="searchQuery">
-                                    <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
-                                </template>
-                            </td>
-                        </tr>
-                        <tr v-for="(finishing, index) in filteredFinishings" :key="finishing.id" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ finishing.id }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ finishing.code || 'N/A' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ finishing.description || 'N/A' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500">{{ formatDate(finishing.created_at) }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500">{{ formatDate(finishing.updated_at) }}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                <div>
+                                    <h2 class="text-xl font-bold">FINISHING LIST</h2>
+                                    <p class="text-sm opacity-80">View and print finishing data</p>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- Table Footer -->
-                <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
-                    <div class="flex items-center justify-between">
-                        <div>Total Finishings: {{ filteredFinishings.length }}</div>
-                        <div v-if="searchQuery">Filtered from {{ finishings.length }} total records</div>
-                        <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
+                        <!-- Table Content -->
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-green-700" style="background-color: #047857;">
+                                <tr>
+                                    <th @click="sortTable('id')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        ID <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Code <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Description <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Created At <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Updated At <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-if="loading" class="hover:bg-gray-50">
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                        <div class="flex justify-center">
+                                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+                                        </div>
+                                        <p class="mt-2">Loading finishing data...</p>
+                                    </td>
+                                </tr>
+                                <tr v-else-if="filteredFinishings.length === 0" class="hover:bg-gray-50">
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                        No finishings found.
+                                        <template v-if="searchQuery">
+                                            <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
+                                            <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:underline">Clear search</button>
+                                        </template>
+                                    </td>
+                                </tr>
+                                <tr v-for="(finishing, index) in filteredFinishings" :key="finishing.id" 
+                                    :class="{'bg-emerald-50': index % 2 === 0}" 
+                                    class="hover:bg-emerald-100">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ finishing.id }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ finishing.code || 'N/A' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ finishing.description || 'N/A' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">{{ formatDate(finishing.created_at) }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">{{ formatDate(finishing.updated_at) }}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Table Footer -->
+                        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+                            <div class="flex items-center justify-between">
+                                <div>Total Finishings: {{ filteredFinishings.length }}</div>
+                                <div v-if="searchQuery">Filtered from {{ finishings.length }} total records</div>
+                                <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Print Instructions -->
-        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
-            </h3>
-            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print PDF" button above to generate and download PDF</li>
-                <li>PDF will be automatically saved in landscape orientation</li>
-                <li>You can search or sort data before exporting</li>
-                <li>PDF includes formatted table with headers and page numbers</li>
-            </ul>
+                <!-- Print Instructions -->
+                <div class="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                    <h3 class="font-semibold text-emerald-800 mb-2 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
+                    </h3>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Click the "Print PDF" button above to generate and download PDF</li>
+                        <li>PDF will be automatically saved in landscape orientation</li>
+                        <li>You can search or sort data before exporting</li>
+                        <li>PDF includes formatted table with headers and page numbers</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
     </AppLayout>

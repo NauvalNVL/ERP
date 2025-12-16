@@ -203,7 +203,7 @@
                 </div>
                 <div class="col-span-2">
                   <span class="font-medium text-green-700">Items:</span>
-                  <span class="text-green-600 ml-2">{{ deliveryOrder.itemDetails.filter(item => item.toDeliver).length }} item(s) to deliver</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.itemDetails.filter(item => item.toDeliver || item.deliverKG).length }} item(s) to deliver</span>
                 </div>
                 <div v-if="deliveryOrder.packingItems && deliveryOrder.packingItems.length > 0" class="col-span-2">
                   <span class="font-medium text-green-700">Packing:</span>
@@ -587,6 +587,9 @@ const saveDeliveryOrder = async () => {
   }
 
   try {
+    const normalizeUnit = (unit) => String(unit || '').trim().toUpperCase()
+    const isKgUnit = (unit) => normalizeUnit(unit) === 'KG'
+
     const normalizeNumber = (val) => {
       if (val === null || val === undefined) return 0
       const str = val.toString().replace(/,/g, '').trim()
@@ -594,9 +597,16 @@ const saveDeliveryOrder = async () => {
       return Number.isFinite(num) ? num : 0
     }
 
-    // Base quantity (in sets) used for DO header / Main component
+    // Base quantity (used as fallback if no per-row quantities are provided)
+    const mainDetailRow = Array.isArray(deliveryOrder.itemDetails)
+      ? (deliveryOrder.itemDetails.find(r => r && r.name === 'Main') || null)
+      : null
+    const mainUnit = mainDetailRow?.unit || deliveryOrder.mainUnit || ''
+    const mainInputQty = isKgUnit(mainUnit)
+      ? (mainDetailRow?.deliverKG ?? '')
+      : (mainDetailRow?.toDeliver ?? '')
     const baseToDeliver = normalizeNumber(
-      deliveryOrder.mainToDel || deliveryOrder.toDeliverySet || '0'
+      mainInputQty || deliveryOrder.mainToDel || deliveryOrder.toDeliverySet || '0'
     )
 
     // Build per-component items array (Main + Fit1-9) for multi-line DO
@@ -617,9 +627,14 @@ const saveDeliveryOrder = async () => {
 
           let rawToDeliver
 
+          const rowUnitIsKg = isKgUnit(row?.unit)
+
           if (!hasComponent) {
             // Baris dummy (Fit2-Fit9 yang tidak ada di MC) -> selalu 0
             rawToDeliver = '0'
+          } else if (rowUnitIsKg && row && row.deliverKG !== undefined && row.deliverKG !== null && row.deliverKG !== '') {
+            // KG flow: user inputs Deliver KG
+            rawToDeliver = row.deliverKG
           } else if (row && row.toDeliver !== undefined && row.toDeliver !== null && row.toDeliver !== '') {
             // Prioritas 1: nilai To Deliver per baris di detail SO (sudah dikalikan dengan pcs masing-masing)
             // Ini adalah nilai yang diinput user baik dari "To Delivery Set" maupun manual per komponen
@@ -669,7 +684,10 @@ const saveDeliveryOrder = async () => {
       pd: deliveryOrder.mainPD,
       per_set: deliveryOrder.mainPCS,
       unit: deliveryOrder.mainUnit,
-      do_qty: normalizeNumber(deliveryOrder.mainToDel || '0'),
+      // Main row quantity: use per-row input first (KG -> deliverKG, else -> toDeliver)
+      do_qty: normalizeNumber(
+        mainInputQty || deliveryOrder.mainToDel || deliveryOrder.toDeliverySet || '0'
+      ),
       pcs_per_bdl: deliveryOrder.pcsPerBdl || '',
       // New: per-component items (Main + Fit1-9) for multi-line DO insert
       items

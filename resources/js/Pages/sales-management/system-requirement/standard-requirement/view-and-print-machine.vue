@@ -2,25 +2,32 @@
     <AppLayout :header="'View & Print Machines'">
         <Head title="View & Print Machines" />
 
-        <!-- Header Section -->
-        <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
-            <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-                <i class="fas fa-cogs mr-3"></i> View & Print Machines
-            </h2>
-            <p class="text-emerald-100">Preview and print machine data</p>
-        </div>
+        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-6xl mx-auto">
+            <!-- Header Section -->
+            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+                <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <i class="fas fa-print text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Machines</h2>
+                        <p class="text-xs sm:text-sm text-emerald-100">Preview and print machine data</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
             <!-- Actions Bar -->
             <div class="flex flex-wrap items-center justify-between mb-6">
                 <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                    <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <button @click="printTable" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                         <i class="fas fa-file-pdf mr-2"></i> Print PDF
                     </button>
-                    <button @click="exportToExcel" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <button @click="exportToExcel" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                         <i class="fas fa-file-excel mr-2"></i> Export Excel
                     </button>
-                    <Link href="/machine" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <Link href="/machine" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md flex items-center space-x-2 border border-gray-200">
                         <i class="fas fa-arrow-left mr-2"></i> Back to Machine Management
                     </Link>
                 </div>
@@ -31,7 +38,7 @@
                     <input
                         type="text"
                         v-model="searchQuery"
-                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         placeholder="Search machines..."
                     >
                 </div>
@@ -41,14 +48,14 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Process:</label>
-                    <select v-model="selectedProcess" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <select v-model="selectedProcess" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                         <option value="">All Processes</option>
                         <option v-for="process in uniqueProcesses" :key="process" :value="process">{{ process }}</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Resource Type:</label>
-                    <select v-model="selectedResourceType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <select v-model="selectedResourceType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                         <option value="">All Resource Types</option>
                         <option value="I-InHouse">I-InHouse</option>
                         <option value="E-External">E-External</option>
@@ -56,7 +63,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Finisher Type:</label>
-                    <select v-model="selectedFinisherType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <select v-model="selectedFinisherType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                         <option value="">All Finisher Types</option>
                         <option value="S-Stitcher">S-Stitcher</option>
                         <option value="L-Stitcher">L-Stitcher</option>
@@ -72,7 +79,7 @@
             <div class="overflow-x-auto">
                 <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <!-- Table Header -->
-                    <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
+                    <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
                         <div class="flex items-center">
                             <div class="mr-4">
                                 <i class="fas fa-cogs text-3xl"></i>
@@ -169,6 +176,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    </div>
     </AppLayout>
 </template>
 
