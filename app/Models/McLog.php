@@ -30,6 +30,7 @@ class McLog extends Model
         'AC_NAME',
         'MCS_NUM',
         'MODEL',
+        'REASON',
         'DateSK',
     ];
 

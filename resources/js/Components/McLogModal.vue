@@ -50,6 +50,15 @@
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Action
                             </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                AC#
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                AC Name
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Model
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -73,15 +82,24 @@
                                     :class="{
                                         'bg-green-100 text-green-800': log.action === 'REACTIVE' || log.action === 'CREATE',
                                         'bg-red-100 text-red-800': log.action === 'OBSOLETE',
-                                        'bg-blue-100 text-blue-800': log.action === 'UPDATE' || log.action === 'MAINTENANCE',
+                                        'bg-blue-100 text-blue-800': log.action === 'AMEND' || log.action === 'MAINTENANCE',
                                     }"
                                 >
                                     {{ log.action }}
                                 </span>
                             </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                {{ log.ac_num || '-' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-700">
+                                {{ log.ac_name || '-' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-700">
+                                {{ log.model || '-' }}
+                            </td>
                         </tr>
                         <tr v-if="filteredLogs.length === 0">
-                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                            <td colspan="7" class="px-4 py-8 text-center text-gray-500">
                                 <i class="fas fa-inbox text-3xl mb-2"></i>
                                 <p>No log entries found</p>
                             </td>

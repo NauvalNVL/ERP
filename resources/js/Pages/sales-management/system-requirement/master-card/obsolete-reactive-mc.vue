@@ -640,6 +640,16 @@ const loadMcDetails = async (mcsNum) => {
 
             console.log('MC Details populated:', mcDetails.value);
 
+            // Prefill Last Update Log with current MC status (so it's never blank)
+            lastUpdate.value = {
+                status: mcDetails.value.current_status || '',
+                user_id: '',
+                date: '',
+                time: '',
+                reason: mc.REASON || '',
+                total_update: 0,
+            };
+
             // Get last update log from MC_UPDATE_LOG table
             try {
                 const logResponse = await axios.get(`/api/mc/update-log/${mcsNum}`);
@@ -648,26 +658,24 @@ const loadMcDetails = async (mcsNum) => {
                 if (logResponse.data && logResponse.data.length > 0) {
                     const lastLog = logResponse.data[0];
 
-                    // Format date and time
-                    const createdDate = lastLog.created_at ? new Date(lastLog.created_at) : null;
-
+                    // Date and time already formatted in WIB by backend
                     lastUpdate.value = {
                         status: lastLog.status || '',
                         user_id: lastLog.user_id || '',
-                        date: createdDate ? createdDate.toLocaleDateString('id-ID') : '',
-                        time: createdDate ? createdDate.toLocaleTimeString('id-ID') : '',
-                        reason: lastLog.reason || '',
+                        date: lastLog.date || '',
+                        time: lastLog.time || '',
+                        reason: lastLog.reason || mc.REASON || '',
                         total_update: logResponse.data.length || 0,
                     };
                     console.log('Last Update Log populated:', lastUpdate.value);
                 } else {
                     // Initialize empty last update if no data
                     lastUpdate.value = {
-                        status: '',
+                        status: mcDetails.value.current_status || '',
                         user_id: '',
                         date: '',
                         time: '',
-                        reason: '',
+                        reason: mc.REASON || '',
                         total_update: 0,
                     };
                     console.log('No last update data available');
@@ -675,11 +683,11 @@ const loadMcDetails = async (mcsNum) => {
             } catch (logError) {
                 console.log('No update log found or error fetching log:', logError);
                 lastUpdate.value = {
-                    status: '',
+                    status: mcDetails.value.current_status || '',
                     user_id: '',
                     date: '',
                     time: '',
-                    reason: '',
+                    reason: mc.REASON || '',
                     total_update: 0,
                 };
             }

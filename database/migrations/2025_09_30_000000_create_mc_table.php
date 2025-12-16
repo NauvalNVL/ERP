@@ -16,6 +16,7 @@ return new class extends Migration
 			$table->string('AC_NUM', 50)->nullable();
 			$table->string('AC_NAME', 250)->nullable();
 			$table->string('STS', 50)->nullable();
+			$table->string('REASON', 255)->nullable();
 			$table->string('COMP', 50)->nullable();
 			$table->string('P_DESIGN', 50)->nullable();
 			$table->string('MCS_Num', 50)->nullable();
