@@ -170,7 +170,7 @@ const currentDate = new Date().toLocaleString();
 const fetchSalespersons = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/salesperson', {
+        const response = await fetch('/api/salesperson?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

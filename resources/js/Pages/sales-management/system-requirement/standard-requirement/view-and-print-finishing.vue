@@ -70,6 +70,9 @@
                                     <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Description <i class="fas fa-sort ml-1"></i>
                                     </th>
+                                    <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Status <i class="fas fa-sort ml-1"></i>
+                                    </th>
                                     <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Created At <i class="fas fa-sort ml-1"></i>
                                     </th>
@@ -80,7 +83,7 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-if="loading" class="hover:bg-gray-50">
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -88,7 +91,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredFinishings.length === 0" class="hover:bg-gray-50">
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                         No finishings found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -107,6 +110,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">{{ finishing.description || 'N/A' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ finishing.status || '' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-500">{{ formatDate(finishing.created_at) }}</div>
@@ -165,7 +171,7 @@ const currentDate = new Date().toLocaleString();
 const fetchFinishings = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/finishings', {
+        const response = await fetch('/api/finishings?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -220,7 +226,8 @@ const filteredFinishings = computed(() => {
         filtered = filtered.filter(finishing => 
             (finishing.id && finishing.id.toString().includes(query)) ||
             (finishing.code && finishing.code.toLowerCase().includes(query)) ||
-            (finishing.description && finishing.description.toLowerCase().includes(query))
+            (finishing.description && finishing.description.toLowerCase().includes(query)) ||
+            (finishing.status && String(finishing.status).toLowerCase().includes(query))
         );
     }
     
@@ -276,6 +283,7 @@ const printTable = () => {
             finishing.id || 'N/A',
             finishing.code || 'N/A',
             finishing.description || 'N/A',
+            finishing.status || '',
             formatDate(finishing.created_at),
             formatDate(finishing.updated_at)
         ]);
@@ -283,7 +291,7 @@ const printTable = () => {
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['ID', 'Code', 'Description', 'Created At', 'Updated At']],
+            head: [['ID', 'Code', 'Description', 'Status', 'Created At', 'Updated At']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

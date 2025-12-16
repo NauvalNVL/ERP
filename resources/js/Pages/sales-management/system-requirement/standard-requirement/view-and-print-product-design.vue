@@ -67,6 +67,9 @@
                                     <th @click="sortTable('pd_name')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Design Name <i :class="getSortIcon('pd_name')"></i>
                                     </th>
+                                    <th @click="sortTable('status')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Status <i :class="getSortIcon('status')"></i>
+                                    </th>
                                     <th @click="sortTable('pd_design_type')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Design Type <i :class="getSortIcon('pd_design_type')"></i>
                                     </th>
@@ -104,7 +107,7 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-if="loading" class="hover:bg-gray-50">
-                                    <td colspan="13" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="14" class="px-3 py-4 text-center text-gray-500">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -112,7 +115,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredProductDesigns.length === 0" class="hover:bg-gray-50">
-                                    <td colspan="13" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="14" class="px-3 py-4 text-center text-gray-500">
                                         No product designs found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -125,6 +128,7 @@
                                     class="hover:bg-emerald-100">
                                     <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ design.pd_code || 'N/A' }}</td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.pd_name || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ getStatusValue(design) }}</td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.pd_design_type || 'N/A' }}</td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.idc || 'N/A' }}</td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm">
@@ -189,7 +193,7 @@ const currentDate = new Date().toLocaleString();
 const fetchProductDesigns = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/product-designs', {
+        const response = await fetch('/api/product-designs?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -246,6 +250,14 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-blue-500';
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Filtered and sorted product designs
 const filteredProductDesigns = computed(() => {
     let filtered = [...productDesigns.value];
@@ -266,7 +278,8 @@ const filteredProductDesigns = computed(() => {
             (design.slot && design.slot.toLowerCase().includes(query)) ||
             (design.flute_style && design.flute_style.toLowerCase().includes(query)) ||
             (design.print_flute && design.print_flute.toLowerCase().includes(query)) ||
-            (design.input_weight && design.input_weight.toLowerCase().includes(query))
+            (design.input_weight && design.input_weight.toLowerCase().includes(query)) ||
+            (getStatusValue(design) && getStatusValue(design).toLowerCase().includes(query))
         );
     }
 
@@ -274,6 +287,11 @@ const filteredProductDesigns = computed(() => {
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
+
+        if (sortColumn.value === 'status') {
+            valueA = getStatusValue(a);
+            valueB = getStatusValue(b);
+        }
 
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
@@ -331,7 +349,8 @@ const printTable = () => {
             design.slot || 'N/A',
             design.flute_style || 'N/A',
             design.print_flute || 'N/A',
-            design.input_weight || 'N/A'
+            design.input_weight || 'N/A',
+            getStatusValue(design)
         ]);
 
         // Add table using autoTable
@@ -350,7 +369,8 @@ const printTable = () => {
                 'Slot',
                 'Flute Style',
                 'Print Flute',
-                'Input Weight'
+                'Input Weight',
+                'Status'
             ]],
             body: tableData,
             theme: 'grid',
@@ -384,7 +404,8 @@ const printTable = () => {
                 9: { cellWidth: 15 },  // Slot
                 10: { cellWidth: 20 }, // Flute Style
                 11: { cellWidth: 18 }, // Print Flute
-                12: { cellWidth: 20 }  // Input Weight
+                12: { cellWidth: 20 },  // Input Weight
+                13: { cellWidth: 14 }   // Status
             }
         });
 

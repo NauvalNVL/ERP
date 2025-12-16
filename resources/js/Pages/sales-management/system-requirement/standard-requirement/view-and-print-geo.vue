@@ -82,11 +82,14 @@
                                     <th @click="sortTable('area')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         Area <i :class="getSortIcon('area')" class="text-xs"></i>
                                     </th>
+                                    <th class="px-4 py-2 text-left font-semibold border border-gray-300" style="color: black; width: 90px;">
+                                        Status
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
                                 <tr v-if="loading">
-                                    <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="8" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -94,7 +97,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredGeos.length === 0">
-                                    <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="8" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         No geo data available.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -125,6 +128,9 @@
                                     </td>
                                     <td class="px-4 py-2 border border-gray-300">
                                         <div class="text-sm text-gray-900">{{ geo.area || 'N/A' }}</div>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">
+                                        <div class="text-sm text-gray-900">{{ getStatusValue(geo) || '-' }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -177,7 +183,7 @@ const currentDate = new Date().toLocaleString();
 const fetchGeos = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/geo', {
+        const response = await fetch('/api/geo?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -294,13 +300,14 @@ const printTable = () => {
             geo.state || 'N/A',
             geo.town || 'N/A',
             geo.town_section || 'N/A',
-            geo.area || 'N/A'
+            geo.area || 'N/A',
+            getStatusValue(geo) || ''
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['No', 'Code', 'Country', 'State', 'Town', 'Town Section', 'Area']],
+            head: [['No', 'Code', 'Country', 'State', 'Town', 'Town Section', 'Area', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -354,6 +361,14 @@ const printTable = () => {
 onMounted(() => {
     fetchGeos();
 });
+
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
 </script>
 
 <style scoped>

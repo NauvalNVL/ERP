@@ -70,11 +70,14 @@
                                     <th @click="sortTable('dry_end_code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         Dry-End Code <i :class="getSortIcon('dry_end_code')" class="text-xs"></i>
                                     </th>
+                                    <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                        Status <i :class="getSortIcon('status')" class="text-xs"></i>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
                                 <tr v-if="loading">
-                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -82,7 +85,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredReinforcementTapes.length === 0">
-                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         No reinforcement tapes found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,6 +104,9 @@
                                     </td>
                                     <td class="px-4 py-2 border border-gray-300">
                                         <div class="text-sm text-gray-900">{{ tape.dry_end_code || '-' }}</div>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">
+                                        <div class="text-sm text-gray-900">{{ getStatusValue(tape) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -153,7 +159,7 @@ const currentDate = new Date().toLocaleString();
 const fetchReinforcementTapes = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/reinforcement-tapes', {
+        const response = await fetch('/api/reinforcement-tapes?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -208,6 +214,14 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-black';
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Filtered and sorted reinforcement tapes
 const filteredReinforcementTapes = computed(() => {
     let filtered = [...reinforcementTapes.value];
@@ -218,7 +232,8 @@ const filteredReinforcementTapes = computed(() => {
         filtered = filtered.filter(tape =>
             (tape.code && tape.code.toLowerCase().includes(query)) ||
             (tape.name && tape.name.toLowerCase().includes(query)) ||
-            (tape.dry_end_code && tape.dry_end_code.toLowerCase().includes(query))
+            (tape.dry_end_code && tape.dry_end_code.toLowerCase().includes(query)) ||
+            (getStatusValue(tape) && getStatusValue(tape).toLowerCase().includes(query))
         );
     }
 
@@ -226,6 +241,11 @@ const filteredReinforcementTapes = computed(() => {
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
+
+        if (sortColumn.value === 'status') {
+            valueA = getStatusValue(a);
+            valueB = getStatusValue(b);
+        }
 
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
@@ -273,13 +293,14 @@ const printTable = () => {
         const tableData = filteredReinforcementTapes.value.map(tape => [
             tape.code || 'N/A',
             tape.name || 'N/A',
-            tape.dry_end_code || '-'
+            tape.dry_end_code || '-',
+            getStatusValue(tape)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Name', 'Dry-End Code']],
+            head: [['Code', 'Name', 'Dry-End Code', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

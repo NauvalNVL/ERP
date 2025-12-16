@@ -67,11 +67,14 @@
                                     <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         Name <i :class="getSortIcon('name')" class="text-xs"></i>
                                     </th>
+                                    <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                        Status <i :class="getSortIcon('status')" class="text-xs"></i>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
                                 <tr v-if="loading">
-                                    <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -79,7 +82,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredStitchWires.length === 0">
-                                    <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         No stitch wires found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -95,6 +98,9 @@
                                     </td>
                                     <td class="px-4 py-2 border border-gray-300">
                                         <div class="text-sm text-gray-900">{{ stitchWire.name || 'N/A' }}</div>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">
+                                        <div class="text-sm text-gray-900">{{ getStatusValue(stitchWire) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -147,7 +153,7 @@ const currentDate = new Date().toLocaleString();
 const fetchStitchWires = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/stitch-wires', {
+        const response = await fetch('/api/stitch-wires?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -202,6 +208,14 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-black';
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Filtered and sorted stitch wires
 const filteredStitchWires = computed(() => {
     let filtered = [...stitchWires.value];
@@ -211,7 +225,8 @@ const filteredStitchWires = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(sw =>
             (sw.code && sw.code.toLowerCase().includes(query)) ||
-            (sw.name && sw.name.toLowerCase().includes(query))
+            (sw.name && sw.name.toLowerCase().includes(query)) ||
+            (getStatusValue(sw) && getStatusValue(sw).toLowerCase().includes(query))
         );
     }
 
@@ -219,6 +234,11 @@ const filteredStitchWires = computed(() => {
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
+
+        if (sortColumn.value === 'status') {
+            valueA = getStatusValue(a);
+            valueB = getStatusValue(b);
+        }
 
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
@@ -265,13 +285,14 @@ const printTable = () => {
         // Prepare table data
         const tableData = filteredStitchWires.value.map(sw => [
             sw.code || 'N/A',
-            sw.name || 'N/A'
+            sw.name || 'N/A',
+            getStatusValue(sw)
         ]);
 
         // Add table using autoTable - call via imported function
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Name']],
+            head: [['Code', 'Name', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',  // Let autoTable calculate optimal widths

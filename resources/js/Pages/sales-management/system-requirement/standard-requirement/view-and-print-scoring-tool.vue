@@ -73,11 +73,14 @@
                             <th @click="sortTable('scorer_gap')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 25%;">
                                 SCORER GAP <i :class="getSortIcon('scorer_gap')" class="text-xs ml-1"></i>
                             </th>
+                            <th @click="sortTable('status')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 15%;">
+                                STATUS <i :class="getSortIcon('status')" class="text-xs ml-1"></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                                 </div>
@@ -85,7 +88,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredScoringTools.length === 0">
-                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <p class="font-medium text-gray-700">No scoring tools found.</p>
                                 <template v-if="searchQuery">
                                     <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
@@ -107,6 +110,9 @@
                             </td>
                             <td class="px-6 py-3 border border-gray-300 text-center">
                                 <div class="text-sm font-medium text-gray-900">{{ formatNumber(tool.scorer_gap) }}</div>
+                            </td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ String(tool.status || (typeof tool.is_active === 'boolean' ? (tool.is_active ? 'Act' : 'Obs') : '')).trim() }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -159,7 +165,7 @@ const currentDate = new Date().toLocaleString();
 const fetchScoringTools = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/scoring-tools', {
+        const response = await fetch('/api/scoring-tools?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -233,7 +239,8 @@ const filteredScoringTools = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(tool =>
             (tool.code && tool.code.toLowerCase().includes(query)) ||
-            (tool.name && tool.name.toLowerCase().includes(query))
+            (tool.name && tool.name.toLowerCase().includes(query)) ||
+            (String(tool.status || (typeof tool.is_active === 'boolean' ? (tool.is_active ? 'Act' : 'Obs') : '')).toLowerCase().includes(query))
         );
     }
 
@@ -301,13 +308,14 @@ const printTable = () => {
             (index + 1).toString(),
             tool.code || 'N/A',
             tool.name || 'N/A',
-            formatNumber(tool.scorer_gap)
+            formatNumber(tool.scorer_gap),
+            String(tool.status || (typeof tool.is_active === 'boolean' ? (tool.is_active ? 'Act' : 'Obs') : '')).trim()
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['NO.', 'CODE', 'NAME', 'SCORER GAP']],
+            head: [['NO.', 'CODE', 'NAME', 'SCORER GAP', 'STATUS']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -331,7 +339,8 @@ const printTable = () => {
                 0: { cellWidth: 20, halign: 'center' },   // NO.
                 1: { cellWidth: 35, halign: 'center' },   // CODE
                 2: { cellWidth: 125, halign: 'center' },  // NAME
-                3: { cellWidth: 50, halign: 'center' }    // SCORER GAP
+                3: { cellWidth: 50, halign: 'center' },    // SCORER GAP
+                4: { cellWidth: 25, halign: 'center' }     // STATUS
             }
         });
 

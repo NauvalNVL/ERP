@@ -70,11 +70,14 @@
                             <th @click="sortTable('inches')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 40%;">
                                 INCHES <i :class="getSortIcon('inches')" class="text-xs ml-1"></i>
                             </th>
+                            <th @click="sortTable('status')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 20%;">
+                                STATUS <i :class="getSortIcon('status')" class="text-xs ml-1"></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                                 </div>
@@ -82,7 +85,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredPaperSizes.length === 0">
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <p class="font-medium text-gray-700">No paper sizes found.</p>
                                 <template v-if="searchQuery">
                                     <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,6 +104,9 @@
                             </td>
                             <td class="px-6 py-3 border border-gray-300 text-center">
                                 <div class="text-sm font-medium text-gray-900">{{ formatNumber(size.inches) }}</div>
+                            </td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ getStatusValue(size) }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -153,7 +159,7 @@ const currentDate = new Date().toLocaleString();
 const fetchPaperSizes = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/paper-sizes', {
+        const response = await fetch('/api/paper-sizes?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -206,6 +212,14 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Filtered and sorted paper sizes
 const filteredPaperSizes = computed(() => {
     let filtered = [...paperSizes.value];
@@ -216,7 +230,8 @@ const filteredPaperSizes = computed(() => {
         filtered = filtered.filter(size => 
             (size.id && size.id.toString().includes(query)) ||
             (size.millimeter && size.millimeter.toString().includes(query)) ||
-            (size.inches && size.inches.toString().includes(query))
+            (size.inches && size.inches.toString().includes(query)) ||
+            (getStatusValue(size) && getStatusValue(size).toLowerCase().includes(query))
         );
     }
     
@@ -304,13 +319,14 @@ const printTable = () => {
         const tableData = filteredPaperSizes.value.map(size => [
             size.id || '',
             formatNumber(size.millimeter),
-            formatNumber(size.inches)
+            formatNumber(size.inches),
+            getStatusValue(size)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['NO.', 'MILLIMETER', 'INCHES']],
+            head: [['NO.', 'MILLIMETER', 'INCHES', 'STATUS']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -333,7 +349,8 @@ const printTable = () => {
             columnStyles: {
                 0: { cellWidth: 30, halign: 'center' },  // ID
                 1: { cellWidth: 60, halign: 'center' },  // Millimeter
-                2: { cellWidth: 60, halign: 'center' }   // Inches
+                2: { cellWidth: 60, halign: 'center' },  // Inches
+                3: { cellWidth: 30, halign: 'center' }   // Status
             }
         });
 

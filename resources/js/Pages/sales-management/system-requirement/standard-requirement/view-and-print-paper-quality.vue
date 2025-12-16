@@ -162,7 +162,7 @@ const currentDate = new Date().toLocaleString();
 const fetchPaperQualities = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/paper-qualities', {
+        const response = await fetch('/api/paper-qualities?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

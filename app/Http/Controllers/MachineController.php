@@ -309,7 +309,8 @@ class MachineController extends Controller
                     'process' => $machine->process,
                     'sub_process' => $machine->sub_process,
                     'resource_type' => $machine->resource_type,
-                    'finisher_type' => $machine->finisher_type
+                    'finisher_type' => $machine->finisher_type,
+                    'status' => $machine->status ?? 'Act',
                 ];
             });
 
