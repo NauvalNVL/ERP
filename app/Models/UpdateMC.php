@@ -16,7 +16,7 @@ class UpdateMC extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'AC_NUM','AC_NAME','STS','COMP','P_DESIGN','MCS_Num','MODEL','FLUTE',
+        'AC_NUM','AC_NAME','STS','REASON','COMP','P_DESIGN','MCS_Num','MODEL','FLUTE',
         'SO_PQ1','SO_PQ2','SO_PQ3','SO_PQ4','SO_PQ5',
         'WO_PQ1','WO_PQ2','WO_PQ3','WO_PQ4','WO_PQ5',
         'S_TOOL','COAT','TAPE','COLOR1','COLOR2','COLOR3','COLOR4','COLOR5','COLOR6','COLOR7',

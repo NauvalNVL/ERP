@@ -1718,7 +1718,7 @@ class UpdateMcController extends Controller
             $newStatus = ($action === 'To Obsolete') ? 'Obsolete' : 'Active';
 
             // Update MC status (MC table doesn't have timestamps)
-            DB::table('MC')->where('MCS_Num', $mcsNum)->update(['STS' => $newStatus]);
+            DB::table('MC')->where('MCS_Num', $mcsNum)->update(['STS' => $newStatus, 'REASON' => $reason]);
 
             // Get authenticated user ID
             $userId = 'system';
@@ -1941,10 +1941,17 @@ class UpdateMcController extends Controller
      */
     public function getUpdateLog($mcsNum)
     {
+        $mcReason = '';
+        try {
+            $mcReason = DB::table('MC')->where('MCS_Num', $mcsNum)->value('REASON') ?? '';
+        } catch (\Exception $e) {
+            $mcReason = '';
+        }
+
         try {
             $rows = $this->fetchMcUpdateLogRows($mcsNum);
 
-            $logs = $rows->map(function($log) {
+            $logs = $rows->map(function($log) use ($mcReason) {
                 $rawCreatedAt = $log->created_at ?? $log->CREATED_AT ?? null;
                 $rawDate = $log->DATE ?? null;
                 $rawTime = $log->TIME ?? null;
@@ -1952,6 +1959,9 @@ class UpdateMcController extends Controller
                 $status = $log->status ?? $log->STS ?? $log->Status ?? null;
                 $userId = $log->user_id ?? $log->UID ?? $log->User_ID ?? $log->USER_ID ?? null;
                 $reason = $log->reason ?? $log->REASON ?? $log->Reason ?? null;
+                if (empty($reason)) {
+                    $reason = $mcReason;
+                }
 
                 $formattedDate = '';
                 $formattedTime = '';
@@ -1997,11 +2007,23 @@ class UpdateMcController extends Controller
                 ->orderBy('DateSK', 'desc')
                 ->orderBy('TIME', 'desc')
                 ->get()
-                ->map(function($log) {
+                ->map(function($log) use ($mcReason) {
                     $status = $log->ACTION === 'OBSOLETE' ? 'Obsolete' : 'Active';
+                    $reason = $mcReason;
+
                     $date = $log->DATE ?? '';
-                    $time = $log->TIME ? ($log->TIME . ' WIB') : '';
-                    $reason = $log->REASON ?? $log->reason ?? $log->Reason ?? '';
+                    $time = '';
+                    try {
+                        $dateTimeString = trim(($log->DATE ?? '') . ' ' . ($log->TIME ?? ''));
+                        if (!empty($dateTimeString)) {
+                            $dateTime = \Carbon\Carbon::parse($dateTimeString)->timezone('Asia/Jakarta');
+                            $date = $dateTime->format('Y-m-d');
+                            $time = $dateTime->format('H:i:s') . ' WIB';
+                        }
+                    } catch (\Exception $e) {
+                        $date = $log->DATE ?? '';
+                        $time = $log->TIME ? ($log->TIME . ' WIB') : '';
+                    }
 
                     return [
                         'status' => $status,
@@ -2036,11 +2058,11 @@ class UpdateMcController extends Controller
             return response()->json(['error' => 'Master Card not found'], 404);
         }
 
+        $reason = $validated['reason'] ?? '';
+
         DB::table('MC')
             ->where('MCS_Num', $mcsNum)
-            ->update(['STS' => 'Obsolete']);
-
-        $reason = $validated['reason'] ?? 'No reason provided';
+            ->update(['STS' => 'Obsolete', 'REASON' => $reason]);
 
         $this->insertMcUpdateLog($mcsNum, 'Obsolete', $reason);
 
@@ -2071,11 +2093,11 @@ class UpdateMcController extends Controller
             return response()->json(['error' => 'Master Card not found'], 404);
         }
 
+        $reason = $validated['reason'] ?? '';
+
         DB::table('MC')
             ->where('MCS_Num', $mcsNum)
-            ->update(['STS' => 'Active']);
-
-        $reason = $validated['reason'] ?? 'No reason provided';
+            ->update(['STS' => 'Active', 'REASON' => $reason]);
 
         $this->insertMcUpdateLog($mcsNum, 'Active', $reason);
 
@@ -2104,11 +2126,11 @@ class UpdateMcController extends Controller
 
         $userId = $this->getCurrentUserId();
         $mcsNums = $validated['mcs_nums'];
-        $reason = $validated['reason'] ?? 'No reason provided';
+        $reason = $validated['reason'] ?? '';
 
         DB::table('MC')
             ->whereIn('MCS_Num', $mcsNums)
-            ->update(['STS' => 'Obsolete']);
+            ->update(['STS' => 'Obsolete', 'REASON' => $reason]);
 
         foreach ($mcsNums as $num) {
             $mc = DB::table('MC')->where('MCS_Num', $num)->first();
@@ -2142,11 +2164,11 @@ class UpdateMcController extends Controller
 
         $userId = $this->getCurrentUserId();
         $mcsNums = $validated['mcs_nums'];
-        $reason = $validated['reason'] ?? 'No reason provided';
+        $reason = $validated['reason'] ?? '';
 
         DB::table('MC')
             ->whereIn('MCS_Num', $mcsNums)
-            ->update(['STS' => 'Active']);
+            ->update(['STS' => 'Active', 'REASON' => $reason]);
 
         foreach ($mcsNums as $num) {
             $mc = DB::table('MC')->where('MCS_Num', $num)->first();

@@ -646,7 +646,7 @@ const loadMcDetails = async (mcsNum) => {
                 user_id: '',
                 date: '',
                 time: '',
-                reason: '',
+                reason: mc.REASON || '',
                 total_update: 0,
             };
 
@@ -664,7 +664,7 @@ const loadMcDetails = async (mcsNum) => {
                         user_id: lastLog.user_id || '',
                         date: lastLog.date || '',
                         time: lastLog.time || '',
-                        reason: lastLog.reason || '',
+                        reason: lastLog.reason || mc.REASON || '',
                         total_update: logResponse.data.length || 0,
                     };
                     console.log('Last Update Log populated:', lastUpdate.value);
@@ -675,7 +675,7 @@ const loadMcDetails = async (mcsNum) => {
                         user_id: '',
                         date: '',
                         time: '',
-                        reason: '',
+                        reason: mc.REASON || '',
                         total_update: 0,
                     };
                     console.log('No last update data available');
@@ -687,7 +687,7 @@ const loadMcDetails = async (mcsNum) => {
                     user_id: '',
                     date: '',
                     time: '',
-                    reason: '',
+                    reason: mc.REASON || '',
                     total_update: 0,
                 };
             }
