@@ -59,7 +59,7 @@
 
                 <!-- Table Content -->
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-blue-600" style="background-color: #2563eb;">
+                    <thead class="bg-gray-50">
                         <tr>
                             <th @click="sortTable('color_id')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Color# <i :class="getSortIcon('color_id')" class="text-xs"></i>
@@ -82,7 +82,7 @@
                         <tr v-if="loading">
                             <td colspan="5" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
                                 <p class="mt-2">Loading color data...</p>
                             </td>
@@ -92,13 +92,13 @@
                             No colors found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:underline">Clear search</button>
                                 </template>
                         </td>
                     </tr>
                         <tr v-for="(color, index) in filteredColors" :key="color.color_id"
-                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                            class="hover:bg-blue-200">
+                            :class="index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'"
+                            class="hover:bg-emerald-100">
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ color.color_id || 'N/A' }}</div>
                             </td>
@@ -162,8 +162,11 @@ const sortDirection = ref('asc');
 const currentDate = new Date().toLocaleString();
 
 onMounted(async () => {
-    await Promise.all([fetchColors(), fetchColorGroups()]);
-    loading.value = false;
+    try {
+        await Promise.all([fetchColors(), fetchColorGroups()]);
+    } finally {
+        loading.value = false;
+    }
 });
 
 const fetchColors = async () => {
@@ -172,7 +175,8 @@ const fetchColors = async () => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            }
+            },
+            credentials: 'same-origin'
         });
 
         if (!response.ok) {
@@ -182,17 +186,18 @@ const fetchColors = async () => {
         const data = await response.json();
         console.log('Fetched colors:', data);
 
-        // API now returns array directly with color_code
-        if (Array.isArray(data)) {
-            // Map color_code to color_id for compatibility with this component
-            colors.value = data.map(color => ({
-                ...color,
-                color_id: color.color_code || color.color_id
-            }));
-        } else {
-            colors.value = [];
-            console.error('Unexpected data format for colors:', data);
-        }
+        const colorsArray = Array.isArray(data)
+            ? data
+            : (Array.isArray(data?.colors) ? data.colors : (Array.isArray(data?.data) ? data.data : []));
+
+        colors.value = colorsArray.map((color) => ({
+            ...color,
+            color_id: String(color.color_id || color.color_code || color.Color_Code || color.colorCode || ''),
+            color_name: String(color.color_name || color.Color_Name || color.name || ''),
+            color_group_id: String(color.color_group_id || color.group_code || color.GroupCode || color.groupCode || ''),
+            origin: color.origin,
+            kg_per_m2: color.kg_per_m2
+        }));
     } catch (error) {
         console.error('Error fetching colors:', error);
         colors.value = []; // Ensure it's always an array
@@ -205,7 +210,8 @@ const fetchColorGroups = async () => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            }
+            },
+            credentials: 'same-origin'
         });
 
         if (!response.ok) {

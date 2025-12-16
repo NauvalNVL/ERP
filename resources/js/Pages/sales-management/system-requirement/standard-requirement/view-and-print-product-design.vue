@@ -59,7 +59,7 @@
 
                         <!-- Table Content -->
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-green-700" style="background-color: #047857;">
+                            <thead class="bg-gray-50">
                                 <tr>
                                     <th @click="sortTable('pd_code')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Design Code <i :class="getSortIcon('pd_code')"></i>

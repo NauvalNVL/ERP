@@ -59,7 +59,7 @@
 
                 <!-- Table Content -->
                 <table class="min-w-full border-collapse table-fixed">
-                    <thead class="bg-green-700" style="background-color: #047857;">
+                    <thead class="bg-gray-50">
                         <tr>
                             <th @click="sortTable('id')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 15%;">
                                 NO. <i :class="getSortIcon('id')" class="text-xs ml-1"></i>

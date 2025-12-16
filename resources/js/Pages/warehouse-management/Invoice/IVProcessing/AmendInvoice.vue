@@ -294,12 +294,21 @@ import CustomerSalesTaxorSalesTaxExemptionTable from '@/Components/CustomerSales
 import FinalScreen from '@/Components/FinalScreen.vue';
 import InvoiceTableModal from '@/Components/InvoiceTableModal.vue';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // Toast notification helper
+const swalToast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+});
+
 const toast = {
-    success: (msg) => alert(msg),
-    error: (msg) => alert(msg),
-    info: (msg) => alert(msg)
+    success: (msg) => swalToast.fire({ icon: 'success', title: msg }),
+    error: (msg) => swalToast.fire({ icon: 'error', title: msg }),
+    info: (msg) => swalToast.fire({ icon: 'info', title: msg })
 };
 
 // Initialize Current Period with current month/year (readonly)
@@ -331,6 +340,29 @@ const selectedDate = ref(null);
 // Calculated values
 const calculatedTotal = ref(0);
 
+const loadTaxOptions = async () => {
+    try {
+        const res = await axios.get('/api/invoices/sales-tax-options');
+        if (Array.isArray(res.data)) {
+            taxOptions.value = res.data.map(tax => ({
+                code: tax.code,
+                name: tax.name,
+                rate: parseFloat(tax.rate) || 0,
+                apply: true,
+                include: false
+            }));
+        } else {
+            taxOptions.value = [];
+        }
+    } catch (e) {
+        taxOptions.value = [];
+    }
+
+    if (!taxOptions.value.some(t => String(t.code || '').toUpperCase() === 'NIL')) {
+        taxOptions.value.unshift({ code: 'NIL', name: 'Non-Taxable', rate: 0, apply: true, include: false });
+    }
+};
+
 const openTable = async () => {
     // CPS Behavior: If full invoice# entered, load directly without table
     if (query.value.part1 && query.value.part2 && query.value.part3) {
@@ -343,6 +375,7 @@ const openTable = async () => {
                 // Convert numeric fields from string to number, ensure tax fields are strings
                 selectedInvoice.value = {
                     ...res.data,
+                    has_faktur: !!res.data.has_faktur,
                     exchange_rate: parseFloat(res.data.exchange_rate) || 0,
                     total_amount: parseFloat(res.data.total_amount) || 0,
                     tax_amount: parseFloat(res.data.tax_amount) || 0,
@@ -382,6 +415,7 @@ const selectForEdit = async (selectedRow) => {
             // Convert numeric fields from string to number, ensure tax fields are strings
             selectedInvoice.value = {
                 ...res.data,
+                has_faktur: !!res.data.has_faktur,
                 exchange_rate: parseFloat(res.data.exchange_rate) || 0,
                 total_amount: parseFloat(res.data.total_amount) || 0,
                 tax_amount: parseFloat(res.data.tax_amount) || 0,
@@ -403,6 +437,15 @@ const selectForEdit = async (selectedRow) => {
 const saveInvoice = async () => {
     if (!selectedInvoice.value) {
         toast.error('No invoice selected');
+        return;
+    }
+
+    if (selectedInvoice.value?.has_faktur) {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Cannot Amend Invoice',
+            text: `Invoice already has Faktur Number: ${selectedInvoice.value.faktur_no || '-'}`,
+        });
         return;
     }
 
@@ -447,6 +490,8 @@ const saveInvoice = async () => {
             {
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': csrfToken
                 }
             }
@@ -471,6 +516,9 @@ const saveInvoice = async () => {
                 };
                 console.log('✅ Invoice details reloaded with updated audit trail');
             }
+        } else {
+            const errorMsg = res?.data?.error || res?.data?.message || 'Failed to update invoice';
+            toast.error(errorMsg);
         }
     } catch (e) {
         console.error('❌ Error saving invoice:', e);
@@ -703,6 +751,15 @@ const openFinalScreen = async () => {
         return;
     }
 
+    if (selectedInvoice.value?.has_faktur) {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Cannot Amend Invoice',
+            text: `Invoice already has Faktur Number: ${selectedInvoice.value.faktur_no || '-'}`,
+        });
+        return;
+    }
+
     console.log('🎬 Opening Final Screen for invoice:', selectedInvoice.value.invoice_no);
 
     // CPS-Compatible: Calculate total amount (Priority order matches Prepare Invoice flow)
@@ -819,32 +876,22 @@ const openFinalScreen = async () => {
         calculatedTotal.value = parseFloat(selectedInvoice.value?.total_amount) || 0;
     }
 
-    // Fetch tax options - with better fallback
     if (taxOptions.value.length === 0) {
-        try {
-            const res = await axios.get('/api/invoices/tax-groups');
-            if (res.data && Array.isArray(res.data)) {
-                taxOptions.value = res.data.map(tax => ({
-                    code: tax.code || tax.tax_code,
-                    name: tax.name || tax.tax_name,
-                    rate: parseFloat(tax.rate || tax.tax_rate) || 0,
-                    apply: true,
-                    include: false
-                }));
-                console.log('✅ Tax options loaded:', taxOptions.value.length);
-            } else {
-                throw new Error('Invalid response format');
-            }
-        } catch (e) {
-            console.warn('Using fallback tax options:', e.message);
-            // Fallback: common Indonesian tax options
-            taxOptions.value = [
-                { code: 'NIL', name: 'Non-Taxable', rate: 0, apply: true, include: false },
-                { code: 'PPN10', name: 'PPN 10%', rate: 10, apply: true, include: false },
-                { code: 'PPN11', name: 'PPN 11%', rate: 11, apply: true, include: false },
-                { code: 'PPN115', name: 'PPN 11.5%', rate: 11.5, apply: true, include: false }
-            ];
-            console.log('✅ Using fallback tax options:', taxOptions.value.length);
+        await loadTaxOptions();
+    }
+
+    const currentTaxCode = String(selectedInvoice.value.tax_code || '').trim();
+    const currentTaxPercent = parseFloat(selectedInvoice.value.tax_percent) || 0;
+    if (currentTaxCode) {
+        const exists = taxOptions.value.some(t => String(t.code || '').toUpperCase() === currentTaxCode.toUpperCase());
+        if (!exists) {
+            taxOptions.value.unshift({
+                code: currentTaxCode,
+                name: currentTaxCode,
+                rate: currentTaxPercent,
+                apply: true,
+                include: false
+            });
         }
     }
 

@@ -415,6 +415,62 @@ const filters = reactive({
   status: ''
 });
 
+const parseDateSkToEpoch = (value) => {
+  const raw = value ?? '';
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return null;
+  const s = String(Math.trunc(n));
+  if (s.length !== 8) return null;
+  const yyyy = s.slice(0, 4);
+  const mm = s.slice(4, 6);
+  const dd = s.slice(6, 8);
+  const t = Date.parse(`${yyyy}-${mm}-${dd}T00:00:00`);
+  return Number.isNaN(t) ? null : t;
+};
+
+const parseDateStringToEpoch = (value) => {
+  const str = String(value ?? '').trim();
+  if (!str) return null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const t = Date.parse(str);
+    return Number.isNaN(t) ? null : t;
+  }
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+    const [dd, mm, yyyy] = str.split('/');
+    const t = Date.parse(`${yyyy}-${mm}-${dd}T00:00:00`);
+    return Number.isNaN(t) ? null : t;
+  }
+  if (/^\d{2}-\d{2}-\d{4}$/.test(str)) {
+    const [dd, mm, yyyy] = str.split('-');
+    const t = Date.parse(`${yyyy}-${mm}-${dd}T00:00:00`);
+    return Number.isNaN(t) ? null : t;
+  }
+  const t = Date.parse(str);
+  return Number.isNaN(t) ? null : t;
+};
+
+const getInvoiceSortKey = (inv) => {
+  return (
+    parseDateSkToEpoch(inv?.IV_DATE_SK ?? inv?.DATE_SK ?? inv?.DateSK ?? inv?.IV_DATE) ??
+    parseDateStringToEpoch(inv?.IV_DMY ?? inv?.IV_DATE ?? inv?.invoice_date) ??
+    0
+  );
+};
+
+const sortInvoicesNewestFirst = (rows) => {
+  const list = Array.isArray(rows) ? rows.slice() : [];
+  list.sort((a, b) => {
+    const ta = getInvoiceSortKey(a);
+    const tb = getInvoiceSortKey(b);
+    if (ta !== tb) return tb - ta;
+    return String(b?.IV_NUM ?? '').localeCompare(String(a?.IV_NUM ?? ''), 'en', {
+      numeric: true,
+      sensitivity: 'base',
+    });
+  });
+  return list;
+};
+
 // Fetch invoices from backend
 const fetchInvoices = async () => {
   loading.value = true;
@@ -436,7 +492,7 @@ const fetchInvoices = async () => {
     const data = await response.json();
 
     if (data.success) {
-      invoices.value = data.data || [];
+      invoices.value = sortInvoicesNewestFirst(data.data || []);
       showMessage(`Loaded ${invoices.value.length} invoice(s)`, 'success');
     } else {
       invoices.value = [];

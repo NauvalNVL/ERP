@@ -59,7 +59,7 @@
 
                         <!-- Table Content -->
                         <table class="min-w-full border-collapse">
-                            <thead class="bg-green-700" style="background-color: #047857;">
+                            <thead class="bg-gray-50">
                                 <tr>
                                     <th @click="sortTable('cg')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         CG# <i :class="getSortIcon('cg')" class="text-xs"></i>

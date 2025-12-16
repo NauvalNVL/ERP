@@ -231,18 +231,21 @@ import InvoiceTableModal from '@/Components/InvoiceTableModal.vue';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import Swal from 'sweetalert2';
 
 // Toast notification helper
+const swalToast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+});
+
 const toast = {
-    success: (msg) => {
-        alert('✅ ' + msg);
-    },
-    error: (msg) => {
-        alert('❌ ' + msg);
-    },
-    info: (msg) => {
-        alert('ℹ️ ' + msg);
-    }
+    success: (msg) => swalToast.fire({ icon: 'success', title: msg }),
+    error: (msg) => swalToast.fire({ icon: 'error', title: msg }),
+    info: (msg) => swalToast.fire({ icon: 'info', title: msg })
 };
 
 // Initialize Current Period with current month/year (readonly)
