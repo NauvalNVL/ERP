@@ -152,6 +152,7 @@
 				</div>
 			</div>
 		</div>
+		</div>
 
 		<!-- Modal Table -->
 		<ProductDesignModal
