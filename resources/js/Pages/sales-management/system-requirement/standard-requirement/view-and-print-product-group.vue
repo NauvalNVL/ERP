@@ -2,22 +2,29 @@
     <AppLayout :header="'View & Print Product Groups'">
     <Head title="View & Print Product Groups" />
 
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-print mr-3"></i> View & Print Product Groups
-        </h2>
-        <p class="text-emerald-100">Preview and print product group data</p>
+    <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+        <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                <i class="fas fa-layer-group text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Product Groups</h2>
+                <p class="text-xs sm:text-sm text-emerald-100">Preview and print product group data</p>
+            </div>
+        </div>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <button @click="printTable" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                     <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
-                <Link href="/product-group" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <Link href="/product-group" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md flex items-center space-x-2 border border-gray-200">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Product Groups
                 </Link>
             </div>
@@ -28,7 +35,7 @@
                 <input 
                     type="text" 
                     v-model="searchQuery" 
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Search product groups..."
                 >
             </div>
@@ -38,7 +45,7 @@
         <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
+                <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
                             <i class="fas fa-layer-group text-3xl"></i>
@@ -52,7 +59,7 @@
 
                 <!-- Table Content -->
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-blue-600" style="background-color: #2563eb;">
+                    <thead class="bg-green-700" style="background-color: #047857;">
                         <tr>
                             <th @click="sortTable('product_group_id')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Group ID <i :class="getSortIcon('product_group_id')" class="text-xs"></i>
@@ -72,7 +79,7 @@
                         <tr v-if="loading">
                             <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
                                 <p class="mt-2">Loading product group data...</p>
                             </td>
@@ -82,13 +89,13 @@
                                 No product groups found. 
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
                         <tr v-for="(group, index) in filteredProductGroups" :key="group.product_group_id" 
-                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                            class="hover:bg-blue-200">
+                            :class="index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'"
+                            class="hover:bg-emerald-100">
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ group.product_group_id || 'N/A' }}</div>
                             </td>
@@ -117,8 +124,8 @@
         </div>
 
         <!-- Print Instructions -->
-        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+        <div class="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+            <h3 class="font-semibold text-emerald-800 mb-2 flex items-center">
                 <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
@@ -127,6 +134,8 @@
                 <li>You can search or sort data before exporting</li>
                 <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
+        </div>
+    </div>
         </div>
     </div>
     </AppLayout>
