@@ -217,6 +217,26 @@ class InvoiceController extends Controller
         return $default;
     }
 
+    private function normalizeInvoiceStatus($ivSts, $amUid = null): string
+    {
+        $raw = strtoupper(trim((string) ($ivSts ?? '')));
+
+        if ($raw === 'CANCEL' || $raw === 'CANCELLED') {
+            return 'Cancel';
+        }
+
+        if ($raw === 'AMEND') {
+            return 'Amend';
+        }
+
+        if (!empty($amUid)) {
+            return 'Amend';
+        }
+
+        // Treat legacy states (Active/Posted/blank) as New
+        return 'New';
+    }
+
     /**
      * Safely convert value to decimal/float or null
      * Handles empty strings, null, and numeric strings
@@ -386,7 +406,10 @@ class InvoiceController extends Controller
                 // Get total invoiced quantity from INV table
                 $invoicedQty = DB::table('INV')
                     ->where('SO_NUM', $do->so_number)
-                    ->where('IV_STS', '!=', 'Cancelled')
+                    ->where(function ($q) {
+                        $q->whereNull('IV_STS')
+                          ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                    })
                     ->sum('IV_QTY');
 
                 $do->invoiced_qty = $invoicedQty ?? 0;
@@ -918,7 +941,10 @@ class InvoiceController extends Controller
                 /** @var float $invoicedQty */
                 $invoicedQty = DB::table('INV')
                     ->where('IV_SECOND_REF', $doNumber) // ✅ Track invoicing per DO number to avoid cross-DO mixing under the same SO
-                    ->where('IV_STS', '!=', 'Cancelled')
+                    ->where(function ($q) {
+                        $q->whereNull('IV_STS')
+                          ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                    })
                     ->where(function ($q) {
                         $q->whereNull('COMP')
                           ->orWhere('COMP', '')
@@ -931,7 +957,10 @@ class InvoiceController extends Controller
                     $invoicedQty = DB::table('INV')
                         ->whereNull('IV_SECOND_REF')
                         ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
-                        ->where('IV_STS', '!=', 'Cancelled')
+                        ->where(function ($q) {
+                            $q->whereNull('IV_STS')
+                              ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                        })
                         ->where(function ($q) {
                             $q->whereNull('COMP')
                               ->orWhere('COMP', '')
@@ -1222,6 +1251,7 @@ class InvoiceController extends Controller
                         'MM' => $mm,
                         'IV_NUM' => $ivNum,
                         'IV_STS' => 'New',
+                        'IV_STS' => 'New',
                         'IV_DMY' => $invoiceDate,
 
                         // Payment terms and references
@@ -1317,7 +1347,10 @@ class InvoiceController extends Controller
                     // Calculate new invoiced quantity after this invoice
                     $newInvoicedQty = DB::table('INV')
                         ->where('IV_SECOND_REF', $doNumber)
-                        ->where('IV_STS', '!=', 'Cancelled')
+                        ->where(function ($q) {
+                            $q->whereNull('IV_STS')
+                              ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                        })
                         ->sum('IV_QTY');
 
                     // Backward compatibility for legacy records without IV_SECOND_REF
@@ -1325,7 +1358,10 @@ class InvoiceController extends Controller
                         $newInvoicedQty = DB::table('INV')
                             ->whereNull('IV_SECOND_REF')
                             ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
-                            ->where('IV_STS', '!=', 'Cancelled')
+                            ->where(function ($q) {
+                                $q->whereNull('IV_STS')
+                                  ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                            })
                             ->sum('IV_QTY');
                     }
 
@@ -1428,13 +1464,8 @@ class InvoiceController extends Controller
                 throw new \RuntimeException("Invoice not found");
             }
 
-            if ($invoice->IV_STS === 'Cancelled') {
+            if (in_array($invoice->IV_STS, ['Cancel', 'Cancelled'], true)) {
                 throw new \RuntimeException("Invoice is already cancelled");
-            }
-
-            // CPS Business Rule: Cannot cancel posted invoices
-            if ($invoice->IV_STS === 'Posted') {
-                throw new \RuntimeException("Cannot cancel invoice that has been posted to GL");
             }
 
             // CPS Business Rule: Cannot cancel printed invoices
@@ -1474,7 +1505,7 @@ class InvoiceController extends Controller
             // Prepare update data (WIB timezone)
             $nowWib = $this->getNowWib();
             $updateData = [
-                'IV_STS' => 'Cancelled',
+                'IV_STS' => 'Cancel',
                 'CANCELLED_REASON_1' => $payload['cancel_reason'],
                 'CX_UID' => $this->getCurrentUserId(),
                 'CX_DATE' => $nowWib->format('d/m/Y'),
@@ -1496,7 +1527,10 @@ class InvoiceController extends Controller
                 // Recalculate invoiced quantity after this cancellation
                 $invoicedQty = DB::table('INV')
                     ->where('SO_NUM', $invoice->SO_NUM)
-                    ->where('IV_STS', '!=', 'Cancelled')
+                    ->where(function ($q) {
+                        $q->whereNull('IV_STS')
+                          ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                    })
                     ->where('IV_NUM', '!=', $payload['invoice_number']) // Exclude current invoice
                     ->sum('IV_QTY');
 
@@ -1592,7 +1626,7 @@ class InvoiceController extends Controller
             'IV_TRAN_AMT as amount',
             'IV_TAX_CODE as tax_code',
             'IV_TAX_PERCENT as tax_percent',
-            'IV_STS as status',
+            DB::raw("CASE WHEN IV_STS IN ('Cancel','Cancelled') THEN 'Cancel' WHEN IV_STS = 'Amend' OR (AM_UID IS NOT NULL AND AM_UID != '') THEN 'Amend' ELSE 'New' END as status"),
             'NW_UID as created_by',
             'NW_DATE as created_date',
         ];
@@ -2106,7 +2140,7 @@ class InvoiceController extends Controller
             if ($request->boolean('exclude_cancelled', false)) {
                 $query->where(function ($q) {
                     $q->whereNull('IV_STS')
-                      ->orWhere('IV_STS', '!=', 'Cancelled');
+                      ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
                 });
             }
 
@@ -2118,8 +2152,17 @@ class InvoiceController extends Controller
                 'IV_NUM as invoice_no',
                 'IV_DMY as invoice_date',
                 'AC_NUM as customer_code',
-                'IV_STS as status',
             ];
+
+            $statusExpr = "CASE";
+            $statusExpr .= " WHEN IV_STS IN ('Cancel','Cancelled') THEN 'Cancel'";
+            $statusExpr .= " WHEN IV_STS = 'Amend' THEN 'Amend'";
+            $statusExpr .= " WHEN IV_STS = 'New' THEN 'New'";
+            if (in_array('AM_UID', $columns)) {
+                $statusExpr .= " WHEN AM_UID IS NOT NULL AND AM_UID != '' THEN 'Amend'";
+            }
+            $statusExpr .= " ELSE 'New' END";
+            $selectColumns[] = DB::raw("{$statusExpr} as status");
 
             // Add optional columns if they exist
             if (in_array('AC_NAME', $columns)) {
@@ -2137,16 +2180,6 @@ class InvoiceController extends Controller
             // Mode - default to Manual
             $selectColumns[] = DB::raw("'Manual' as mode");
 
-            // PC Status - check if printed
-            if (in_array('PT_UID', $columns)) {
-                $selectColumns[] = DB::raw("CASE WHEN PT_UID IS NOT NULL AND PT_UID != '' THEN '1' ELSE '0' END as pc_status");
-            } else {
-                $selectColumns[] = DB::raw("'0' as pc_status");
-            }
-
-            // Post Status
-            $selectColumns[] = DB::raw("CASE WHEN IV_STS = 'Posted' THEN 'Posted' ELSE 'UnPost' END as post_status");
-
             // ✅ Audit trail columns with TIME fields (CPS-compatible)
             $auditColumns = [
                 'ORDER_MODE' => 'order_mode',
@@ -2162,9 +2195,6 @@ class InvoiceController extends Controller
                 'PT_UID' => 'printed_by',
                 'PT_DATE' => 'printed_date',
                 'PT_TIME' => 'printed_time',
-                'PO_UID' => 'posted_by',
-                'PO_DATE' => 'posted_date',
-                'PO_TIME' => 'posted_time',
             ];
 
             foreach ($auditColumns as $dbColumn => $alias) {
@@ -2290,7 +2320,7 @@ class InvoiceController extends Controller
                 'ref2' => $invoice->IV_SECOND_REF ?? '',
                 'second_ref' => $invoice->IV_SECOND_REF ?? '',
                 'remark' => $invoice->IV_REMARK ?? '',
-                'status' => $invoice->IV_STS ?? 'Prepared',
+                'status' => $this->normalizeInvoiceStatus($invoice->IV_STS ?? null, $invoice->AM_UID ?? null),
                 'total_amount' => (float)($invoice->IV_TRAN_AMT ?? 0),
                 // ✅ Calculate tax_amount and net_amount on-the-fly (not stored in table)
                 'tax_amount' => $this->calculateTaxAmount($invoice),
@@ -2316,9 +2346,6 @@ class InvoiceController extends Controller
                 'printed_by' => $invoice->PT_UID ?? '',
                 'printed_date' => $invoice->PT_DATE ?? '',
                 'printed_time' => $invoice->PT_TIME ?? '',
-                'posted_by' => $invoice->PO_UID ?? '',
-                'posted_date' => $invoice->PO_DATE ?? '',
-                'posted_time' => $invoice->PO_TIME ?? '',
                 // Cancellation reasons (if applicable)
                 'cancelled_reason_1' => $invoice->CANCELLED_REASON_1 ?? '',
                 'cancelled_reason_2' => $invoice->CANCELLED_REASON_2 ?? '',
@@ -2477,7 +2504,10 @@ class InvoiceController extends Controller
             // Calculate invoiced quantity from INV table
             $invoicedQty = DB::table('INV')
                 ->where('SO_NUM', $do->SO_Num)
-                ->where('IV_STS', '!=', 'Cancelled')
+                ->where(function ($q) {
+                    $q->whereNull('IV_STS')
+                      ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                })
                 ->sum('IV_QTY');
 
             $doQty = $do->DO_Qty ?? 0;
@@ -2529,7 +2559,7 @@ class InvoiceController extends Controller
             }
 
             // CPS Business Rules: Cannot update print audit for cancelled invoices
-            if ($invoice->IV_STS === 'Cancelled') {
+            if (in_array($invoice->IV_STS, ['Cancel', 'Cancelled'], true)) {
                 return response()->json([
                     'error' => 'Cannot print cancelled invoice'
                 ], 400);
@@ -2656,15 +2686,9 @@ class InvoiceController extends Controller
                 ], 400);
             }
 
-            if ($invoice->IV_STS === 'Cancelled') {
+            if (in_array($invoice->IV_STS, ['Cancel', 'Cancelled'], true)) {
                 return response()->json([
                     'error' => 'Cannot amend cancelled invoice'
-                ], 400);
-            }
-
-            if ($invoice->IV_STS === 'Posted') {
-                return response()->json([
-                    'error' => 'Cannot amend invoice that has been posted to GL'
                 ], 400);
             }
 
@@ -2703,6 +2727,7 @@ class InvoiceController extends Controller
             ]);
 
             $updateData = [
+                'IV_STS' => 'Amend',
                 'AM_UID' => $currentUserId, // ✅ Guaranteed to be non-null
                 'AM_DATE' => $nowWib->format('d/m/Y'),
                 'AM_TIME' => $nowWib->format('H:i'),
@@ -3063,7 +3088,29 @@ class InvoiceController extends Controller
             }
 
             if ($status) {
-                $query->where('INV.IV_STS', $status);
+                if ($status === 'Cancel') {
+                    $query->whereIn('INV.IV_STS', ['Cancel', 'Cancelled']);
+                } elseif ($status === 'Amend') {
+                    $query->where(function ($q) {
+                        $q->where('INV.IV_STS', 'Amend')
+                          ->orWhere(function ($q2) {
+                              $q2->whereNull('INV.IV_STS')
+                                 ->whereNotNull('INV.AM_UID')
+                                 ->where('INV.AM_UID', '!=', '');
+                          });
+                    });
+                } elseif ($status === 'New') {
+                    $query->where(function ($q) {
+                        $q->whereNull('INV.IV_STS')
+                          ->orWhereNotIn('INV.IV_STS', ['Cancel', 'Cancelled', 'Amend']);
+                    });
+                    $query->where(function ($q) {
+                        $q->whereNull('INV.AM_UID')
+                          ->orWhere('INV.AM_UID', '=', '');
+                    });
+                } else {
+                    $query->where('INV.IV_STS', $status);
+                }
             }
 
             // Get invoices

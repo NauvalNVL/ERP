@@ -265,7 +265,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import MachineModal from '@/Components/MachineModal.vue';
@@ -350,8 +350,10 @@ const createNewMachine = () => {
 
 const onMachineSelected = (machine) => {
     selectedRow.value = machine;
+    searchQuery.value = machine?.machine_code || '';
     editForm.value = { ...machine };
     isCreating.value = false;
+    showModal.value = false;
     showEditModal.value = true;
 };
 
@@ -445,6 +447,34 @@ const showNotification = (message, type = 'success') => {
         notification.value.show = false;
     }, 3000);
 };
+
+watch([searchQuery, machines], ([newQuery, newMachines]) => {
+    const q = (newQuery || '').toString().trim().toLowerCase();
+
+    if (!q) {
+        selectedRow.value = null;
+        return;
+    }
+
+    if (newMachines.length === 0) {
+        selectedRow.value = null;
+        return;
+    }
+
+    const foundMachine = newMachines.find((m) => {
+        const code = (m.machine_code || '').toString().toLowerCase();
+        const name = (m.machine_name || '').toString().toLowerCase();
+        return code.includes(q) || name.includes(q);
+    });
+
+    selectedRow.value = foundMachine || null;
+});
+
+watch(showModal, (isOpen) => {
+    if (isOpen) {
+        fetchMachines();
+    }
+});
 
 onMounted(() => {
     if (machines.value.length === 0) {

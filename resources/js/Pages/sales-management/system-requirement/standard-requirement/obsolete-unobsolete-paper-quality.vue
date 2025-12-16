@@ -3,53 +3,75 @@
     <Head title="Manage Paper Quality Status" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg mb-6">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-sync-alt mr-3"></i> Manage Paper Quality Status (Obsolete/Unobsolete)
-        </h2>
-        <p class="text-emerald-100">Toggle the active status of paper qualities.</p>
-    </div>
-
-    <div class="bg-white rounded-b-lg shadow-lg p-6">
-        <!-- Success/Error Messages -->
-        <div v-if="notification.show" 
-             :class="{
-                'bg-green-100 border border-green-400 text-green-700': notification.type === 'success',
-                'bg-red-100 border border-red-400 text-red-700': notification.type === 'error',
-                'px-4 py-3 rounded relative mb-4': true
-             }">
-            <span class="block sm:inline">{{ notification.message }}</span>
-        </div>
-
-        <!-- Search and Filter Controls -->
-        <div class="mb-6 flex flex-wrap items-center gap-4">
-            <div class="flex-1 min-w-[300px]">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" v-model="searchQuery" placeholder="Search paper qualities..."
-                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
+    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+                <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg sm:text-xl font-semibold leading-tight">Manage Paper Quality Status</h1>
+                            <p class="text-xs sm:text-sm text-emerald-100">Activate or deactivate paper qualities quickly and easily.</p>
+                        </div>
+                    </div>
+                    <!-- Search and Filter Controls -->
+                    <div class="relative w-full sm:w-72">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-100">
+                            <i class="fas fa-search text-xs"></i>
+                        </span>
+                        <input
+                            v-model="searchQuery"
+                            type="text"
+                            placeholder="Cari paper quality (code, name)..."
+                            class="block w-full rounded-md border border-gray-200 bg-white py-1.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        />
+                    </div>
                 </div>
             </div>
-            <div>
-                <select v-model="statusFilter" class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="all">All Statuses</option>
-                    <option value="active">Active Only</option>
-                    <option value="obsolete">Obsolete Only</option>
-                </select>
+
+            <div
+                v-if="notification.show"
+                :class="[
+                    notification.type === 'success'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                        : 'bg-red-50 border-red-200 text-red-800',
+                    'px-4 py-3 mb-4 rounded-lg border text-sm shadow-sm'
+                ]"
+            >
+                <span class="block">{{ notification.message }}</span>
             </div>
-        </div>
 
-        <!-- Loading Indicator -->
-        <div v-if="loading" class="my-8 flex justify-center">
-            <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-4 py-2 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white">
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-800">Paper Quality List</h2>
+                        <p class="text-xs text-gray-500">{{ filteredPaperQualities.length }} of {{ paperQualities.length }} paper qualities</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-600">Status:</label>
+                        <select
+                            v-model="statusFilter"
+                            class="py-1.5 px-2.5 text-xs border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                            <option value="all">All</option>
+                            <option value="active">Active Only</option>
+                            <option value="obsolete">Obsolete Only</option>
+                        </select>
+                    </div>
+                </div>
 
-        <!-- Paper Qualities Table -->
-        <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-            <table class="min-w-full divide-y divide-gray-200 bg-white">
-                <thead class="bg-gray-100">
+                <div class="relative">
+                    <!-- Loading Indicator -->
+                    <div v-if="loading" class="py-10 flex justify-center items-center">
+                        <div class="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+
+                    <!-- Paper Qualities Table -->
+                    <div v-else class="overflow-x-auto">
+                        <table class="min-w-full table-auto divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
@@ -93,7 +115,10 @@
                         <td colspan="6" class="px-6 py-4 text-center text-gray-500">No paper qualities found.</td>
                     </tr>
                 </tbody>
-            </table>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

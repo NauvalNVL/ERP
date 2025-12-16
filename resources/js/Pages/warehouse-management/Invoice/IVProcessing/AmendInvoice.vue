@@ -199,19 +199,6 @@
                                    class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
                         </div>
                     </div>
-                    <!-- Posted By -->
-                    <div class="flex gap-2">
-                        <div class="flex-1">
-                            <label class="block text-gray-600 text-xs mb-1">Posted by:</label>
-                            <input type="text" :value="selectedInvoice?.posted_by || ''" readonly
-                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
-                        </div>
-                        <div class="flex-1">
-                            <label class="block text-gray-600 text-xs mb-1">Date:</label>
-                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.posted_date, selectedInvoice?.posted_time)" readonly
-                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -468,13 +455,8 @@ const saveInvoice = async () => {
         return;
     }
 
-    if (selectedInvoice.value.status === 'Cancelled') {
+    if (selectedInvoice.value.status === 'Cancel') {
         toast.error('Cannot amend cancelled invoice');
-        return;
-    }
-
-    if (selectedInvoice.value.status === 'Posted') {
-        toast.error('Cannot amend invoice that has been posted to GL');
         return;
     }
 

@@ -21,8 +21,7 @@
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">AC#</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">TAX</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">MODE</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">PC STATUS</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">POST STATUS</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">STATUS</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -35,11 +34,10 @@
                                 <td class="px-3 py-2">{{ row.customer_code }}</td>
                                 <td class="px-3 py-2">{{ row.tax_code }}</td>
                                 <td class="px-3 py-2">{{ row.mode }}</td>
-                                <td class="px-3 py-2">{{ row.pc_status }}</td>
-                                <td class="px-3 py-2">{{ row.post_status }}</td>
+                                <td class="px-3 py-2">{{ row.status }}</td>
                             </tr>
                             <tr v-if="!loading && invoices.length === 0">
-                                <td colspan="7" class="px-6 py-8 text-center">
+                                <td colspan="6" class="px-6 py-8 text-center">
                                     <div class="flex flex-col items-center gap-3">
                                         <i class="fas fa-inbox text-4xl text-gray-300"></i>
                                         <div>
@@ -50,7 +48,7 @@
                                 </td>
                             </tr>
                             <tr v-if="loading">
-                                <td colspan="7" class="px-6 py-6 text-center text-gray-500">
+                                <td colspan="6" class="px-6 py-6 text-center text-gray-500">
                                     <i class="fas fa-spinner fa-spin mr-2"></i>
                                     Loading invoices...
                                 </td>
@@ -118,16 +116,6 @@
                         <div>
                             <label class="block text-gray-600 text-xs">Date:</label>
                             <input type="text" :value="formatAuditDateTime(selectedRow?.printed_date, selectedRow?.printed_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-gray-600 text-xs">Posted by:</label>
-                            <input type="text" :value="selectedRow?.posted_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-xs">Date:</label>
-                            <input type="text" :value="formatAuditDateTime(selectedRow?.posted_date, selectedRow?.posted_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
                         </div>
                     </div>
                     <div class="md:col-span-2">

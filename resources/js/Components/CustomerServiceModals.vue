@@ -746,8 +746,7 @@
                                 <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                 <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax</th>
                                 <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/C Status</th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post Status</th>
+                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -764,11 +763,10 @@
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ invoice.customer_code }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ invoice.tax }}</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ invoice.mode }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ invoice.pc_status }}</td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ invoice.post_status }}</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">{{ invoice.status }}</td>
                             </tr>
                             <tr v-if="filteredInvoices.length === 0">
-                                <td colspan="7" class="px-3 py-2 text-center text-sm text-gray-500">No invoices found.</td>
+                                <td colspan="6" class="px-3 py-2 text-center text-sm text-gray-500">No invoices found.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -824,14 +822,6 @@
                                 <input type="text" class="form-input mt-1 block w-20 bg-gray-100" :value="selectedInvoice.printed_by" readonly>
                                 <label class="ml-4 text-sm font-medium text-gray-700">Date:</label>
                                 <input type="text" class="form-input mt-1 ml-2 block w-full bg-gray-100" :value="selectedInvoice.printed_date" readonly>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Posted by:</label>
-                            <div class="flex items-center">
-                                <input type="text" class="form-input mt-1 block w-20 bg-gray-100" :value="selectedInvoice.posted_by" readonly>
-                                <label class="ml-4 text-sm font-medium text-gray-700">Date:</label>
-                                <input type="text" class="form-input mt-1 ml-2 block w-full bg-gray-100" :value="selectedInvoice.posted_date" readonly>
                             </div>
                         </div>
                         <div>
@@ -1574,8 +1564,8 @@ const fetchInvoices = async (extraParams = {}) => {
             customer_code: inv.customer_code || inv.AC_NUM || '',
             tax: inv.tax_code || inv.tax || '',
             mode: inv.mode || 'Manual',
-            pc_status: inv.pc_status ?? '',
-            post_status: inv.post_status ?? '',
+            status: inv.status ?? '',
+
 
             // Detail fields used in the bottom panel
             customer_name_detail: inv.customer_name || inv.customer_name_detail || '',
@@ -1775,7 +1765,7 @@ const performSearch = async () => {
                             customer_name: invoiceData.customer_name || selected.customer_name_detail,
                             tax_code: invoiceData.tax_code || selected.tax,
                             order_mode: invoiceData.order_mode || selected.order_mode,
-                            status: invoiceData.status || selected.status || selected.post_status,
+                            status: invoiceData.status || selected.status,
                             so_number: soNum,
                             do_number: invoiceData.do_number || '',
                             issued_by: invoiceData.issued_by || selected.issued_by,
