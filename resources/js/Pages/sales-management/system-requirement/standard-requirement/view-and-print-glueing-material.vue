@@ -59,7 +59,7 @@
 
                 <!-- Table Content -->
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-blue-600" style="background-color: #2563eb;">
+                    <thead class="bg-gray-50">
                         <tr>
                             <th @click="sortTable('code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Code <i :class="getSortIcon('code')" class="text-xs"></i>
@@ -76,7 +76,7 @@
                         <tr v-if="loading">
                             <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
                                 <p class="mt-2">Loading glueing material data...</p>
                             </td>
@@ -86,13 +86,13 @@
                                 No glueing materials found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
                         <tr v-for="(material, index) in filteredGlueingMaterials" :key="material.id || material.code"
-                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                            class="hover:bg-blue-200">
+                            :class="index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'"
+                            class="hover:bg-emerald-100">
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ material.code || 'N/A' }}</div>
                             </td>

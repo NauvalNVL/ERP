@@ -93,7 +93,7 @@
 
                     <!-- Table Content -->
                     <table class="min-w-full border-collapse">
-                        <thead class="bg-blue-600" style="background-color: #2563eb;">
+                        <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-2 text-left font-semibold border border-gray-300" style="color: black; width: 80px;">
                                     NO.
@@ -122,7 +122,7 @@
                             <tr v-if="isLoading">
                                 <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                     <div class="flex justify-center">
-                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                     </div>
                                     <p class="mt-2">Loading machine data...</p>
                                 </td>
@@ -132,13 +132,13 @@
                                     No machines found.
                                     <template v-if="searchQuery || selectedProcess || selectedResourceType || selectedFinisherType">
                                         <p class="mt-2">No results match your search criteria.</p>
-                                        <button @click="clearFilters" class="mt-2 text-blue-500 hover:underline">Clear filters</button>
+                                        <button @click="clearFilters" class="mt-2 text-emerald-600 hover:underline">Clear filters</button>
                                     </template>
                                 </td>
                             </tr>
                             <tr v-for="(machine, index) in filteredMachines" :key="machine.id"
-                                :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                                class="hover:bg-blue-200">
+                                :class="index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'"
+                                class="hover:bg-emerald-100">
                                 <td class="px-4 py-2 border border-gray-300 text-center">
                                     <div class="text-sm font-medium text-gray-900">{{ index + 1 }}</div>
                                 </td>

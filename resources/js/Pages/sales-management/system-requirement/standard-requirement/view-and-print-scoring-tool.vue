@@ -59,7 +59,7 @@
 
                 <!-- Table Content -->
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-blue-600" style="background-color: #2563eb;">
+                    <thead class="bg-gray-50">
                         <tr>
                             <th @click="sortTable('id')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 10%;">
                                 NO. <i :class="getSortIcon('id')" class="text-xs ml-1"></i>
@@ -79,7 +79,7 @@
                         <tr v-if="loading">
                             <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                                 </div>
                                 <p class="mt-3 font-medium">Loading scoring tool data...</p>
                             </td>
@@ -89,13 +89,13 @@
                                 <p class="font-medium text-gray-700">No scoring tools found.</p>
                                 <template v-if="searchQuery">
                                     <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-3 text-blue-500 hover:text-blue-700 hover:underline font-medium">Clear search</button>
+                                    <button @click="searchQuery = ''" class="mt-3 text-emerald-600 hover:text-emerald-700 hover:underline font-medium">Clear search</button>
                                 </template>
                             </td>
                         </tr>
                         <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id"
-                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                            class="hover:bg-blue-200 transition-colors duration-150">
+                            :class="index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'"
+                            class="hover:bg-emerald-100 transition-colors duration-150">
                             <td class="px-6 py-3 border border-gray-300 text-center">
                                 <div class="text-sm font-semibold text-gray-900">{{ index + 1 }}</div>
                             </td>
