@@ -246,13 +246,8 @@ const selectInvoice = async (invoice) => {
 
         if (res.data) {
             // Check if invoice can be cancelled
-            if (res.data.status === 'Cancelled') {
+            if (res.data.status === 'Cancel') {
                 toast.error('This invoice is already cancelled');
-                return;
-            }
-
-            if (res.data.status === 'Posted') {
-                toast.error('Cannot cancel invoice that has been posted to GL');
                 return;
             }
 

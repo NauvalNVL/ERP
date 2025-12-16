@@ -219,13 +219,6 @@
               </div>
             </div>
             <div>
-              <div class="text-[11px] font-semibold text-gray-500 mb-1">Posted By</div>
-              <div class="flex justify-between gap-2">
-                <span class="text-gray-900">{{ selectedInvoice.posted_by || '-' }}</span>
-                <span class="text-gray-500">{{ formatAuditDateTime(selectedInvoice.posted_date, selectedInvoice.posted_time) }}</span>
-              </div>
-            </div>
-            <div>
               <div class="text-[11px] font-semibold text-gray-500 mb-1">Cancelled By</div>
               <div class="flex justify-between gap-2">
                 <span class="text-gray-900">{{ selectedInvoice.cancelled_by || '-' }}</span>
@@ -297,10 +290,12 @@ const formatCurrency = (value) => {
 
 const statusChipClass = (value) => {
   switch (value) {
-    case 'Posted':
-      return 'bg-emerald-100 text-emerald-800 border border-emerald-300';
-    case 'Cancelled':
+    case 'Cancel':
       return 'bg-rose-100 text-rose-800 border border-rose-300';
+    case 'Amend':
+      return 'bg-indigo-100 text-indigo-800 border border-indigo-300';
+    case 'New':
+      return 'bg-emerald-100 text-emerald-800 border border-emerald-300';
     default:
       return 'bg-sky-100 text-sky-800 border border-sky-300';
   }
@@ -483,22 +478,22 @@ const printLog = async () => {
     let totalNet = 0;
     let activeIv = 0;
     let cancelledIv = 0;
-    let unpostIv = 0;
-    let postedIv = 0;
+    let newIv = 0;
+    let amendIv = 0;
 
     prepared.forEach((row) => {
       totalGross += row.gross;
       totalTax += row.taxAmt;
       totalNet += row.net;
 
-      if (row.status === 'Cancelled') {
+      if (row.status === 'Cancel') {
         cancelledIv += row.gross;
       } else {
         activeIv += row.gross;
-        if (row.status === 'Posted') {
-          postedIv += row.gross;
+        if (row.status === 'Amend') {
+          amendIv += row.gross;
         } else {
-          unpostIv += row.gross;
+          newIv += row.gross;
         }
       }
     });
@@ -615,29 +610,17 @@ const printLog = async () => {
     doc.text(':', leftColonX, y);
     doc.text(formatCurrency(activeIv), leftValueX, y, { align: 'right' });
 
-    doc.text('CANCELLED IV', leftLabelX, y + 4);
+    doc.text('CANCEL IV', leftLabelX, y + 4);
     doc.text(':', leftColonX, y + 4);
     doc.text(formatCurrency(cancelledIv), leftValueX, y + 4, { align: 'right' });
 
-    doc.text('NOT POSTED IV', leftLabelX, y + 8);
+    doc.text('NEW IV', leftLabelX, y + 8);
     doc.text(':', leftColonX, y + 8);
-    doc.text(formatCurrency(0), leftValueX, y + 8, { align: 'right' });
+    doc.text(formatCurrency(newIv), leftValueX, y + 8, { align: 'right' });
 
-    doc.text('UNPOST IV', leftLabelX, y + 12);
+    doc.text('AMEND IV', leftLabelX, y + 12);
     doc.text(':', leftColonX, y + 12);
-    doc.text(formatCurrency(unpostIv), leftValueX, y + 12, { align: 'right' });
-
-    doc.text('POSTED IV', leftLabelX, y + 16);
-    doc.text(':', leftColonX, y + 16);
-    doc.text(formatCurrency(postedIv), leftValueX, y + 16, { align: 'right' });
-
-    doc.text('CANCELLED POSTED IV', leftLabelX, y + 20);
-    doc.text(':', leftColonX, y + 20);
-    doc.text(formatCurrency(0), leftValueX, y + 20, { align: 'right' });
-
-    doc.text('POSTING IV', leftLabelX, y + 24);
-    doc.text(':', leftColonX, y + 24);
-    doc.text(formatCurrency(0), leftValueX, y + 24, { align: 'right' });
+    doc.text(formatCurrency(amendIv), leftValueX, y + 12, { align: 'right' });
 
     doc.save(`InvoiceLog_${period.value.year}${period.value.month}_${fromNo || 'ALL'}_${toNo || 'ALL'}.pdf`);
   } catch (e) {
