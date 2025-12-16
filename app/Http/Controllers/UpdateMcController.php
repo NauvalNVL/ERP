@@ -2016,7 +2016,11 @@ class UpdateMcController extends Controller
                     try {
                         $dateTimeString = trim(($log->DATE ?? '') . ' ' . ($log->TIME ?? ''));
                         if (!empty($dateTimeString)) {
-                            $dateTime = \Carbon\Carbon::parse($dateTimeString)->timezone('Asia/Jakarta');
+                            try {
+                                $dateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateTimeString, 'Asia/Jakarta');
+                            } catch (\Exception $e) {
+                                $dateTime = \Carbon\Carbon::parse($dateTimeString, 'Asia/Jakarta');
+                            }
                             $date = $dateTime->format('Y-m-d');
                             $time = $dateTime->format('H:i:s') . ' WIB';
                         }
@@ -2255,13 +2259,17 @@ class UpdateMcController extends Controller
             ->map(function($log) {
                 // Parse date and time, convert to WIB (UTC+7)
                 try {
-                    $dateTimeString = $log->DATE . ' ' . $log->TIME;
-                    $dateTime = \Carbon\Carbon::parse($dateTimeString)->timezone('Asia/Jakarta');
+                    $dateTimeString = trim(($log->DATE ?? '') . ' ' . ($log->TIME ?? ''));
+                    try {
+                        $dateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateTimeString, 'Asia/Jakarta');
+                    } catch (\Exception $e) {
+                        $dateTime = \Carbon\Carbon::parse($dateTimeString, 'Asia/Jakarta');
+                    }
                     $formattedDate = $dateTime->format('Y-m-d');
                     $formattedTime = $dateTime->format('H:i:s') . ' WIB';
                 } catch (\Exception $e) {
                     $formattedDate = $log->DATE;
-                    $formattedTime = $log->TIME;
+                    $formattedTime = $log->TIME ? ($log->TIME . ' WIB') : '';
                 }
 
                 return [
@@ -2292,13 +2300,17 @@ class UpdateMcController extends Controller
             ->map(function($log) {
                 // Parse date and time, convert to WIB (UTC+7)
                 try {
-                    $dateTimeString = $log->DATE . ' ' . $log->TIME;
-                    $dateTime = \Carbon\Carbon::parse($dateTimeString)->timezone('Asia/Jakarta');
+                    $dateTimeString = trim(($log->DATE ?? '') . ' ' . ($log->TIME ?? ''));
+                    try {
+                        $dateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateTimeString, 'Asia/Jakarta');
+                    } catch (\Exception $e) {
+                        $dateTime = \Carbon\Carbon::parse($dateTimeString, 'Asia/Jakarta');
+                    }
                     $formattedDate = $dateTime->format('Y-m-d');
                     $formattedTime = $dateTime->format('H:i:s') . ' WIB';
                 } catch (\Exception $e) {
                     $formattedDate = $log->DATE;
-                    $formattedTime = $log->TIME;
+                    $formattedTime = $log->TIME ? ($log->TIME . ' WIB') : '';
                 }
 
                 return [
