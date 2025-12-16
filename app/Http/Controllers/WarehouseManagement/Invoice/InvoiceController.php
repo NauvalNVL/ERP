@@ -1251,7 +1251,6 @@ class InvoiceController extends Controller
                         'MM' => $mm,
                         'IV_NUM' => $ivNum,
                         'IV_STS' => 'New',
-                        'IV_STS' => 'New',
                         'IV_DMY' => $invoiceDate,
 
                         // Payment terms and references
@@ -2731,7 +2730,6 @@ class InvoiceController extends Controller
                 'AM_UID' => $currentUserId, // ✅ Guaranteed to be non-null
                 'AM_DATE' => $nowWib->format('d/m/Y'),
                 'AM_TIME' => $nowWib->format('H:i'),
-                'IV_STS' => 'Amended',
             ];
 
             // ✅ Update ONLY editable fields that exist in table (CPS-compatible)
