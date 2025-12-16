@@ -250,10 +250,7 @@
                             :key="index"
                             :class="item.item === 'Main' ? '' : 'bg-gray-50'"
                           >
-                            <td
-                              class="px-2 py-2 font-medium"
-                              :class="item.item !== 'Main' ? 'text-gray-400' : ''"
-                            >
+                            <td class="px-2 py-2 font-medium">
                               {{ item.item }}
                             </td>
                             <td
@@ -297,20 +294,19 @@
                             </td>
                             <td class="px-2 py-2 text-center">
                               <input
-                                v-if="item.item === 'Main'"
+                                v-if="!isKgUnit(item)"
                                 v-model.number="item.to_bill"
                                 @input="onToBillChange(item)"
                                 type="number"
                                 :max="item.unbill"
                                 placeholder="0"
-                                :disabled="isKgUnit(item)"
                                 class="w-full px-1 py-1 text-center border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                               />
-                              <span v-else class="text-gray-400">-</span>
+                              <span v-else class="text-gray-400"></span>
                             </td>
                             <td class="px-2 py-2 text-center">
                               <input
-                                v-if="item.item === 'Main' && isKgUnit(item)"
+                                v-if="isKgUnit(item)"
                                 v-model.number="item.to_bill_kg"
                                 @input="onToBillKgChange(item)"
                                 type="number"
@@ -319,14 +315,7 @@
                                 placeholder="0"
                                 class="w-full px-1 py-1 text-center border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                               />
-                              <span v-else-if="item.item === 'Main'">{{
-                                item.to_bill_kg === null ||
-                                item.to_bill_kg === undefined ||
-                                item.to_bill_kg === ""
-                                  ? ""
-                                  : formatNumber(item.to_bill_kg, 2)
-                              }}</span>
-                              <span v-else class="text-gray-400">-</span>
+                              <span v-else class="text-gray-400"></span>
                             </td>
                           </tr>
                         </tbody>
@@ -546,7 +535,10 @@ const onToBillChange = (item) => {
 
   console.log("✅ Updated:", {
     to_bill: item.to_bill,
-    to_bill_kg: item.to_bill_kg === null || item.to_bill_kg === undefined ? null : Number(item.to_bill_kg).toFixed(2),
+    to_bill_kg:
+      item.to_bill_kg === null || item.to_bill_kg === undefined
+        ? null
+        : Number(item.to_bill_kg).toFixed(2),
     new_total: formatCurrency(total.value),
   });
 };
@@ -581,8 +573,6 @@ const calculateTotal = () => {
   let newTotal = 0;
 
   itemDetails.value.forEach((item) => {
-    if (item.item !== "Main") return;
-
     const unitPrice = Number(item.u_price || 0);
     if (!unitPrice || unitPrice <= 0) return;
 
@@ -620,7 +610,7 @@ const handleConfirm = () => {
 
   console.log("📤 Emitting data:", {
     finalTotal: formatCurrency(finalTotal),
-    itemDetails: itemDetails.value.filter((i) => i.item === "Main"),
+    itemDetails: itemDetails.value,
   });
 
   emit("confirm", {

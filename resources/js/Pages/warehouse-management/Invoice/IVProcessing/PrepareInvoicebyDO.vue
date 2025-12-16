@@ -993,6 +993,11 @@ async function prepareInvoices(){
     // Get DO numbers
     const doNumbers = selectedDOs.value.map(d => d.do_number)
 
+    const billedItemsPayload = {}
+    billedItems.value.forEach((value, key) => {
+      billedItemsPayload[key] = value
+    })
+
     // Prepare invoices
     const prepareRes = await fetch('/api/invoices/prepare', {
       method: 'POST',
@@ -1004,6 +1009,7 @@ async function prepareInvoices(){
       },
       body: JSON.stringify({
         do_numbers: doNumbers,
+        billed_items: billedItemsPayload,
         customer_code: customerCode.value,
         tax_index_no: taxIndexNo.value,
         tax_code: finalTaxData.value?.taxCode || selectedTaxCode.value || null, // ✅ Pass tax code explicitly (from Final Screen or Check Sales Tax)

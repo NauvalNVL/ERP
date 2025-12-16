@@ -157,6 +157,8 @@ class SalesOrderController extends Controller
             'set_quantity' => 'nullable|numeric|min:0',
             'product_design_quantities' => 'nullable|array',
             'product_design_quantities.*' => 'numeric|min:0',
+            'product_design_units' => 'nullable|array',
+            'product_design_units.*' => 'string|max:10',
             'delivery_location.delivery_code' => 'nullable|string|max:50',
             'delivery_location.customer_name' => 'nullable|string|max:250',
             'delivery_location.address' => 'nullable|string|max:250',
@@ -175,6 +177,33 @@ class SalesOrderController extends Controller
         }
 
         $validated = $request->all();
+
+        $headerUom = $this->normalizeProductDesignUnit($validated['details'][0]['uom'] ?? null) ?? 'PCS';
+
+        $productDesignUnits = $validated['product_design_units'] ?? [];
+        if (!is_array($productDesignUnits)) {
+            $productDesignUnits = [];
+        }
+        $normalizedProductDesignUnits = [];
+        foreach ($productDesignUnits as $component => $unit) {
+            $rawKey = (string) $component;
+            $noSpaces = preg_replace('/\s+/', '', $rawKey);
+            $lower = strtolower($noSpaces);
+
+            if ($lower === 'main') {
+                $normalizedKey = 'Main';
+            } elseif (preg_match('/^fit(\d+)$/', $lower, $m)) {
+                $normalizedKey = 'Fit' . $m[1];
+            } else {
+                $normalizedKey = $rawKey;
+            }
+
+            $normalizedUnit = $this->normalizeProductDesignUnit($unit);
+            if ($normalizedUnit !== null) {
+                $normalizedProductDesignUnits[$normalizedKey] = $normalizedUnit;
+            }
+        }
+        $productDesignUnits = $normalizedProductDesignUnits;
         // Generate SO number in format: MM-YYYY-XXXXX (matching the filter format)
         $month = date('m');
         $year = date('Y');
@@ -519,7 +548,7 @@ class SalesOrderController extends Controller
             'COMP_Num' => $masterCardData ? (string) ($masterCardData->COMP ?? '') : '',
             'P_DESIGN' => $mcPDesign,
             'PER_SET' => 1,
-            'UNIT' => (string) ($validated['details'][0]['uom'] ?? ''),
+            'UNIT' => $productDesignUnits['Main'] ?? $headerUom,
             'PART_NUMBER' => $partNumber,
             // Populate dimensions from MC table (will be overridden per component if multiple exist)
             'INT_L' => $intL,
@@ -676,6 +705,12 @@ class SalesOrderController extends Controller
             $compPDesign = $componentRow->P_DESIGN ?? $mcPDesign;
             $compPartNumber = $componentRow->PART_NO ?? $mcPartNumber;
 
+            $mcUnitRaw = $componentRow->UNIT ?? null;
+            $mcUnit = $this->normalizeProductDesignUnit($mcUnitRaw);
+            $componentUnit = $productDesignUnits[$componentName]
+                ?? $mcUnit
+                ?? $headerUom;
+
             $compIntL = (float)($componentRow->INT_LENGTH ?? 0);
             $compIntW = (float)($componentRow->INT_WIDTH ?? 0);
             $compIntH = (float)($componentRow->INT_HEIGHT ?? 0);
@@ -716,6 +751,7 @@ class SalesOrderController extends Controller
             $row['COMP_Num'] = (string) ($componentRow->COMP ?? '');
             $row['P_DESIGN'] = $compPDesign;
             $row['PART_NUMBER'] = $compPartNumber;
+            $row['UNIT'] = $componentUnit;
 
             $row['SO_QTY'] = (float) $componentQty; // Use component-specific quantity
 

@@ -658,6 +658,7 @@ const orderDetails = reactive({
   instruction2: '',
   so_number: '',
   productDesignQuantities: {},
+  productDesignUnits: {},
   isProductDesignQuantity: false,
   mainQuantity: 0,
   unitPrice: 0,
@@ -1023,6 +1024,7 @@ const refreshPage = () => {
     instruction2: '',
     so_number: '',
     productDesignQuantities: {},
+    productDesignUnits: {},
     isProductDesignQuantity: false,
     mainQuantity: 0,
     unitPrice: 0,
@@ -1555,15 +1557,22 @@ const saveProductDesign = async (designData) => {
 
         // Map quantity per component (Main, Fit1-9) from Product Design
         const componentQtyMap = {}
+        const componentUnitMap = {}
         if (Array.isArray(designData.items)) {
           designData.items.forEach((item) => {
             const qty = Number(item.quantity) || 0
             const name = (item.name || '').toString()
             if (!name || qty <= 0) return
             componentQtyMap[name] = qty
+
+            const unitRaw = (item.unit || '').toString().trim().toUpperCase()
+            if (unitRaw) {
+              componentUnitMap[name] = unitRaw
+            }
           })
         }
         orderDetails.productDesignQuantities = componentQtyMap
+        orderDetails.productDesignUnits = componentUnitMap
 
         const totalDesignQty = Array.isArray(designData.items)
           ? designData.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
@@ -1890,6 +1899,7 @@ const createSalesOrder = async () => {
         : '',
       // Include product design quantities for each component (Main, Fit1-9)
       product_design_quantities: orderDetails.productDesignQuantities || {},
+      product_design_units: orderDetails.productDesignUnits || {},
       // ===================================================================
       // DELIVERY LOCATION DATA - Dual Mode System
       // ===================================================================
