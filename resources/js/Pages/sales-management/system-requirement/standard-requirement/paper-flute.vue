@@ -331,11 +331,22 @@ const fetchFlutes = async () => {
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            flutes.value = data;
+            flutes.value = data.filter(isActiveFlute);
         } else {
             flutes.value = [];
             console.error('Unexpected data format:', data);
             showNotification('Error loading paper flutes: Invalid data format', 'error');
+        }
+
+        if (flutes.value.length === 0) {
+            selectedRow.value = null;
+            searchQuery.value = '';
+        } else if (selectedRow.value) {
+            const stillExists = flutes.value.some(f => String(f.Flute || '').toLowerCase() === String(selectedRow.value?.Flute || '').toLowerCase());
+            if (!stillExists) {
+                selectedRow.value = null;
+                searchQuery.value = '';
+            }
         }
     } catch (e) {
         console.error('Error fetching paper flutes:', e);
@@ -349,8 +360,14 @@ const fetchFlutes = async () => {
 onMounted(fetchFlutes);
 
 const isActiveFlute = (flute) => {
-    const status = flute?.status;
-    return status === undefined || status === null || status === 'Act' || status === 'Active';
+    const status = flute?.status ?? flute?.STATUS;
+    if (status === undefined || status === null || String(status).trim() === '') return true;
+
+    const s = String(status).trim().toLowerCase();
+    if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+    if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+    return true;
 };
 
 const normalizeFluteCode = (value) => {

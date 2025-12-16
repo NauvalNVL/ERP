@@ -91,12 +91,22 @@ const selectedFlute = ref(null);
 const sortKey = ref('Flute');
 const sortAsc = ref(true);
 
+const isActiveFlute = (flute) => {
+  const status = flute?.status ?? flute?.STATUS;
+  if (status === undefined || status === null || String(status).trim() === '') return true;
+
+  const s = String(status).trim().toLowerCase();
+  if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+  if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+  return true;
+};
+
 // Compute filtered flutes based on search query
 const filteredFlutes = computed(() => {
   let flutes = props.flutes;
   
-  // Filter out obsolete flutes (only show active ones)
-  flutes = flutes.filter(f => f.status === 'Act' || f.status === 'Active');
+  flutes = (Array.isArray(flutes) ? flutes : []).filter(isActiveFlute);
   
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();

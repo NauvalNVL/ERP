@@ -505,6 +505,10 @@
                                                 <span class="ml-3 text-xs text-gray-700">Define Customer Group</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_reactive_customer_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Reactive Customer Group</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.update_customer_account" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Update Customer Account</span>
                                             </label>
@@ -938,6 +942,7 @@ export default {
                     'view_print_glueing_material': false,
                     'view_print_machine': false,
                     'define_customer_group': false,
+                    'obsolete_reactive_customer_group': false,
                     'update_customer_account': false,
                     'obsolete_reactive_customer_ac': false,
                     'define_customer_alternate_address': false,

@@ -219,4 +219,109 @@ class CustomerGroupController extends Controller
             ], 500);
         }
     }
+
+    public function toggleStatus(Request $request, $group_code)
+    {
+        try {
+            $customerGroup = CustomerGroup::findOrFail($group_code);
+
+            $table = $customerGroup->getTable();
+            $columns = DB::getSchemaBuilder()->getColumnListing($table);
+            $columnsLower = array_map(fn ($c) => strtolower((string) $c), $columns);
+
+            $getColumn = function (string $name) use ($columns, $columnsLower) {
+                $idx = array_search(strtolower($name), $columnsLower, true);
+                return $idx !== false ? $columns[$idx] : null;
+            };
+
+            $statusCol = $getColumn('status')
+                ?? $getColumn('is_active')
+                ?? $getColumn('active')
+                ?? $getColumn('ac');
+
+            if (!$statusCol) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Customer Group status column not found (expected one of: status, is_active, active, AC).'
+                ], 422);
+            }
+
+            $current = $customerGroup->getAttribute($statusCol);
+            $newValue = null;
+
+            $statusColLower = strtolower((string) $statusCol);
+
+            if ($statusColLower === 'status') {
+                $currentTrim = trim((string) ($current ?? ''));
+                if ($currentTrim === '' || $currentTrim === 'Act' || $currentTrim === 'Obs') {
+                    $currentTrim = $currentTrim === '' ? 'Act' : $currentTrim;
+                    $newValue = $currentTrim === 'Act' ? 'Obs' : 'Act';
+                } elseif ($currentTrim === 'Active' || $currentTrim === 'Inactive') {
+                    $newValue = $currentTrim === 'Active' ? 'Inactive' : 'Active';
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unsupported Customer Group status format: ' . $currentTrim
+                    ], 422);
+                }
+            } elseif ($statusColLower === 'is_active' || $statusColLower === 'active') {
+                if (is_bool($current)) {
+                    $newValue = !$current;
+                } elseif (is_numeric($current)) {
+                    $newValue = ((int) $current) ? 0 : 1;
+                } else {
+                    $currentTrim = strtoupper(trim((string) ($current ?? '')));
+                    if ($currentTrim === '' || $currentTrim === 'Y' || $currentTrim === 'N') {
+                        $currentTrim = $currentTrim === '' ? 'Y' : $currentTrim;
+                        $newValue = $currentTrim === 'Y' ? 'N' : 'Y';
+                    } elseif ($currentTrim === 'A' || $currentTrim === 'I') {
+                        $newValue = $currentTrim === 'A' ? 'I' : 'A';
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Unsupported Customer Group active format: ' . $currentTrim
+                        ], 422);
+                    }
+                }
+            } elseif ($statusColLower === 'ac') {
+                $currentTrim = strtoupper(trim((string) ($current ?? '')));
+                if ($currentTrim === '' || $currentTrim === 'Y' || $currentTrim === 'N') {
+                    $currentTrim = $currentTrim === '' ? 'Y' : $currentTrim;
+                    $newValue = $currentTrim === 'Y' ? 'N' : 'Y';
+                } elseif ($currentTrim === 'A' || $currentTrim === 'I') {
+                    $newValue = $currentTrim === 'A' ? 'I' : 'A';
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Customer Group AC column is not a boolean-like status (value: ' . $currentTrim . ')'
+                    ], 422);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unsupported status column for Customer Group: ' . $statusCol
+                ], 422);
+            }
+
+            $customerGroup->setAttribute($statusCol, $newValue);
+            $customerGroup->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer Group status updated successfully',
+                'data' => $customerGroup
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer Group not found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Error toggling customer group status: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update Customer Group status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

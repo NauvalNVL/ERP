@@ -316,7 +316,18 @@ const props = defineProps({
     }
 });
 
-const geos = ref(props.geos || []);
+const isActiveGeo = (geo) => {
+    const status = geo?.status ?? geo?.STATUS;
+    if (status === undefined || status === null || String(status).trim() === '') return true;
+
+    const s = String(status).trim().toLowerCase();
+    if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+    if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+    return true;
+};
+
+const geos = ref((props.geos || []).filter(isActiveGeo));
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -354,10 +365,23 @@ const fetchGeos = async () => {
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            geos.value = data;
+            geos.value = data.filter(isActiveGeo);
         } else {
             geos.value = [];
             console.error('Unexpected data format:', data);
+        }
+
+        if (geos.value.length === 0) {
+            selectedGeo.value = null;
+            geoCode.value = '';
+            searchResult.value = '';
+        } else if (selectedGeo.value) {
+            const stillExists = geos.value.some(g => String(g.code || '').toUpperCase() === String(selectedGeo.value?.code || '').toUpperCase());
+            if (!stillExists) {
+                selectedGeo.value = null;
+                geoCode.value = '';
+                searchResult.value = '';
+            }
         }
     } catch (e) {
         console.error('Error fetching geo data:', e);
@@ -370,7 +394,22 @@ const fetchGeos = async () => {
 // Watch for props changes
 watch(() => props.geos, (newGeos) => {
     if (newGeos && newGeos.length > 0) {
-        geos.value = newGeos;
+        geos.value = newGeos.filter(isActiveGeo);
+    } else {
+        geos.value = [];
+    }
+
+    if (geos.value.length === 0) {
+        selectedGeo.value = null;
+        geoCode.value = '';
+        searchResult.value = '';
+    } else if (selectedGeo.value) {
+        const stillExists = geos.value.some(g => String(g.code || '').toUpperCase() === String(selectedGeo.value?.code || '').toUpperCase());
+        if (!stillExists) {
+            selectedGeo.value = null;
+            geoCode.value = '';
+            searchResult.value = '';
+        }
     }
 }, { immediate: true });
 

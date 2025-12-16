@@ -649,6 +649,7 @@ Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::cl
 Route::post('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiStore'])->name('api.customer-groups.store');
 Route::put('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiUpdate'])->name('api.customer-groups.update');
 Route::delete('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiDestroy'])->name('api.customer-groups.destroy');
+Route::put('/customer-groups/{group_code}/status', [App\Http\Controllers\CustomerGroupController::class, 'toggleStatus'])->name('api.customer-groups.toggle-status');
 
 // Update Customer Account API route
 Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);
