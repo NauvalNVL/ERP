@@ -48,12 +48,19 @@
                 <div class="flex items-center">
                   <label class="w-32 text-sm font-semibold text-gray-700">Tax Group:</label>
                   <div class="flex-1">
-                    <input
-                      type="text"
-                      :value="selectedTaxDisplay"
-                      readonly
-                      class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded text-left font-medium text-gray-900"
-                    />
+                    <select
+                      v-model="selectedTaxGroup"
+                      class="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded text-left font-medium text-gray-900"
+                    >
+                      <option value="">Select Tax</option>
+                      <option
+                        v-for="t in normalizedTaxOptions"
+                        :key="t.code"
+                        :value="t.code"
+                      >
+                        {{ t.name }} ({{ t.rate }}%)
+                      </option>
+                    </select>
                   </div>
                 </div>
 
@@ -130,6 +137,19 @@ const emit = defineEmits(['close', 'confirm'])
 const selectedTaxGroup = ref('')
 const taxAmount = ref(0)
 
+const normalizedTaxOptions = computed(() => {
+  const raw = Array.isArray(props.taxOptions) ? props.taxOptions : []
+  return raw
+    .map((t) => {
+      const code = (t?.code ?? t?.tax_code ?? t?.Code ?? t?.TAX_CODE ?? '').toString()
+      const name = (t?.name ?? t?.tax_name ?? t?.TAXNAME ?? code).toString()
+      const rateRaw = t?.rate ?? t?.tax_rate ?? t?.RATEPPN ?? 0
+      const rate = Number(rateRaw) || 0
+      return { code, name, rate }
+    })
+    .filter((t) => t.code && t.code.trim() !== '')
+})
+
 // Define calculateTax FIRST before any watchers that use it
 const calculateTax = () => {
   console.log('🧮 Calculating tax...', {
@@ -150,10 +170,10 @@ const calculateTax = () => {
     return
   }
 
-  const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
+  const tax = normalizedTaxOptions.value.find(t => t.code === selectedTaxGroup.value)
   console.log('📊 Found tax option:', tax)
 
-  if (tax && tax.rate) {
+  if (tax) {
     taxAmount.value = props.totalAmount * (tax.rate / 100)
     console.log('✅ Tax calculated:', {
       taxCode: tax.code,
@@ -166,6 +186,10 @@ const calculateTax = () => {
     console.warn('⚠️ Tax rate not found or invalid')
   }
 }
+
+watch(() => selectedTaxGroup.value, () => {
+  calculateTax()
+})
 
 // Watch for tax code changes (with validation)
 watch(() => props.taxCode, (newVal, oldVal) => {
@@ -322,13 +346,13 @@ const netAmount = computed(() => {
 
 const selectedTaxRate = computed(() => {
   if (!selectedTaxGroup.value) return 0
-  const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
+  const tax = normalizedTaxOptions.value.find(t => t.code === selectedTaxGroup.value)
   return tax?.rate || 0
 })
 
 const selectedTaxDisplay = computed(() => {
   if (!selectedTaxGroup.value) return ''
-  const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
+  const tax = normalizedTaxOptions.value.find(t => t.code === selectedTaxGroup.value)
   return tax ? `${tax.name} (${tax.rate}%)` : selectedTaxGroup.value
 })
 

@@ -389,6 +389,62 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, computed, watch, defineAsyncComponent } from 'vue'
+import Swal from 'sweetalert2'
+
+const swalToast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+})
+
+const toast = {
+  success: (msg) => swalToast.fire({ icon: 'success', title: msg }),
+  error: (msg) => swalToast.fire({ icon: 'error', title: msg }),
+  info: (msg) => swalToast.fire({ icon: 'info', title: msg }),
+}
+
+const escapeHtml = (value) => {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+const asPreHtml = (msg) => {
+  const safe = escapeHtml(String(msg ?? ''))
+  return `<pre style="text-align:left;white-space:pre-wrap;margin:0">${safe}</pre>`
+}
+
+const extractApiErrorMessage = (payload, fallback = '') => {
+  try {
+    if (!payload) return fallback || 'Unknown error'
+    if (typeof payload === 'string') return payload
+
+    const direct = payload.message || payload.error
+    if (direct && String(direct).trim() !== '') return String(direct)
+
+    const errors = payload.errors
+    if (errors && typeof errors === 'object') {
+      const lines = []
+      Object.entries(errors).forEach(([field, msgs]) => {
+        if (Array.isArray(msgs)) {
+          msgs.forEach((m) => lines.push(`${field}: ${m}`))
+        } else if (msgs) {
+          lines.push(`${field}: ${msgs}`)
+        }
+      })
+      if (lines.length) return lines.join('\n')
+    }
+
+    return fallback || 'Unknown error'
+  } catch (_) {
+    return fallback || 'Unknown error'
+  }
+}
 
 const CustomerAccountModal = defineAsyncComponent(() => import('@/Components/customer-account-modal.vue'))
 const CustomerSalesTaxIndexTableModalForInvoice = defineAsyncComponent(() => import('@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue'))
@@ -571,7 +627,11 @@ function handleTaxIndexInput(event) {
 async function fetchTaxIndexByNumber() {
   if (!customerCode.value) {
     console.warn('⚠️ Cannot fetch tax index: No customer selected')
-    alert('Please select a customer first before entering tax index number.')
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Select Customer',
+      text: 'Please select a customer first before entering tax index number.',
+    })
     return
   }
 
@@ -656,7 +716,11 @@ async function fetchTaxIndexByNumber() {
           ? `\n\nAvailable indices for this customer:\n${result.data.map(i => `  ${String(i.index_number).padStart(2, '0')} - ${i.tax_group_code}`).join('\n')}`
           : '\n\nNo tax indices found for this customer.\nPlease add indices in Define Customer Sales Tax Index menu.'
 
-        alert(`Tax Index ${String(indexNumber).padStart(2, '0')} not found in Define Customer Sales Tax Index.${availableMsg}`)
+        await Swal.fire({
+          icon: 'error',
+          title: 'Tax Index Not Found',
+          html: asPreHtml(`Tax Index ${String(indexNumber).padStart(2, '0')} not found in Define Customer Sales Tax Index.${availableMsg}`),
+        })
       }
     } else {
       console.warn('═══════════════════════════════════════════════════════════')
@@ -665,7 +729,11 @@ async function fetchTaxIndexByNumber() {
       console.warn('   Please define tax indices in Define Customer Sales Tax Index menu')
       console.warn('═══════════════════════════════════════════════════════════')
       selectedIndexData.value = null
-      alert(`No tax indices defined for customer ${customerCode.value}.\n\nPlease add tax indices in:\nInvoice → Setup → Define Customer Sales Tax Index`)
+      await Swal.fire({
+        icon: 'error',
+        title: 'No Tax Indices',
+        html: asPreHtml(`No tax indices defined for customer ${customerCode.value}.\n\nPlease add tax indices in:\nInvoice → Setup → Define Customer Sales Tax Index`),
+      })
     }
   } catch (error) {
     console.error('═══════════════════════════════════════════════════════════')
@@ -674,7 +742,11 @@ async function fetchTaxIndexByNumber() {
     console.error('   API Endpoint:', `/api/invoices/customer-tax-indices/${customerCode.value}`)
     console.error('═══════════════════════════════════════════════════════════')
     selectedIndexData.value = null
-    alert(`Error fetching tax index data: ${error.message}\n\nPlease check:\n1. Customer code is valid\n2. Tax indices are defined in Define Customer Sales Tax Index menu\n3. Database connection is working`)
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error Fetching Tax Index',
+      html: asPreHtml(`Error fetching tax index data: ${error.message}\n\nPlease check:\n1. Customer code is valid\n2. Tax indices are defined in Define Customer Sales Tax Index menu\n3. Database connection is working`),
+    })
   }
 }
 
@@ -686,12 +758,16 @@ async function fetchTaxIndexByNumber() {
  * Step 1: User clicks "Continue to Prepare"
  * Opens Check Sales Tax Screen
  */
-function openFlow(){
+async function openFlow(){
   if (!hasCustomer.value) return
 
   // CPS Validation: Tax Index No is MANDATORY
   if (!taxIndexNo.value || taxIndexNo.value.trim() === '') {
-    alert('Please select Tax Index No. from Customer\'s Sales Tax Index Table.\n\nClick the search icon (🔍) next to Tax Index No. field to select a tax.')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Tax Index Required',
+      html: asPreHtml('Please select Tax Index No. from Customer\'s Sales Tax Index Table.\n\nClick the search icon (🔍) next to Tax Index No. field to select a tax.'),
+    })
     return
   }
 
@@ -835,7 +911,11 @@ async function onDOsSelected(dos){
   doListModalOpen.value = false
 
   if (dos.length === 0) {
-    alert('No delivery orders selected')
+    await Swal.fire({
+      icon: 'error',
+      title: 'No Delivery Orders',
+      text: 'No delivery orders selected',
+    })
     return
   }
 
@@ -927,7 +1007,11 @@ async function proceedToFinalScreen(){
 
   // Check if any items have been billed
   if (billedItems.value.size === 0) {
-    alert('Please select and bill at least one delivery order')
+    await Swal.fire({
+      icon: 'error',
+      title: 'No Billed Items',
+      text: 'Please select and bill at least one delivery order',
+    })
     return
   }
 
@@ -1018,19 +1102,45 @@ async function prepareInvoices(){
       })
     })
 
-    const result = await prepareRes.json()
+    const rawText = await prepareRes.text()
+    let result = null
+    try {
+      result = rawText ? JSON.parse(rawText) : null
+    } catch (_) {
+      result = null
+    }
 
-    if (result.success) {
+    if (!prepareRes.ok || result?.success === false) {
+      const fallback = rawText || `HTTP ${prepareRes.status}`
+      const msg = extractApiErrorMessage(result, fallback)
+      throw new Error(msg)
+    }
+
+    if (result?.success) {
       const invoiceNumbers = result.data.map(d => d.invoice_number).join('\n')
-      alert(`Success! ${result.data.length} invoice(s) prepared:\n${invoiceNumbers}`)
+      await Swal.fire({
+        icon: 'success',
+        title: 'Invoices Prepared',
+        html: asPreHtml(`Success! ${result.data.length} invoice(s) prepared:\n${invoiceNumbers}`),
+        confirmButtonColor: '#16a34a',
+      })
 
       // Reset form
       resetForm()
     } else {
-      alert('Failed to prepare invoices: ' + (result.error || 'Unknown error'))
+      const msg = extractApiErrorMessage(result, 'Failed to prepare invoices')
+      await Swal.fire({
+        icon: 'error',
+        title: 'Failed to Prepare Invoices',
+        html: asPreHtml(msg),
+      })
     }
   } catch (e) {
-    alert('Error: ' + e.message)
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      html: asPreHtml(e?.message || 'Unknown error'),
+    })
   } finally {
     preparing.value = false
   }
@@ -1063,7 +1173,7 @@ function resetForm(){
 
 function refreshPeriodData(){
   if (!hasCustomer.value) return
-  alert('Period data will be refreshed when you continue to prepare')
+  toast.info('Period data will be refreshed when you continue to prepare')
 }
 
 // Handle customer code input changes

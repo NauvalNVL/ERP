@@ -181,18 +181,21 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import InvoiceTableModal from '@/Components/InvoiceTableModal.vue';
 // cspell:ignore axios
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // Toast notification helper
+const swalToast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+});
+
 const toast = {
-    success: (msg) => {
-        alert('✅ ' + msg);
-    },
-    error: (msg) => {
-        alert('❌ ' + msg);
-    },
-    info: (msg) => {
-        alert('ℹ️ ' + msg);
-    }
+    success: (msg) => swalToast.fire({ icon: 'success', title: msg }),
+    error: (msg) => swalToast.fire({ icon: 'error', title: msg }),
+    info: (msg) => swalToast.fire({ icon: 'info', title: msg })
 };
 
 // Initialize Current Period with current month/year (readonly)
@@ -245,6 +248,26 @@ const selectInvoice = async (invoice) => {
         const res = await axios.get(`/api/invoices/${encodeURIComponent(invoice.invoice_no)}`);
 
         if (res.data) {
+            // CPS Business Rule: Cannot cancel printed invoices
+            if (res.data.printed_by && String(res.data.printed_by).trim() !== '') {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Cannot Cancel Invoice',
+                    text: `Invoice has been printed by: ${res.data.printed_by}`,
+                });
+                return;
+            }
+
+            // CPS Business Rule: Cannot cancel invoices that already have Faktur Number
+            if (res.data.has_faktur) {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Cannot Cancel Invoice',
+                    text: `Invoice already has Faktur Number: ${res.data.faktur_no || '-'}`,
+                });
+                return;
+            }
+
             // Check if invoice can be cancelled
             if (res.data.status === 'Cancelled') {
                 toast.error('This invoice is already cancelled');
@@ -265,7 +288,10 @@ const selectInvoice = async (invoice) => {
                 order_mode: res.data.order_mode,
                 salesperson: res.data.salesperson,
                 currency: res.data.currency,
-                status: res.data.status
+                status: res.data.status,
+                printed_by: String(res.data.printed_by || ''),
+                has_faktur: !!res.data.has_faktur,
+                faktur_no: String(res.data.faktur_no || '')
             };
 
             // Clear previous reasons
@@ -297,13 +323,44 @@ const confirmCancel = () => {
         return;
     }
 
-    showConfirmation.value = true;
+    Swal.fire({
+        icon: 'question',
+        title: 'Confirmation',
+        text: 'Confirm Saving / Updating ?',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await executeCancel();
+        }
+    });
 };
 
 // Execute cancel invoice (after confirmation)
 const executeCancel = async () => {
     if (!selectedInvoice.value) {
         toast.error('No invoice selected');
+        return;
+    }
+
+    if (selectedInvoice.value?.printed_by && selectedInvoice.value.printed_by.trim() !== '') {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Cannot Cancel Invoice',
+            text: `Invoice has been printed by: ${selectedInvoice.value.printed_by}`,
+        });
+        return;
+    }
+
+    if (selectedInvoice.value?.has_faktur) {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Cannot Cancel Invoice',
+            text: `Invoice already has Faktur Number: ${selectedInvoice.value.faktur_no || '-'}`,
+        });
         return;
     }
 
@@ -321,6 +378,8 @@ const executeCancel = async () => {
         const res = await axios.post('/api/invoices/cancel', payload, {
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': csrfToken
             }
         });

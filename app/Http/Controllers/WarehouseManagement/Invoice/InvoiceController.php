@@ -1221,7 +1221,7 @@ class InvoiceController extends Controller
                         'YYYY' => $yyyy,
                         'MM' => $mm,
                         'IV_NUM' => $ivNum,
-                        'IV_STS' => 'Active',
+                        'IV_STS' => 'New',
                         'IV_DMY' => $invoiceDate,
 
                         // Payment terms and references
@@ -1435,6 +1435,40 @@ class InvoiceController extends Controller
             // CPS Business Rule: Cannot cancel posted invoices
             if ($invoice->IV_STS === 'Posted') {
                 throw new \RuntimeException("Cannot cancel invoice that has been posted to GL");
+            }
+
+            // CPS Business Rule: Cannot cancel printed invoices
+            if (!empty($invoice->PT_UID)) {
+                throw new \RuntimeException("Cannot cancel invoice that has been printed");
+            }
+
+            // CPS Business Rule: Cannot cancel invoice that already has Faktur Number
+            try {
+                $hasFaktur = DB::table('TAX')
+                    ->where('INV_Num', $payload['invoice_number'])
+                    ->whereNotNull('No_Faktur')
+                    ->where('No_Faktur', '!=', '')
+                    ->exists();
+
+                if ($hasFaktur) {
+                    $fakturRow = DB::table('TAX')
+                        ->where('INV_Num', $payload['invoice_number'])
+                        ->whereNotNull('No_Faktur')
+                        ->where('No_Faktur', '!=', '')
+                        ->orderByDesc('Tgl_Faktur')
+                        ->first();
+
+                    throw new \RuntimeException(
+                        "Cannot cancel invoice that already has Faktur Number: " . ($fakturRow->No_Faktur ?? '-')
+                    );
+                }
+            } catch (\RuntimeException $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                Log::warning('Failed to check TAX faktur number (cancel)', [
+                    'invoice_number' => $payload['invoice_number'],
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             // Prepare update data (WIB timezone)
@@ -2177,6 +2211,23 @@ class InvoiceController extends Controller
                 ], 404);
             }
 
+            $fakturNo = '';
+            try {
+                $fakturRow = DB::table('TAX')
+                    ->where('INV_Num', $invoiceNo)
+                    ->whereNotNull('No_Faktur')
+                    ->where('No_Faktur', '!=', '')
+                    ->orderByDesc('Tgl_Faktur')
+                    ->first();
+
+                $fakturNo = $fakturRow ? (string) ($fakturRow->No_Faktur ?? '') : '';
+            } catch (\Exception $e) {
+                Log::warning('Failed to check TAX faktur number (show)', [
+                    'invoice_no' => $invoiceNo,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Convert IV_DMY to YYYY-MM-DD for input[type=date]
             $invoiceDate = '';
             if (!empty($invoice->IV_DMY)) {
@@ -2226,6 +2277,8 @@ class InvoiceController extends Controller
                 'payment_term' => $paymentTerm,
                 'due_date' => $dueDate,
                 'tax_invoice_no' => $invoice->TAX_INVOICE_NO ?? ($invoice->TaxInvoiceNo ?? ''),
+                'faktur_no' => $fakturNo,
+                'has_faktur' => !empty($fakturNo),
                 // ✅ UI-only fields (not stored in DB)
                 'exchange_method' => '1', // Default: Multiply (UI display only)
                 'tax_index_no' => '', // UI display only, actual tax stored in IV_TAX_CODE
@@ -2549,7 +2602,7 @@ class InvoiceController extends Controller
                 'tax_percent' => 'nullable|numeric|min:0|max:100',
                 'invoice_date' => 'nullable|string',
                 'ref2' => 'nullable|string|max:50', // Will map to IV_SECOND_REF
-                'remark' => 'nullable|string|max:50',
+                'remark' => 'nullable|string|max:250',
                 'total_amount' => 'nullable|numeric|min:0',
                 // tax_amount and net_amount are accepted but not stored (calculated on-the-fly)
                 'tax_amount' => 'nullable|numeric|min:0',
@@ -2565,6 +2618,34 @@ class InvoiceController extends Controller
                 return response()->json([
                     'error' => 'Invoice not found'
                 ], 404);
+            }
+
+            try {
+                $hasFaktur = DB::table('TAX')
+                    ->where('INV_Num', $invoiceNo)
+                    ->whereNotNull('No_Faktur')
+                    ->where('No_Faktur', '!=', '')
+                    ->exists();
+
+                if ($hasFaktur) {
+                    $fakturRow = DB::table('TAX')
+                        ->where('INV_Num', $invoiceNo)
+                        ->whereNotNull('No_Faktur')
+                        ->where('No_Faktur', '!=', '')
+                        ->orderByDesc('Tgl_Faktur')
+                        ->first();
+
+                    return response()->json([
+                        'error' => 'Cannot amend invoice that already has Faktur Number',
+                        'message' => 'Invoice already has Faktur Number: ' . ($fakturRow->No_Faktur ?? '-'),
+                        'faktur_no' => $fakturRow->No_Faktur ?? null,
+                    ], 400);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to check TAX faktur number (update)', [
+                    'invoice_no' => $invoiceNo,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             // CPS Business Rules: Check if invoice can be amended
@@ -2625,6 +2706,7 @@ class InvoiceController extends Controller
                 'AM_UID' => $currentUserId, // ✅ Guaranteed to be non-null
                 'AM_DATE' => $nowWib->format('d/m/Y'),
                 'AM_TIME' => $nowWib->format('H:i'),
+                'IV_STS' => 'Amended',
             ];
 
             // ✅ Update ONLY editable fields that exist in table (CPS-compatible)
