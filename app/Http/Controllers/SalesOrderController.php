@@ -117,6 +117,24 @@ class SalesOrderController extends Controller
         }
     }
 
+    private function normalizeProductDesignUnit($unit): ?string
+    {
+        $u = strtoupper(trim((string) $unit));
+        if ($u === '') {
+            return null;
+        }
+
+        if (in_array($u, ['KG', 'KILO', 'KILOS'], true)) {
+            return 'KG';
+        }
+
+        if (in_array($u, ['PCS', 'PCS.', 'PC', 'P', 'PIECE', 'PIECES'], true)) {
+            return 'PCS';
+        }
+
+        return null;
+    }
+
 
     public function store(Request $request): JsonResponse
     {
@@ -893,18 +911,50 @@ class SalesOrderController extends Controller
     {
         $validated = $request->validate([
             'master_card_seq' => 'required|string',
-            'items' => 'array',
-            'dimensions' => 'array',
-            'total_amount' => 'numeric',
-            'total_gross_kg' => 'numeric',
+            'items' => 'nullable|array',
+            'items.*' => 'array',
+            'items.*.unit' => 'nullable|string|max:10',
+            'dimensions' => 'nullable|array',
+            'total_amount' => 'nullable|numeric',
+            'total_gross_kg' => 'nullable|numeric',
         ]);
+
+        $items = $request->input('items', []);
+        $normalizedItems = [];
+        if (is_array($items)) {
+            foreach ($items as $idx => $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+
+                $rawUnit = $item['unit'] ?? null;
+                $normalizedUnit = $this->normalizeProductDesignUnit($rawUnit);
+
+                if ($rawUnit !== null && $rawUnit !== '' && $normalizedUnit === null) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid unit on product design items. Only KG and PCS are allowed.',
+                        'errors' => [
+                            'items' => [
+                                $idx => [
+                                    'unit' => $rawUnit
+                                ]
+                            ]
+                        ]
+                    ], 422);
+                }
+
+                $item['unit'] = $normalizedUnit ?? 'PCS';
+                $normalizedItems[] = $item;
+            }
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Product design saved successfully',
             'data' => [
                 'master_card_seq' => $validated['master_card_seq'],
-                'items' => $request->input('items', []),
+                'items' => $normalizedItems,
                 'dimensions' => $request->input('dimensions', []),
                 'total_amount' => (float) $request->input('total_amount', 0),
                 'total_gross_kg' => (float) $request->input('total_gross_kg', 0),
