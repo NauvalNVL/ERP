@@ -249,6 +249,20 @@
         </div>
       </div>
 
+      <!-- Faktur Date -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          <i class="fas fa-calendar-day text-gray-400 mr-1" />
+          Tanggal Faktur Diterbitkan
+        </label>
+        <input
+          v-model="fakturDate"
+          type="date"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+        <p class="text-xs text-gray-500 mt-1">Wajib diisi. Tanggal ini akan disimpan ke kolom Tgl_Faktur.</p>
+      </div>
+
       <!-- Single Input Mode -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -390,6 +404,7 @@ const loading = ref(false);
 const invoices = ref([]);
 const selectedInvoices = ref([]);
 const globalFakturNumber = ref('');
+const fakturDate = ref(new Date().toISOString().slice(0,10));
 const message = ref(null);
 
 // Filters
@@ -440,6 +455,10 @@ const fetchInvoices = async () => {
 const searchInvoices = () => fetchInvoices();
 
 const toggleInvoice = (invoice) => {
+  if (invoice.FAKTUR_NO) {
+    showMessage('Invoice sudah memiliki No Faktur', 'error');
+    return;
+  }
   const index = selectedInvoices.value.findIndex(inv => inv.IV_NUM === invoice.IV_NUM);
   if (index > -1) {
     selectedInvoices.value.splice(index, 1);
@@ -456,12 +475,16 @@ const toggleSelectAll = () => {
   if (selectedInvoices.value.length === invoices.value.length) {
     selectedInvoices.value = [];
   } else {
-    selectedInvoices.value = invoices.value.map(inv => ({ ...inv, FAKTUR_NO_INPUT: '' }));
+    selectedInvoices.value = invoices.value
+      .filter(inv => !inv.FAKTUR_NO)
+      .map(inv => ({ ...inv, FAKTUR_NO_INPUT: '' }));
   }
 };
 
 const selectAll = () => {
-  selectedInvoices.value = invoices.value.map(inv => ({ ...inv, FAKTUR_NO_INPUT: '' }));
+  selectedInvoices.value = invoices.value
+    .filter(inv => !inv.FAKTUR_NO)
+    .map(inv => ({ ...inv, FAKTUR_NO_INPUT: '' }));
 };
 
 const clearSelection = () => {
@@ -525,9 +548,14 @@ const saveFakturNumbers = async () => {
     return;
   }
 
+  if (!fakturDate.value) {
+    showMessage('Tanggal faktur wajib diisi', 'error');
+    return;
+  }
+
   const confirm = await Swal.fire({
     title: 'Simpan Faktur?',
-    text: `Anda akan menyimpan ${withFaktur.length} nomor faktur ke database.`,
+    text: `Anda akan menyimpan ${withFaktur.length} nomor faktur ke database dengan tanggal ${fakturDate.value}.`,
     icon: 'question',
     showCancelButton: true,
     confirmButtonText: 'Ya, simpan',
@@ -546,7 +574,8 @@ const saveFakturNumbers = async () => {
       invoices: withFaktur.map(inv => ({
         IV_NUM: inv.IV_NUM,
         FAKTUR_NO_INPUT: inv.FAKTUR_NO_INPUT
-      }))
+      })),
+      faktur_date: fakturDate.value
     };
 
     const res = await fetch('/api/invoices/coretax/save-faktur', {
