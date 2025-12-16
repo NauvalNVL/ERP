@@ -23,6 +23,7 @@ class ExportToCoretaxController extends Controller
 
             $query = DB::table('INV')
                 ->leftJoin('CUSTOMER', 'INV.AC_NUM', '=', 'CUSTOMER.CODE')
+                ->leftJoin('TAX', 'INV.IV_NUM', '=', 'TAX.INV_Num')
                 ->select(
                     // 1. Tanggal Faktur
                     'INV.IV_DMY as FK_TANGGAL_FAKTUR',
@@ -70,10 +71,11 @@ class ExportToCoretaxController extends Controller
                     'INV.YYYY',
                     'INV.MM',
                     'INV.COMP',
-                    'CUSTOMER.EMAIL'
+                    'CUSTOMER.EMAIL',
+                    'TAX.No_Faktur as FAKTUR_NO'
                 )
                 ->whereNotNull('INV.IV_NUM')
-                ->where('INV.IV_STS', '<>', 'CX') // Abaikan faktur yang Cancel (CX)
+                ->whereNotIn('INV.IV_STS', ['CX', 'Cancelled', 'CANCELLED']) // Abaikan faktur yang Cancel
                 ->where(function($q) {
                     // Hanya tampilkan Main component di list
                     $q->where('INV.COMP', '=', 'Main')
@@ -208,10 +210,12 @@ class ExportToCoretaxController extends Controller
             'invoices' => 'required|array|min:1',
             'invoices.*.IV_NUM' => 'required|string|max:50',
             'invoices.*.FAKTUR_NO_INPUT' => 'required|string|max:50',
+            'faktur_date' => 'required|date',
         ]);
 
         $rows = [];
         $invoiceNums = [];
+        $fakturDateInput = $payload['faktur_date'];
 
         foreach ($payload['invoices'] as $item) {
             $ivNum = $item['IV_NUM'];
@@ -248,6 +252,10 @@ class ExportToCoretaxController extends Controller
 
             $rate = $invoice->IV_TAX_PERCENT ?? 0;
             $ppn = round($dpp * ((float) $rate / 100), 2);
+            $isNilTax = strtoupper(trim((string) ($invoice->IV_TAX_CODE ?? ''))) === 'NIL';
+            $isZeroTax = (float) ($invoice->IV_TAX_PERCENT ?? 0) == 0.0;
+            $typ = ($isNilTax && $isZeroTax) ? '10' : '04';
+            $tglFaktur = $this->formatDateToYmd($fakturDateInput);
 
             $invoiceNums[] = $ivNum;
 
@@ -256,8 +264,8 @@ class ExportToCoretaxController extends Controller
                 'AC_Name' => $invoice->AC_NAME,
                 'NPWP' => $invoice->NPWP,
                 'No_Faktur' => $fakturNo,
-                'Tgl_Faktur' => $invoice->IV_DMY,
-                'Typ' => $invoice->IV_TAX_CODE,
+                'Tgl_Faktur' => $tglFaktur,
+                'Typ' => $typ,
                 'INV_Num' => $invoice->IV_NUM,
                 'Currency' => $invoice->CURR ?? 'IDR',
                 'DPP' => $dpp,
@@ -265,7 +273,7 @@ class ExportToCoretaxController extends Controller
                 'Rate' => (string) $rate,
                 'Jenis_Barang' => $invoice->PRODUCT ?? $invoice->MODEL,
                 'Nama_Bank' => null,
-                'DateSK' => $this->toDateSk($invoice->IV_DMY),
+                'DateSK' => $this->toDateSk($tglFaktur),
             ];
         }
 
