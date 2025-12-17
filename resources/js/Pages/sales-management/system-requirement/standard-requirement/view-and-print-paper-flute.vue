@@ -88,11 +88,14 @@
                                     <th @click="sortTable('Starch')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Starch <i class="fas fa-sort ml-1"></i>
                                     </th>
+                                    <th @click="sortTable('status')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                        Status <i class="fas fa-sort ml-1"></i>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-if="loading" class="hover:bg-gray-50">
-                                    <td colspan="9" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="10" class="px-3 py-4 text-center text-gray-500">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -100,7 +103,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredPaperFlutes.length === 0" class="hover:bg-gray-50">
-                                    <td colspan="9" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="10" class="px-3 py-4 text-center text-gray-500">
                                         No paper flutes found. 
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -137,6 +140,9 @@
                                     </td>
                                     <td class="px-3 py-4 whitespace-nowrap text-right">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute.Starch) }}</div>
+                                    </td>
+                                    <td class="px-3 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ getStatusValue(flute) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -189,7 +195,7 @@ const currentDate = new Date().toLocaleString();
 const fetchPaperFlutes = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/paper-flutes', {
+        const response = await fetch('/api/paper-flutes?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -225,6 +231,14 @@ const formatNumber = (value) => {
     return Number(value).toFixed(2);
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Filtered and sorted paper flutes
 const filteredPaperFlutes = computed(() => {
     let filtered = [...paperFlutes.value];
@@ -234,7 +248,8 @@ const filteredPaperFlutes = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(flute => 
             (flute.Flute && flute.Flute.toLowerCase().includes(query)) ||
-            (flute.Descr && flute.Descr.toLowerCase().includes(query))
+            (flute.Descr && flute.Descr.toLowerCase().includes(query)) ||
+            (getStatusValue(flute) && getStatusValue(flute).toLowerCase().includes(query))
         );
     }
     
@@ -307,13 +322,14 @@ const exportPDF = () => {
             formatNumber(flute.A_C_E),
             formatNumber(flute._2L),
             formatNumber(flute.Height),
-            formatNumber(flute.Starch)
+            formatNumber(flute.Starch),
+            getStatusValue(flute)
         ]);
 
         // Add table using autoTable - call via imported function
         autoTable(doc, {
             startY: 28,
-            head: [['Flute', 'Description', 'DB', 'B', '1L', 'A/C/E', '2L', 'Height', 'Starch']],
+            head: [['Flute', 'Description', 'DB', 'B', '1L', 'A/C/E', '2L', 'Height', 'Starch', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -340,7 +356,8 @@ const exportPDF = () => {
                 5: { halign: 'right' },
                 6: { halign: 'right' },
                 7: { halign: 'right' },
-                8: { halign: 'right' }
+                8: { halign: 'right' },
+                9: { halign: 'left' }
             },
             margin: { top: 28, left: 10, right: 10 }
         });

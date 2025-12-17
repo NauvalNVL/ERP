@@ -508,6 +508,10 @@ Route::get('/obsolete-reactive-customer-account', function () {
     return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-ac');
 })->name('vue.obsolete-reactive-customer-account.index');
 
+Route::get('/obsolete-reactive-customer-group', function () {
+    return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-group');
+})->name('vue.obsolete-reactive-customer-group.index');
+
 Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
 Route::get('/customer-alternate-address/view-print', function () {
     return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');

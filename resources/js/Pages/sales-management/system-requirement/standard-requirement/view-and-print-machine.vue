@@ -24,9 +24,6 @@
                     <button @click="printTable" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                         <i class="fas fa-file-pdf mr-2"></i> Print PDF
                     </button>
-                    <button @click="exportToExcel" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-                        <i class="fas fa-file-excel mr-2"></i> Export Excel
-                    </button>
                     <Link href="/machine" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md flex items-center space-x-2 border border-gray-200">
                         <i class="fas fa-arrow-left mr-2"></i> Back to Machine Management
                     </Link>
@@ -41,37 +38,6 @@
                         class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         placeholder="Search machines..."
                     >
-                </div>
-            </div>
-
-            <!-- Filter Section -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Process:</label>
-                    <select v-model="selectedProcess" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
-                        <option value="">All Processes</option>
-                        <option v-for="process in uniqueProcesses" :key="process" :value="process">{{ process }}</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Resource Type:</label>
-                    <select v-model="selectedResourceType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
-                        <option value="">All Resource Types</option>
-                        <option value="I-InHouse">I-InHouse</option>
-                        <option value="E-External">E-External</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Finisher Type:</label>
-                    <select v-model="selectedFinisherType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
-                        <option value="">All Finisher Types</option>
-                        <option value="S-Stitcher">S-Stitcher</option>
-                        <option value="L-Stitcher">L-Stitcher</option>
-                        <option value="G-Gluer">G-Gluer</option>
-                        <option value="A-Assembler">A-Assembler</option>
-                        <option value="P-Packing">P-Packing</option>
-                        <option value="X-N/Applicable">X-N/Applicable</option>
-                    </select>
                 </div>
             </div>
 
@@ -116,11 +82,14 @@
                                 <th @click="sortTable('finisher_type')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                     FINISHER TYPE <i :class="getSortIcon('finisher_type')" class="text-xs"></i>
                                 </th>
+                                <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                    STATUS <i :class="getSortIcon('status')" class="text-xs"></i>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white">
                             <tr v-if="isLoading">
-                                <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                <td colspan="8" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                     <div class="flex justify-center">
                                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                     </div>
@@ -128,11 +97,11 @@
                                 </td>
                             </tr>
                             <tr v-else-if="filteredMachines.length === 0">
-                                <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                <td colspan="8" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                     No machines found.
-                                    <template v-if="searchQuery || selectedProcess || selectedResourceType || selectedFinisherType">
-                                        <p class="mt-2">No results match your search criteria.</p>
-                                        <button @click="clearFilters" class="mt-2 text-emerald-600 hover:underline">Clear filters</button>
+                                    <template v-if="searchQuery">
+                                        <p class="mt-2">No results match your search query.</p>
+                                        <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:underline">Clear search</button>
                                     </template>
                                 </td>
                             </tr>
@@ -160,6 +129,9 @@
                                 <td class="px-4 py-2 border border-gray-300">
                                     <div class="text-sm text-gray-900">{{ machine.finisher_type || '-' }}</div>
                                 </td>
+                                <td class="px-4 py-2 border border-gray-300">
+                                    <div class="text-sm text-gray-900">{{ getStatusValue(machine) }}</div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -169,7 +141,7 @@
                 <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                     <div class="text-sm text-gray-600">
                         Total Machines: <span class="font-semibold">{{ filteredMachines.length }}</span>
-                        <span v-if="searchQuery || selectedProcess || selectedResourceType || selectedFinisherType">
+                        <span v-if="searchQuery">
                             (filtered from {{ machines.length }} total)
                         </span>
                     </div>
@@ -200,21 +172,11 @@ const props = defineProps({
 // Reactive data
 const machines = ref(props.machines || []);
 const isLoading = ref(false);
-const selectedProcess = ref('');
-const selectedResourceType = ref('');
-const selectedFinisherType = ref('');
 const searchQuery = ref('');
 const sortKey = ref('machine_code');
 const sortAsc = ref(true);
 
 // Computed properties
-const uniqueProcesses = computed(() => {
-    const processes = machines.value
-        .map(machine => machine.process)
-        .filter(process => process && process.trim() !== '');
-    return [...new Set(processes)].sort();
-});
-
 const filteredMachines = computed(() => {
     let filtered = machines.value;
 
@@ -227,27 +189,15 @@ const filteredMachines = computed(() => {
             (machine.process && machine.process.toLowerCase().includes(query)) ||
             (machine.sub_process && machine.sub_process.toLowerCase().includes(query)) ||
             (machine.resource_type && machine.resource_type.toLowerCase().includes(query)) ||
-            (machine.finisher_type && machine.finisher_type.toLowerCase().includes(query))
+            (machine.finisher_type && machine.finisher_type.toLowerCase().includes(query)) ||
+            (getStatusValue(machine) && getStatusValue(machine).toLowerCase().includes(query))
         );
-    }
-
-    // Apply dropdown filters
-    if (selectedProcess.value) {
-        filtered = filtered.filter(machine => machine.process === selectedProcess.value);
-    }
-
-    if (selectedResourceType.value) {
-        filtered = filtered.filter(machine => machine.resource_type === selectedResourceType.value);
-    }
-
-    if (selectedFinisherType.value) {
-        filtered = filtered.filter(machine => machine.finisher_type === selectedFinisherType.value);
     }
 
     // Apply sorting
     return [...filtered].sort((a, b) => {
-        const aVal = a[sortKey.value] || '';
-        const bVal = b[sortKey.value] || '';
+        const aVal = sortKey.value === 'status' ? getStatusValue(a) : (a[sortKey.value] || '');
+        const bVal = sortKey.value === 'status' ? getStatusValue(b) : (b[sortKey.value] || '');
         
         if (aVal < bVal) return sortAsc.value ? -1 : 1;
         if (aVal > bVal) return sortAsc.value ? 1 : -1;
@@ -259,20 +209,34 @@ const filteredMachines = computed(() => {
 const fetchMachines = async () => {
     try {
         isLoading.value = true;
-        const response = await axios.get('/api/machines');
-        
+        const response = await axios.get('/api/machines?all_status=1');
+
         if (response.data && Array.isArray(response.data)) {
             machines.value = response.data;
-        } else {
-            console.error('Invalid response format:', response.data);
-            machines.value = [];
+            return;
         }
+
+        if (response.data && Array.isArray(response.data.machines)) {
+            machines.value = response.data.machines;
+            return;
+        }
+
+        console.error('Invalid response format:', response.data);
+        machines.value = [];
     } catch (error) {
         console.error('Error fetching machines:', error);
         machines.value = [];
     } finally {
         isLoading.value = false;
     }
+};
+
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
 };
 
 const sortTable = (key) => {
@@ -289,13 +253,6 @@ const getSortIcon = (key) => {
         return 'fas fa-sort text-gray-400';
     }
     return sortAsc.value ? 'fas fa-sort-up text-blue-600' : 'fas fa-sort-down text-blue-600';
-};
-
-const clearFilters = () => {
-    searchQuery.value = '';
-    selectedProcess.value = '';
-    selectedResourceType.value = '';
-    selectedFinisherType.value = '';
 };
 
 const printTable = () => {
@@ -330,13 +287,14 @@ const printTable = () => {
             machine.process || '-',
             machine.sub_process || '-',
             machine.resource_type || '-',
-            machine.finisher_type || '-'
+            machine.finisher_type || '-',
+            getStatusValue(machine)
         ]);
 
         // Add table using autoTable - use the same pattern as industry.vue
         autoTable(doc, {
             startY: 38,
-            head: [['NO.', 'MACHINE CODE', 'MACHINE NAME', 'PROCESS', 'SUB PROCESS', 'RESOURCE TYPE', 'FINISHER TYPE']],
+            head: [['NO.', 'MACHINE CODE', 'MACHINE NAME', 'PROCESS', 'SUB PROCESS', 'RESOURCE TYPE', 'FINISHER TYPE', 'STATUS']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -362,7 +320,8 @@ const printTable = () => {
                 3: { cellWidth: 30 }, // Process
                 4: { cellWidth: 30 }, // Sub Process
                 5: { cellWidth: 25 }, // Resource Type
-                6: { cellWidth: 25 }  // Finisher Type
+                6: { cellWidth: 25 },  // Finisher Type
+                7: { cellWidth: 18 }   // Status
             },
             margin: { top: 38, left: 10, right: 10 },
             didDrawPage: function (data) {
@@ -383,41 +342,6 @@ const printTable = () => {
     } catch (error) {
         console.error('Error generating PDF:', error);
     }
-};
-
-const exportToExcel = () => {
-    const csvContent = generateCSV();
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `machine_list_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-};
-
-const generateCSV = () => {
-    const headers = ['Machine Code', 'Machine Name', 'Process', 'Sub Process', 'Resource Type', 'Finisher Type'];
-    const csvRows = [headers.join(',')];
-    
-    filteredMachines.value.forEach(machine => {
-        const row = [
-            `"${machine.machine_code || ''}"`,
-            `"${machine.machine_name || ''}"`,
-            `"${machine.process || ''}"`,
-            `"${machine.sub_process || ''}"`,
-            `"${machine.resource_type || ''}"`,
-            `"${machine.finisher_type || ''}"`
-        ];
-        csvRows.push(row.join(','));
-    });
-    
-    return csvRows.join('\n');
 };
 
 // Notification function removed to eliminate popups

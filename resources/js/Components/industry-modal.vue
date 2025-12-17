@@ -103,14 +103,22 @@ const sortKey = ref('code');
 const sortAsc = ref(true);
 const loading = ref(false);
 
+const isActiveIndustry = (industry) => {
+  const status = industry?.status ?? industry?.STATUS;
+  if (status === undefined || status === null || String(status).trim() === '') return true;
+
+  const s = String(status).trim().toLowerCase();
+  if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+  if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+  return true;
+};
+
 // Compute filtered industries based on search query
 const filteredIndustries = computed(() => {
   let industries = props.industries || [];
   
-  // Filter to only show active industries (status = 'Act' or no status)
-  industries = industries.filter(industry => 
-    !industry.status || industry.status === 'Act'
-  );
+  industries = industries.filter(isActiveIndustry);
   
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();

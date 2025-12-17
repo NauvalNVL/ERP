@@ -415,6 +415,13 @@ class UserPermission extends Model
                 'parent' => 'sales_management'
             ],
             [
+                'key' => 'obsolete_reactive_customer_group',
+                'name' => 'Obsolete/Reactive Customer Group',
+                'route' => '/sales-management/system-requirement/customer-account/obsolete-reactive-customer-group',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
                 'key' => 'update_customer_account',
                 'name' => 'Update Customer Account',
                 'route' => '/sales-management/system-requirement/customer-account/update-customer-account',

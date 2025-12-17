@@ -3,11 +3,14 @@
     <div class="space-y-6" v-page-transition>
       <!-- Hero header -->
       <div class="mx-auto w-full max-w-5xl">
-        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-xl shadow-sm">
-          <div class="px-6 py-5 flex items-center justify-between">
-            <div class="flex items-center gap-2 text-sm">
-              <i class="fa fa-file-invoice-dollar text-white"></i>
-              <span class="font-semibold text-white">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</span>
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 text-white shadow-sm rounded-xl border border-blue-700">
+          <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+              <i class="fa fa-file-invoice-dollar text-white text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-lg sm:text-xl font-semibold leading-tight">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</h2>
+              <p class="text-xs sm:text-sm text-blue-100">Prepare invoices by delivery order for invoice processing.</p>
             </div>
           </div>
         </div>

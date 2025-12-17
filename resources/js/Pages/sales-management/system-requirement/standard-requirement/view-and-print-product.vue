@@ -73,8 +73,8 @@
                             <th @click="sortTable('category')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Category <i :class="getSortIcon('category')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('is_active')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Active <i :class="getSortIcon('is_active')" class="text-xs"></i>
+                            <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                Status <i :class="getSortIcon('status')" class="text-xs"></i>
                             </th>
                             <th @click="sortTable('created_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Created At <i :class="getSortIcon('created_at')" class="text-xs"></i>
@@ -118,7 +118,7 @@
                                 <div class="text-sm text-gray-900">{{ product.category || 'N/A' }}</div>
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ product.is_active ? 'Yes' : 'No' }}</div>
+                                <div class="text-sm text-gray-900">{{ getStatusValue(product) }}</div>
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ formatDate(product.created_at) }}</div>
@@ -179,7 +179,7 @@ const fetchProducts = async () => {
     loading.value = true;
     try {
         // Fetch products
-        const response = await fetch('/api/products', {
+        const response = await fetch('/api/products?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -197,7 +197,7 @@ const fetchProducts = async () => {
         
         // Fetch product groups for better display
         try {
-            const groupsResponse = await fetch('/api/product-groups', {
+            const groupsResponse = await fetch('/api/product-groups?all_status=1', {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
@@ -270,6 +270,14 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-emerald-600';
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Format date
 const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -287,7 +295,8 @@ const filteredProducts = computed(() => {
             (product.product_code && product.product_code.toLowerCase().includes(query)) ||
             (product.description && product.description.toLowerCase().includes(query)) ||
             (product.category && product.category.toLowerCase().includes(query)) ||
-            (getProductGroupName(product) && getProductGroupName(product).toLowerCase().includes(query))
+            (getProductGroupName(product) && getProductGroupName(product).toLowerCase().includes(query)) ||
+            (getStatusValue(product) && getStatusValue(product).toLowerCase().includes(query))
         );
     }
     
@@ -305,14 +314,10 @@ const filteredProducts = computed(() => {
             valueA = getProductGroupName(a);
             valueB = getProductGroupName(b);
         }
-        
-        // Handle boolean column
-        if (sortColumn.value === 'is_active') {
-            if (sortDirection.value === 'asc') {
-                return valueA === valueB ? 0 : valueA ? -1 : 1;
-            } else {
-                return valueA === valueB ? 0 : valueA ? 1 : -1;
-            }
+
+        if (sortColumn.value === 'status') {
+            valueA = getStatusValue(a);
+            valueB = getStatusValue(b);
         }
         
         // Handle date columns
@@ -371,7 +376,7 @@ const printTable = () => {
             product.description || 'N/A',
             getProductGroupName(product),
             product.category || 'N/A',
-            product.is_active ? 'Yes' : 'No',
+            getStatusValue(product),
             formatDate(product.created_at),
             formatDate(product.updated_at)
         ]);
@@ -379,7 +384,7 @@ const printTable = () => {
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Product Code', 'Description', 'Product Group', 'Category', 'Active', 'Created At', 'Updated At']],
+            head: [['Product Code', 'Description', 'Product Group', 'Category', 'Status', 'Created At', 'Updated At']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -404,7 +409,7 @@ const printTable = () => {
                 1: { cellWidth: 60 },  // Description
                 2: { cellWidth: 35 },  // Product Group
                 3: { cellWidth: 45 },  // Category
-                4: { cellWidth: 20 },  // Active
+                4: { cellWidth: 20 },  // Status
                 5: { cellWidth: 35 },  // Created At
                 6: { cellWidth: 35 }   // Updated At
             }

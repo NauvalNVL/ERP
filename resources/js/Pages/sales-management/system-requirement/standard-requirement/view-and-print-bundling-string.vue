@@ -70,11 +70,14 @@
                             <th @click="sortTable('description')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Description <i :class="getSortIcon('description')" class="text-xs"></i>
                             </th>
+                            <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                Status <i :class="getSortIcon('status')" class="text-xs"></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
@@ -82,7 +85,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredBundlingStrings.length === 0">
-                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 No bundling strings found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,6 +104,9 @@
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ string.description || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ getStatusValue(string) }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -153,7 +159,7 @@ const currentDate = new Date().toLocaleString();
 const fetchBundlingStrings = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/bundling-strings', {
+        const response = await fetch('/api/bundling-strings?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -208,6 +214,14 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-black';
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 // Filtered and sorted bundling strings
 const filteredBundlingStrings = computed(() => {
     let filtered = [...bundlingStrings.value];
@@ -218,7 +232,8 @@ const filteredBundlingStrings = computed(() => {
         filtered = filtered.filter(string =>
             (string.code && string.code.toLowerCase().includes(query)) ||
             (string.name && string.name.toLowerCase().includes(query)) ||
-            (string.description && string.description.toLowerCase().includes(query))
+            (string.description && string.description.toLowerCase().includes(query)) ||
+            (getStatusValue(string) && getStatusValue(string).toLowerCase().includes(query))
         );
     }
 
@@ -227,6 +242,11 @@ const filteredBundlingStrings = computed(() => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
 
+        if (sortColumn.value === 'status') {
+            valueA = getStatusValue(a);
+            valueB = getStatusValue(b);
+        }
+        
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
@@ -273,13 +293,14 @@ const printTable = () => {
         const tableData = filteredBundlingStrings.value.map(string => [
             string.code || 'N/A',
             string.name || 'N/A',
-            string.description || '-'
+            string.description || '-',
+            getStatusValue(string)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Name', 'Description']],
+            head: [['Code', 'Name', 'Description', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

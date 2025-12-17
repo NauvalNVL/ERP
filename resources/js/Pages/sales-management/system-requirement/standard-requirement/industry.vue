@@ -298,7 +298,18 @@ const props = defineProps({
     }
 });
 
-const industries = ref(props.industries || []);
+const isActiveIndustry = (industry) => {
+    const status = industry?.status ?? industry?.STATUS;
+    if (status === undefined || status === null || String(status).trim() === '') return true;
+
+    const s = String(status).trim().toLowerCase();
+    if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+    if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+    return true;
+};
+
+const industries = ref((props.industries || []).filter(isActiveIndustry));
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -335,10 +346,25 @@ const fetchIndustries = async () => {
         const data = await res.json();
 
         if (Array.isArray(data)) {
-            industries.value = data;
+            industries.value = data.filter(isActiveIndustry);
         } else {
             industries.value = [];
             console.error('Unexpected data format:', data);
+        }
+
+        if (industries.value.length === 0) {
+            selectedIndustry.value = null;
+            industryCode.value = '';
+            searchResult.value = '';
+        } else if (selectedIndustry.value) {
+            const stillExists = industries.value.some(i => String(i.code || '').toUpperCase() === String(selectedIndustry.value?.code || '').toUpperCase());
+            if (!stillExists) {
+                selectedIndustry.value = null;
+                if (industryCode.value) {
+                    industryCode.value = '';
+                }
+                searchResult.value = '';
+            }
         }
     } catch (e) {
         console.error('Error fetching industries:', e);

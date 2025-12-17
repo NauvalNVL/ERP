@@ -70,8 +70,8 @@
                                     <th @click="sortTable('dry_end_code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         Dry-End Code <i :class="getSortIcon('dry_end_code')" class="text-xs"></i>
                                     </th>
-                                    <th class="px-4 py-2 text-left font-semibold border border-gray-300" style="color: black;">
-                                        Status
+                                    <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                        Status <i :class="getSortIcon('status')" class="text-xs"></i>
                                     </th>
                                 </tr>
                             </thead>
@@ -106,10 +106,7 @@
                                         <div class="text-sm text-gray-900">{{ item.dry_end_code || '-' }}</div>
                                     </td>
                                     <td class="px-4 py-2 border border-gray-300">
-                                        <div class="text-sm text-gray-900">
-                                            <span v-if="item.is_active" class="text-green-600">Active</span>
-                                            <span v-else class="text-red-600">Inactive</span>
-                                        </div>
+                                        <div class="text-sm text-gray-900">{{ getStatusValue(item) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -165,7 +162,7 @@ onMounted(async () => {
 
 const fetchItems = async () => {
     try {
-        const response = await fetch('/api/chemical-coats', {
+        const response = await fetch('/api/chemical-coats?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -202,6 +199,14 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-black';
 };
 
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
+
 const filteredItems = computed(() => {
     let filtered = [...items.value];
 
@@ -210,13 +215,19 @@ const filteredItems = computed(() => {
         filtered = filtered.filter(item =>
             (item.code && String(item.code).toLowerCase().includes(query)) ||
             (item.name && item.name.toLowerCase().includes(query)) ||
-            (item.dry_end_code && item.dry_end_code.toLowerCase().includes(query))
+            (item.dry_end_code && item.dry_end_code.toLowerCase().includes(query)) ||
+            (getStatusValue(item) && getStatusValue(item).toLowerCase().includes(query))
         );
     }
 
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value] || '';
         let valueB = b[sortColumn.value] || '';
+
+        if (sortColumn.value === 'status') {
+            valueA = getStatusValue(a);
+            valueB = getStatusValue(b);
+        }
 
         if (typeof valueA !== 'string') valueA = String(valueA);
         if (typeof valueB !== 'string') valueB = String(valueB);
@@ -254,7 +265,7 @@ const printTable = () => {
             item.code || 'N/A',
             item.name || 'N/A',
             item.dry_end_code || '-',
-            item.is_active ? 'Active' : 'Inactive'
+            getStatusValue(item)
         ]);
 
         autoTable(doc, {

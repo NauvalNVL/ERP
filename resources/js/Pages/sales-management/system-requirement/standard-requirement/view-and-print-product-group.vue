@@ -67,6 +67,9 @@
                             <th @click="sortTable('product_group_name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Group Name <i :class="getSortIcon('product_group_name')" class="text-xs"></i>
                             </th>
+                            <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
+                                Status <i :class="getSortIcon('status')" class="text-xs"></i>
+                            </th>
                             <th @click="sortTable('created_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Created At <i :class="getSortIcon('created_at')" class="text-xs"></i>
                             </th>
@@ -77,7 +80,7 @@
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="5" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
@@ -85,7 +88,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredProductGroups.length === 0">
-                            <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="5" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 No product groups found. 
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,6 +104,9 @@
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ group.product_group_name || 'N/A' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ String(group.status || (typeof group.is_active === 'boolean' ? (group.is_active ? 'Act' : 'Obs') : '')).trim() }}</div>
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ formatDate(group.created_at) }}</div>
@@ -159,7 +165,7 @@ const currentDate = new Date().toLocaleString();
 const fetchProductGroups = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/product-groups', {
+        const response = await fetch('/api/product-groups?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -224,7 +230,8 @@ const filteredProductGroups = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(group => 
             (group.product_group_id && String(group.product_group_id).toLowerCase().includes(query)) ||
-            (group.product_group_name && group.product_group_name.toLowerCase().includes(query))
+            (group.product_group_name && group.product_group_name.toLowerCase().includes(query)) ||
+            (String(group.status || (typeof group.is_active === 'boolean' ? (group.is_active ? 'Act' : 'Obs') : '')).toLowerCase().includes(query))
         );
     }
     
@@ -291,6 +298,7 @@ const printTable = () => {
         const tableData = filteredProductGroups.value.map(group => [
             group.product_group_id || 'N/A',
             group.product_group_name || 'N/A',
+            String(group.status || (typeof group.is_active === 'boolean' ? (group.is_active ? 'Act' : 'Obs') : '')).trim(),
             formatDate(group.created_at),
             formatDate(group.updated_at)
         ]);
@@ -298,7 +306,7 @@ const printTable = () => {
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Group ID', 'Group Name', 'Created At', 'Updated At']],
+            head: [['Group ID', 'Group Name', 'Status', 'Created At', 'Updated At']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

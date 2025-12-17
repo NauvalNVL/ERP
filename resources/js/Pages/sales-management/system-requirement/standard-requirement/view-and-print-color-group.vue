@@ -70,11 +70,14 @@
                                     <th @click="sortTable('cg_type')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         CG Type <i :class="getSortIcon('cg_type')" class="text-xs"></i>
                                     </th>
+                                    <th class="px-4 py-2 text-left font-semibold border border-gray-300" style="color: black; width: 90px;">
+                                        Status
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
                                 <tr v-if="loading">
-                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -82,7 +85,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredColorGroups.length === 0">
-                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         No color group data found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,6 +104,9 @@
                                     </td>
                                     <td class="px-4 py-2 border border-gray-300">
                                         <div class="text-sm text-gray-900">{{ group.cg_type }}</div>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">
+                                        <div class="text-sm text-gray-900">{{ String(group.status || '').trim() }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -153,7 +159,7 @@ const currentDate = new Date().toLocaleString();
 const fetchColorGroups = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/color-groups', {
+        const response = await fetch('/api/color-groups?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -216,7 +222,8 @@ const filteredColorGroups = computed(() => {
         filtered = filtered.filter(group =>
             group.cg.toLowerCase().includes(query) ||
             group.cg_name.toLowerCase().includes(query) ||
-            group.cg_type.toLowerCase().includes(query)
+            group.cg_type.toLowerCase().includes(query) ||
+            String(group.status || '').toLowerCase().includes(query)
         );
     }
 
@@ -258,13 +265,14 @@ const printTable = () => {
         const tableData = filteredColorGroups.value.map(group => [
             group.cg || 'N/A',
             group.cg_name || 'N/A',
-            group.cg_type || 'N/A'
+            group.cg_type || 'N/A',
+            String(group.status || '').trim() || ''
         ]);
 
         // Add table using autoTable - call via imported function
         autoTable(doc, {
             startY: 28,
-            head: [['CG#', 'CG Name', 'CG Type']],
+            head: [['CG#', 'CG Name', 'CG Type', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',  // Let autoTable calculate optimal widths

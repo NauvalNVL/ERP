@@ -70,11 +70,14 @@
                                     <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                         INDUSTRY NAME <i :class="getSortIcon('name')" class="text-xs"></i>
                                     </th>
+                                    <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 120px;">
+                                        STATUS <i :class="getSortIcon('status')" class="text-xs"></i>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
                                 <tr v-if="loading">
-                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -82,7 +85,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredIndustries.length === 0">
-                                    <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                         No industries found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,6 +104,9 @@
                                     </td>
                                     <td class="px-4 py-2 border border-gray-300">
                                         <div class="text-sm text-gray-900">{{ industry.name || '' }}</div>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">
+                                        <div class="text-sm text-gray-900">{{ getStatusValue(industry) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -153,7 +159,7 @@ const currentDate = new Date().toLocaleString();
 const fetchIndustries = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/industry', {
+        const response = await fetch('/api/industry?all_status=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -210,7 +216,8 @@ const filteredIndustries = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(industry =>
             (industry.code && industry.code.toLowerCase().includes(query)) ||
-            (industry.name && industry.name.toLowerCase().includes(query))
+            (industry.name && industry.name.toLowerCase().includes(query)) ||
+            (getStatusValue(industry) && getStatusValue(industry).toLowerCase().includes(query))
         );
     }
 
@@ -265,13 +272,14 @@ const printTable = () => {
         const tableData = filteredIndustries.value.map((industry, index) => [
             (index + 1).toString(),
             industry.code || '',
-            industry.name || ''
+            industry.name || '',
+            getStatusValue(industry)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['NO.', 'INDUSTRY CODE', 'INDUSTRY NAME']],
+            head: [['NO.', 'INDUSTRY CODE', 'INDUSTRY NAME', 'STATUS']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -317,6 +325,14 @@ const printTable = () => {
 onMounted(() => {
     fetchIndustries();
 });
+
+const getStatusValue = (row) => {
+    if (!row) return '';
+    if (row.status) return String(row.status).trim();
+    if (row.STATUS) return String(row.STATUS).trim();
+    if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+    return '';
+};
 </script>
 
 <style scoped>

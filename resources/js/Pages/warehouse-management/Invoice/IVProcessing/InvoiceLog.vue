@@ -1,18 +1,18 @@
 <template>
   <AppLayout :header="'View & Print Invoice Log'">
     <div class="space-y-4">
-      <div class="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 p-4 rounded-lg shadow text-white">
-        <div class="flex justify-between items-center">
+      <div class="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 text-white shadow rounded-lg border border-sky-700">
+        <div class="px-4 py-3 sm:px-6 flex items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <div class="bg-white/20 rounded-lg p-2">
-              <i class="fas fa-history text-xl" />
+            <div class="h-9 w-9 rounded-full bg-sky-500 flex items-center justify-center">
+              <i class="fas fa-history text-white text-lg" />
             </div>
             <div>
-              <h2 class="text-xl md:text-2xl font-bold">View &amp; Print Invoice Log</h2>
-              <p class="text-xs md:text-sm text-blue-100">Filter and review invoice history, then print or export via browser print.</p>
+              <h2 class="text-lg sm:text-xl font-semibold leading-tight">View &amp; Print Invoice Log</h2>
+              <p class="text-xs sm:text-sm text-sky-100">Filter and review invoice history, then print or export via browser print.</p>
             </div>
           </div>
-          <div class="hidden md:flex flex-col items-end text-xs text-blue-100">
+          <div class="hidden md:flex flex-col items-end text-xs text-sky-100">
             <span>Today {{ today }}</span>
             <span>Period {{ period.month }}/{{ period.year }}</span>
           </div>

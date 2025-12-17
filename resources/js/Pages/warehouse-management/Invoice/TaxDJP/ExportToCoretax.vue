@@ -1,15 +1,15 @@
 <template>
   <AppLayout :header="'Export to Coretax - Bulk XML Generator'">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 rounded-lg shadow-lg mb-6">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="bg-white/20 rounded-lg p-3">
-            <i class="fas fa-file-export text-3xl text-white" />
+    <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-lg rounded-lg border border-emerald-700 mb-6">
+      <div class="px-4 py-3 sm:px-6 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+            <i class="fas fa-file-export text-white text-lg" />
           </div>
           <div>
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Export to Coretax</h2>
-            <p class="text-emerald-100 text-sm">Generate bulk XML tax invoices for DJP Coretax system</p>
+            <h2 class="text-lg sm:text-xl font-semibold leading-tight">Export to Coretax</h2>
+            <p class="text-xs sm:text-sm text-emerald-100">Generate bulk XML tax invoices for DJP Coretax system</p>
           </div>
         </div>
         <div class="hidden md:block text-right text-emerald-100 text-sm">
