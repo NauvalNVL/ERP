@@ -68,9 +68,6 @@
                             <div v-else-if="wrappingMaterials.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
                                 <p class="text-sm font-medium text-yellow-800">No wrapping material data available.</p>
                                 <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                                <div class="mt-2 flex items-center space-x-3">
-                                    <button @click="fetchWrappingMaterials" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">Reload Data</button>
-                                </div>
                             </div>
                             <div v-else class="mt-4 bg-green-100 p-3 rounded">
                                 <p class="text-sm font-medium text-green-800">Data available: {{ wrappingMaterials.length }} wrapping materials found.</p>

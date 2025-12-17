@@ -80,9 +80,6 @@
 								<div v-else-if="geos.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
 									<p class="text-sm font-medium text-yellow-800">No geo data available.</p>
 									<p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-									<div class="mt-2">
-										<button @click="fetchGeos" class="inline-flex items-center px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded transition-colors transform active:translate-y-px">Reload Data</button>
-									</div>
 								</div>
 								<div v-else class="mt-4 bg-green-100 p-3 rounded">
 									<p class="text-sm font-medium text-green-800">Data available: {{ geos.length }} geo locations found.</p>
