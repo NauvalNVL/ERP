@@ -778,6 +778,7 @@ class InvoiceController extends Controller
                 'manual_invoice_number' => 'nullable|string|max:50',
                 'year' => 'nullable|string|max:4',
                 'month' => 'nullable|string|max:2',
+                'billed_items' => 'nullable|array', // ✅ FIX: Accept billed items with to_bill quantities
             ]);
 
             $now = now();
@@ -813,6 +814,10 @@ class InvoiceController extends Controller
             /** @var float|null $taxPercentFromFrontend */
             $taxPercentFromFrontend = $payload['tax_percent'] ?? null;
 
+            // ✅ FIX: Get billed_items with to_bill quantities from frontend
+            /** @var array $billedItems */
+            $billedItems = $payload['billed_items'] ?? [];
+
             Log::info('Invoice Preparation Started', [
                 'do_count' => count($payload['do_numbers']),
                 'mode' => $invoiceNumberMode,
@@ -821,7 +826,9 @@ class InvoiceController extends Controller
                 'tax_from_frontend' => [
                     'tax_code' => $taxCodeFromFrontend,
                     'tax_percent' => $taxPercentFromFrontend
-                ]
+                ],
+                'has_billed_items' => !empty($billedItems),
+                'billed_items_count' => count($billedItems)
             ]);
 
             // ✅ PRIORITY 1: Use tax data from frontend (already confirmed by user in Final Screen)
@@ -892,15 +899,23 @@ class InvoiceController extends Controller
                 Log::info('ℹ️ No tax information provided (tax-free invoice)');
             }
 
-            // Get existing invoice count for auto-numbering (per period)
-            /** @var int $existingCount */
-            $existingCount = (int) DB::table('INV')
+            // Get last used invoice sequence for auto-numbering (per period)
+            // IMPORTANT: Do NOT use row count because 1 invoice can create multiple INV rows (Main + Fit)
+            /** @var string|null $lastIvNum */
+            $lastIvNum = DB::table('INV')
                 ->where('YYYY', $yyyy)
                 ->where('MM', $mm)
-                ->count();
+                ->where('IV_NUM', 'like', sprintf('%s-%s-%%', $mm, $yyyy))
+                ->max('IV_NUM');
+
+            /** @var int $lastSeq */
+            $lastSeq = 0;
+            if ($lastIvNum) {
+                $lastSeq = (int) substr((string) $lastIvNum, -5);
+            }
 
             /** @var int $seq */
-            $seq = $existingCount + 1;
+            $seq = $lastSeq + 1;
 
             // Invoice number generator function (CPS-like format: MM-YYYY-SEQ)
             /** @var \Closure(int): string $generateNumber */
@@ -919,6 +934,27 @@ class InvoiceController extends Controller
                 'Auth::user() exists' => Auth::user() !== null,
                 'User class' => Auth::user() ? get_class(Auth::user()) : null,
             ]);
+
+            // ✅ VALIDATION: Check if there are any items with to_bill > 0
+            $hasItemsToBill = false;
+            foreach ($billedItems as $doNum => $billedData) {
+                $items = $billedData['item_details'] ?? [];
+                foreach ($items as $item) {
+                    $toBill = floatval($item['to_bill'] ?? 0);
+                    $toBillKg = floatval($item['to_bill_kg'] ?? 0);
+                    if ($toBill > 0 || $toBillKg > 0) {
+                        $hasItemsToBill = true;
+                        break 2; // Break both loops
+                    }
+                }
+            }
+
+            if (!$hasItemsToBill) {
+                throw new \RuntimeException(
+                    'No items to bill. All items have zero unbilled quantity or no To Bill amount specified. ' .
+                    'Please ensure items have remaining quantity to bill.'
+                );
+            }
 
             DB::beginTransaction();
 
@@ -1173,9 +1209,116 @@ class InvoiceController extends Controller
                 // =====================================================================
                 $itemNo = 1;
 
-                foreach ($doRecords as $line) {
-                    // Base quantity per line
+                // ✅ FIX: Get billed item details for this DO from frontend
+                $billedItemData = $billedItems[$doNumber] ?? null;
+                $itemDetailsFromFrontend = $billedItemData['item_details'] ?? [];
+                
+                Log::info('📦 Processing DO with to_bill quantities', [
+                    'do_number' => $doNumber,
+                    'has_item_details' => !empty($itemDetailsFromFrontend),
+                    'item_count' => count($itemDetailsFromFrontend)
+                ]);
+
+                foreach ($doRecords as $index => $line) {
+                    // ✅ FIX: Get user-specified to_bill quantity from frontend
+                    $comp = trim((string) ($line->COMP ?? ''));
+                    $isMainComp = ($index === 0) || strcasecmp($comp, 'Main') === 0;
+                    
+                    // ✅ IMPROVED: Match frontend items by index (most reliable) or label
+                    $frontendItem = null;
+                    if (!empty($itemDetailsFromFrontend)) {
+                        // Try to match by index first (most reliable)
+                        if (isset($itemDetailsFromFrontend[$index])) {
+                            $frontendItem = $itemDetailsFromFrontend[$index];
+                            Log::info("✅ Matched by index", [
+                                'index' => $index,
+                                'frontend_item' => $frontendItem['item'] ?? 'unknown',
+                                'do_comp' => $comp ?: 'empty'
+                            ]);
+                        } else {
+                            // Fallback: Try to match by label
+                            foreach ($itemDetailsFromFrontend as $item) {
+                                $itemLabel = $item['item'] ?? '';
+                                $itemIsMain = ($itemLabel === 'Main');
+                                
+                                if ($isMainComp && $itemIsMain) {
+                                    $frontendItem = $item;
+                                    break;
+                                } elseif (!$isMainComp && $comp && $itemLabel === $comp) {
+                                    $frontendItem = $item;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Base quantity per line (from DO)
                     $lineQty = $this->toDecimalOrNull($this->getProperty($line, 'DO_Qty'), 0);
+                    
+                    // ✅ FIX: Use to_bill quantity if provided, otherwise skip this item
+                    $toBillQty = 0;
+                    $toBillKg = 0;
+                    
+                    if ($frontendItem) {
+                        // Check unit type - KG vs PCS
+                        $unit = strtoupper(trim($frontendItem['unit'] ?? ''));
+                        
+                        if ($unit === 'KG') {
+                            // For KG unit, use to_bill_kg
+                            $toBillKg = floatval($frontendItem['to_bill_kg'] ?? 0);
+                            $toBillQty = $toBillKg; // Invoice quantity is in KG
+                        } else {
+                            // For other units (PCS, etc.), use to_bill
+                            $toBillQty = floatval($frontendItem['to_bill'] ?? 0);
+                        }
+                        
+                        Log::info("✅ Using to_bill quantity for {$comp}", [
+                            'do_number' => $doNumber,
+                            'component' => $comp ?: 'Main',
+                            'unit' => $unit,
+                            'deliver_qty' => $lineQty,
+                            'to_bill' => $toBillQty,
+                            'to_bill_kg' => $toBillKg
+                        ]);
+                    }
+                    
+                    // ✅ CRITICAL: Skip items with zero to_bill quantity (user didn't bill them)
+                    if ($toBillQty <= 0) {
+                        Log::info("⏭️ Skipping item with zero to_bill", [
+                            'do_number' => $doNumber,
+                            'component' => $comp ?: 'Main',
+                            'reason' => 'to_bill = 0'
+                        ]);
+                        continue; // Skip this item - don't create invoice line
+                    }
+                    
+                    // ✅ VALIDATION: Ensure to_bill doesn't exceed available quantity
+                    $invoicedQty = DB::table('INV')
+                        ->where('IV_SECOND_REF', $doNumber)
+                        ->where('SO_NUM', $this->getProperty($line, 'SO_Num'))
+                        ->where(function($q) use ($comp, $isMainComp) {
+                            if ($isMainComp) {
+                                $q->whereNull('COMP')->orWhere('COMP', '')->orWhere('COMP', 'Main');
+                            } else {
+                                $q->where('COMP', $comp);
+                            }
+                        })
+                        ->where(function ($q) {
+                            $q->whereNull('IV_STS')->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                        })
+                        ->sum('IV_QTY');
+                    
+                    $remainingQty = $lineQty - floatval($invoicedQty);
+                    
+                    if ($toBillQty > $remainingQty) {
+                        throw new \RuntimeException(
+                            "Cannot bill {$toBillQty} for {$comp} in DO {$doNumber}. " .
+                            "Only {$remainingQty} remaining (Delivered: {$lineQty}, Already Invoiced: {$invoicedQty})"
+                        );
+                    }
+                    
+                    // Use to_bill quantity for invoice (not full DO quantity)
+                    $lineQty = $toBillQty;
 
                     // Normalize PO date for INV.PO_DMY
                     $poDateRaw = $this->getProperty($line, 'PO_Date');
@@ -1192,58 +1335,112 @@ class InvoiceController extends Controller
                     $totalGrossKg  = $this->toDecimalOrNull($this->getProperty($line, 'Total_DO_Gross_KG'));
                     $totalNetKg    = $this->toDecimalOrNull($this->getProperty($line, 'Total_DO_Net_KG'));
 
-                    // --- Derive per-PCS values from totals when missing ---
-                    if ((!$grossM2PerPcs || $grossM2PerPcs == 0) && $totalGrossM2 && $lineQty > 0) {
-                        $grossM2PerPcs = round($totalGrossM2 / $lineQty, 4);
+                    // ✅ FIX: Store original DO quantity before overriding with to_bill
+                    $originalDoQty = $this->toDecimalOrNull($this->getProperty($line, 'DO_Qty'), 0);
+                    
+                    // --- Derive per-PCS values from totals when missing (use original DO qty) ---
+                    if ((!$grossM2PerPcs || $grossM2PerPcs == 0) && $totalGrossM2 && $originalDoQty > 0) {
+                        $grossM2PerPcs = round($totalGrossM2 / $originalDoQty, 4);
                     }
-                    if ((!$netM2PerPcs || $netM2PerPcs == 0) && $totalNetM2 && $lineQty > 0) {
-                        $netM2PerPcs = round($totalNetM2 / $lineQty, 4);
+                    if ((!$netM2PerPcs || $netM2PerPcs == 0) && $totalNetM2 && $originalDoQty > 0) {
+                        $netM2PerPcs = round($totalNetM2 / $originalDoQty, 4);
                     }
-                    if ((!$grossKgPerPcs || $grossKgPerPcs == 0) && $totalGrossKg && $lineQty > 0) {
-                        $grossKgPerPcs = round($totalGrossKg / $lineQty, 4);
+                    if ((!$grossKgPerPcs || $grossKgPerPcs == 0) && $totalGrossKg && $originalDoQty > 0) {
+                        $grossKgPerPcs = round($totalGrossKg / $originalDoQty, 4);
                     }
-                    if ((!$netKgPerPcs || $netKgPerPcs == 0) && $totalNetKg && $lineQty > 0) {
-                        $netKgPerPcs = round($totalNetKg / $lineQty, 4);
+                    if ((!$netKgPerPcs || $netKgPerPcs == 0) && $totalNetKg && $originalDoQty > 0) {
+                        $netKgPerPcs = round($totalNetKg / $originalDoQty, 4);
                     }
 
-                    // --- Derive totals from per-PCS values when missing ---
-                    if ((!$totalGrossM2 || $totalGrossM2 == 0) && $grossM2PerPcs && $lineQty > 0) {
+                    // ✅ FIX: Calculate invoice totals based on to_bill quantity (not original DO qty)
+                    // Proportionally scale M2/KG values based on to_bill vs original
+                    if ($grossM2PerPcs && $lineQty > 0) {
                         $totalGrossM2 = round($grossM2PerPcs * $lineQty, 4);
+                    } else {
+                        $totalGrossM2 = 0;
                     }
-                    if ((!$totalNetM2 || $totalNetM2 == 0) && $netM2PerPcs && $lineQty > 0) {
+                    
+                    if ($netM2PerPcs && $lineQty > 0) {
                         $totalNetM2 = round($netM2PerPcs * $lineQty, 4);
+                    } else {
+                        $totalNetM2 = 0;
                     }
-                    if ((!$totalGrossKg || $totalGrossKg == 0) && $grossKgPerPcs && $lineQty > 0) {
+                    
+                    if ($grossKgPerPcs && $lineQty > 0) {
                         $totalGrossKg = round($grossKgPerPcs * $lineQty, 4);
+                    } else {
+                        $totalGrossKg = 0;
                     }
-                    if ((!$totalNetKg || $totalNetKg == 0) && $netKgPerPcs && $lineQty > 0) {
+                    
+                    if ($netKgPerPcs && $lineQty > 0) {
                         $totalNetKg = round($netKgPerPcs * $lineQty, 4);
+                    } else {
+                        $totalNetKg = 0;
                     }
 
                     // Determine Main vs Fit component (still used for informational flags/printing)
-                    $comp = trim((string) ($line->COMP ?? ''));
                     $isMain = ($itemNo === 1) || strcasecmp($comp, 'Main') === 0;
 
-                    // Both Main and Fit components carry their DO quantity in INV.IV_QTY
-                    // DO-level remaining quantity checks now only sum Main components (see above),
-                    // so this will not cause double-counting for status calculations.
+                    // ✅ Invoice quantity is the to_bill quantity (already set in $lineQty)
                     $ivQty = $lineQty;
 
-                    // Line-level amounts from DO line
-                    $lineTranAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Tran_Amt'), 0);
-                    $lineBaseAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Base_Amt'), 0);
-
-                    if ($lineTranAmt == 0 && $lineQty > 0) {
-                        $unitPrice = $this->toDecimalOrNull($this->getProperty($line, 'SO_Unit_Price'), 0);
-                        if ($unitPrice > 0) {
-                            $lineTranAmt = round($lineQty * $unitPrice, 2);
-                            $lineBaseAmt = round($lineTranAmt * $exRate, 2);
+                    // ✅ FIX: Calculate amounts based on to_bill quantity
+                    $unitPrice = $this->toDecimalOrNull($this->getProperty($line, 'SO_Unit_Price'), 0);
+                    
+                    // Always recalculate amounts based on to_bill quantity
+                    if ($unitPrice > 0 && $lineQty > 0) {
+                        $lineTranAmt = round($lineQty * $unitPrice, 2);
+                        $lineBaseAmt = round($lineTranAmt * $exRate, 2);
+                        
+                        Log::info("💰 Calculated amounts for to_bill", [
+                            'to_bill_qty' => $lineQty,
+                            'unit_price' => $unitPrice,
+                            'tran_amt' => $lineTranAmt,
+                            'base_amt' => $lineBaseAmt
+                        ]);
+                    } else {
+                        // Fallback to proportional calculation from DO amounts
+                        $doTranAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Tran_Amt'), 0);
+                        $doBaseAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Base_Amt'), 0);
+                        
+                        if ($doTranAmt > 0 && $originalDoQty > 0) {
+                            // Proportionally scale DO amount based on to_bill vs original
+                            $lineTranAmt = round(($doTranAmt / $originalDoQty) * $lineQty, 2);
+                            $lineBaseAmt = round(($doBaseAmt / $originalDoQty) * $lineQty, 2);
+                        } else {
+                            $lineTranAmt = 0;
+                            $lineBaseAmt = 0;
                         }
                     }
+                    
                     if ($lineBaseAmt == 0 && $lineTranAmt > 0) {
                         $lineBaseAmt = round($lineTranAmt * $exRate, 2);
                     }
 
+                    // ✅ CRITICAL: Determine proper COMP value for storage
+                    // Use frontend item label if available, otherwise use DO.COMP
+                    $compToStore = null;
+                    if ($frontendItem) {
+                        $frontendLabel = $frontendItem['item'] ?? '';
+                        // Store component label from frontend (Main, Fit1, etc.)
+                        $compToStore = $frontendLabel === 'Main' ? 'Main' : $frontendLabel;
+                    } else {
+                        // Fallback to DO.COMP
+                        $compToStore = $comp ?: null;
+                    }
+                    
+                    // 🔍 DEBUG: Log what we're about to insert
+                    Log::info("💾 DEBUG: Inserting invoice record", [
+                        'do_number' => $doNumber,
+                        'iv_num' => $ivNum,
+                        'comp_from_do' => $comp ?: 'NULL',
+                        'comp_to_store' => $compToStore ?: 'NULL',
+                        'is_main' => $isMain,
+                        'iv_qty' => $ivQty,
+                        'iv_second_ref' => $this->getProperty($line, 'DO_Num'),
+                        'frontend_item' => $frontendItem['item'] ?? 'not_found'
+                    ]);
+                    
                     // Insert invoice record for this DO component line
                     DB::table('INV')->insert([
                         // Period and identification
@@ -1255,7 +1452,7 @@ class InvoiceController extends Controller
 
                         // Payment terms and references
                         'AR_TERM' => $paymentTerm,
-                        'IV_SECOND_REF' => $secondRef ?? $this->getProperty($line, 'DO_Num'),
+                        'IV_SECOND_REF' => $this->getProperty($line, 'DO_Num'), // ✅ CRITICAL: Always use DO_Num for tracking unbill
 
                         // Customer information
                         'AC_NUM' => $this->getProperty($line, 'AC_Num'),
@@ -1266,7 +1463,7 @@ class InvoiceController extends Controller
                         'MCS_NUM' => $this->getProperty($line, 'MCS_Num'),
                         'MODEL' => $this->getProperty($line, 'Model'),
                         'PRODUCT' => $this->getProperty($line, 'Product'),
-                        'COMP' => $this->getProperty($line, 'COMP'),
+                        'COMP' => $compToStore, // ✅ CRITICAL: Store proper component label for unbill tracking
                         'P_DESIGN' => $this->getProperty($line, 'PD'),
                         'PCS_PER_SET' => $this->toDecimalOrNull($this->getProperty($line, 'PCS_PER_SET')),
                         'UNIT' => $this->getProperty($line, 'Unit'),
@@ -1324,8 +1521,8 @@ class InvoiceController extends Controller
                         'IV_TAX_CODE' => $taxCode,
                         'IV_TAX_PERCENT' => $this->toDecimalOrNull($taxPercent),
 
-                        // Remarks
-                        'IV_REMARK' => $remark,
+                        // Remarks (combine user's secondRef and remark)
+                        'IV_REMARK' => $secondRef ? ($remark ? "{$secondRef} - {$remark}" : $secondRef) : $remark,
 
                         // Audit trail
                         'NW_UID' => $currentUserId,
@@ -1804,11 +2001,76 @@ class InvoiceController extends Controller
                 $comp = trim((string) ($record->COMP ?? ''));
                 $isMain = ($index === 0) || strcasecmp($comp, 'Main') === 0;
 
-                $label = $comp !== ''
-                    ? $comp
-                    : ($isMain ? 'Main' : ('Comp ' . ($record->No ?? ($index + 1))));
+                // ✅ CRITICAL: Use consistent label that matches what's stored in INV.COMP
+                // Frontend displays as "Main", "Fit1", "Fit2", etc.
+                // We need to match this in our query
+                $label = $isMain ? 'Main' : ($comp !== '' ? $comp : 'Fit' . $index);
 
                 $qty = floatval($record->DO_Qty ?: 0);
+
+                // ✅ FIX: Calculate already invoiced quantity for this specific DO and component
+                // Query INV table to get total invoiced for this DO_Num, SO_Num, and Component
+                
+                // 🔍 DEBUG: Log search parameters
+                Log::info("🔍 Searching invoices for unbill calculation", [
+                    'do_number' => $doNumber,
+                    'so_number' => $record->SO_Num,
+                    'label' => $label,
+                    'is_main' => $isMain,
+                    'index' => $index
+                ]);
+                
+                $invoicedQty = DB::table('INV')
+                    ->where('IV_SECOND_REF', $doNumber) // Track by DO number (most accurate)
+                    ->where('SO_NUM', $record->SO_Num) // Also match SO number
+                    ->where(function($q) use ($label, $isMain) {
+                        // Match component type using consistent label
+                        if ($isMain) {
+                            // For Main component: COMP is null or 'Main'
+                            $q->whereNull('COMP')
+                              ->orWhere('COMP', '')
+                              ->orWhere('COMP', 'Main');
+                        } else {
+                            // For Fit components: match label (Fit1, Fit2, etc.)
+                            $q->where('COMP', $label);
+                        }
+                    })
+                    ->where(function ($q) {
+                        // Only count non-cancelled invoices
+                        $q->whereNull('IV_STS')
+                          ->orWhereNotIn('IV_STS', ['Cancel', 'Cancelled']);
+                    })
+                    ->sum('IV_QTY');
+                
+                // 🔍 DEBUG: Check what invoices exist for this DO
+                $debugInvoices = DB::table('INV')
+                    ->where('IV_SECOND_REF', $doNumber)
+                    ->select(['IV_NUM', 'COMP', 'IV_QTY', 'SO_NUM'])
+                    ->get();
+                    
+                Log::info("🔍 Found invoices", [
+                    'do_number' => $doNumber,
+                    'invoices' => $debugInvoices->toArray(),
+                    'calculated_invoiced_qty' => $invoicedQty
+                ]);
+
+                $invoicedQty = floatval($invoicedQty ?: 0);
+                
+                // Calculate remaining unbilled quantity
+                $unbillQty = $qty - $invoicedQty;
+                
+                // Ensure unbill is not negative
+                if ($unbillQty < 0) {
+                    $unbillQty = 0;
+                }
+
+                Log::info("📊 Unbill calculation for {$label}", [
+                    'do_number' => $doNumber,
+                    'component' => $comp ?: 'Main',
+                    'deliver_qty' => $qty,
+                    'invoiced_qty' => $invoicedQty,
+                    'unbill_qty' => $unbillQty,
+                ]);
 
                 $detail = [
                     'item' => $label,
@@ -1818,7 +2080,7 @@ class InvoiceController extends Controller
                     'u_price' => floatval($record->SO_Unit_Price ?: 0),
                     'deliver' => $qty,
                     'reject' => 0,
-                    'unbill' => $qty,
+                    'unbill' => $unbillQty,  // ✅ FIXED: Now reflects actual remaining quantity
                     'to_bill' => 0,      // User will input for Main row only in UI
                     'to_bill_kg' => 0,   // Calculated client-side for Main row
                     'kg_per_unit' => $isMain ? $kgPerUnit : null,
