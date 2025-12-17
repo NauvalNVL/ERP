@@ -4,16 +4,14 @@
         <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
             <div class="max-w-5xl w-full mx-auto relative z-0">
                 <!-- Header Card -->
-                <div class="bg-white/80 shadow-lg rounded-2xl border border-white/40 mb-6 backdrop-blur-sm">
-                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-4 sm:px-6 sm:py-5">
-                        <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                                <CopyIcon class="h-5 w-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 class="text-lg sm:text-2xl font-bold leading-tight text-white">Copy &amp; Paste Permissions</h1>
-                                <p class="text-xs sm:text-sm text-indigo-100">Transfer user access permissions between users</p>
-                            </div>
+                <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg rounded-2xl border border-indigo-700 mb-6">
+                    <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-full bg-indigo-500 flex items-center justify-center">
+                            <CopyIcon class="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-semibold leading-tight">Copy &amp; Paste User Access Permission</h2>
+                            <p class="text-xs sm:text-sm text-indigo-100">Transfer user access permissions between users</p>
                         </div>
                     </div>
                 </div>

@@ -10,26 +10,24 @@
                     <div class="bubble bubble-4"></div>
                 </div>
                 <!-- Header -->
-                <div class="bg-white/80 shadow-lg rounded-2xl border border-white/40 mb-6 backdrop-blur-sm">
-                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-4 sm:px-6 sm:py-5">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                                    <UserGroupIcon class="h-5 w-5 text-white" />
-                                </div>
-                                <div>
-                                    <h1 class="text-xl sm:text-2xl font-bold text-white leading-tight">User Management</h1>
-                                    <p class="text-xs sm:text-sm text-indigo-100">Manage system users and their information</p>
-                                </div>
+                <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg rounded-2xl border border-indigo-700 mb-6">
+                    <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="h-9 w-9 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <UserGroupIcon class="h-5 w-5 text-white" />
                             </div>
-                            <Link
-                                href="/user/create"
-                                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                <UserAddIcon class="h-4 w-4 mr-2" />
-                                <span>Add New User</span>
-                            </Link>
+                            <div>
+                                <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define User</h2>
+                                <p class="text-xs sm:text-sm text-indigo-100">Define and manage system users for ERP access</p>
+                            </div>
                         </div>
+                        <Link
+                            href="/user/create"
+                            class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            <UserAddIcon class="h-4 w-4 mr-2" />
+                            <span>Add New User</span>
+                        </Link>
                     </div>
                 </div>
 

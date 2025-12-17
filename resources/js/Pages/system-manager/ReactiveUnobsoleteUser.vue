@@ -2,32 +2,38 @@
 	<AppLayout :header="'Reactive / Unobsolete User'">
 		<Head title="Reactive / Unobsolete User" />
 
-		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+		<div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
 			<div class="max-w-7xl mx-auto relative z-0">
+				<!-- Floating background bubbles -->
+				<div class="hidden md:block absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+					<div class="bubble bubble-1"></div>
+					<div class="bubble bubble-2"></div>
+					<div class="bubble bubble-4"></div>
+				</div>
 				<!-- Header Section -->
-				<div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+				<div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg rounded-2xl border border-indigo-700 mb-6">
 					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 						<div class="flex items-center gap-3">
-							<div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+							<div class="h-9 w-9 rounded-full bg-indigo-500 flex items-center justify-center">
 								<i class="fas fa-user-clock text-white text-sm"></i>
 							</div>
 							<div>
-								<h2 class="text-lg sm:text-xl font-semibold text-white leading-tight">
+								<h2 class="text-lg sm:text-xl font-semibold leading-tight">
 									Reactive / Unobsolete User
 								</h2>
-								<p class="text-xs sm:text-sm text-blue-100">
-									View user list and manage obsolete / inactive users
+								<p class="text-xs sm:text-sm text-indigo-100">
+									Manage obsolete / inactive users and reactivate access
 								</p>
 							</div>
 						</div>
-						<div class="text-xs sm:text-sm text-blue-100">
+						<div class="text-xs sm:text-sm text-indigo-100">
 							<span class="font-semibold">{{ filteredUsers.length }}</span>
 							<span class="ml-1">users found</span>
 						</div>
 					</div>
 				</div>
 
-				<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+				<div class="bg-white/90 shadow-lg rounded-2xl border border-indigo-100 p-4 sm:p-6 backdrop-blur-sm">
 					<!-- Success/Error Messages -->
 					<div
 						v-if="notification.show"
