@@ -1,15 +1,15 @@
 <template>
   <AppLayout :header="'Input No Faktur - Tax Invoice Number Input'">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-lg mb-6">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="bg-white/20 rounded-lg p-3">
-            <i class="fas fa-receipt text-3xl text-white" />
+    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg rounded-lg border border-blue-700 mb-6">
+      <div class="px-4 py-3 sm:px-6 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+            <i class="fas fa-receipt text-white text-lg" />
           </div>
           <div>
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Input No Faktur</h2>
-            <p class="text-blue-100 text-sm">Input tax invoice numbers for approved invoices</p>
+            <h2 class="text-lg sm:text-xl font-semibold leading-tight">Input No Faktur</h2>
+            <p class="text-xs sm:text-sm text-blue-100">Input tax invoice numbers for approved invoices</p>
           </div>
         </div>
         <div class="hidden md:block text-right text-blue-100 text-sm">
