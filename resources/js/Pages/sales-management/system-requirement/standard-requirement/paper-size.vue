@@ -5,14 +5,14 @@
     <!-- Header Section -->
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
-            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
                 <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                         <i class="fas fa-ruler-combined text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Paper Size</h2>
-                        <p class="text-xs sm:text-sm text-emerald-100">Define standard paper sizes for production and document purposes. Use consistent paper sizes for production and printing documents.</p>
+                        <p class="text-xs sm:text-sm text-green-100">Define standard paper sizes for production and document purposes</p>
                     </div>
                 </div>
             </div>
