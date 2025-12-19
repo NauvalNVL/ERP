@@ -281,6 +281,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import PaperFluteModal from '@/Components/paper-flute-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -491,7 +492,18 @@ const saveFluteChanges = async () => {
 };
 
 const obsoleteFlute = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete paper flute "${editForm.value.Flute}"? This will hide it from paper flute selection.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Paper Flute?',
+        text: `Are you sure you want to obsolete paper flute "${editForm.value.Flute}"? This will hide it from paper flute selection.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

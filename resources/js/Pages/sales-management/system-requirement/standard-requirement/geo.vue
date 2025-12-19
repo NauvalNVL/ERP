@@ -300,6 +300,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import GeoModal from '@/Components/geo-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -623,7 +624,18 @@ const saveGeoData = async () => {
 };
 
 const obsoleteGeo = async () => {
-    if (!confirm(`Are you sure you want to obsolete geo "${editForm.value.code}"? This will mark it as inactive and it will no longer appear in selection lists.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Geo?',
+        text: `Are you sure you want to obsolete geo "${editForm.value.code}"? This will mark it as inactive and it will no longer appear in selection lists.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

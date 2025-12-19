@@ -232,6 +232,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import glueingMaterialModal from '@/Components/glueing-material-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -443,7 +444,18 @@ const saveglueingMaterialChanges = async () => {
 };
 
 const deleteglueingMaterial = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this Glueing Material?`)) return;
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Glueing Material?',
+        text: 'Are you sure you want to obsolete this Glueing Material?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
 
     saving.value = true;
 

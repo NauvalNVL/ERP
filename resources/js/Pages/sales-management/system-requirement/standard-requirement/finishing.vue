@@ -215,6 +215,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import FinishingModal from '@/Components/finishing-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -418,7 +419,18 @@ const saveFinishingChanges = async () => {
 };
 
 const deleteFinishing = async (code) => {
-    if (!confirm(`Are you sure you want to delete finishing "${code}"?`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Delete Finishing?',
+        text: `Are you sure you want to delete finishing "${code}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     
@@ -476,7 +488,18 @@ const obsoleteFinishing = async (code) => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to obsolete finishing "${code}"? This will hide it from selection and tables.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Finishing?',
+        text: `Are you sure you want to obsolete finishing "${code}"? This will hide it from selection and tables.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

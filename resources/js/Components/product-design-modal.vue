@@ -420,6 +420,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import ProductModal from '@/Components/product-modal.vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
   show: Boolean,
@@ -629,16 +630,32 @@ async function saveDesignChanges() {
         emit('close');
     } catch (e) {
         console.error('Error saving product design:', e);
-        alert('Error: ' + e.message);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error: ' + (e?.message || 'Unknown error'),
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+        });
     } finally {
         saving.value = false;
     }
 }
 
 async function obsoleteDesign(pdCode) {
-    if (!confirm(`Are you sure you want to obsolete product design "${pdCode}"? This will hide it from product design selection.`)) {
-        return;
-    }
+    const confirmMessage = `Are you sure you want to obsolete product design "${pdCode}"? This will hide it from product design selection.`;
+    const confirmRes = await Swal.fire({
+        title: 'Confirm Status Change?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
 
     saving.value = true;
     try {
@@ -659,13 +676,25 @@ async function obsoleteDesign(pdCode) {
             emit('data-changed');
             view.value = 'list';
             emit('close');
-            alert(`Product design "${pdCode}" has been obsoleted successfully.`);
+            await Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: `Product design "${pdCode}" has been obsoleted successfully.`,
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+            });
         } else {
             throw new Error(result.message || 'Failed to obsolete product design');
         }
     } catch (e) {
         console.error('Error obsoleting product design:', e);
-        alert('Error: ' + e.message);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error: ' + (e?.message || 'Unknown error'),
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+        });
     } finally {
         saving.value = false;
     }

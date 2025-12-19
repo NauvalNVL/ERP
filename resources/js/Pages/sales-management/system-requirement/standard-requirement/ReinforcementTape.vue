@@ -232,6 +232,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -434,7 +435,18 @@ const saveReinforcementTapeChanges = async () => {
 };
 
 const deleteReinforcementTape = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this reinforcement tape?`)) return;
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Reinforcement Tape?',
+        text: 'Are you sure you want to obsolete this reinforcement tape?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
 
     saving.value = true;
 

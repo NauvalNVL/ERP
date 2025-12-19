@@ -285,6 +285,7 @@
 import { ref, onMounted } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import IndustryModal from '@/Components/industry-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -663,7 +664,18 @@ const deleteIndustry = async () => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to mark industry "${selectedIndustry.value.code}" as obsolete?`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Industry?',
+        text: `Are you sure you want to mark industry "${selectedIndustry.value.code}" as obsolete?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 
