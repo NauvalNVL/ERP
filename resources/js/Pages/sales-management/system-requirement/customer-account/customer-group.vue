@@ -203,6 +203,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import { route } from 'ziggy-js';
 import CustomerGroupModal from '@/Components/customer-group-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -371,7 +372,18 @@ const saveCustomerGroupChanges = async () => {
 };
 
 const obsoleteCustomerGroup = async (groupCode) => {
-  if (!confirm(`Are you sure you want to obsolete customer group "${groupCode}"?`)) {
+  const confirmRes = await Swal.fire({
+    title: 'Obsolete Customer Group?',
+    text: `Are you sure you want to obsolete customer group "${groupCode}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    allowOutsideClick: false,
+  });
+
+  if (!confirmRes.isConfirmed) {
     return;
   }
 

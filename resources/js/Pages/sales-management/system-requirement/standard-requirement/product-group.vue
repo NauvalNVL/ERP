@@ -227,6 +227,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ProductGroupModal from '@/Components/product-group-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -440,7 +441,18 @@ const saveGroupChanges = async () => {
 };
 
 const obsoleteGroup = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this product group? This will mark it as inactive and it will no longer appear in selection lists.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Product Group?',
+        text: 'Are you sure you want to obsolete this product group? This will mark it as inactive and it will no longer appear in selection lists.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

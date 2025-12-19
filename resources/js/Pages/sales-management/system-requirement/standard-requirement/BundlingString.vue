@@ -219,6 +219,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import BundlingStringModal from '@/Components/bundling-string-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -421,7 +422,18 @@ const saveBundlingStringChanges = async () => {
 };
 
 const deleteBundlingString = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this bundling string?`)) return;
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Bundling String?',
+        text: 'Are you sure you want to obsolete this bundling string?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
 
     saving.value = true;
 

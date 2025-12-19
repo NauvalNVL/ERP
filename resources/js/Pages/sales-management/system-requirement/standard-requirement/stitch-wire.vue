@@ -241,6 +241,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import StitchWireModal from '@/Components/stitch-wire-modal.vue';
+import Swal from 'sweetalert2';
 
 // Reference to the CSRF form
 const csrfForm = ref(null);
@@ -443,7 +444,18 @@ const saveStitchWireChanges = async () => {
 };
 
 const deleteStitchWire = async (code) => {
-    if (!confirm(`Are you sure you want to obsolete stitch wire "${code}"?`)) return;
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Stitch Wire?',
+        text: `Are you sure you want to obsolete stitch wire "${code}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
 
     saving.value = true;
 

@@ -268,6 +268,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ScoringToolModal from '@/Components/scoring-tool-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -447,7 +448,18 @@ const saveScoringToolChanges = async () => {
 };
 
 const obsoleteScoringTool = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this scoring tool? This will hide it from scoring tool selection.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Scoring Tool?',
+        text: 'Are you sure you want to obsolete this scoring tool? This will hide it from scoring tool selection.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

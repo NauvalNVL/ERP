@@ -252,6 +252,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get any props passed from the controller
 const props = defineProps({
@@ -483,7 +484,18 @@ const deletePaperSize = async () => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to delete paper size "${sizeDisplay.value}"?`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Paper Size?',
+        text: `Are you sure you want to delete paper size "${sizeDisplay.value}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

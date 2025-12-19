@@ -138,6 +138,7 @@
 import { ref, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     bundlingStrings: {
@@ -213,7 +214,18 @@ const toggleBundlingStringStatus = async (item) => {
     }
 
     const confirmMessage = `Are you sure you want to change the status for "${item.code} - ${item.name}"?`;
-    if (!confirm(confirmMessage)) {
+    const confirmRes = await Swal.fire({
+        title: 'Confirm Status Change?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

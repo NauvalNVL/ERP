@@ -849,6 +849,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch, defineAsyncComponent } from "vue";
+import Swal from "sweetalert2";
 
 const selectedMcsFull = ref(null);
 // Reset SO/WO paper quality arrays to empty values
@@ -1107,7 +1108,18 @@ const saveSpecialInstructions = async (rows) => {
       ? rows.slice(0, 4).map((v) => (v ?? "") + "")
       : ["", "", "", ""];
 
-    if (!window.confirm("Save Special Instructions for this Master Card?")) {
+    const confirmRes = await Swal.fire({
+      title: "Save Special Instructions?",
+      text: "Save Special Instructions for this Master Card?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+      allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
       return;
     }
 
@@ -1653,19 +1665,23 @@ const deriveMcShortModel = (model) => {
 watch(
   () => form.value.mc_model,
   (newVal, oldVal) => {
-    console.log('🔍 MC Model changed:', { newVal, oldVal, shortModel: form.value.mc_short_model });
+    console.log("🔍 MC Model changed:", {
+      newVal,
+      oldVal,
+      shortModel: form.value.mc_short_model,
+    });
     const prevAuto = deriveMcShortModel(oldVal);
     const newAuto = deriveMcShortModel(newVal);
-    console.log('📝 Auto values:', { prevAuto, newAuto });
-    
+    console.log("📝 Auto values:", { prevAuto, newAuto });
+
     // Only auto-fill if short model is empty or matches the previous auto-generated value
     if (!form.value.mc_short_model || form.value.mc_short_model === prevAuto) {
-      console.log('✅ Auto-filling MC Short Model:', newAuto);
+      console.log("✅ Auto-filling MC Short Model:", newAuto);
       form.value.mc_short_model = newAuto;
       // Also update mcDetails to keep in sync
       mcDetails.value.mc_short_model = newAuto;
     } else {
-      console.log('⏭️ Skipping auto-fill (user has custom value)');
+      console.log("⏭️ Skipping auto-fill (user has custom value)");
     }
   }
 );

@@ -380,6 +380,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ProductModal from '@/Components/product-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -734,7 +735,18 @@ const saveProductChanges = async () => {
 };
 
 const obsoleteProduct = async (productId) => {
-    if (!confirm(`Are you sure you want to obsolete this product? This will mark it as inactive and it will no longer appear in selection lists.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Product?',
+        text: 'Are you sure you want to obsolete this product? This will mark it as inactive and it will no longer appear in selection lists.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

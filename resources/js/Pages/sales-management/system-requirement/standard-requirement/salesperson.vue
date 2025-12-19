@@ -264,6 +264,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalespersonModal from '@/Components/salesperson-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -578,7 +579,18 @@ const saveSalespersonChanges = async () => {
 };
 
 const deleteSalesperson = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this salesperson?`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Salesperson?',
+        text: 'Are you sure you want to obsolete this salesperson?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

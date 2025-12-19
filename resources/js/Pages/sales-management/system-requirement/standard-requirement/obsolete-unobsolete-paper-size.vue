@@ -134,6 +134,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Props from controller
 const props = defineProps({
@@ -222,7 +223,18 @@ const toggleSizeStatus = async (size) => {
     if (isToggling.value) return;
     
     const confirmMessage = `Are you sure you want to change the status for "${size.millimeter} mm"?`;
-    if (!confirm(confirmMessage)) return;
+    const confirmRes = await Swal.fire({
+        title: 'Confirm Status Change?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
     
     isToggling.value = true;
     

@@ -352,6 +352,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import TaxGroupModal from '@/Components/TaxGroupModal.vue';
 import TaxItemScreenModal from '@/Components/TaxItemScreenModal.vue';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // UI State
 const showTableModal = ref(false);
@@ -507,8 +508,18 @@ const handleSave = async () => {
         return false;
     }
 
-    // Show confirmation dialog
-    if (!confirm('Confirm Saving / Updating ?')) {
+    const confirmRes = await Swal.fire({
+        title: 'Confirm Saving / Updating?',
+        text: 'Confirm Saving / Updating ?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return false;
     }
 
@@ -561,7 +572,18 @@ const handleDelete = async () => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to delete tax group "${form.value.code}"? This action cannot be undone.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Delete Tax Group?',
+        text: `Are you sure you want to delete tax group "${form.value.code}"? This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

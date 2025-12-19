@@ -257,6 +257,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PaperQualityModal from '@/Components/paper-quality-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -448,7 +449,18 @@ const obsoletePaperQuality = async () => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to obsolete paper quality "${selectedQuality.value.paper_quality}"? This will hide it from paper quality selection.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Paper Quality?',
+        text: `Are you sure you want to obsolete paper quality "${selectedQuality.value.paper_quality}"? This will hide it from paper quality selection.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 
