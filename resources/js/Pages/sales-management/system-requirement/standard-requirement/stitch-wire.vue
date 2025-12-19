@@ -133,16 +133,16 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg border border-emerald-100 w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                    <div class="p-2 bg-white/20 rounded-lg mr-3">
                         <i class="fas fa-paperclip"></i>
                     </div>
                     <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Stitch Wire' : 'Edit Stitch Wire' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -158,7 +158,7 @@
                                 <input
                                     v-model="editForm.code"
                                     type="text"
-                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                                     :class="{ 'bg-gray-100': !isCreating }"
                                     :readonly="!isCreating"
                                     required
@@ -189,13 +189,13 @@
                             <button
                                 type="button"
                                 @click="closeEditModal"
-                                class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium"
+                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium"
                             >
                                 <i class="fas fa-times mr-2"></i>Cancel
                             </button>
                             <button
                                 type="submit"
-                                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium"
+                                class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg text-sm font-medium"
                             >
                                 <i class="fas fa-save mr-2"></i>Save
                             </button>

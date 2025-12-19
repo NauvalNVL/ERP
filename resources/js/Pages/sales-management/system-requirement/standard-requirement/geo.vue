@@ -153,16 +153,16 @@
 		/>
 
 		<!-- Edit Modal -->
-		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
+		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
 			<div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
 					<div class="flex items-center">
-						<div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+						<div class="p-2 bg-white/20 rounded-lg mr-3">
 							<i class="fas fa-globe-americas"></i>
 						</div>
 						<h3 class="text-sm font-semibold">{{ isCreating ? 'Create Geo' : 'Edit Geo' }}</h3>
 					</div>
-					<button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+					<button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
 						<i class="fas fa-times text-lg"></i>
 					</button>
 				</div>
@@ -171,27 +171,27 @@
 						<div class="grid grid-cols-1 gap-4">
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Geo Code:</label>
-								<input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+								<input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Country:</label>
-								<input v-model="editForm.country" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.country" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">State:</label>
-								<input v-model="editForm.state" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.state" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Town:</label>
-								<input v-model="editForm.town" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.town" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Town Section:</label>
-								<input v-model="editForm.town_section" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.town_section" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Area:</label>
-								<input v-model="editForm.area" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.area" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
@@ -206,8 +206,8 @@
 							</button>
 							<div v-else class="w-24"></div>
 							<div class="flex space-x-3">
-								<button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-								<button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Review</button>
+								<button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+								<button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 text-sm font-medium">Review</button>
 							</div>
 						</div>
 					</form>

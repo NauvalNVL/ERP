@@ -149,16 +149,16 @@
 		/>
 
 		<!-- Edit Modal -->
-		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center p-4 overflow-y-auto">
-			<div class="bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
-				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+			<div class="bg-white rounded-xl shadow-lg border border-emerald-100 w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
 					<div class="flex items-center">
-						<div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+						<div class="p-2 bg-white/20 rounded-lg mr-3">
 							<i class="fas fa-box"></i>
 						</div>
 						<h3 class="text-sm sm:text-base font-semibold">{{ isCreating ? 'Create Product' : 'Edit Product' }}</h3>
 					</div>
-					<button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+					<button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
 						<i class="fas fa-times text-lg"></i>
 					</button>
 				</div>
@@ -337,7 +337,7 @@
 							<button type="button" @click="closeEditModal" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm flex items-center">
 								<i class="fas fa-times mr-2"></i>Cancel
 							</button>
-							<button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-sm flex items-center">
+							<button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg transition-colors shadow-sm flex items-center">
 								<i class="fas fa-save mr-2"></i>Save Changes
 							</button>
 						</div>
@@ -347,7 +347,7 @@
 		</div>
 
 		<!-- Loading Overlay -->
-		<div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-center">
+		<div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
 			<div class="w-10 h-10 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
 		</div>
 		
