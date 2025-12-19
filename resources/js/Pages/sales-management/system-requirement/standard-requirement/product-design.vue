@@ -200,21 +200,19 @@
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Modal Table -->
-<ProductDesignModal
-  :show="showModal"
-  :designs="designs"
-  :products="products"
-  :doubleClickAction="'edit'"
-  :isCreating="isCreatingNewDesign"
-  @close="closeModal"
-  @select="onDesignSelected"
-  @data-changed="fetchDesigns"
-/>
-</AppLayout>
+    <!-- Modal Table -->
+    <ProductDesignModal
+      :show="showModal"
+      :designs="designs"
+      :products="products"
+      :doubleClickAction="'edit'"
+      :isCreating="isCreatingNewDesign"
+      @close="closeModal"
+      @select="onDesignSelected"
+      @data-changed="fetchDesigns"
+    />
+  </AppLayout>
 </template>
 
 <script setup>
