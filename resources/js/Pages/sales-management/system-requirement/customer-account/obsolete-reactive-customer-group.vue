@@ -356,7 +356,16 @@ const fetchGroups = async () => {
 
 const toggleStatus = async (group) => {
   if (isToggling.value) return;
-  if (getStatusLabel(group) === "Unknown") {
+
+  const currentStatusLabel = getStatusLabel(group);
+  console.log("Toggle status called for group:", {
+    group_code: group.group_code,
+    description: group.description,
+    current_status: group.status,
+    status_label: currentStatusLabel,
+  });
+
+  if (currentStatusLabel === "Unknown") {
     showNotification(
       "Status field for Customer Group is not available in current data source.",
       "error"
@@ -364,7 +373,9 @@ const toggleStatus = async (group) => {
     return;
   }
 
-  const confirmMessage = `Are you sure you want to change the status for "${group.group_code} - ${group.description}"?`;
+  const newStatusLabel = currentStatusLabel === "Active" ? "Obsolete" : "Active";
+  const confirmMessage = `Are you sure you want to change the status for "${group.group_code} - ${group.description}" from ${currentStatusLabel} to ${newStatusLabel}?`;
+
   const confirmRes = await Swal.fire({
     title: "Confirm Status Change?",
     text: confirmMessage,
@@ -383,6 +394,12 @@ const toggleStatus = async (group) => {
     const csrfToken = getCsrfToken();
     const url = `/api/customer-groups/${encodeURIComponent(group.group_code)}/status`;
 
+    console.log("Sending toggle request:", {
+      url: url,
+      method: "PUT",
+      group_code: group.group_code,
+    });
+
     const response = await fetch(url, {
       method: "PUT",
       headers: {
@@ -394,16 +411,40 @@ const toggleStatus = async (group) => {
       body: JSON.stringify({}),
     });
 
+    console.log("Response received:", {
+      status: response.status,
+      ok: response.ok,
+      statusText: response.statusText,
+    });
+
     const result = await response.json().catch(() => ({}));
+    console.log("Response data:", result);
+
     if (!response.ok) {
       throw new Error(result.message || "Failed to update customer group status");
     }
 
-    showNotification("Customer group status updated successfully", "success");
-    await fetchGroups();
+    if (result.success) {
+      await Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Customer group status updated successfully",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      await fetchGroups();
+    } else {
+      throw new Error(result.message || "Unknown error occurred");
+    }
   } catch (error) {
     console.error("Error toggling customer group status:", error);
-    showNotification("Error updating status: " + error.message, "error");
+    await Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Error updating status: " + error.message,
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
   } finally {
     isToggling.value = false;
   }

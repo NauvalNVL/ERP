@@ -135,7 +135,8 @@ class CustomerGroupController extends Controller
                 'Group_Name' => $request->description,
                 'Currency' => null,
                 'AC' => null,
-                'Name' => null
+                'Name' => null,
+                'status' => 'Act'
             ]);
 
             DB::commit();
@@ -222,102 +223,66 @@ class CustomerGroupController extends Controller
 
     public function toggleStatus(Request $request, $group_code)
     {
+        DB::beginTransaction();
         try {
+            Log::info('Toggle status called', ['group_code' => $group_code]);
+            
             $customerGroup = CustomerGroup::findOrFail($group_code);
+            
+            // Get current status directly from database attributes
+            $currentStatus = $customerGroup->getOriginal('status');
+            $currentTrim = trim((string) ($currentStatus ?? ''));
+            $currentTrim = $currentTrim === '' ? 'Act' : $currentTrim;
+            
+            Log::info('Current status', [
+                'group_code' => $group_code,
+                'current_status' => $currentStatus,
+                'current_trim' => $currentTrim
+            ]);
 
-            $table = $customerGroup->getTable();
-            $columns = DB::getSchemaBuilder()->getColumnListing($table);
-            $columnsLower = array_map(fn ($c) => strtolower((string) $c), $columns);
+            // Toggle: Act -> Obs, Obs -> Act
+            $newValue = $currentTrim === 'Act' ? 'Obs' : 'Act';
+            
+            // Direct update using DB query to ensure it works
+            $updated = DB::table('CUST_GROUP')
+                ->where('Group_ID', $group_code)
+                ->update(['status' => $newValue]);
+            
+            Log::info('Status update result', [
+                'group_code' => $group_code,
+                'old_status' => $currentTrim,
+                'new_status' => $newValue,
+                'rows_updated' => $updated
+            ]);
 
-            $getColumn = function (string $name) use ($columns, $columnsLower) {
-                $idx = array_search(strtolower($name), $columnsLower, true);
-                return $idx !== false ? $columns[$idx] : null;
-            };
-
-            $statusCol = $getColumn('status')
-                ?? $getColumn('is_active')
-                ?? $getColumn('active')
-                ?? $getColumn('ac');
-
-            if (!$statusCol) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Customer Group status column not found (expected one of: status, is_active, active, AC).'
-                ], 422);
+            if ($updated === 0) {
+                throw new \Exception('No rows were updated');
             }
 
-            $current = $customerGroup->getAttribute($statusCol);
-            $newValue = null;
+            // Refresh the model to get updated data
+            $customerGroup->refresh();
 
-            $statusColLower = strtolower((string) $statusCol);
-
-            if ($statusColLower === 'status') {
-                $currentTrim = trim((string) ($current ?? ''));
-                if ($currentTrim === '' || $currentTrim === 'Act' || $currentTrim === 'Obs') {
-                    $currentTrim = $currentTrim === '' ? 'Act' : $currentTrim;
-                    $newValue = $currentTrim === 'Act' ? 'Obs' : 'Act';
-                } elseif ($currentTrim === 'Active' || $currentTrim === 'Inactive') {
-                    $newValue = $currentTrim === 'Active' ? 'Inactive' : 'Active';
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Unsupported Customer Group status format: ' . $currentTrim
-                    ], 422);
-                }
-            } elseif ($statusColLower === 'is_active' || $statusColLower === 'active') {
-                if (is_bool($current)) {
-                    $newValue = !$current;
-                } elseif (is_numeric($current)) {
-                    $newValue = ((int) $current) ? 0 : 1;
-                } else {
-                    $currentTrim = strtoupper(trim((string) ($current ?? '')));
-                    if ($currentTrim === '' || $currentTrim === 'Y' || $currentTrim === 'N') {
-                        $currentTrim = $currentTrim === '' ? 'Y' : $currentTrim;
-                        $newValue = $currentTrim === 'Y' ? 'N' : 'Y';
-                    } elseif ($currentTrim === 'A' || $currentTrim === 'I') {
-                        $newValue = $currentTrim === 'A' ? 'I' : 'A';
-                    } else {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Unsupported Customer Group active format: ' . $currentTrim
-                        ], 422);
-                    }
-                }
-            } elseif ($statusColLower === 'ac') {
-                $currentTrim = strtoupper(trim((string) ($current ?? '')));
-                if ($currentTrim === '' || $currentTrim === 'Y' || $currentTrim === 'N') {
-                    $currentTrim = $currentTrim === '' ? 'Y' : $currentTrim;
-                    $newValue = $currentTrim === 'Y' ? 'N' : 'Y';
-                } elseif ($currentTrim === 'A' || $currentTrim === 'I') {
-                    $newValue = $currentTrim === 'A' ? 'I' : 'A';
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Customer Group AC column is not a boolean-like status (value: ' . $currentTrim . ')'
-                    ], 422);
-                }
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unsupported status column for Customer Group: ' . $statusCol
-                ], 422);
-            }
-
-            $customerGroup->setAttribute($statusCol, $newValue);
-            $customerGroup->save();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Customer Group status updated successfully',
-                'data' => $customerGroup
+                'data' => $customerGroup->fresh()
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollback();
+            Log::error('Customer group not found', ['group_code' => $group_code]);
             return response()->json([
                 'success' => false,
                 'message' => 'Customer Group not found'
             ], 404);
         } catch (\Exception $e) {
-            Log::error('Error toggling customer group status: ' . $e->getMessage());
+            DB::rollback();
+            Log::error('Error toggling customer group status', [
+                'group_code' => $group_code,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update Customer Group status: ' . $e->getMessage()

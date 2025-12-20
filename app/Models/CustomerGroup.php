@@ -22,10 +22,12 @@ class CustomerGroup extends Model
         'Group_Name',
         'Currency',
         'AC',
-        'Name'
+        'Name',
+        'status'
     ];
 
     // Add accessors to $appends for JSON serialization
+    // Note: 'status' is NOT in appends because it's a real database column
     protected $appends = ['group_code', 'description'];
 
     // Map to CPS fields for backward compatibility
@@ -47,5 +49,16 @@ class CustomerGroup extends Model
     public function setDescriptionAttribute($value)
     {
         $this->attributes['Group_Name'] = $value;
+    }
+
+    public function getStatusAttribute($value)
+    {
+        $trim = trim((string) ($value ?? ''));
+        return $trim === '' ? 'Act' : $trim;
+    }
+
+    public function setStatusAttribute($value)
+    {
+        $this->attributes['status'] = $value;
     }
 }

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('Currency', 50)->nullable()->collation($collation);
             $table->string('AC', 50)->nullable()->collation($collation);
             $table->string('Name', 50)->nullable()->collation($collation);
+            $table->string('status', 3)->nullable()->default('Act')->collation($collation);
 
             // Tambahkan primary key atau index jika diperlukan
             // $table->primary('Group_ID');
