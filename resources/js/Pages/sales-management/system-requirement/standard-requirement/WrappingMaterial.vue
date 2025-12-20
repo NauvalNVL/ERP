@@ -200,18 +200,11 @@
     />
 
     <!-- Edit Modal -->
-    <div
-      v-if="showEditModal"
-      class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
-    >
-      <div
-        class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300"
-      >
-        <div
-          class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg"
-        >
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg shadow-xl border border-emerald-100 w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
+        <div class="flex items-center justify-between p-4 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
           <div class="flex items-center">
-            <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+            <div class="p-2 bg-white/20 rounded-lg mr-3">
               <i class="fas fa-box-open"></i>
             </div>
             <h3 class="text-xl font-semibold">
@@ -221,7 +214,7 @@
           <button
             type="button"
             @click="closeEditModal"
-            class="text-white hover:text-gray-200 transform active:translate-y-px"
+            class="text-white hover:text-emerald-100 transform active:translate-y-px"
           >
             <i class="fas fa-times text-xl"></i>
           </button>
@@ -242,7 +235,7 @@
                   <input
                     v-model="editForm.code"
                     type="text"
-                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm"
+                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
                     :class="{ 'bg-gray-100': !isCreating }"
                     :readonly="!isCreating"
                     required

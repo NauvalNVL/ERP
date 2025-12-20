@@ -142,16 +142,16 @@
         />
 
         <!-- Edit Modal -->
-        <div v-if="showEditModal" class="fixed inset-0 z-40 bg-black bg-opacity-30 flex items-start sm:items-center justify-center">
+        <div v-if="showEditModal" class="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-start sm:items-center justify-center">
             <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
-                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 rounded-t-xl text-white">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 rounded-t-xl text-white">
                     <div class="flex items-center">
-                        <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                        <div class="p-2 bg-white/20 rounded-lg mr-3">
                             <i class="fas fa-tools"></i>
                         </div>
                         <h3 class="text-sm sm:text-base font-semibold">{{ isCreating ? 'Create Scoring Tool' : 'Edit Scoring Tool' }}</h3>
                     </div>
-                    <button type="button" @click="closeEditModal" class="text-white hover:text-gray-100">
+                    <button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
                         <i class="fas fa-times text-lg"></i>
                     </button>
                 </div>
@@ -207,13 +207,13 @@
                                 <button
                                     type="button"
                                     @click="closeEditModal"
-                                    class="px-3 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-xs sm:text-sm"
+                                    class="px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-xs sm:text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs sm:text-sm font-semibold shadow-sm"
+                                    class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-md text-xs sm:text-sm font-semibold shadow-sm"
                                 >
                                     Save
                                 </button>
@@ -225,7 +225,7 @@
         </div>
 
         <!-- Loading Overlay -->
-        <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-start pt-32">
+        <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-start pt-32">
             <div class="bg-white px-5 py-4 rounded-lg shadow-lg text-center border border-gray-200">
                 <div class="w-8 h-8 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
                 <p class="text-sm text-gray-700">Saving changes...</p>

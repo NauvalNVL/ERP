@@ -150,16 +150,16 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-2xl mx-auto my-8">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-lg border border-emerald-100 w-full max-w-2xl mx-auto my-8">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                    <div class="p-2 bg-white/20 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <h3 class="text-sm md:text-base font-semibold">{{ isCreating ? 'Create Paper Flute' : 'Edit Paper Flute' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -169,13 +169,13 @@
                         <!-- Paper Flute -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Paper Flute:</label>
-                            <input v-model="editForm.Flute" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required maxlength="25">
+                            <input v-model="editForm.Flute" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required maxlength="25">
                         </div>
                         
                         <!-- Description -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <input v-model="editForm.Descr" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required maxlength="100">
+                            <input v-model="editForm.Descr" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required maxlength="100">
                         </div>
                         
                         <!-- Take-Up Ratio Section -->
@@ -184,23 +184,23 @@
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L1: DB</label>
-                                    <input v-model.number="editForm.DB" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm.DB" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L2: B</label>
-                                    <input v-model.number="editForm.B" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm.B" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L3: 1L</label>
-                                    <input v-model.number="editForm._1L" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm._1L" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L4: A/C/E</label>
-                                    <input v-model.number="editForm.A_C_E" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm.A_C_E" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L5: 2L</label>
-                                    <input v-model.number="editForm._2L" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm._2L" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm px-2 py-1.5">
                                 </div>
                             </div>
                         </div>
@@ -210,7 +210,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Flute Height:</label>
                                 <div class="flex items-center space-x-2">
-                                    <input v-model.number="editForm.Height" type="number" step="0.01" min="0" class="block flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                                    <input v-model.number="editForm.Height" type="number" step="0.01" min="0" class="block flex-1 rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                                     <span class="text-xs text-gray-600 whitespace-nowrap">mm</span>
                                 </div>
                             </div>
@@ -218,7 +218,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Starch Consumption:</label>
                                 <div class="flex items-center space-x-2">
-                                    <input v-model.number="editForm.Starch" type="number" step="0.01" min="0" class="block flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                                    <input v-model.number="editForm.Starch" type="number" step="0.01" min="0" class="block flex-1 rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                                     <span class="text-xs text-gray-600 whitespace-nowrap">Factor</span>
                                 </div>
                             </div>
@@ -238,8 +238,8 @@
                         </button>
                         <div v-else></div>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                            <button type="button" @click="closeEditModal" class="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-                            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
+                            <button type="button" @click="closeEditModal" class="w-full sm:w-auto px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+                            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg text-sm font-medium">Save</button>
                         </div>
                     </div>
                 </form>
