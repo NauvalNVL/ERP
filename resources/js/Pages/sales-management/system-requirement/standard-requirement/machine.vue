@@ -148,6 +148,40 @@
                       <li>Any changes must be saved</li>
                     </ul>
                   </div>
+
+                  <div class="p-4 bg-blue-50 rounded-lg">
+                    <h4
+                      class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2"
+                    >
+                      Common Machine
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2 text-sm">
+                      <div class="flex items-center">
+                        <span
+                          class="w-6 h-6 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2"
+                        >
+                          10
+                        </span>
+                        <span>Corrugating</span>
+                      </div>
+                      <div class="flex items-center">
+                        <span
+                          class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2"
+                        >
+                          20
+                        </span>
+                        <span>Converting</span>
+                      </div>
+                      <div class="flex items-center">
+                        <span
+                          class="w-6 h-6 flex items-center justify-center bg-gray-600 text-white rounded-full font-bold mr-2"
+                        >
+                          30
+                        </span>
+                        <span>Warehouse</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
