@@ -1045,83 +1045,64 @@ Route::get('/vehicles/{vehicleNumber}', [DeliveryOrderController::class, 'getVeh
 
 // Expose a concise list of navigable menu routes for header search
 Route::get('/menu-routes', function () {
-    $routes = [];
-    $abbrMap = [
-        'mc' => 'Master Card',
-        'so' => 'Sales Order',
-        'fg' => 'Finished Goods',
-        'ac' => 'Account',
-        'pd' => 'Product Design',
-        'po' => 'Purchase Order',
-    ];
-    $crudExclude = ['index', 'create', 'edit'];
-    $genericView = ['view', 'view-print', 'viewandprint', 'view-printing', 'viewandprinting', 'view_print'];
+    $sidebarMap = [];
+    $sidebarPath = resource_path('js/Layouts/Partials/Sidebar.vue');
 
-    $humanize = function (string $leaf) use ($abbrMap) {
-        $tokens = preg_split('/[-_\s]+/', strtolower($leaf));
-        $words = array_map(function ($t) use ($abbrMap) {
-            if ($t === '') return '';
-            if (isset($abbrMap[$t])) return $abbrMap[$t];
-            if (strlen($t) <= 3 && preg_match('/^[a-z]+$/', $t)) return strtoupper($t);
-            return ucwords($t);
-        }, $tokens);
-        return trim(preg_replace('/\s+/', ' ', implode(' ', $words)));
+    $normalizeUri = function (string $uri): string {
+        $uri = trim($uri);
+        $uri = preg_replace('/[?#].*$/', '', $uri);
+        return '/' . ltrim((string) $uri, '/');
     };
 
-    foreach (Route::getRoutes() as $route) {
-        $name = $route->getName();
-        $methods = $route->methods();
-        if (!in_array('GET', $methods)) {
-            continue;
-        }
-        $uri = '/' . ltrim($route->uri(), '/');
-        if (str_starts_with($uri, '/api/')) {
-            continue;
-        }
-        if ($name && str_contains($name, 'vue.')) {
-            $parts = explode('.', $name);
-            $leaf = end($parts) ?: $name;
-            if (in_array(strtolower($leaf), $crudExclude, true)) {
-                continue;
+    if (is_readable($sidebarPath)) {
+        $sidebar = file_get_contents($sidebarPath);
+
+        // Extract pairs like: { title: 'Define User', ..., route: '/user' }
+        preg_match_all(
+            "/\\{[^\\{\\}]*?title:\\s*['\"]([^'\"]+)['\"][^\\{\\}]*?route:\\s*['\"]([^'\"]+)['\"][^\\{\\}]*?\\}/s",
+            $sidebar,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($matches as $m) {
+            $title = trim($m[1]);
+            $uri = $normalizeUri($m[2] ?? '');
+            if ($title !== '' && $uri !== '/') {
+                $sidebarMap[$uri] = $title;
             }
-
-            // Determine title; if leaf is generic view, prepend with previous meaningful segment
-            $title = '';
-            $leafLower = strtolower($leaf);
-
-            // Custom title mappings for specific routes
-            $customTitles = [
-                'vue.update-customer-account-management' => 'Update Customer Account',
-            ];
-
-            if (isset($customTitles[$name])) {
-                $title = $customTitles[$name];
-            } elseif (in_array($leafLower, $genericView, true)) {
-                // find previous non-generic segment
-                $prev = '';
-                for ($i = count($parts) - 2; $i >= 0; $i--) {
-                    $candidate = $parts[$i];
-                    if (!in_array(strtolower($candidate), array_merge($crudExclude, $genericView), true)) {
-                        $prev = $candidate;
-                        break;
-                    }
-                }
-                $subject = $prev !== '' ? $humanize($prev) : 'Data';
-                $title = 'View & Print ' . $subject;
-            } else {
-                $title = $humanize($leaf);
-            }
-
-            $routes[] = [
-                'name'  => $name,
-                'uri'   => $uri,
-                'title' => $title,
-            ];
         }
     }
 
-    $routes = collect($routes)
-        ->unique('uri')
+    // Dashboard is a special case in Sidebar (not inside route objects)
+    $sidebarMap['/dashboard'] = $sidebarMap['/dashboard'] ?? 'Dashboard';
+
+    $routeNameByUri = [];
+    foreach (Route::getRoutes() as $route) {
+        if (!in_array('GET', $route->methods(), true)) {
+            continue;
+        }
+
+        $uri = $normalizeUri($route->uri());
+        if (str_starts_with($uri, '/api/')) {
+            continue;
+        }
+
+        if (!isset($routeNameByUri[$uri])) {
+            $routeNameByUri[$uri] = $route->getName();
+        }
+    }
+
+    $routes = collect($sidebarMap)
+        ->map(function ($title, $uri) use ($routeNameByUri) {
+            return [
+                'name'  => $routeNameByUri[$uri] ?? null,
+                'uri'   => $uri,
+                'title' => $title,
+            ];
+        })
+        ->values()
+        ->sortBy('title')
         ->values()
         ->all();
 
