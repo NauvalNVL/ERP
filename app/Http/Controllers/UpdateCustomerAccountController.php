@@ -147,10 +147,10 @@ class UpdateCustomerAccountController extends Controller
                 });
             }
 
-            // Optional: filter by status (Active / Inactive/Obsolete)
-            if ($request->has('status')) {
-                $status = strtolower($request->input('status'));
+            // Filter by status with "active" as default for safety
+            $status = strtolower($request->input('status', 'active'));
 
+            if ($status !== 'all') {
                 $query->where(function ($q) use ($status) {
                     if ($status === 'active') {
                         $q->whereIn('AC_STS', ['A', 'Active', ''])
