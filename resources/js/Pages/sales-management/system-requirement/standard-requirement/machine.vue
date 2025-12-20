@@ -172,7 +172,7 @@
       class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
     >
       <div
-        class="bg-white rounded-xl shadow-lg border border-emerald-100 w-11/12 md:w-2/5 max-w-md mx-auto"
+        class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto"
       >
         <div
           class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl"

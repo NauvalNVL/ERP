@@ -151,46 +151,37 @@
                     </ul>
                   </div>
 
-                  <div
-                    class="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                    :class="{ 'cursor-pointer': selectedRow }"
-                    @click="selectedRow ? (showModal = true) : null"
-                  >
-                    <div class="flex justify-between items-center mb-2">
-                      <h4
-                        class="text-sm font-semibold text-blue-800 uppercase tracking-wider"
-                      >
-                        Design Information
-                      </h4>
-                      <button
-                        v-if="selectedRow"
-                        @click.stop="showModal = true"
-                        class="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-200"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    </div>
-                    <div class="space-y-2 text-sm">
-                      <div v-if="selectedRow" class="grid grid-cols-2 gap-2">
-                        <div class="font-medium text-gray-700">Code:</div>
-                        <div>{{ selectedRow.pd_code }}</div>
-                        <div class="font-medium text-gray-700">Name:</div>
-                        <div>{{ selectedRow.pd_name }}</div>
-                        <div class="font-medium text-gray-700">Product:</div>
-                        <div>{{ selectedRow.product }}</div>
-                        <div class="font-medium text-gray-700">IDC:</div>
-                        <div>{{ selectedRow.idc }}</div>
-                      </div>
-                      <div v-else class="text-gray-500 italic">
-                        Select a design to view details
-                      </div>
-                    </div>
-                    <div
-                      v-if="selectedRow"
-                      class="mt-3 text-xs text-blue-600 flex items-center"
+                  <div class="p-4 bg-blue-50 rounded-lg">
+                    <h4
+                      class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2"
                     >
-                      <i class="fas fa-info-circle mr-1"></i>
-                      Click the browse button to edit this design
+                      Common Design
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2 text-sm">
+                      <div class="flex items-center">
+                        <span
+                          class="w-6 h-6 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2"
+                        >
+                          T
+                        </span>
+                        <span>T-Trading</span>
+                      </div>
+                      <div class="flex items-center">
+                        <span
+                          class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2"
+                        >
+                          M
+                        </span>
+                        <span>M-Manufacture</span>
+                      </div>
+                      <div class="flex items-center">
+                        <span
+                          class="w-6 h-6 flex items-center justify-center bg-gray-600 text-white rounded-full font-bold mr-2"
+                        >
+                          -
+                        </span>
+                        <span>N/A</span>
+                      </div>
                     </div>
                   </div>
                 </div>

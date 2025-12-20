@@ -150,7 +150,7 @@
 
 		<!-- Edit Modal -->
 		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
-			<div class="bg-white rounded-xl shadow-lg border border-emerald-100 w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
+			<div class="bg-white rounded-xl shadow-lg w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
 				<div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
 					<div class="flex items-center">
 						<div class="p-2 bg-white/20 rounded-lg mr-3">

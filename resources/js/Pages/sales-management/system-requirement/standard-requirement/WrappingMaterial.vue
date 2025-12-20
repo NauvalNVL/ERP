@@ -201,7 +201,7 @@
 
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white rounded-lg shadow-xl border border-emerald-100 w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
         <div class="flex items-center justify-between p-4 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
           <div class="flex items-center">
             <div class="p-2 bg-white/20 rounded-lg mr-3">
