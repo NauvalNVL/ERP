@@ -12,6 +12,31 @@ use App\Models\Customer;
 
 class InvoiceController extends Controller
 {
+    private function normalizeCustomerStatus(?string $status): array
+    {
+        $raw = trim((string) $status);
+        $lower = strtolower($raw);
+
+        if ($raw === '' || in_array($lower, ['a', 'active', 'y'], true)) {
+            return ['label' => $raw ?: 'Active', 'category' => 'active'];
+        }
+
+        if (in_array($lower, ['i', 'inactive', 'n'], true)) {
+            return ['label' => 'Inactive', 'category' => 'inactive'];
+        }
+
+        if (in_array($lower, ['obsolete', 'obs', 'o'], true)) {
+            return ['label' => 'Obsolete', 'category' => 'inactive'];
+        }
+
+        return ['label' => $raw ?: 'Active', 'category' => 'other'];
+    }
+
+    private function isCustomerActive(?string $status): bool
+    {
+        return $this->normalizeCustomerStatus($status)['category'] === 'active';
+    }
+
     /**
      * Get current date/time in WIB timezone (UTC+7)
      *
@@ -481,6 +506,17 @@ class InvoiceController extends Controller
             if ($customer) {
                 Log::info("Customer found in Customer model: {$customerCode}", ['customer' => $customer->toArray()]);
 
+                $statusMeta = $this->normalizeCustomerStatus($customer->AC_STS ?? '');
+                if ($statusMeta['category'] !== 'active') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot prepare invoice because customer status is ' . $statusMeta['label'],
+                        'status_raw' => $customer->AC_STS ?? '',
+                        'status_label' => $statusMeta['label'],
+                        'status_category' => $statusMeta['category'],
+                    ], 422);
+                }
+
                 return response()->json([
                     'customer_code' => $customer->CODE,
                     'customer_name' => $customer->NAME,
@@ -488,6 +524,9 @@ class InvoiceController extends Controller
                     'tax_index_no' => '',
                     'salesperson' => $customer->SLM ?? '',
                     'area' => $customer->AREA ?? '',
+                    'status_raw' => $customer->AC_STS ?? '',
+                    'status_label' => $statusMeta['label'],
+                    'status_category' => $statusMeta['category'],
                     'debug_info' => [
                         'found_in_table' => 'Customer Model',
                         'search_code' => $customerCode
@@ -519,6 +558,9 @@ class InvoiceController extends Controller
                     'tax_index_no' => '',
                     'salesperson' => '',
                     'area' => '',
+                    'status_raw' => '',
+                    'status_label' => 'Active',
+                    'status_category' => 'active',
                     'debug_info' => [
                         'found_in_table' => 'DO',
                         'search_code' => $customerCode
@@ -555,6 +597,18 @@ class InvoiceController extends Controller
             }
 
             if ($customer) {
+                $statusValue = $customer->AC_STS ?? $customer->status ?? $customer->status_raw ?? '';
+                $statusMeta = $this->normalizeCustomerStatus($statusValue);
+                if ($statusMeta['category'] !== 'active') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot prepare invoice because customer status is ' . $statusMeta['label'],
+                        'status_raw' => $statusValue,
+                        'status_label' => $statusMeta['label'],
+                        'status_category' => $statusMeta['category'],
+                    ], 422);
+                }
+
                 $currency = $customer->CURRENCY ?? $customer->currency ?? $customer->Currency ?? $customer->currency_code ?? 'IDR';
                 $customerName = $customer->NAME ?? $customer->customer_name ?? $customer->Customer_Name ?? '';
                 $customerCodeResult = $customer->CODE ?? $customer->customer_code ?? $customer->Customer_Code ?? '';
@@ -566,6 +620,9 @@ class InvoiceController extends Controller
                     'tax_index_no' => $customer->tax_index_no ?? $customer->Tax_Index_No ?? '',
                     'salesperson' => $customer->SLM ?? $customer->salesperson ?? $customer->Salesperson ?? $customer->salesperson_code ?? '',
                     'area' => $customer->AREA ?? $customer->area ?? $customer->Area ?? $customer->geographical ?? '',
+                    'status_raw' => $statusValue,
+                    'status_label' => $statusMeta['label'],
+                    'status_category' => $statusMeta['category'],
                     'debug_info' => [
                         'found_in_table' => $usedTable,
                         'search_code' => $customerCode
