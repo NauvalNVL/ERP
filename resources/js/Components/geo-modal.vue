@@ -114,6 +114,17 @@ const selectedGeo = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
 
+const isActiveGeo = (geo) => {
+  const status = geo?.status ?? geo?.STATUS;
+  if (status === undefined || status === null || String(status).trim() === '') return true;
+
+  const s = String(status).trim().toLowerCase();
+  if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+  if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+  return true;
+};
+
 // Compute filtered geos based on search query
 const filteredGeos = computed(() => {
   let geos = props.geos;
@@ -124,7 +135,7 @@ const filteredGeos = computed(() => {
   }
   
   // Only show active geos (hide obsolete ones)
-  geos = geos.filter(geo => !geo.status || geo.status === 'Act');
+  geos = geos.filter(isActiveGeo);
   
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();

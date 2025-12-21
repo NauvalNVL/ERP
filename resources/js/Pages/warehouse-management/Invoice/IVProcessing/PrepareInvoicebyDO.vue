@@ -3,11 +3,14 @@
     <div class="space-y-6" v-page-transition>
       <!-- Hero header -->
       <div class="mx-auto w-full max-w-5xl">
-        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-xl shadow-sm">
-          <div class="px-6 py-5 flex items-center justify-between">
-            <div class="flex items-center gap-2 text-sm">
-              <i class="fa fa-file-invoice-dollar text-white"></i>
-              <span class="font-semibold text-white">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</span>
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 text-white shadow-sm rounded-xl border border-blue-700">
+          <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+              <i class="fa fa-file-invoice-dollar text-white text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-lg sm:text-xl font-semibold leading-tight">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</h2>
+              <p class="text-xs sm:text-sm text-blue-100">Prepare invoices by delivery order for invoice processing.</p>
             </div>
           </div>
         </div>
@@ -388,7 +391,7 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, computed, watch, defineAsyncComponent } from 'vue'
+import { ref, reactive, computed, watch, defineAsyncComponent } from 'vue'
 import Swal from 'sweetalert2'
 
 const swalToast = Swal.mixin({
@@ -483,6 +486,18 @@ const updatePeriodValid = computed(() => {
 const customerCode = ref('')
 const showCustomerModal = ref(false)
 async function selectCustomer(customer){
+  if (!customer) return
+
+  const statusMeta = extractCustomerStatusMeta(customer)
+  if (statusMeta.category !== 'active') {
+    toast.error(
+      `Customer ${
+        customer.customer_code ?? customer.code ?? ''
+      } is ${statusMeta.label || 'Inactive'} and cannot be used for invoicing.`
+    )
+    return
+  }
+
   customerCode.value = customer?.customer_code || customer?.code || ''
   customerName.value = customer?.customer_name || ''
 
@@ -495,6 +510,8 @@ async function selectCustomer(customer){
   // Track the selected customer code to detect manual changes later
   lastSelectedCustomerCode.value = customerCode.value
 
+  setCustomerStatus(statusMeta)
+
   showCustomerModal.value = false
 
   // Try to fetch more details from API (optional enhancement)
@@ -505,6 +522,19 @@ async function selectCustomer(customer){
       })
       if (res.ok) {
         const data = await res.json()
+        const apiStatus = extractCustomerStatusMeta(data)
+        if (apiStatus.category !== 'active') {
+          toast.error(
+            `Customer ${
+              data.customer_code || customerCode.value
+            } is ${apiStatus.label || 'Inactive'} and cannot be used for invoicing.`
+          )
+          clearCustomerSelection()
+          return
+        }
+
+        setCustomerStatus(apiStatus)
+
         // Only update if API returns data AND it's different from modal selection
         if (data.customer_name && data.customer_name !== customerName.value) {
           customerName.value = data.customer_name
@@ -526,10 +556,24 @@ async function selectCustomer(customer){
         }
         // Update other fields that don't conflict
         if (data.tax_index_no) taxIndexNo.value = data.tax_index_no
+      } else {
+        let errorMessage = `Failed to validate customer (HTTP ${res.status})`
+        try {
+          const errorPayload = await res.json()
+          errorMessage = extractApiErrorMessage(errorPayload, errorMessage)
+        } catch (_) {
+          const fallbackText = await res.text()
+          if (fallbackText) errorMessage = fallbackText
+        }
+        toast.error(errorMessage)
+        clearCustomerSelection()
+        return
       }
     } catch (e) {
       console.error('Failed to fetch customer details from API, using modal data:', e)
-      // Already populated from modal data above, so no problem
+      toast.error(`Failed to validate customer: ${e.message || 'Network error'}`)
+      clearCustomerSelection()
+      return
     }
   }
 
@@ -542,6 +586,11 @@ const currency = ref('')
 const taxIndexNo = ref('')
 const selectedTaxCode = ref('')
 const selectedIndexData = ref(null) // Store full tax index data: { index_number, tax_group_code, tax_group_name, status }
+const customerStatus = reactive({
+  raw: '',
+  label: '',
+  category: ''
+})
 const taxModalOpen = ref(false)
 const invoiceDate = ref(new Date().toISOString().slice(0,10))
 const secondRef = ref('')
@@ -597,9 +646,64 @@ watch(() => customerCode.value, (newVal, oldVal) => {
     taxIndexNo.value = ''
     selectedTaxCode.value = ''
     selectedIndexData.value = null
+    setCustomerStatus()
     console.log('🔄 Customer changed, tax index reset')
   }
 })
+
+
+const normalizeCustomerStatus = (status) => {
+  const raw = (status ?? '').toString().trim()
+  const lower = raw.toLowerCase()
+  if (!raw || ['a', 'active', 'y'].includes(lower)) {
+    return { raw, label: raw || 'Active', category: 'active' }
+  }
+  if (['i', 'inactive', 'n'].includes(lower)) {
+    return { raw, label: 'Inactive', category: 'inactive' }
+  }
+  if (['obsolete', 'obs', 'o'].includes(lower)) {
+    return { raw, label: 'Obsolete', category: 'inactive' }
+  }
+  return { raw, label: raw || 'Unknown', category: 'other' }
+}
+
+const extractCustomerStatusMeta = (payload) => {
+  const raw =
+    payload?.status_raw ??
+    payload?.status ??
+    payload?.statusLabel ??
+    payload?.status_label ??
+    ''
+  const normalized = normalizeCustomerStatus(raw)
+  const label =
+    payload?.status_label || payload?.statusLabel || normalized.label
+  const category =
+    payload?.status_category || payload?.statusCategory || normalized.category
+  return {
+    raw: normalized.raw,
+    label,
+    category
+  }
+}
+
+const setCustomerStatus = (meta = { raw: '', label: '', category: '' }) => {
+  customerStatus.raw = meta.raw || ''
+  customerStatus.label = meta.label || ''
+  customerStatus.category = meta.category || ''
+}
+
+const clearCustomerSelection = (options = { keepCode: false }) => {
+  if (!options.keepCode) {
+    customerCode.value = ''
+  }
+  customerName.value = ''
+  currency.value = ''
+  taxIndexNo.value = ''
+  selectedTaxCode.value = ''
+  selectedIndexData.value = null
+  setCustomerStatus()
+  lastSelectedCustomerCode.value = ''
+}
 
 function selectTaxIndex(row){
   // row contains: index_number, tax_group_code, tax_group_name, status
@@ -1193,6 +1297,7 @@ async function onCustomerCodeInput() {
   if (customerCode.value !== lastSelectedCustomerCode.value) {
     customerName.value = ''
     currency.value = ''
+    setCustomerStatus()
   }
 
   // Auto-lookup customer details when code is entered (debounced)
@@ -1224,11 +1329,24 @@ async function onCustomerCodeInput() {
           if (data) {
             console.log('Debug info from backend:', data.debug_info)
 
+            const apiStatus = extractCustomerStatusMeta(data)
+
+            if (apiStatus.category !== 'active') {
+              toast.error(
+                `Customer ${data.customer_code || code} is ${
+                  apiStatus.label || 'Inactive'
+                } and cannot be used for invoicing.`
+              )
+              clearCustomerSelection()
+              return
+            }
+
             if (data.customer_name && data.customer_name.trim() !== '') {
               customerName.value = data.customer_name
               // Extract only currency code (3 letters)
               currency.value = extractCurrencyCode(data.currency)
               lastSelectedCustomerCode.value = code
+              setCustomerStatus(apiStatus)
 
               console.log(`Auto-lookup successful: ${data.customer_name}, Currency: ${currency.value}`)
               console.log(`Found in table: ${data.debug_info?.found_in_table}`)
@@ -1242,31 +1360,35 @@ async function onCustomerCodeInput() {
                 console.error(`Backend error: ${data.error}`)
                 console.error(`Error details: ${data.debug_info?.error_message}`)
               }
-              customerName.value = ''
-              currency.value = ''
+              clearCustomerSelection(true)
             }
           } else {
             console.log('No data returned from API')
-            customerName.value = ''
-            currency.value = ''
+            clearCustomerSelection(true)
           }
         } else {
           console.log(`API error: ${res.status} ${res.statusText}`)
-          const errorText = await res.text()
-          console.log('Error response:', errorText)
-          customerName.value = ''
-          currency.value = ''
+          let errorMessage = `Failed to validate customer (HTTP ${res.status})`
+          try {
+            const errorPayload = await res.json()
+            errorMessage = extractApiErrorMessage(errorPayload, errorMessage)
+          } catch (_) {
+            const errorText = await res.text()
+            console.log('Error response:', errorText)
+            if (errorText) errorMessage = errorText
+          }
+          toast.error(errorMessage)
+          clearCustomerSelection(true)
         }
       } catch (error) {
         console.error('Customer lookup failed:', error)
-        customerName.value = ''
-        currency.value = ''
+        toast.error(`Failed to validate customer: ${error.message || 'Network error'}`)
+        clearCustomerSelection(true)
       }
     }, 500) // Wait 500ms after user stops typing
   } else if (code.length === 0) {
     // Clear fields when input is empty
-    customerName.value = ''
-    currency.value = ''
+    clearCustomerSelection()
   }
 }
 

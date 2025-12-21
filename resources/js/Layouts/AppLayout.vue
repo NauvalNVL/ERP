@@ -15,7 +15,7 @@
         <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
             <nav
-                class="sticky top-0 z-10 transition-transform duration-300 ease-out"
+                class="sticky top-0 z-20 transition-transform duration-300 ease-out"
                 :class="
                     headerHidden
                         ? '-translate-y-full shadow-none'

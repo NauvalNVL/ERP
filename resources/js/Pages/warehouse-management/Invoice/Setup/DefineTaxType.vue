@@ -406,6 +406,14 @@ const showNotification = (message, type = 'success') => {
     }, 3000);
 };
 
+const handleObsoleteSelection = (code, message) => {
+    showNotification(
+        message || `Tax type ${code || ''} is obsolete and cannot be used.`,
+        'error'
+    );
+    resetForm();
+};
+
 // Methods
 const resetForm = () => {
     form.value = {
@@ -432,6 +440,14 @@ const getSelectedTaxType = () => {
 
 const selectFromTable = (tx) => {
     if (!tx) return;
+    if ((tx.status || '').toUpperCase() === 'O') {
+        handleObsoleteSelection(
+            tx.code,
+            `Tax type ${tx.code} is obsolete and cannot be selected.`
+        );
+        showTable.value = false;
+        return;
+    }
     form.value.code = tx.code;
     form.value.name = tx.name;
     form.value.apply = tx.apply;
@@ -463,9 +479,22 @@ const handleCodeInput = async () => {
             showForm.value = true;
         }
     } catch (e) {
-        // Not found - can create new
-        recordMode.value = 'select';
-        showForm.value = false;
+        const status = e.response?.status;
+        if (status === 422) {
+            handleObsoleteSelection(
+                form.value.code,
+                e.response?.data?.message
+            );
+            return;
+        }
+        if (status === 404) {
+            // Not found - can create new
+            recordMode.value = 'select';
+            showForm.value = false;
+            return;
+        }
+        console.error('Error fetching tax type:', e);
+        showNotification('Failed to fetch tax type data.', 'error');
     }
 };
 

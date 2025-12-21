@@ -6,28 +6,28 @@
 		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
 			<div class="max-w-7xl mx-auto">
 				<!-- Header Section -->
-				<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+				<div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
 					<div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 						<div class="flex items-center gap-3">
-							<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+							<div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
 								<i class="fas fa-industry text-white text-sm"></i>
 							</div>
 							<div>
 								<h1 class="text-lg sm:text-xl font-semibold leading-tight">Manage Industry Status</h1>
-								<p class="text-xs sm:text-sm text-emerald-100">
+								<p class="text-xs sm:text-sm text-green-100">
 									Activate or deactivate industries quickly and easily.
 								</p>
 							</div>
 						</div>
 						<div class="relative w-full sm:w-72">
-							<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-100">
+							<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-green-100">
 								<i class="fas fa-search text-xs"></i>
 							</span>
 							<input
 								v-model="searchQuery"
 								type="text"
 								placeholder="Cari industry (code, nama)..."
-								class="block w-full rounded-md border border-gray-200 bg-white py-1.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+								class="block w-full rounded-md border border-gray-200 bg-white py-1.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
 							/>
 						</div>
 					</div>
@@ -218,6 +218,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import Swal from 'sweetalert2';
 
 // Props from controller
 const props = defineProps({
@@ -314,7 +315,18 @@ const toggleIndustryStatus = async (industry) => {
     if (isToggling.value) return;
     
     const confirmMessage = `Are you sure you want to change the status for "${industry.code} - ${industry.name}"?`;
-    if (!confirm(confirmMessage)) return;
+    const confirmRes = await Swal.fire({
+        title: 'Confirm Status Change?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) return;
     
     isToggling.value = true;
     

@@ -849,6 +849,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch, defineAsyncComponent } from "vue";
+import Swal from "sweetalert2";
 
 const selectedMcsFull = ref(null);
 // Reset SO/WO paper quality arrays to empty values
@@ -1107,7 +1108,18 @@ const saveSpecialInstructions = async (rows) => {
       ? rows.slice(0, 4).map((v) => (v ?? "") + "")
       : ["", "", "", ""];
 
-    if (!window.confirm("Save Special Instructions for this Master Card?")) {
+    const confirmRes = await Swal.fire({
+      title: "Save Special Instructions?",
+      text: "Save Special Instructions for this Master Card?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+      allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
       return;
     }
 
@@ -1225,10 +1237,34 @@ const showCustomerAccountModal = ref(false);
 const isLoadingCustomers = ref(false);
 const customerSortOption = ref("customer_code"); // Default sort by customer code
 
+const getCustomerStatusLabel = (customer) => {
+  return (
+    customer?.status_label ||
+    customer?.status ||
+    customer?.status_raw ||
+    ""
+  )
+    .toString()
+    .trim()
+    .toLowerCase();
+};
+
+const restrictedStatuses = ["obsolete", "obs", "o", "inactive", "inact", "i", "n"];
+const isRestrictedCustomer = (customer) =>
+  restrictedStatuses.includes(getCustomerStatusLabel(customer));
+
+const getStatusDisplay = (customer) =>
+  (customer?.status_label ||
+    customer?.status ||
+    customer?.status_raw ||
+    "Inactive").toString();
+
 // Computed Properties for Customer Account
 const filteredCustomers = computed(() => {
   const list = Array.isArray(customersList.value) ? customersList.value : [];
-  const safeList = list.filter((c) => c && typeof c === "object");
+  const safeList = list
+    .filter((c) => c && typeof c === "object")
+    .filter((customer) => !isRestrictedCustomer(customer));
 
   const q = (searchTerm.value || "").toString().trim();
   if (!q) {
@@ -1318,6 +1354,13 @@ const loadCustomerAccounts = async () => {
 // This is the main selectCustomer function that will be used
 const selectCustomer = async (customer) => {
   if (!customer) return;
+  if (isRestrictedCustomer(customer)) {
+    const statusLabel = getStatusDisplay(customer);
+    toast.error(
+      `Customer ${customer.customer_code ?? ""} is ${statusLabel} and cannot be used for Master Card updates.`
+    );
+    return;
+  }
 
   // Show processing state
   isProcessing.value = true;
@@ -1653,19 +1696,23 @@ const deriveMcShortModel = (model) => {
 watch(
   () => form.value.mc_model,
   (newVal, oldVal) => {
-    console.log('🔍 MC Model changed:', { newVal, oldVal, shortModel: form.value.mc_short_model });
+    console.log("🔍 MC Model changed:", {
+      newVal,
+      oldVal,
+      shortModel: form.value.mc_short_model,
+    });
     const prevAuto = deriveMcShortModel(oldVal);
     const newAuto = deriveMcShortModel(newVal);
-    console.log('📝 Auto values:', { prevAuto, newAuto });
-    
+    console.log("📝 Auto values:", { prevAuto, newAuto });
+
     // Only auto-fill if short model is empty or matches the previous auto-generated value
     if (!form.value.mc_short_model || form.value.mc_short_model === prevAuto) {
-      console.log('✅ Auto-filling MC Short Model:', newAuto);
+      console.log("✅ Auto-filling MC Short Model:", newAuto);
       form.value.mc_short_model = newAuto;
       // Also update mcDetails to keep in sync
       mcDetails.value.mc_short_model = newAuto;
     } else {
-      console.log('⏭️ Skipping auto-fill (user has custom value)');
+      console.log("⏭️ Skipping auto-fill (user has custom value)");
     }
   }
 );
@@ -2264,6 +2311,45 @@ const handleAcInput = () => {
       int_dim_2: "",
       int_dim_3: "",
     };
+  }
+
+  const typedCode = (form.value.ac || "").toString().trim();
+  if (!typedCode) {
+    selectedCustomer.value = null;
+    form.value.customer_name = "";
+    return;
+  }
+
+  const match =
+    customersList.value.find(
+      (customer) =>
+        (customer?.customer_code || "")
+          .toString()
+          .trim()
+          .toLowerCase() === typedCode.toLowerCase()
+    ) || null;
+
+  if (match) {
+    if (isRestrictedCustomer(match)) {
+      const statusLabel = getStatusDisplay(match);
+      toast.error(
+        `Customer ${match.customer_code ?? ""} is ${statusLabel} and cannot be used for Master Card updates.`
+      );
+      isProgrammaticUpdate.value = true;
+      form.value.ac = "";
+      form.value.customer_name = "";
+      isProgrammaticUpdate.value = false;
+      selectedCustomer.value = null;
+      return;
+    }
+
+    selectedCustomer.value = match;
+    form.value.customer_name = match.customer_name || "";
+    mcDetails.value.ac_name = match.customer_name || "";
+    recordSelected.value = true;
+  } else {
+    selectedCustomer.value = null;
+    form.value.customer_name = "";
   }
 };
 

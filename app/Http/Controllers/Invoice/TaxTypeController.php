@@ -85,6 +85,13 @@ class TaxTypeController extends Controller
                 ], 404);
             }
 
+            if (strtoupper($taxType->status ?? '') === 'O') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot use this tax type because it is marked as Obsolete.',
+                ], 422);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $taxType

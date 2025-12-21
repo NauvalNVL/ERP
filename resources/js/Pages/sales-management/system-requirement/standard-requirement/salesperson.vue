@@ -10,14 +10,14 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
     <!-- Header Section -->
-    <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
         <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-            <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+            <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                 <i class="fas fa-user-tie text-white text-lg"></i>
             </div>
             <div>
                 <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Salesperson</h2>
-                <p class="text-xs sm:text-sm text-emerald-100">Define salespersons for sales management</p>
+                <p class="text-xs sm:text-sm text-green-100">Define salespersons for sales management</p>
             </div>
         </div>
     </div>
@@ -264,6 +264,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalespersonModal from '@/Components/salesperson-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -578,7 +579,18 @@ const saveSalespersonChanges = async () => {
 };
 
 const deleteSalesperson = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this salesperson?`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Salesperson?',
+        text: 'Are you sure you want to obsolete this salesperson?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

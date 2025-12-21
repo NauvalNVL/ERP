@@ -3,8 +3,12 @@
     <!-- Header with animation -->
     <div class="px-4 py-3 border-b border-gray-700 relative z-10">
       <div class="flex items-center">
-        <div class="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full mr-3 pulse">
-          <i class="fas fa-building text-xl"></i>
+        <div class="w-10 h-10 rounded-full mr-3 overflow-hidden pulse flex items-center justify-center">
+          <img
+            :src="logoSrc"
+            alt="ERP Logo"
+            class="w-full h-full object-contain"
+          />
         </div>
         <h1 class="text-xl font-bold slide-in-right">ERP System</h1>
       </div>
@@ -182,6 +186,7 @@ const user = computed(() => page.props.auth?.user);
 const userPermissions = computed(() => page.props.auth?.permissions || []);
 const userInitial = computed(() => user.value?.username ? user.value.username.charAt(0).toUpperCase() : 'G');
 const currentPath = computed(() => page.url);
+const logoSrc = new URL('../../../../public/favicon.png', import.meta.url).href;
 
 // Extract the base path from the URL (e.g., '/foreign-currency/view-print' -> '/foreign-currency')
 const getBasePath = (path) => {
@@ -244,6 +249,7 @@ const hasPermission = (menuKey) => {
     menuKey === 'obsolete_unobsolete_bundling_string' ||
     menuKey === 'obsolete_unobsolete_wrapping_material' ||
     menuKey === 'obsolete_unobsolete_glueing_material' ||
+    menuKey === 'obsolete_reactive_customer_group' ||
     menuKey === 'obsolete_unobsolete_tax_type' ||
     menuKey === 'obsolete_unobsolete_tax_group' ||
     menuKey === 'obsolete_unobsolete_customer_sales_tax_index' ||
@@ -327,6 +333,7 @@ const getPermissionKeyFromTitle = (title) => {
 
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
+    'Obsolete/Reactive Customer Group': 'obsolete_reactive_customer_group',
     'Update Customer Account': 'update_customer_account',
     'Define Customer Alternate Address': 'define_customer_alternate_address',
     'Define Customer Sales Type': 'define_customer_sales_type',
@@ -418,6 +425,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Update Customer Account': 'update_customer_account',
     'Define Customer Alternate Address': 'define_customer_alternate_address',
     'Define Customer Sales Type': 'define_customer_sales_type',
+    'Obsolete/Reactive Customer Group': 'obsolete_reactive_customer_group',
     'View & Print Customer Group': 'view_print_customer_group',
     'View & Print Customer Account': 'view_print_customer_account',
     'View & Print Customer Alternate Address': 'view_print_customer_alternate_address',
@@ -662,6 +670,7 @@ const salesManagementItems = [
         icon: 'fas fa-user-circle',
         children: [
           { title: 'Define Customer Group', icon: 'fas fa-users', route: '/customer-group' },
+          { title: 'Obsolete/Reactive Customer Group', icon: 'fas fa-user-clock', route: '/obsolete-reactive-customer-group' },
           { title: 'Update Customer Account', icon: 'fas fa-user-edit', route: '/update-customer-account' },
           { title: 'Obsolete/Reactive Customer A/C', icon: 'fas fa-user-clock', route: '/obsolete-reactive-customer-account' },
           { title: 'Define Customer Alternate Address', icon: 'fas fa-map-marked-alt', route: '/customer-alternate-address' },

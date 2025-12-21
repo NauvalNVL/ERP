@@ -22,10 +22,12 @@ class CustomerGroup extends Model
         'Group_Name',
         'Currency',
         'AC',
-        'Name'
+        'Name',
+        'Status'
     ];
 
     // Add accessors to $appends for JSON serialization
+    // Note: 'status' is NOT in appends because it's a real database column
     protected $appends = ['group_code', 'description'];
 
     // Map to CPS fields for backward compatibility

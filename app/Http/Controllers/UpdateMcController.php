@@ -877,6 +877,18 @@ class UpdateMcController extends Controller
             // Map and upsert to legacy MC table for reporting/compatibility
             // Get customer data to populate AC_NAME and CURRENCY
             $customer = \App\Models\Customer::where('CODE', $validated['customer_code'])->first();
+            if (!$customer) {
+                return response()->json([
+                    'message' => 'Customer not found. Please select a valid customer account before saving Master Card.',
+                ], 422);
+            }
+
+            $customerStatus = strtolower(trim($customer->AC_STS ?? ''));
+            if (in_array($customerStatus, ['obsolete', 'obs', 'o'])) {
+                return response()->json([
+                    'message' => 'Cannot create or update Master Card for a customer with status Obsolete.',
+                ], 422);
+            }
 
             Log::info('Customer lookup', [
                 'customer_code' => $validated['customer_code'],

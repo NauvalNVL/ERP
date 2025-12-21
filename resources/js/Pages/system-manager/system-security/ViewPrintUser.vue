@@ -1,53 +1,57 @@
 <template>
     <AppLayout header="View & Print User">
         <Head title="View & Print User" />
-        <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
             <div class="max-w-7xl mx-auto w-full relative z-0">
+                <!-- Floating background bubbles -->
+                <div class="hidden md:block absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+                    <div class="bubble bubble-1"></div>
+                    <div class="bubble bubble-2"></div>
+                    <div class="bubble bubble-4"></div>
+                </div>
                 <!-- Header Card -->
-                <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 mb-4">
-                    <div class="bg-blue-600 px-4 py-3 sm:px-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                            <div class="flex items-center">
-                                <div class="bg-white/20 rounded-full p-3 mr-3">
-                                    <UsersIcon class="h-6 w-6 text-white" />
-                                </div>
-                                <div>
-                                    <h1 class="text-lg md:text-xl font-semibold text-white leading-tight mb-1">View & Print Users</h1>
-                                    <p class="text-blue-100 text-xs md:text-sm">Comprehensive user information and printing</p>
-                                </div>
+                <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg rounded-2xl border border-indigo-700 mb-6">
+                    <div class="px-4 py-3 sm:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="h-9 w-9 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <UsersIcon class="h-5 w-5 text-white" />
                             </div>
-                            <div class="flex flex-wrap items-center gap-2 justify-start md:justify-end">
-                                <button
-                                    @click="refreshData"
-                                    class="inline-flex items-center px-3 py-2 bg-white/10 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Refresh Data"
-                                >
-                                    <ArrowPathIcon class="h-5 w-5 mr-2" />
-                                    Refresh
-                                </button>
-                                <button
-                                    @click="printUsers"
-                                    class="inline-flex items-center px-3 py-2 bg-emerald-500 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Print Users"
-                                >
-                                    <PrinterIcon class="h-5 w-5 mr-2" />
-                                    Print
-                                </button>
+                            <div>
+                                <h2 class="text-lg sm:text-xl font-semibold leading-tight">View &amp; Print User</h2>
+                                <p class="text-xs sm:text-sm text-indigo-100">Comprehensive user information and printing</p>
                             </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 justify-start md:justify-end">
+                            <button
+                                @click="refreshData"
+                                class="inline-flex items-center px-3 py-2 bg-white/10 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Refresh Data"
+                            >
+                                <ArrowPathIcon class="h-5 w-5 mr-2" />
+                                Refresh
+                            </button>
+                            <button
+                                @click="printUsers"
+                                class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Print Users"
+                            >
+                                <PrinterIcon class="h-5 w-5 mr-2" />
+                                Print
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- User Table -->
-                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4">
-                    <div class="bg-blue-600 px-4 py-3 sm:px-6">
+                <div class="bg-white/90 shadow-lg rounded-2xl border border-indigo-100 overflow-hidden mb-4 backdrop-blur-sm">
+                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 px-4 py-3 sm:px-6">
                         <h2 class="text-lg md:text-xl font-semibold text-white flex items-center">
                             <div class="bg-white/20 rounded-full p-2 mr-3">
                                 <TableCellsIcon class="h-6 w-6 text-white" />
                             </div>
                             User Directory
                         </h2>
-                        <p class="text-blue-100 text-xs md:text-sm mt-1">Click on any user to view detailed information</p>
+                        <p class="text-indigo-100 text-xs md:text-sm mt-1">Click on any user to view detailed information</p>
                     </div>
                     <div class="overflow-hidden">
                         <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
@@ -57,7 +61,7 @@
                                     <tr>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
-                                                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-1 mr-2">
+                                                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full p-1 mr-2">
                                                     <IdentificationIcon class="h-4 w-4 text-white" />
                                                 </div>
                                                 User ID
@@ -65,7 +69,7 @@
                                         </th>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
-                                                <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-1 mr-2">
+                                                <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-1 mr-2">
                                                     <UserIcon class="h-4 w-4 text-white" />
                                                 </div>
                                                 Username
@@ -73,7 +77,7 @@
                                         </th>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
-                                                <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-1 mr-2">
+                                                <div class="bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full p-1 mr-2">
                                                     <CheckCircleIcon class="h-4 w-4 text-white" />
                                                 </div>
                                                 Official Name
@@ -81,7 +85,7 @@
                                         </th>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
-                                                <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-1 mr-2">
+                                                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full p-1 mr-2">
                                                     <BriefcaseIcon class="h-4 w-4 text-white" />
                                                 </div>
                                                 Position
@@ -89,7 +93,7 @@
                                         </th>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
-                                                <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
+                                                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full p-1 mr-2">
                                                     <CheckCircleIcon class="h-4 w-4 text-white" />
                                                 </div>
                                                 Status
@@ -109,8 +113,8 @@
                                     >
                                         <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="rounded-md bg-blue-50 border border-blue-100 px-3 py-1.5">
-                                                    <span class="text-xs font-mono font-semibold text-blue-700">{{ user.userID }}</span>
+                                                <div class="rounded-md bg-indigo-50 border border-indigo-100 px-3 py-1.5">
+                                                    <span class="text-xs font-mono font-semibold text-indigo-700">{{ user.userID }}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -173,8 +177,8 @@
                                 >
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <div class="bg-blue-50 border border-blue-100 rounded-md px-3 py-1.5 mr-3">
-                                                <span class="text-xs font-mono font-semibold text-blue-700">{{ user.userID }}</span>
+                                            <div class="bg-indigo-50 border border-indigo-100 rounded-md px-3 py-1.5 mr-3">
+                                                <span class="text-xs font-mono font-semibold text-indigo-700">{{ user.userID }}</span>
                                             </div>
                                         </div>
                                         <div>
@@ -196,16 +200,16 @@
                 </div>
 
                 <!-- User Details Form -->
-                <div v-if="selectedUser" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mb-4">
-                    <div class="bg-emerald-600 px-4 py-4 sm:px-6">
+                <div v-if="selectedUser" class="bg-white/90 shadow-lg rounded-2xl border border-indigo-100 overflow-hidden mb-4 backdrop-blur-sm">
+                    <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-4 py-4 sm:px-6">
                         <div class="flex items-center">
                             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
                                 {{ selectedUser.officialName ? selectedUser.officialName.charAt(0).toUpperCase() : selectedUser.userID.charAt(0).toUpperCase() }}
                             </div>
                             <div>
                                 <h3 class="text-xl md:text-2xl font-bold text-white">{{ selectedUser.officialName || selectedUser.userName }}</h3>
-                                <p class="text-emerald-100">{{ selectedUser.userID }} • {{ selectedUser.officialTitle || 'No Title' }}</p>
-                                <p class="text-sm text-emerald-200 mt-1">✓ User selected for detailed view</p>
+                                <p class="text-indigo-100">{{ selectedUser.userID }} • {{ selectedUser.officialTitle || 'No Title' }}</p>
+                                <p class="text-sm text-indigo-200 mt-1">✓ User selected for detailed view</p>
                             </div>
                         </div>
                     </div>
@@ -215,19 +219,19 @@
                             <div class="space-y-6">
                                 <div class="bg-white rounded-lg p-4 sm:p-5 border border-gray-200">
                                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                        <UserIcon class="h-5 w-5 mr-2 text-emerald-600" />
+                                        <UserIcon class="h-5 w-5 mr-2 text-indigo-600" />
                                         Personal Information
                                     </h4>
                                     <div class="space-y-4">
                                         <div class="flex flex-col">
                                             <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                                <IdentificationIcon class="h-4 w-4 mr-2 text-blue-500" />
+                                                <IdentificationIcon class="h-4 w-4 mr-2 text-indigo-500" />
                                                 Official Name
                                             </label>
                                             <input
                                                 v-model="selectedUser.officialName"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
                                                 readonly
                                             >
                                         </div>
@@ -240,7 +244,7 @@
                                             <input
                                                 v-model="selectedUser.officialTitle"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                 readonly
                                             >
                                         </div>
@@ -253,20 +257,20 @@
                                             <input
                                                 v-model="selectedUser.mobileNumber"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                 readonly
                                             >
                                         </div>
 
                                         <div class="flex flex-col">
                                             <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                                <PhoneIcon class="h-4 w-4 mr-2 text-blue-500" />
+                                                <PhoneIcon class="h-4 w-4 mr-2 text-indigo-500" />
                                                 Office Tel
                                             </label>
                                             <input
                                                 v-model="selectedUser.officeTel"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                 readonly
                                             >
                                         </div>
@@ -284,7 +288,7 @@
                                             <input
                                                 v-model="selectedUser.slmName"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                 readonly
                                             >
                                         </div>
@@ -293,7 +297,7 @@
                                             <input
                                                 v-model="selectedUser.menuType"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                 readonly
                                             >
                                         </div>
@@ -315,7 +319,7 @@
                                                 <input
                                                     v-model="selectedUser.passwordExpiry"
                                                     type="text"
-                                                    class="w-20 px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-center focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
+                                                    class="w-20 px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
                                                     readonly
                                                 >
                                                 <span class="text-sm text-gray-600">[Zero for None]</span>
@@ -327,7 +331,7 @@
                                                 <input
                                                     v-model="selectedUser.passwordExpired"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
                                                     readonly
                                                 >
                                             </div>
@@ -336,7 +340,7 @@
                                                 <input
                                                     v-model="selectedUser.passwordLocked"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>
@@ -356,7 +360,7 @@
                                                 <input
                                                     v-model="selectedUser.accessUnitPrice"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>
@@ -365,7 +369,7 @@
                                                 <input
                                                     v-model="selectedUser.amendMC"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>
@@ -376,7 +380,7 @@
                                                 <input
                                                     v-model="selectedUser.accessCustomerAC"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>
@@ -385,7 +389,7 @@
                                                 <input
                                                     v-model="selectedUser.amendMCPrice"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>
@@ -395,7 +399,7 @@
                                             <input
                                                 v-model="selectedUser.amendExpiredPassword"
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                 readonly
                                             >
                                         </div>
@@ -405,7 +409,7 @@
                                                 <input
                                                     v-model="selectedUser.rcRtPrice"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>
@@ -414,7 +418,7 @@
                                                 <input
                                                     v-model="selectedUser.bpRcCost"
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                                     readonly
                                                 >
                                             </div>

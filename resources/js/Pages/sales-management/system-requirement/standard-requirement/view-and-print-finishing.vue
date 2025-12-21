@@ -5,14 +5,14 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
             <!-- Header Section -->
-            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
                 <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                         <i class="fas fa-tools text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Finishings</h2>
-                        <p class="text-xs sm:text-sm text-emerald-100">Preview and print finishing data</p>
+                        <p class="text-xs sm:text-sm text-green-100">Preview and print finishing data</p>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                 <div class="overflow-x-auto">
                     <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                         <!-- Table Header -->
-                        <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
+                        <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
                             <div class="flex items-center">
                                 <div class="mr-4">
                                     <i class="fas fa-tools text-3xl"></i>
@@ -72,12 +72,6 @@
                                     </th>
                                     <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Status <i class="fas fa-sort ml-1"></i>
-                                    </th>
-                                    <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
-                                        Created At <i class="fas fa-sort ml-1"></i>
-                                    </th>
-                                    <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
-                                        Updated At <i class="fas fa-sort ml-1"></i>
                                     </th>
                                 </tr>
                             </thead>
@@ -113,12 +107,6 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">{{ finishing.status || '' }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">{{ formatDate(finishing.created_at) }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">{{ formatDate(finishing.updated_at) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -210,12 +198,6 @@ const sortTable = (column) => {
     }
 };
 
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
-};
-
 // Filtered and sorted finishings
 const filteredFinishings = computed(() => {
     let filtered = [...finishings.value];
@@ -283,15 +265,13 @@ const printTable = () => {
             finishing.id || 'N/A',
             finishing.code || 'N/A',
             finishing.description || 'N/A',
-            finishing.status || '',
-            formatDate(finishing.created_at),
-            formatDate(finishing.updated_at)
+            finishing.status || ''
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['ID', 'Code', 'Description', 'Status', 'Created At', 'Updated At']],
+            head: [['ID', 'Code', 'Description', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

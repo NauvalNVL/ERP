@@ -150,9 +150,15 @@
                             <td class="px-2 py-2 text-sm font-medium">
                               {{ 1001 + index }}
                             </td>
-                            <td class="px-2 py-2 text-sm">{{ item.so_number }}</td>
-                            <td class="px-2 py-2 text-sm">{{ item.mc_seq }}</td>
-                            <td class="px-2 py-2 text-sm">{{ item.do_ref }}</td>
+                            <td class="px-2 py-2 text-sm">
+                              {{ item.so_number }}
+                            </td>
+                            <td class="px-2 py-2 text-sm">
+                              {{ item.mc_seq }}
+                            </td>
+                            <td class="px-2 py-2 text-sm">
+                              {{ item.do_ref }}
+                            </td>
                             <td class="px-2 py-2 text-sm text-right font-semibold">
                               {{ formatCurrency(item.amount) }}
                             </td>
@@ -298,6 +304,7 @@
                                 v-model.number="item.to_bill"
                                 @input="onToBillChange(item)"
                                 type="number"
+                                :disabled="Number(item.unbill || 0) <= 0"
                                 :max="item.unbill"
                                 placeholder="0"
                                 class="w-full px-1 py-1 text-center border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -310,6 +317,7 @@
                                 v-model.number="item.to_bill_kg"
                                 @input="onToBillKgChange(item)"
                                 type="number"
+                                :disabled="Number(item.unbill || 0) <= 0"
                                 :max="item.unbill"
                                 step="0.0001"
                                 placeholder="0"

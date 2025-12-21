@@ -5,14 +5,14 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
-        <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
             <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                     <i class="fas fa-print text-white text-lg"></i>
                 </div>
                 <div>
                     <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Bundling Strings</h2>
-                    <p class="text-xs sm:text-sm text-emerald-100">Preview and print bundling string data</p>
+                    <p class="text-xs sm:text-sm text-green-100">Preview and print bundling string data</p>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
         <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
                             <i class="fas fa-link text-3xl"></i>
@@ -67,9 +67,6 @@
                             <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Name <i :class="getSortIcon('name')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('description')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Description <i :class="getSortIcon('description')" class="text-xs"></i>
-                            </th>
                             <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
                                 Status <i :class="getSortIcon('status')" class="text-xs"></i>
                             </th>
@@ -77,7 +74,7 @@
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
@@ -85,7 +82,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredBundlingStrings.length === 0">
-                            <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 No bundling strings found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -101,9 +98,6 @@
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ string.name || 'N/A' }}</div>
-                            </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ string.description || '-' }}</div>
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ getStatusValue(string) }}</div>
@@ -232,7 +226,6 @@ const filteredBundlingStrings = computed(() => {
         filtered = filtered.filter(string =>
             (string.code && string.code.toLowerCase().includes(query)) ||
             (string.name && string.name.toLowerCase().includes(query)) ||
-            (string.description && string.description.toLowerCase().includes(query)) ||
             (getStatusValue(string) && getStatusValue(string).toLowerCase().includes(query))
         );
     }
@@ -293,14 +286,13 @@ const printTable = () => {
         const tableData = filteredBundlingStrings.value.map(string => [
             string.code || 'N/A',
             string.name || 'N/A',
-            string.description || '-',
             getStatusValue(string)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Name', 'Description', 'Status']],
+            head: [['Code', 'Name', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

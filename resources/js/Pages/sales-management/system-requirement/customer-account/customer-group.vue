@@ -151,8 +151,8 @@
           </form>
         </div>
         <div class="flex justify-between items-center p-4 bg-gray-100 border-t border-gray-200 rounded-b-lg">
-          <button type="button" v-if="!isCreating" @click="deleteCustomerGroup(editForm.group_code)" class="secondary-button group text-red-600 border-red-200 hover:bg-red-50">
-            <i class="fas fa-trash-alt mr-2 group-hover:animate-shake"></i>Delete
+          <button type="button" v-if="!isCreating" @click="obsoleteCustomerGroup(editForm.group_code)" class="secondary-button group text-red-600 border-red-200 hover:bg-red-50">
+            <i class="fas fa-ban mr-2 group-hover:animate-shake"></i>Obsolete
           </button>
           <div v-else class="w-24"></div>
           <div class="flex space-x-3">
@@ -203,6 +203,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import { route } from 'ziggy-js';
 import CustomerGroupModal from '@/Components/customer-group-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -226,18 +227,65 @@ const editForm = ref({ group_code: '', description: '' });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
+const isActiveGroup = (group) => {
+  const status = (group?.status ?? group?.STATUS);
+  if (status !== undefined && status !== null && String(status).trim() !== '') {
+    const s = String(status).trim().toLowerCase();
+    if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+    if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+  }
+
+  const active = (group?.active ?? group?.ACTIVE);
+  if (active !== undefined && active !== null && String(active).trim() !== '') {
+    const a = String(active).trim().toLowerCase();
+    if (a === 'y' || a === 'a' || a === '1' || a === 'true') return true;
+    if (a === 'n' || a === 'i' || a === '0' || a === 'false') return false;
+  }
+
+  if (group?.is_active !== undefined && group?.is_active !== null) {
+    if (group.is_active === true || group.is_active === 1 || group.is_active === '1') return true;
+    if (group.is_active === false || group.is_active === 0 || group.is_active === '0') return false;
+  }
+
+  const ac = (group?.AC ?? group?.ac);
+  if (ac !== undefined && ac !== null && String(ac).trim() !== '') {
+    const v = String(ac).trim().toUpperCase();
+    if (v === 'Y' || v === 'A') return true;
+    if (v === 'N' || v === 'I') return false;
+  }
+
+  return true;
+};
+
 const fetchCustomerGroups = async () => {
   loading.value = true;
   try {
     const response = await axios.get('/api/customer-groups');
     const data = response.data;
     if (data && Array.isArray(data.data)) {
-      customerGroups.value = data.data;
+      customerGroups.value = data.data.filter(isActiveGroup);
     } else if (Array.isArray(data)) { // Fallback for direct array response
-      customerGroups.value = data;
+      customerGroups.value = data.filter(isActiveGroup);
     } else {
       customerGroups.value = [];
       console.error('Unexpected data format:', data);
+    }
+
+    if (customerGroups.value.length === 0) {
+      selectedRow.value = null;
+      searchQuery.value = '';
+      return;
+    }
+
+    if (selectedRow.value) {
+      const stillExists = customerGroups.value.some(g => g.group_code === selectedRow.value?.group_code);
+      if (!stillExists) {
+        const selectedCode = selectedRow.value?.group_code;
+        selectedRow.value = null;
+        if (selectedCode && searchQuery.value === selectedCode) {
+          searchQuery.value = '';
+        }
+      }
     }
   } catch (e) {
     console.error('Error fetching customer groups:', e);
@@ -323,30 +371,37 @@ const saveCustomerGroupChanges = async () => {
   }
 };
 
-const deleteCustomerGroup = async (groupCode) => {
-  if (!confirm(`Are you sure you want to delete customer group "${groupCode}"? This action cannot be undone.`)) {
+const obsoleteCustomerGroup = async (groupCode) => {
+  const confirmRes = await Swal.fire({
+    title: 'Obsolete Customer Group?',
+    text: `Are you sure you want to obsolete customer group "${groupCode}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    allowOutsideClick: false,
+  });
+
+  if (!confirmRes.isConfirmed) {
     return;
   }
 
   saving.value = true;
   try {
-    const response = await axios.delete(`/api/customer-groups/${groupCode}`);
+    const response = await axios.put(`/api/customer-groups/${groupCode}/status`, {});
     const result = response.data;
     if (result.success) {
       await fetchCustomerGroups();
-      if (selectedRow.value && selectedRow.value.group_code === groupCode) {
-        selectedRow.value = null;
-        searchQuery.value = '';
-      }
       closeEditModal();
-      showNotification('Customer group deleted successfully.', 'success');
+      showNotification('Customer group status updated successfully.', 'success');
     } else {
-      showNotification('Error deleting customer group: ' + (result.message || 'Unknown error'), 'error');
+      showNotification('Error updating customer group status: ' + (result.message || 'Unknown error'), 'error');
     }
   } catch (e) {
     const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
-    console.error('Error deleting customer group:', e);
-    showNotification(`Error deleting customer group: ${errorMessage}`, 'error');
+    console.error('Error updating customer group status:', e);
+    showNotification(`Error updating customer group status: ${errorMessage}`, 'error');
   } finally {
     saving.value = false;
   }

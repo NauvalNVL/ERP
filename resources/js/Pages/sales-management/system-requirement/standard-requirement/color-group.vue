@@ -10,14 +10,14 @@
 	<!-- Header Section -->
 	<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
 		<div class="max-w-6xl mx-auto">
-			<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+			<div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
 				<div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-					<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+					<div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
 						<i class="fas fa-layer-group text-white text-lg"></i>
 					</div>
 					<div>
 						<h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Color Group</h2>
-						<p class="text-xs sm:text-sm text-emerald-100">Define color groups for production and inventory management.</p>
+						<p class="text-xs sm:text-sm text-green-100">Define color groups for production and inventory management.</p>
 					</div>
 				</div>
 			</div>
@@ -134,16 +134,16 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                    <div class="p-2 bg-white/20 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Color Group' : 'Edit Color Group' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -159,7 +159,7 @@
                                 <input
                                     type="text"
                                     v-model="form.cg"
-                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                                     :class="{ 'bg-gray-100': !isCreating }"
                                     :readonly="!isCreating"
                                     required
@@ -173,7 +173,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-font"></i>
                                 </span>
-                                <input type="text" v-model="form.cg_name" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+                                <input type="text" v-model="form.cg_name" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                             </div>
                         </div>
 
@@ -209,8 +209,8 @@
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg text-sm font-medium">Save</button>
                         </div>
                     </div>
                 </form>
@@ -253,6 +253,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ColorGroupModal from '@/Components/color-group-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get any props passed from the controller
 const props = defineProps({
@@ -518,7 +519,18 @@ const obsoleteColorGroup = async () => {
 		return;
 	}
 
-	if (!confirm(`Are you sure you want to obsolete color group "${selectedGroup.value.cg}"? This will hide it from selection.`)) {
+	const confirmRes = await Swal.fire({
+		title: 'Obsolete Color Group?',
+		text: `Are you sure you want to obsolete color group "${selectedGroup.value.cg}"? This will hide it from selection.`,
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonText: 'OK',
+		cancelButtonText: 'Cancel',
+		reverseButtons: true,
+		allowOutsideClick: false,
+	});
+
+	if (!confirmRes.isConfirmed) {
 		return;
 	}
 

@@ -5,14 +5,14 @@
     <!-- Header Section -->
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
-            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
                 <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                         <i class="fas fa-ruler-combined text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Paper Size</h2>
-                        <p class="text-xs sm:text-sm text-emerald-100">Define standard paper sizes for production and document purposes. Use consistent paper sizes for production and printing documents.</p>
+                        <p class="text-xs sm:text-sm text-green-100">Define standard paper sizes for production and document purposes</p>
                     </div>
                 </div>
             </div>
@@ -77,9 +77,6 @@
                             <div v-else-if="paperSizes.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
                                 <p class="text-sm font-medium text-yellow-800">No paper size data available.</p>
                                 <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                                <div class="mt-2">
-                                    <button @click="fetchPaperSizes" class="inline-flex items-center px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded transition-colors transform active:translate-y-px">Reload Data</button>
-                                </div>
                             </div>
                             <div v-else class="mt-4 bg-green-100 p-3 rounded">
                                 <p class="text-sm font-medium text-green-800">Data available: {{ paperSizes.length }} paper sizes found.</p>
@@ -150,16 +147,16 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                    <div class="p-2 bg-white/20 rounded-lg mr-3">
                         <i class="fas fa-ruler-combined"></i>
                     </div>
                     <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Paper Size' : 'Edit Paper Size' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -178,7 +175,7 @@
                                 step="0.01"
                                 min="0.01"
                                 @input="updateInches"
-                                class="block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                                 required>
                         </div>
                         <div>
@@ -189,7 +186,7 @@
                                 step="0.01"
                                 min="0.01"
                                 @input="updateMillimeters"
-                                class="block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                                 required>
                         </div>
                         <div class="p-4 mt-2 bg-emerald-50 rounded-lg border border-emerald-100">
@@ -211,8 +208,8 @@
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg text-sm font-medium">Save</button>
                         </div>
                     </div>
                 </form>
@@ -255,6 +252,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get any props passed from the controller
 const props = defineProps({
@@ -486,7 +484,18 @@ const deletePaperSize = async () => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to delete paper size "${sizeDisplay.value}"?`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Paper Size?',
+        text: `Are you sure you want to delete paper size "${sizeDisplay.value}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

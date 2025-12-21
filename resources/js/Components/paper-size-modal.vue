@@ -43,7 +43,7 @@
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.millimeter).toFixed(2) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.inches).toFixed(2) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">
-                  <span v-if="size.status === 'Act'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  <span v-if="isActiveSize(size)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                     Active
                   </span>
                   <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -52,7 +52,7 @@
                 </td>
               </tr>
               <tr v-if="filteredSizes.length === 0">
-                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No paper sizes found.</td>
+                <td colspan="4" class="px-4 py-4 text-center text-gray-500">No paper size data available.</td>
               </tr>
             </tbody>
           </table>
@@ -94,22 +94,22 @@ const selectedSize = ref(null);
 const sortKey = ref('millimeter');
 const sortAsc = ref(true);
 
-const defaultPaperSizes = [
-  { id: 1, millimeter: '210.00', inches: '8.27', description: 'A4 Paper Size', status: 'Act' },
-  { id: 2, millimeter: '297.00', inches: '11.69', description: 'A4 Paper Size', status: 'Act' },
-  { id: 3, millimeter: '148.00', inches: '5.83', description: 'A5 Paper Size', status: 'Act' },
-  { id: 4, millimeter: '105.00', inches: '4.13', description: 'A6 Paper Size', status: 'Act' },
-  { id: 5, millimeter: '74.00', inches: '2.91', description: 'A7 Paper Size', status: 'Act' }
-];
+const isActiveSize = (size) => {
+  const status = size?.status ?? size?.STATUS;
+  if (status === undefined || status === null || String(status).trim() === '') return true;
+
+  const s = String(status).trim().toLowerCase();
+  if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+  if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+  return true;
+};
 
 // Compute filtered sizes based on search query
 const filteredSizes = computed(() => {
-  let sizes = (Array.isArray(props.paperSizes) && props.paperSizes.length > 0)
-    ? props.paperSizes
-    : defaultPaperSizes;
+  let sizes = Array.isArray(props.paperSizes) ? props.paperSizes : [];
 
-  // Hide obsolete sizes from selection (only show Act or missing status)
-  sizes = sizes.filter(size => !size.status || size.status === 'Act');
+  sizes = sizes.filter(isActiveSize);
 
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();

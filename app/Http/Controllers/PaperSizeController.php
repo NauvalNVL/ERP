@@ -14,9 +14,7 @@ class PaperSizeController extends Controller
 {
     private function ensureSeeded(): void
     {
-        if (PaperSize::count() === 0) {
-            $this->seedData();
-        }
+        return;
     }
 
     public function index()
@@ -26,21 +24,10 @@ class PaperSizeController extends Controller
             if (request()->ajax() || request()->wantsJson()) {
                 $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
 
-                if ($paperSizes->isEmpty()) {
-                    $this->seedData();
-                    $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
-                }
-
                 return response()->json($paperSizes);
             }
 
             $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
-
-            // If there are no paper sizes in the database, seed them
-            if ($paperSizes->isEmpty()) {
-                $this->seedData();
-                $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
-            }
 
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSizes'));
         } catch (\Exception $e) {
@@ -215,7 +202,6 @@ class PaperSizeController extends Controller
     public function vueIndex()
     {
         try {
-            $this->ensureSeeded();
             // Ambil hanya data paper size yang masih aktif (status Act atau belum di-set)
             $paperSizes = PaperSize::where(function ($q) {
                     $q->whereNull('status')
@@ -268,7 +254,6 @@ class PaperSizeController extends Controller
     public function vueManageStatus()
     {
         try {
-            $this->ensureSeeded();
             $paperSizes = PaperSize::orderBy('millimeter', 'asc')->paginate(15);
 
             return Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-size', [
@@ -316,18 +301,6 @@ class PaperSizeController extends Controller
             }
 
             $paperSizes = $query->get();
-            if ($paperSizes->isEmpty()) {
-                $this->ensureSeeded();
-
-                $query = PaperSize::orderBy('millimeter', 'asc');
-                if (!$request->has('all_status') || !$request->all_status) {
-                    $query->where(function ($q) {
-                        $q->whereNull('status')
-                          ->orWhere('status', 'Act');
-                    });
-                }
-                $paperSizes = $query->get();
-            }
 
             return response()->json($paperSizes);
         } catch (\Exception $e) {

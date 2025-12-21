@@ -21,7 +21,8 @@ class CustomerGroupSeeder extends Seeder
                 'Group_Name' => 'PHUTANG TRADER',
                 'Currency' => null,
                 'AC' => null,
-                'Name' => null
+                'Name' => null,
+                'status' => 'Act'
             ],
             [
                 'No' => '2',
@@ -29,7 +30,8 @@ class CustomerGroupSeeder extends Seeder
                 'Group_Name' => 'PHUTANG USAHA PENDAPATAN LAIN1',
                 'Currency' => null,
                 'AC' => null,
-                'Name' => null
+                'Name' => null,
+                'status' => 'Act'
             ],
             [
                 'No' => '3',
@@ -37,7 +39,8 @@ class CustomerGroupSeeder extends Seeder
                 'Group_Name' => 'PHUTANG USAHA PENDAPATAN LAIN2',
                 'Currency' => null,
                 'AC' => null,
-                'Name' => null
+                'Name' => null,
+                'status' => 'Act'
             ],
             [
                 'No' => '4',
@@ -45,7 +48,8 @@ class CustomerGroupSeeder extends Seeder
                 'Group_Name' => 'PHUTANG USAHA',
                 'Currency' => null,
                 'AC' => null,
-                'Name' => null
+                'Name' => null,
+                'status' => 'Act'
             ],
         ];
 

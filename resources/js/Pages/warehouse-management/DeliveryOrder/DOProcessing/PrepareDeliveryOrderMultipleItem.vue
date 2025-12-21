@@ -311,7 +311,10 @@ const selectedCustomer = reactive({
   name: '',
   address: '',
   salesperson: '',
-  currency: 'IDR'
+  currency: 'IDR',
+  statusRaw: '',
+  statusLabel: '',
+  statusCategory: ''
 })
 
 
@@ -375,42 +378,113 @@ const openCustomerLookup = () => {
   showCustomerModal.value = true
 }
 
+const normalizeCustomerStatus = (status) => {
+  const raw = (status ?? '').toString().trim()
+  const lower = raw.toLowerCase()
+  if (!raw || ['a', 'active', 'y'].includes(lower)) {
+    return { label: raw || 'Active', category: 'active' }
+  }
+  if (['i', 'inactive', 'n'].includes(lower)) {
+    return { label: 'Inactive', category: 'inactive' }
+  }
+  if (['obsolete', 'obs', 'o'].includes(lower)) {
+    return { label: 'Obsolete', category: 'inactive' }
+  }
+  return { label: raw || 'Unknown', category: 'other' }
+}
+
+const extractCustomerStatusMeta = (payload) => {
+  const raw =
+    payload?.status_raw ??
+    payload?.status ??
+    payload?.statusLabel ??
+    payload?.status_label ??
+    ''
+  const normalized = normalizeCustomerStatus(raw)
+  return {
+    raw,
+    label: payload?.status_label || payload?.statusLabel || normalized.label,
+    category:
+      payload?.status_category || payload?.statusCategory || normalized.category
+  }
+}
+
+const clearCustomerSelection = (keepCode = false) => {
+  if (!keepCode) selectedCustomer.code = ''
+  selectedCustomer.name = ''
+  selectedCustomer.address = ''
+  selectedCustomer.salesperson = ''
+  selectedCustomer.currency = 'IDR'
+  selectedCustomer.statusRaw = ''
+  selectedCustomer.statusLabel = ''
+  selectedCustomer.statusCategory = ''
+}
+
 const selectCustomer = async (customer) => {
+  if (!customer) return
+
+  const statusMeta = extractCustomerStatusMeta(customer)
+  if (statusMeta.category !== 'active') {
+    error(
+      `Customer ${
+        customer.customer_code ?? customer.code ?? ''
+      } is ${statusMeta.label || 'Inactive'} and cannot be used for Delivery Order.`
+    )
+    return
+  }
+
   selectedCustomer.code = customer.customer_code
   selectedCustomer.name = customer.customer_name
   selectedCustomer.address = customer.address || ''
   selectedCustomer.salesperson = customer.salesperson_code || ''
   selectedCustomer.currency = customer.currency_code || 'IDR'
+  selectedCustomer.statusRaw = statusMeta.raw || ''
+  selectedCustomer.statusLabel = statusMeta.label || ''
+  selectedCustomer.statusCategory = statusMeta.category || ''
 
   showCustomerModal.value = false
   success('Customer selected successfully')
 }
 
 const validateCustomer = async () => {
-  if (!selectedCustomer.code.trim()) return
+  const code = selectedCustomer.code?.trim()
+  if (!code) return
 
   try {
-    const response = await fetch(`/api/sales-order/customer/${selectedCustomer.code}`)
+    const response = await fetch(`/api/sales-order/customer/${code}`)
     const data = await response.json()
 
-    if (data.success) {
+    if (data.success && data.data) {
       const customer = data.data
+      const statusMeta = extractCustomerStatusMeta(customer)
+
+      if (statusMeta.category !== 'active') {
+        error(
+          `Customer ${customer.customer_code || code} is ${
+            statusMeta.label || 'Inactive'
+          } and cannot be used for Delivery Order.`
+        )
+        clearCustomerSelection()
+        return
+      }
+
       selectedCustomer.name = customer.customer_name
       selectedCustomer.address = customer.address || ''
       selectedCustomer.salesperson = customer.salesperson_code || ''
       selectedCustomer.currency = customer.currency_code || 'IDR'
+      selectedCustomer.statusRaw = statusMeta.raw || ''
+      selectedCustomer.statusLabel = statusMeta.label || ''
+      selectedCustomer.statusCategory = statusMeta.category || ''
 
       success('Customer validated successfully')
     } else {
-      error('Customer not found')
-      selectedCustomer.name = ''
-      selectedCustomer.address = ''
+      error(data.message || 'Customer not found')
+      clearCustomerSelection(true)
     }
   } catch (err) {
     console.error('Error validating customer:', err)
     error('Error validating customer')
-    selectedCustomer.name = ''
-    selectedCustomer.address = ''
+    clearCustomerSelection(true)
   }
 }
 

@@ -5,14 +5,14 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
-        <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
             <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                     <i class="fas fa-print text-white text-lg"></i>
                 </div>
                 <div>
                     <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Products</h2>
-                    <p class="text-xs sm:text-sm text-emerald-100">Preview and print product data</p>
+                    <p class="text-xs sm:text-sm text-green-100">Preview and print product data</p>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
         <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
                             <i class="fas fa-box-open text-3xl"></i>
@@ -75,12 +75,6 @@
                             </th>
                             <th @click="sortTable('status')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 90px;">
                                 Status <i :class="getSortIcon('status')" class="text-xs"></i>
-                            </th>
-                            <th @click="sortTable('created_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Created At <i :class="getSortIcon('created_at')" class="text-xs"></i>
-                            </th>
-                            <th @click="sortTable('updated_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Updated At <i :class="getSortIcon('updated_at')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
@@ -119,12 +113,6 @@
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ getStatusValue(product) }}</div>
-                            </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ formatDate(product.created_at) }}</div>
-                            </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ formatDate(product.updated_at) }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -278,12 +266,6 @@ const getStatusValue = (row) => {
     return '';
 };
 
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
-};
-
 // Filtered and sorted products
 const filteredProducts = computed(() => {
     let filtered = [...products.value];
@@ -318,18 +300,6 @@ const filteredProducts = computed(() => {
         if (sortColumn.value === 'status') {
             valueA = getStatusValue(a);
             valueB = getStatusValue(b);
-        }
-        
-        // Handle date columns
-        if (['created_at', 'updated_at'].includes(sortColumn.value)) {
-            const dateA = valueA ? new Date(valueA).getTime() : 0;
-            const dateB = valueB ? new Date(valueB).getTime() : 0;
-            
-            if (sortDirection.value === 'asc') {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
         }
         
         // Convert to string for comparison if not already
@@ -376,15 +346,13 @@ const printTable = () => {
             product.description || 'N/A',
             getProductGroupName(product),
             product.category || 'N/A',
-            getStatusValue(product),
-            formatDate(product.created_at),
-            formatDate(product.updated_at)
+            getStatusValue(product)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Product Code', 'Description', 'Product Group', 'Category', 'Status', 'Created At', 'Updated At']],
+            head: [['Product Code', 'Description', 'Product Group', 'Category', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -409,9 +377,7 @@ const printTable = () => {
                 1: { cellWidth: 60 },  // Description
                 2: { cellWidth: 35 },  // Product Group
                 3: { cellWidth: 45 },  // Category
-                4: { cellWidth: 20 },  // Status
-                5: { cellWidth: 35 },  // Created At
-                6: { cellWidth: 35 }   // Updated At
+                4: { cellWidth: 20 }   // Status
             }
         });
 

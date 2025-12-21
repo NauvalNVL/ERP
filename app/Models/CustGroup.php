@@ -22,7 +22,19 @@ class CustGroup extends Model
         'Currency',
         'AC',
         'Name',
+        'status',
     ];
+
+    public function getStatusAttribute($value)
+    {
+        $trim = trim((string) ($value ?? ''));
+        return $trim === '' ? 'Act' : $trim;
+    }
+
+    public function setStatusAttribute($value)
+    {
+        $this->attributes['status'] = $value;
+    }
 
     public function customers()
     {

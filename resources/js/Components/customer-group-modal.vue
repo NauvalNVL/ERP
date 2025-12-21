@@ -112,6 +112,37 @@ const sortAsc = ref(true);
 const loading = ref(false);
 const error = ref(null);
 
+const isActiveGroup = (group) => {
+  const status = (group?.status ?? group?.STATUS);
+  if (status !== undefined && status !== null && String(status).trim() !== '') {
+    const s = String(status).trim().toLowerCase();
+    if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+    if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+  }
+
+  const active = (group?.active ?? group?.ACTIVE);
+  if (active !== undefined && active !== null && String(active).trim() !== '') {
+    const a = String(active).trim().toLowerCase();
+    if (a === 'y' || a === 'a' || a === '1' || a === 'true') return true;
+    if (a === 'n' || a === 'i' || a === '0' || a === 'false') return false;
+  }
+
+  if (group?.is_active !== undefined && group?.is_active !== null) {
+    if (group.is_active === true || group.is_active === 1 || group.is_active === '1') return true;
+    if (group.is_active === false || group.is_active === 0 || group.is_active === '0') return false;
+  }
+
+  const ac = (group?.AC ?? group?.ac);
+  if (ac !== undefined && ac !== null && String(ac).trim() !== '') {
+    const v = String(ac).trim().toUpperCase();
+    if (v === 'Y' || v === 'A') return true;
+    if (v === 'N' || v === 'I') return false;
+  }
+
+  // Default: treat as active when no status flag is present
+  return true;
+};
+
 // Fetch customer groups when the component is mounted or when show changes
 const fetchCustomerGroups = async () => {
   loading.value = true;
@@ -130,8 +161,8 @@ const fetchCustomerGroups = async () => {
       console.log('Has Group_ID?', response.data[0].Group_ID);
       console.log('Has Group_Name?', response.data[0].Group_Name);
     }
-    
-    customerGroups.value = response.data;
+
+    customerGroups.value = (response.data || []).filter(isActiveGroup);
   } catch (err) {
     console.error('Error fetching customer groups:', err);
     console.error('Error details:', err.response?.data);
@@ -144,6 +175,9 @@ const fetchCustomerGroups = async () => {
 // Compute filtered groups based on search query
 const filteredGroups = computed(() => {
   let groups = customerGroups.value || [];
+
+  // Hide obsolete groups from the lookup modal
+  groups = groups.filter(isActiveGroup);
   
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();

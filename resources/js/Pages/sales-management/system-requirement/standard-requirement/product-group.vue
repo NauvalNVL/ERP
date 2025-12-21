@@ -6,14 +6,14 @@
 		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
 			<div class="max-w-6xl mx-auto">
 				<!-- Header Section -->
-				<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+				<div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
 					<div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-						<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+						<div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
 							<i class="fas fa-object-group text-white text-lg"></i>
 						</div>
 						<div>
 							<h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Product Group</h2>
-							<p class="text-xs sm:text-sm text-emerald-100">Define product groups for organizing products. Use short codes (e.g. B, P) to group related products.</p>
+							<p class="text-xs sm:text-sm text-green-100">Define product groups for product categorization</p>
 						</div>
 					</div>
 				</div>
@@ -109,21 +109,31 @@
 									</div>
 
 									<div class="p-4 bg-blue-50 rounded-lg">
-										<h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Group Information</h4>
-										<div class="space-y-2 text-sm">
-											<div v-if="selectedRow" class="grid grid-cols-2 gap-2">
-												<div class="font-medium text-gray-700">Group ID:</div>
-												<div>{{ selectedRow.code }}</div>
-												<div class="font-medium text-gray-700">Group Name:</div>
-												<div>{{ selectedRow.name }}</div>
-												<div class="font-medium text-gray-700">Status:</div>
-												<div>
-													<span v-if="selectedRow.is_active" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Active</span>
-													<span v-else class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Inactive</span>
-												</div>
+										<h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Group</h4>
+										<div class="grid grid-cols-2 gap-2 text-sm">
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-emerald-600 text-white rounded-full font-bold mr-2 shrink-0">B</span>
+												<span>Box</span>
 											</div>
-											<div v-else class="text-gray-500 italic">
-												Select a product group to view details
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2 shrink-0">P</span>
+												<span>Paper</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-purple-600 text-white rounded-full font-bold mr-2 shrink-0">L</span>
+												<span>Label</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2 shrink-0">A</span>
+												<span>Accessory</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2 shrink-0">S</span>
+												<span>Sticker</span>
+											</div>
+											<div class="flex items-center">
+												<span class="w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full font-bold mr-2 shrink-0">F</span>
+												<span>Foam</span>
 											</div>
 										</div>
 									</div>
@@ -145,16 +155,16 @@
 		/>
 
 		<!-- Edit Modal -->
-		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-			<div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+			<div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
 					<div class="flex items-center">
-						<div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+						<div class="p-2 bg-white/20 rounded-lg mr-3">
 							<i class="fas fa-object-group"></i>
 						</div>
 						<h3 class="text-sm font-semibold">{{ isCreating ? 'Create Product Group' : 'Edit Product Group' }}</h3>
 					</div>
-					<button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+					<button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
 						<i class="fas fa-times text-lg"></i>
 					</button>
 				</div>
@@ -163,12 +173,12 @@
 						<div class="grid grid-cols-1 gap-4">
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Group Code:</label>
-								<input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+								<input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
 								<p class="mt-1 text-xs text-gray-500">Short code like "B" for Box or "P" for Paper</p>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Group Name:</label>
-								<input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="flex items-center">
@@ -183,8 +193,8 @@
 							</button>
 							<div v-else class="w-24"></div>
 							<div class="flex space-x-3">
-								<button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-								<button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
+								<button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+								<button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 text-sm font-medium">Save</button>
 							</div>
 						</div>
 					</form>
@@ -227,6 +237,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ProductGroupModal from '@/Components/product-group-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -440,7 +451,18 @@ const saveGroupChanges = async () => {
 };
 
 const obsoleteGroup = async (id) => {
-    if (!confirm(`Are you sure you want to obsolete this product group? This will mark it as inactive and it will no longer appear in selection lists.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Product Group?',
+        text: 'Are you sure you want to obsolete this product group? This will mark it as inactive and it will no longer appear in selection lists.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

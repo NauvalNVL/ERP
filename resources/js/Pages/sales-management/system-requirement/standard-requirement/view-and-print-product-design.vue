@@ -5,14 +5,14 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
             <!-- Header Section -->
-            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
                 <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                         <i class="fas fa-drafting-compass text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-lg sm:text-xl font-semibold leading-tight">View & Print Product Designs</h2>
-                        <p class="text-xs sm:text-sm text-emerald-100">Preview and print product design data</p>
+                        <p class="text-xs sm:text-sm text-green-100">Preview and print product design data</p>
                     </div>
                 </div>
             </div>
@@ -41,11 +41,20 @@
                     </div>
                 </div>
 
-                <!-- Table Section -->
-                <div class="overflow-x-auto">
-                    <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <!-- Table Section with Scroll Indicators -->
+                <div class="relative">
+                    <!-- Scroll Indicator -->
+                    <div class="mb-2 flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-arrows-alt-h mr-2 text-emerald-600"></i>
+                            <span>Scroll horizontally to view all columns</span>
+                        </div>
+                        <div class="text-emerald-600 font-medium">14 columns total</div>
+                    </div>
+                    <div class="overflow-x-auto overflow-y-auto max-h-[600px] border-2 border-emerald-200 rounded-lg shadow-inner">
+                        <div id="printableTable" class="min-w-full bg-white">
                         <!-- Table Header -->
-                        <div class="bg-emerald-600 text-white py-4 px-6 flex items-center">
+                        <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center" style="min-width: 1400px;">
                             <div class="flex items-center">
                                 <div class="mr-4">
                                     <i class="fas fa-drafting-compass text-3xl"></i>
@@ -58,7 +67,7 @@
                         </div>
 
                         <!-- Table Content -->
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-[1400px] divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th @click="sortTable('pd_code')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
@@ -145,9 +154,11 @@
                                 </tr>
                             </tbody>
                         </table>
+                        </div>
+                    </div>
 
-                        <!-- Table Footer -->
-                        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+                    <!-- Table Footer -->
+                    <div class="bg-white px-6 py-3 border-t-2 border-emerald-200 text-sm text-gray-500 rounded-b-lg">
                             <div class="flex items-center justify-between">
                                 <div>Total Product Designs: {{ filteredProductDesigns.length }}</div>
                                 <div v-if="searchQuery">Filtered from {{ productDesigns.length }} total records</div>
@@ -169,7 +180,6 @@
                         <li>PDF includes formatted table with headers and page numbers</li>
                     </ul>
                 </div>
-            </div>
         </div>
     </div>
     </AppLayout>

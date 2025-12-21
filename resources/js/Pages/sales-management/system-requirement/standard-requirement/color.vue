@@ -10,14 +10,14 @@
     <!-- Header Section -->
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
-            <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
                 <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
                         <i class="fas fa-palette text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Color</h2>
-                        <p class="text-xs sm:text-sm text-emerald-100">Define colors for specific product categories.</p>
+                        <p class="text-xs sm:text-sm text-green-100">Define colors for specific product categories.</p>
                     </div>
                 </div>
             </div>
@@ -118,8 +118,11 @@
                                         </div>
                                         <div class="flex items-center">
                                             <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">05</span>
-                                            <span class="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">05</span>
                                             <span>Green</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">06</span>
+                                            <span>Yellow</span>
                                         </div>
                                     </div>
                                 </div>
@@ -143,16 +146,16 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                    <div class="p-2 bg-white/20 rounded-lg mr-3">
                         <i class="fas fa-palette"></i>
                     </div>
                     <h3 class="text-sm font-semibold">{{ isCreating ? 'Create Color' : 'Edit Color' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -165,7 +168,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-hashtag"></i>
                                 </span>
-                                <input v-model="editForm.color_id" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                                <input v-model="editForm.color_id" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                             </div>
                         </div>
                         <div>
@@ -184,7 +187,7 @@
                                     <i class="fas fa-layer-group"></i>
                                 </span>
                                 <input v-model="editForm.color_group_id" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
-                                <button type="button" @click="openColorGroupSelector" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-600 hover:bg-emerald-700 text-white rounded-r-md text-sm">
+                                <button type="button" @click="openColorGroupSelector" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md text-sm">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -212,8 +215,8 @@
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Save</button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg text-sm font-medium">Save</button>
                         </div>
                     </div>
                 </form>
@@ -222,16 +225,16 @@
     </div>
 
     <!-- Color Group Selector Modal -->
-    <div v-if="showColorGroupModal" class="fixed inset-0 z-[70] bg-black bg-opacity-30 flex items-center justify-center">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-2xl mx-auto">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+    <div v-if="showColorGroupModal" class="fixed inset-0 z-[70] bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl mx-auto">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                    <div class="p-2 bg-white/20 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <h3 class="text-sm font-semibold">Color Group Table</h3>
                 </div>
-                <button @click="showColorGroupModal = false" class="text-white hover:text-gray-200">
+                <button @click="showColorGroupModal = false" class="text-white hover:text-emerald-100">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -272,10 +275,10 @@
                 </div>
 
                 <div class="mt-4 flex justify-center space-x-4">
-                    <button @click="confirmColorGroupSelection" class="py-2 px-6 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg">
+                    <button @click="confirmColorGroupSelection" class="py-2 px-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-sm rounded-lg">
                         <i class="fas fa-check mr-2"></i>Select
                     </button>
-                    <button @click="showColorGroupModal = false" class="py-2 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm rounded-lg">
+                    <button @click="showColorGroupModal = false" class="py-2 px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm rounded-lg">
                         <i class="fas fa-times mr-2"></i>Exit
                     </button>
                 </div>
@@ -318,6 +321,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ColorModal from '@/Components/color-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -684,7 +688,18 @@ const obsoleteColor = async (colorId) => {
         return;
     }
 
-    if (!confirm(`Are you sure you want to obsolete color "${colorId}"? This will hide it from selection and tables.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Color?',
+        text: `Are you sure you want to obsolete color "${colorId}"? This will hide it from selection and tables.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
 

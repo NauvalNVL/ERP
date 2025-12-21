@@ -7,14 +7,14 @@
 		<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
 			<div class="max-w-6xl mx-auto">
 				<!-- Header Section -->
-				<div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+				<div class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-sm rounded-xl border border-green-700 mb-4">
 					<div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-						<div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+						<div class="h-9 w-9 rounded-full bg-green-500 flex items-center justify-center">
 							<i class="fas fa-globe-americas text-white text-lg"></i>
 						</div>
 						<div>
 							<h2 class="text-lg sm:text-xl font-semibold leading-tight">Define Geo</h2>
-							<p class="text-xs sm:text-sm text-emerald-100">Define geographical data for specific locations and areas. Use geo codes to group and manage customer locations.</p>
+							<p class="text-xs sm:text-sm text-green-100">Define geographical data for customer location grouping</p>
 						</div>
 					</div>
 				</div>
@@ -80,9 +80,6 @@
 								<div v-else-if="geos.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
 									<p class="text-sm font-medium text-yellow-800">No geo data available.</p>
 									<p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-									<div class="mt-2">
-										<button @click="fetchGeos" class="inline-flex items-center px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded transition-colors transform active:translate-y-px">Reload Data</button>
-									</div>
 								</div>
 								<div v-else class="mt-4 bg-green-100 p-3 rounded">
 									<p class="text-sm font-medium text-green-800">Data available: {{ geos.length }} geo locations found.</p>
@@ -156,16 +153,16 @@
 		/>
 
 		<!-- Edit Modal -->
-		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-			<div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
-				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
+		<div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+			<div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-xl">
 					<div class="flex items-center">
-						<div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+						<div class="p-2 bg-white/20 rounded-lg mr-3">
 							<i class="fas fa-globe-americas"></i>
 						</div>
 						<h3 class="text-sm font-semibold">{{ isCreating ? 'Create Geo' : 'Edit Geo' }}</h3>
 					</div>
-					<button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+					<button type="button" @click="closeEditModal" class="text-white hover:text-emerald-100">
 						<i class="fas fa-times text-lg"></i>
 					</button>
 				</div>
@@ -174,27 +171,27 @@
 						<div class="grid grid-cols-1 gap-4">
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Geo Code:</label>
-								<input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+								<input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Country:</label>
-								<input v-model="editForm.country" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.country" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">State:</label>
-								<input v-model="editForm.state" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.state" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Town:</label>
-								<input v-model="editForm.town" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.town" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Town Section:</label>
-								<input v-model="editForm.town_section" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.town_section" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Area:</label>
-								<input v-model="editForm.area" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm" required>
+								<input v-model="editForm.area" type="text" class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:ring-emerald-500 focus:border-emerald-500" required>
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
@@ -209,8 +206,8 @@
 							</button>
 							<div v-else class="w-24"></div>
 							<div class="flex space-x-3">
-								<button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm font-medium">Cancel</button>
-								<button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Review</button>
+								<button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium">Cancel</button>
+								<button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 text-sm font-medium">Review</button>
 							</div>
 						</div>
 					</form>
@@ -220,7 +217,7 @@
 
 		<!-- Review Modal -->
 		<div v-if="showReviewModal" class="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-			<div class="bg-white rounded-xl shadow-lg border border-gray-200 w-11/12 md:w-2/5 max-w-md mx-auto">
+			<div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/5 max-w-md mx-auto">
 				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-emerald-600 text-white rounded-t-xl">
 					<div class="flex items-center">
 						<div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
@@ -303,6 +300,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import GeoModal from '@/Components/geo-modal.vue';
+import Swal from 'sweetalert2';
 
 // Get the header from props
 const props = defineProps({
@@ -316,7 +314,18 @@ const props = defineProps({
     }
 });
 
-const geos = ref(props.geos || []);
+const isActiveGeo = (geo) => {
+    const status = geo?.status ?? geo?.STATUS;
+    if (status === undefined || status === null || String(status).trim() === '') return true;
+
+    const s = String(status).trim().toLowerCase();
+    if (s === 'act' || s === 'active' || s === 'a' || s === 'y' || s === '1' || s === 'true') return true;
+    if (s === 'obs' || s === 'obsolete' || s === 'inactive' || s === 'i' || s === 'n' || s === '0' || s === 'false') return false;
+
+    return true;
+};
+
+const geos = ref((props.geos || []).filter(isActiveGeo));
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -354,10 +363,23 @@ const fetchGeos = async () => {
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            geos.value = data;
+            geos.value = data.filter(isActiveGeo);
         } else {
             geos.value = [];
             console.error('Unexpected data format:', data);
+        }
+
+        if (geos.value.length === 0) {
+            selectedGeo.value = null;
+            geoCode.value = '';
+            searchResult.value = '';
+        } else if (selectedGeo.value) {
+            const stillExists = geos.value.some(g => String(g.code || '').toUpperCase() === String(selectedGeo.value?.code || '').toUpperCase());
+            if (!stillExists) {
+                selectedGeo.value = null;
+                geoCode.value = '';
+                searchResult.value = '';
+            }
         }
     } catch (e) {
         console.error('Error fetching geo data:', e);
@@ -370,7 +392,22 @@ const fetchGeos = async () => {
 // Watch for props changes
 watch(() => props.geos, (newGeos) => {
     if (newGeos && newGeos.length > 0) {
-        geos.value = newGeos;
+        geos.value = newGeos.filter(isActiveGeo);
+    } else {
+        geos.value = [];
+    }
+
+    if (geos.value.length === 0) {
+        selectedGeo.value = null;
+        geoCode.value = '';
+        searchResult.value = '';
+    } else if (selectedGeo.value) {
+        const stillExists = geos.value.some(g => String(g.code || '').toUpperCase() === String(selectedGeo.value?.code || '').toUpperCase());
+        if (!stillExists) {
+            selectedGeo.value = null;
+            geoCode.value = '';
+            searchResult.value = '';
+        }
     }
 }, { immediate: true });
 
@@ -587,7 +624,18 @@ const saveGeoData = async () => {
 };
 
 const obsoleteGeo = async () => {
-    if (!confirm(`Are you sure you want to obsolete geo "${editForm.value.code}"? This will mark it as inactive and it will no longer appear in selection lists.`)) {
+    const confirmRes = await Swal.fire({
+        title: 'Obsolete Geo?',
+        text: `Are you sure you want to obsolete geo "${editForm.value.code}"? This will mark it as inactive and it will no longer appear in selection lists.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+
+    if (!confirmRes.isConfirmed) {
         return;
     }
     

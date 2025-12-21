@@ -52,53 +52,66 @@ use App\Http\Controllers\PaperSizeController;
 // It scans all registered routes, filters for GET web routes whose names
 // start with 'vue.', and returns a simplified list of { title, uri, name }.
 Route::get('/menu-routes', function (Request $request) {
-    $routes = collect(Route::getRoutes())
-        ->filter(function ($route) {
-            // Only GET routes
-            if (!in_array('GET', $route->methods(), true)) {
-                return false;
+    $sidebarMap = [];
+    $sidebarPath = resource_path('js/Layouts/Partials/Sidebar.vue');
+
+    $normalizeUri = function (string $uri): string {
+        $uri = trim($uri);
+        $uri = preg_replace('/[?#].*$/', '', $uri);
+        return '/' . ltrim((string) $uri, '/');
+    };
+
+    if (is_readable($sidebarPath)) {
+        $sidebar = file_get_contents($sidebarPath);
+
+        // Extract pairs like: { title: 'Define User', ..., route: '/user' }
+        preg_match_all(
+            "/\\{[^\\{\\}]*?title:\\s*['\"]([^'\"]+)['\"][^\\{\\}]*?route:\\s*['\"]([^'\"]+)['\"][^\\{\\}]*?\\}/s",
+            $sidebar,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($matches as $m) {
+            $title = trim($m[1]);
+            $uri = $normalizeUri($m[2] ?? '');
+            if ($title !== '' && $uri !== '/') {
+                $sidebarMap[$uri] = $title;
             }
+        }
+    }
 
-            $uri = $route->uri();
+    // Dashboard is a special case in Sidebar (not inside route objects)
+    $sidebarMap['/dashboard'] = $sidebarMap['/dashboard'] ?? 'Dashboard';
 
-            // Skip API routes themselves to avoid noise
-            if (strpos($uri, 'api/') === 0) {
-                return false;
-            }
+    $routeNameByUri = [];
+    foreach (Route::getRoutes() as $route) {
+        if (!in_array('GET', $route->methods(), true)) {
+            continue;
+        }
 
-            $name = $route->getName();
+        $uri = $normalizeUri($route->uri());
 
-            // Only include routes that are used for Vue pages / menus
-            if ($name && strpos($name, 'vue.') === 0) {
-                return true;
-            }
+        // Skip API routes themselves to avoid noise
+        if (strpos(ltrim($uri, '/'), 'api/') === 0) {
+            continue;
+        }
 
-            return false;
-        })
-        ->map(function ($route) {
-            $uri = '/' . ltrim($route->uri(), '/');
-            $name = $route->getName();
+        if (!isset($routeNameByUri[$uri])) {
+            $routeNameByUri[$uri] = $route->getName();
+        }
+    }
 
-            // Humanize title from last URI segment (e.g. 'prepare-mc-so' -> 'Prepare Mc So')
-            $segment = collect(explode('/', trim($uri, '/')))->last();
-            $segment = $segment ?: $uri;
-            $title = ucwords(str_replace(['-', '_'], ' ', $segment));
-
-            // Custom labels for specific invoice DO routes so they appear nicely in menu search
-            if ($name === 'vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period') {
-                $title = 'Prepare Invoice by D/Order (Current Period)';
-            } elseif ($name === 'vue.warehouse-management.invoice.iv-processing.prepare-by-do-open-period') {
-                $title = 'Prepare Invoice by D/Order (Open Period)';
-            }
-
+    $routes = collect($sidebarMap)
+        ->map(function ($title, $uri) use ($routeNameByUri) {
             return [
                 'title' => $title,
                 'uri'   => $uri,
-                'name'  => $name,
+                'name'  => $routeNameByUri[$uri] ?? null,
             ];
         })
-        // Ensure each URI appears only once
-        ->unique('uri')
+        ->values()
+        ->sortBy('title')
         ->values();
 
     return response()->json($routes);
@@ -649,6 +662,7 @@ Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::cl
 Route::post('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiStore'])->name('api.customer-groups.store');
 Route::put('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiUpdate'])->name('api.customer-groups.update');
 Route::delete('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiDestroy'])->name('api.customer-groups.destroy');
+Route::put('/customer-groups/{group_code}/status', [App\Http\Controllers\CustomerGroupController::class, 'toggleStatus'])->name('api.customer-groups.toggle-status');
 
 // Update Customer Account API route
 Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);

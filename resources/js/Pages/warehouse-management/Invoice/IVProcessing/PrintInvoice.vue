@@ -1,18 +1,14 @@
 <template>
     <AppLayout :header="'Print Invoice'">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"></div>
-            <div class="flex items-center">
-                <div class="bg-gradient-to-br from-purple-500 to-indigo-700 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
-                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
-                    <i class="fas fa-print text-white text-2xl z-10"></i>
+        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white shadow-lg rounded-t-lg border border-purple-700">
+            <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
+                <div class="h-9 w-9 rounded-full bg-purple-500 flex items-center justify-center">
+                    <i class="fas fa-print text-white text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Print Invoice</h2>
-                    <p class="text-purple-100">Print and export invoices with PDF generation</p>
+                    <h2 class="text-lg sm:text-xl font-semibold leading-tight">Print Invoice</h2>
+                    <p class="text-xs sm:text-sm text-purple-100">Print and export invoices with PDF generation</p>
                 </div>
             </div>
         </div>
