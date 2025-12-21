@@ -21,7 +21,11 @@ class UpdateCustomerAccountController extends Controller
         $geoData = Geo::all();
         $salespersons = Salesperson::all();
         $customerGroups = CustomerGroup::all();
-        return view('sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount', compact('customers', 'industries', 'geoData', 'salespersons', 'customerGroups'));
+
+        return view(
+            'sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount',
+            compact('customers', 'industries', 'geoData', 'salespersons', 'customerGroups')
+        );
     }
 
     public function store(Request $request)
@@ -147,16 +151,18 @@ class UpdateCustomerAccountController extends Controller
                 });
             }
 
-            // Filter by status with "active" as default for safety
-            $status = strtolower($request->input('status', 'active'));
+            // Apply status filter (defaults to "all" for UI consistency)
+            $status = strtolower($request->input('status', 'all'));
 
-            if ($status !== 'all') {
+            if (in_array($status, ['active', 'inactive', 'obsolete'])) {
                 $query->where(function ($q) use ($status) {
                     if ($status === 'active') {
-                        $q->whereIn('AC_STS', ['A', 'Active', ''])
+                        $q->whereIn('AC_STS', ['A', 'Active', 'Y', ''])
                           ->orWhereNull('AC_STS');
-                    } elseif (in_array($status, ['inactive', 'obsolete'])) {
-                        $q->whereIn('AC_STS', ['I', 'Inactive', 'Obsolete']);
+                    } elseif ($status === 'inactive') {
+                        $q->whereIn('AC_STS', ['I', 'Inactive', 'N']);
+                    } elseif ($status === 'obsolete') {
+                        $q->where('AC_STS', 'Obsolete');
                     }
                 });
             }
@@ -174,6 +180,7 @@ class UpdateCustomerAccountController extends Controller
 
             // Transform data to ensure consistent format with expected fields
             $formatted = $customers->map(function($customer) {
+                $statusMeta = $this->normalizeStatus($customer->AC_STS);
                 return [
                     'id' => $customer->CODE, // Use CODE as ID
                     'customer_code' => $customer->CODE,
@@ -198,7 +205,10 @@ class UpdateCustomerAccountController extends Controller
                     'grouping_code' => $customer->GROUP_ ?? '',
                     'sales_type' => $customer->CUST_TYPE ?? '',
                     'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No',
-                    'status' => $customer->AC_STS ?? 'A'
+                    'status_raw' => $customer->AC_STS ?? '',
+                    'status' => $statusMeta['label'],
+                    'status_label' => $statusMeta['label'],
+                    'status_category' => $statusMeta['category'],
                 ];
             });
 
@@ -212,6 +222,32 @@ class UpdateCustomerAccountController extends Controller
             Log::error('Error in CustomerAccount API:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Gagal mengambil data customer account: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Normalize various AC_STS representations into display label + category.
+     */
+    private function normalizeStatus(?string $status): array
+    {
+        $raw = trim((string) $status);
+        $lower = strtolower($raw);
+
+        if ($raw === '' || in_array($lower, ['a', 'active', 'y'], true)) {
+            return ['label' => 'Active', 'category' => 'active'];
+        }
+
+        if (in_array($lower, ['i', 'inactive', 'n'], true)) {
+            return ['label' => 'Inactive', 'category' => 'inactive'];
+        }
+
+        if ($lower === 'obsolete') {
+            return ['label' => 'Obsolete', 'category' => 'inactive'];
+        }
+
+        return [
+            'label' => $raw !== '' ? $raw : 'Active',
+            'category' => 'other',
+        ];
     }
 
     public function apiStore(Request $request)
