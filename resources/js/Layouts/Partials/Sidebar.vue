@@ -3,7 +3,7 @@
     <!-- Header with animation -->
     <div class="px-4 py-3 border-b border-gray-700 relative z-10">
       <div class="flex items-center">
-        <div class="w-10 h-10 rounded-full mr-3 overflow-hidden pulse bg-white/10 flex items-center justify-center">
+        <div class="w-10 h-10 rounded-full mr-3 overflow-hidden pulse flex items-center justify-center">
           <img
             :src="logoSrc"
             alt="ERP Logo"
