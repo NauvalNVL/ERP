@@ -102,12 +102,19 @@
                     </td>
                     <td class="px-4 py-3">
                       <select
+                        v-if="item.hasComponent"
                         v-model="item.unit"
                         class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       >
                         <option value="PCS">PCS</option>
                         <option value="KG">KG</option>
                       </select>
+                      <div
+                        v-else
+                        class="w-20 h-8 border border-dashed border-gray-200 rounded bg-gray-50 text-center text-xs text-gray-400 flex items-center justify-center"
+                      >
+                        —
+                      </div>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 font-medium">
                       {{ formatCurrency(item.amount) }}
@@ -388,6 +395,7 @@ const items = reactive([
     unitPrice: 3036.36,
     unit: "PCS",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 1",
@@ -395,8 +403,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 2",
@@ -404,8 +413,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 3",
@@ -413,8 +423,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 4",
@@ -422,8 +433,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 5",
@@ -431,8 +443,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 6",
@@ -440,8 +453,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 7",
@@ -449,8 +463,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 8",
@@ -458,8 +473,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
   {
     name: "Fit 9",
@@ -467,8 +483,9 @@ const items = reactive([
     pcs: "",
     quantity: null,
     unitPrice: null,
-    unit: "PCS",
+    unit: "",
     amount: 0,
+    hasComponent: false,
   },
 ]);
 
@@ -569,6 +586,19 @@ const dimensionItems = reactive([
 const hydrateFromMcComponents = () => {
   try {
     const comps = Array.isArray(props.mcComponents) ? props.mcComponents : [];
+
+    items.forEach((item, index) => {
+      item.hasComponent = false;
+      if (index === 0) {
+        item.name = "Main";
+      } else {
+        item.name = `Fit ${index}`;
+      }
+      if (!item.hasComponent) {
+        item.unit = "";
+      }
+    });
+
     if (!comps.length) {
       console.log(
         "No mcComponents provided to ProductDesignScreenModal, skipping hydrate"
@@ -603,6 +633,7 @@ const hydrateFromMcComponents = () => {
       const nameLabel = idx === 0 ? "Main" : `Fit ${idx}`;
       itemRow.name = nameLabel;
       dimRow.name = nameLabel;
+      itemRow.hasComponent = true;
 
       // P/Design
       itemRow.design = comp.pd || comp.p_design || itemRow.design;
@@ -616,7 +647,7 @@ const hydrateFromMcComponents = () => {
 
       // Unit (restrict to KG/PCS)
       const unitRaw = comp.unit ?? comp.UNIT ?? comp.uom ?? comp.UOM ?? itemRow.unit;
-      itemRow.unit = normalizeDesignUnit(unitRaw);
+      itemRow.unit = unitRaw ? normalizeDesignUnit(unitRaw) : "";
 
       // Part#
       dimRow.partNumber = comp.part_no || comp.part_num || dimRow.partNumber;
@@ -738,10 +769,7 @@ const applyQuantityToAllComponents = (qty) => {
     }
 
     // For Fit rows, only apply if there is MC data (design/pcs/partNumber filled)
-    const dimRow = dimensionItems[index];
-    const hasComponentData =
-      !!item.design || !!item.pcs || !!(dimRow && dimRow.partNumber);
-    if (!hasComponentData) {
+    if (!item.hasComponent) {
       return;
     }
 
@@ -810,6 +838,14 @@ const saveDesign = () => {
   const mainItem = items[0];
   if (!mainItem.quantity || !mainItem.unitPrice) {
     error("Please fill in quantity and unit price for main item");
+    return;
+  }
+
+  const missingUnit = items.find(
+    (item) => item.hasComponent && !item.unit
+  );
+  if (missingUnit) {
+    error(`Please select a unit for ${missingUnit.name}`);
     return;
   }
 
