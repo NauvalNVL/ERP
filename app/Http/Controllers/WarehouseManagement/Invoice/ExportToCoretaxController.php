@@ -75,7 +75,7 @@ class ExportToCoretaxController extends Controller
                     'TAX.No_Faktur as FAKTUR_NO'
                 )
                 ->whereNotNull('INV.IV_NUM')
-                ->whereNotIn('INV.IV_STS', ['CX', 'Cancelled', 'CANCELLED']) // Abaikan faktur yang Cancel
+                ->whereNotIn('INV.IV_STS', ['CX', 'Cancelled', 'CANCELLED', 'CANCEL', 'cancel']) // Abaikan faktur yang Cancel
                 ->where(function($q) {
                     // Hanya tampilkan Main component di list
                     $q->where('INV.COMP', '=', 'Main')
@@ -160,7 +160,7 @@ class ExportToCoretaxController extends Controller
                     DB::raw("'IV/' + INV.IV_NUM AS FK_REFERENSI")
                 )
                 ->whereIn('INV.IV_NUM', $invoiceNums)
-                ->where('INV.IV_STS', '<>', 'CX')
+                ->whereNotIn('INV.IV_STS', ['CX', 'Cancelled', 'CANCELLED', 'CANCEL', 'cancel'])
                 ->orderBy('INV.IV_DMY')
                 ->orderBy('INV.IV_NUM')
                 ->orderByRaw("CASE WHEN INV.COMP = 'Main' OR INV.COMP IS NULL OR INV.COMP = '' THEN 0 ELSE 1 END") // Main dulu, Fit kemudian
@@ -247,7 +247,7 @@ class ExportToCoretaxController extends Controller
             // Sum amount for this invoice (all components except cancelled)
             $dpp = DB::table('INV')
                 ->where('IV_NUM', $ivNum)
-                ->where('IV_STS', '!=', 'Cancelled')
+                ->whereNotIn('IV_STS', ['CX', 'Cancelled', 'CANCELLED', 'CANCEL', 'cancel'])
                 ->sum('IV_TRAN_AMT');
 
             $rate = $invoice->IV_TAX_PERCENT ?? 0;

@@ -220,10 +220,8 @@
             </div>
         </div>
 
-        <!-- Recent Data and Quick Actions -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Recent Industries Table (real data) -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
+        <!-- Recent Industries Table (real data) -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-semibold text-gray-800">
                         Recent Industries
@@ -286,71 +284,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <!-- ERP Quick Actions -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Quick Actions - ERP Modules
-                </h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <a
-                        href="/product-group"
-                        class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-300"
-                    >
-                        <div class="bg-green-100 p-3 rounded-full mb-2">
-                            <i class="fas fa-boxes text-green-500 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >Define Product Group</span
-                        >
-                    </a>
-                    <a
-                        href="/machine"
-                        class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-300"
-                    >
-                        <div class="bg-purple-100 p-3 rounded-full mb-2">
-                            <i class="fas fa-cogs text-purple-500 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >Define Machine</span
-                        >
-                    </a>
-                    <a
-                        href="/paper-quality"
-                        class="flex flex-col items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition duration-300"
-                    >
-                        <div class="bg-orange-100 p-3 rounded-full mb-2">
-                            <i class="fas fa-scroll text-orange-500 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >Define Paper Quality</span
-                        >
-                    </a>
-                    <a
-                        href="/machine/view-print"
-                        class="flex flex-col items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition duration-300"
-                    >
-                        <div class="bg-indigo-100 p-3 rounded-full mb-2">
-                            <i class="fas fa-print text-indigo-500 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >View & Print Machine</span
-                        >
-                    </a>
-                    <a
-                        href="/user"
-                        class="flex flex-col items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition duration-300"
-                    >
-                        <div class="bg-red-100 p-3 rounded-full mb-2">
-                            <i class="fas fa-user-plus text-red-500 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >System Security</span
-                        >
-                    </a>
-                </div>
-            </div>
         </div>
 
         <!-- Invoices Overview (real data) -->

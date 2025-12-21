@@ -492,7 +492,11 @@ const fetchInvoices = async () => {
     const data = await response.json();
 
     if (data.success) {
-      invoices.value = sortInvoicesNewestFirst(data.data || []);
+      // Filter out invoices with status 'CANCEL'
+      const filteredData = (data.data || []).filter(invoice => 
+        invoice.IV_STS !== 'CANCEL' && invoice.IV_STS !== 'cancel'
+      );
+      invoices.value = sortInvoicesNewestFirst(filteredData);
       showMessage(`Loaded ${invoices.value.length} invoice(s)`, 'success');
     } else {
       invoices.value = [];
