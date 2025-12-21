@@ -73,12 +73,6 @@
                                     <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Status <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
-                                        Created At <i class="fas fa-sort ml-1"></i>
-                                    </th>
-                                    <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
-                                        Updated At <i class="fas fa-sort ml-1"></i>
-                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -113,12 +107,6 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">{{ finishing.status || '' }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">{{ formatDate(finishing.created_at) }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">{{ formatDate(finishing.updated_at) }}</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -210,12 +198,6 @@ const sortTable = (column) => {
     }
 };
 
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
-};
-
 // Filtered and sorted finishings
 const filteredFinishings = computed(() => {
     let filtered = [...finishings.value];
@@ -283,15 +265,13 @@ const printTable = () => {
             finishing.id || 'N/A',
             finishing.code || 'N/A',
             finishing.description || 'N/A',
-            finishing.status || '',
-            formatDate(finishing.created_at),
-            formatDate(finishing.updated_at)
+            finishing.status || ''
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['ID', 'Code', 'Description', 'Status', 'Created At', 'Updated At']],
+            head: [['ID', 'Code', 'Description', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

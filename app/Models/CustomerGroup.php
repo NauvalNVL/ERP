@@ -23,7 +23,7 @@ class CustomerGroup extends Model
         'Currency',
         'AC',
         'Name',
-        'status'
+        'Status'
     ];
 
     // Add accessors to $appends for JSON serialization
@@ -49,16 +49,5 @@ class CustomerGroup extends Model
     public function setDescriptionAttribute($value)
     {
         $this->attributes['Group_Name'] = $value;
-    }
-
-    public function getStatusAttribute($value)
-    {
-        $trim = trim((string) ($value ?? ''));
-        return $trim === '' ? 'Act' : $trim;
-    }
-
-    public function setStatusAttribute($value)
-    {
-        $this->attributes['status'] = $value;
     }
 }

@@ -136,7 +136,7 @@ class CustomerGroupController extends Controller
                 'Currency' => null,
                 'AC' => null,
                 'Name' => null,
-                'status' => 'Act'
+                'Status' => 'Act'
             ]);
 
             DB::commit();
@@ -227,26 +227,41 @@ class CustomerGroupController extends Controller
         try {
             Log::info('Toggle status called', ['group_code' => $group_code]);
             
-            $customerGroup = CustomerGroup::findOrFail($group_code);
+            // Get current record from database
+            $record = DB::table('CUST_GROUP')
+                ->where('Group_ID', $group_code)
+                ->first();
             
-            // Get current status directly from database attributes
-            $currentStatus = $customerGroup->getOriginal('status');
+            if (!$record) {
+                throw new \Exception('Customer Group not found');
+            }
+            
+            // Get current status - try both Status and status columns
+            $currentStatus = $record->Status ?? $record->status ?? null;
             $currentTrim = trim((string) ($currentStatus ?? ''));
             $currentTrim = $currentTrim === '' ? 'Act' : $currentTrim;
             
             Log::info('Current status', [
                 'group_code' => $group_code,
                 'current_status' => $currentStatus,
-                'current_trim' => $currentTrim
+                'current_trim' => $currentTrim,
+                'record' => (array)$record
             ]);
 
             // Toggle: Act -> Obs, Obs -> Act
             $newValue = $currentTrim === 'Act' ? 'Obs' : 'Act';
             
-            // Direct update using DB query to ensure it works
+            // Try updating with Status column first
             $updated = DB::table('CUST_GROUP')
                 ->where('Group_ID', $group_code)
-                ->update(['status' => $newValue]);
+                ->update(['Status' => $newValue]);
+            
+            // If Status column doesn't exist, try lowercase status
+            if ($updated === 0) {
+                $updated = DB::table('CUST_GROUP')
+                    ->where('Group_ID', $group_code)
+                    ->update(['status' => $newValue]);
+            }
             
             Log::info('Status update result', [
                 'group_code' => $group_code,
@@ -256,18 +271,18 @@ class CustomerGroupController extends Controller
             ]);
 
             if ($updated === 0) {
-                throw new \Exception('No rows were updated');
+                throw new \Exception('No rows were updated - Status column may not exist');
             }
 
-            // Refresh the model to get updated data
-            $customerGroup->refresh();
-
             DB::commit();
+            
+            // Fetch fresh data
+            $customerGroup = CustomerGroup::find($group_code);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Customer Group status updated successfully',
-                'data' => $customerGroup->fresh()
+                'data' => $customerGroup
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollback();
