@@ -3,8 +3,12 @@
     <!-- Header with animation -->
     <div class="px-4 py-3 border-b border-gray-700 relative z-10">
       <div class="flex items-center">
-        <div class="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full mr-3 pulse">
-          <i class="fas fa-building text-xl"></i>
+        <div class="w-10 h-10 rounded-full mr-3 overflow-hidden pulse bg-white/10 flex items-center justify-center">
+          <img
+            :src="logoSrc"
+            alt="ERP Logo"
+            class="w-full h-full object-contain"
+          />
         </div>
         <h1 class="text-xl font-bold slide-in-right">ERP System</h1>
       </div>
@@ -182,6 +186,7 @@ const user = computed(() => page.props.auth?.user);
 const userPermissions = computed(() => page.props.auth?.permissions || []);
 const userInitial = computed(() => user.value?.username ? user.value.username.charAt(0).toUpperCase() : 'G');
 const currentPath = computed(() => page.url);
+const logoSrc = new URL('../../../../public/favicon.png', import.meta.url).href;
 
 // Extract the base path from the URL (e.g., '/foreign-currency/view-print' -> '/foreign-currency')
 const getBasePath = (path) => {

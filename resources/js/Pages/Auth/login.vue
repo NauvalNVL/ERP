@@ -3,8 +3,12 @@
     <div class="min-h-screen flex items-center justify-center bg-gray-100 animate-fadeIn">
         <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg animate-slideUp">
             <div class="flex flex-col items-center">
-                <div class="w-20 h-20 flex items-center justify-center bg-blue-600 text-white rounded-full mb-4 animate-bounce-soft">
-                    <i class="fas fa-building text-3xl"></i>
+                <div class="w-20 h-20 mb-4 animate-bounce-soft">
+                    <img
+                        :src="logoSrc"
+                        alt="ERP Logo"
+                        class="w-full h-full object-contain drop-shadow-md"
+                    />
                 </div>
                 <h2 class="text-center text-3xl font-extrabold text-gray-900 animate-fadeIn animation-delay-300">
                     Login to ERP System
@@ -89,6 +93,7 @@ import { EyeIcon, EyeSlashIcon as EyeOffIcon } from '@heroicons/vue/24/outline';
 const isLoading = ref(false);
 const showPassword = ref(false);
 const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content || '';
+const logoSrc = new URL('../../../../public/favicon.png', import.meta.url).href;
 
 // Optional v-model bindings for nicer UX
 const userId = ref('');
