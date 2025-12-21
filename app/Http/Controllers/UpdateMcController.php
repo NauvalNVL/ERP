@@ -410,6 +410,13 @@ class UpdateMcController extends Controller
                 $main->COLOR6_AREA_PERCENT ?? null,
                 $main->COLOR7_AREA_PERCENT ?? null,
             ],
+            'moreDescriptions' => [
+                $main->MC_MORE_DESCRIPTION_1 ?? '',
+                $main->MC_MORE_DESCRIPTION_2 ?? '',
+                $main->MC_MORE_DESCRIPTION_3 ?? '',
+                $main->MC_MORE_DESCRIPTION_4 ?? '',
+                $main->MC_MORE_DESCRIPTION_5 ?? '',
+            ],
             // Corrugating / converting fields per component
             'selectedPaperFlute' => $main->FLUTE ?? null,
             'selectedScoringToolCode' => $main->S_TOOL ?? null,
@@ -1886,6 +1893,13 @@ class UpdateMcController extends Controller
                         $comp->COLOR5_AREA_PERCENT ?? null,
                         $comp->COLOR6_AREA_PERCENT ?? null,
                         $comp->COLOR7_AREA_PERCENT ?? null,
+                    ],
+                    'moreDescriptions' => [
+                        $comp->MC_MORE_DESCRIPTION_1 ?? '',
+                        $comp->MC_MORE_DESCRIPTION_2 ?? '',
+                        $comp->MC_MORE_DESCRIPTION_3 ?? '',
+                        $comp->MC_MORE_DESCRIPTION_4 ?? '',
+                        $comp->MC_MORE_DESCRIPTION_5 ?? '',
                     ],
                     // Die cut & blocks
                     'dcutSheet' => [

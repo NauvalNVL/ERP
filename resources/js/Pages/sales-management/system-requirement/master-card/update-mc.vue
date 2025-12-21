@@ -1719,7 +1719,7 @@ watch(
 
 // New state for the detailed MC info section
 const showDetailedMcInfo = ref(false);
-const mcDetails = ref({
+const makeEmptyMcDetails = () => ({
   ac_name: "",
   mc_model: "",
   mc_short_model: "",
@@ -1733,6 +1733,7 @@ const mcDetails = ref({
   int_dim_2: "",
   int_dim_3: "",
 });
+const mcDetails = ref(makeEmptyMcDetails());
 
 // Product Design data - sample data matching the image format
 const productDesigns = ref([
@@ -2177,6 +2178,10 @@ const handleMcsInput = async () => {
     soValues.value = ["", "", "", "", ""];
     woValues.value = ["", "", "", "", ""];
     selectedMcsFull.value = null;
+    mcDetails.value = {
+      ...makeEmptyMcDetails(),
+      ac_name: form.value.customer_name || "",
+    };
     return;
   }
 
@@ -2264,6 +2269,10 @@ const handleMcsInput = async () => {
             form.value.mc_model = "";
             form.value.mc_short_model = "";
             form.value.mc_status = "Active";
+            mcDetails.value = {
+              ...makeEmptyMcDetails(),
+              ac_name: form.value.customer_name || "",
+            };
           }
         } else {
           console.error("Error checking MCS:", response.status);
@@ -2297,20 +2306,7 @@ const handleAcInput = () => {
     recordMode.value = "new";
 
     // Reset MC details
-    mcDetails.value = {
-      ac_name: "",
-      mc_model: "",
-      mc_short_model: "",
-      mc_status: "Active",
-      last_mcs: "",
-      last_updated_seq: "",
-      ext_dim_1: "",
-      ext_dim_2: "",
-      ext_dim_3: "",
-      int_dim_1: "",
-      int_dim_2: "",
-      int_dim_3: "",
-    };
+    mcDetails.value = makeEmptyMcDetails();
   }
 
   const typedCode = (form.value.ac || "").toString().trim();
@@ -2372,6 +2368,12 @@ const addNewRecord = () => {
 
   // Clear selectedMcsFull to ensure fresh data
   selectedMcsFull.value = null;
+
+  // Ensure detailed info starts fresh while keeping customer context
+  mcDetails.value = {
+    ...makeEmptyMcDetails(),
+    ac_name: form.value.customer_name || "",
+  };
 };
 
 const searchAc = async () => {

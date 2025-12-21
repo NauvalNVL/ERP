@@ -3436,6 +3436,12 @@ const onMoreDescriptionSave = (rows) => {
     console.debug("[UpdateMcModal] MoreDescription saved");
   }
   moreDescriptions.value = normalized;
+  
+  // Also save to the current component form
+  const idx = selectedComponentIndex.value ?? 0;
+  if (componentForms.value[idx]) {
+    componentForms.value[idx].moreDescriptions = normalized;
+  }
 };
 
 // Additional PD state bindings
@@ -4078,6 +4084,40 @@ const selectedComponentIndex = ref(0);
 const localComponents = ref([]);
 const componentsLoadedFromDb = ref(false); // Flag to track if components loaded from DB
 
+const COMPONENT_LABELS = [
+  "Main",
+  "Fit1",
+  "Fit2",
+  "Fit3",
+  "Fit4",
+  "Fit5",
+  "Fit6",
+  "Fit7",
+  "Fit8",
+  "Fit9",
+];
+
+const makeDefaultLocalComponents = () =>
+  COMPONENT_LABELS.map((label, idx) => ({
+    c_num: label,
+    pd: "",
+    pcs_set: "",
+    part_num: "",
+    selected: idx === 0,
+    index: idx,
+  }));
+
+const makeEmptyComponentForms = () =>
+  Array.from({ length: COMPONENT_LABELS.length }, () => makeEmptyPdState());
+
+const resetComponentState = () => {
+  componentsLoadedFromDb.value = false;
+  localComponents.value = makeDefaultLocalComponents();
+  componentForms.value = makeEmptyComponentForms();
+  selectedComponentIndex.value = 0;
+  moreDescriptions.value = ["", "", "", "", ""];
+};
+
 // Per-component PD state (per C#)
 const makeEmptyPdState = () => ({
   partNo: "",
@@ -4130,17 +4170,23 @@ const makeEmptyPdState = () => ({
   handHole: false,
   rotaryDCut: false,
   fullBlockPrint: false,
+  // More descriptions (5 lines) per component
+  moreDescriptions: ["", "", "", "", ""],
 });
-const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()));
+const componentForms = ref(makeEmptyComponentForms());
 // Now safe to hydrate PD from loaded MC/PD data
 watch(
   () => props.mcLoaded,
-  (newValue) => {
+  (newValue, oldValue) => {
     if (newValue) {
       hydratePdFromLoaded();
     } else {
       // Reset MSP data when creating new MC (mcLoaded is null)
       mspData.value = {};
+      resetComponentState();
+      if (oldValue) {
+        emit("requestClearSoWo");
+      }
     }
   },
   { immediate: true }
@@ -4149,18 +4195,10 @@ watch(
 // Prefer loaded components when available, else fallback to props.mcComponents
 // Always render exactly 10 rows with C# labels: Main, Fit1..Fit9
 const mcComponentsToRender = computed(() => {
-  const desiredLabels = [
-    "Main",
-    "Fit1",
-    "Fit2",
-    "Fit3",
-    "Fit4",
-    "Fit5",
-    "Fit6",
-    "Fit7",
-    "Fit8",
-    "Fit9",
-  ];
+  // When no MC is loaded (new entry), always render blank template rows
+  if (!props.mcLoaded) {
+    return makeDefaultLocalComponents();
+  }
 
   // Source components: loaded first, otherwise props.mcComponents
   let source = [];
@@ -4187,8 +4225,8 @@ const mcComponentsToRender = computed(() => {
 
   // Build exactly 10 rows, normalizing labels and padding missing entries
   const rows = [];
-  for (let i = 0; i < 10; i++) {
-    const label = desiredLabels[i];
+  for (let i = 0; i < COMPONENT_LABELS.length; i++) {
+    const label = COMPONENT_LABELS[i];
     let base = {};
 
     if (Array.isArray(fromLoaded) && fromLoaded.length > 0) {
@@ -4367,24 +4405,15 @@ watch(
   () => props.mcLoaded,
   (loaded) => {
     try {
+      if (!loaded) {
+        return;
+      }
       console.debug(
         "[UpdateMcModal] mcLoaded changed, pd_setup snapshot:",
         JSON.parse(JSON.stringify(loaded?.pd_setup || null))
       );
     } catch (e) {}
     // Utilities (SO/WO extraction kept only for legacy root fallback)
-    const desiredLabels = [
-      "Main",
-      "Fit1",
-      "Fit2",
-      "Fit3",
-      "Fit4",
-      "Fit5",
-      "Fit6",
-      "Fit7",
-      "Fit8",
-      "Fit9",
-    ];
     const fromNumberedKeys = (obj, baseKey) => {
       if (!obj || typeof obj !== "object") return [];
       const entries = [];
@@ -4420,14 +4449,14 @@ watch(
         // Basic fields from components when available (match by C# label, not raw index)
         let compSrc = null;
         if (Array.isArray(pd.components)) {
-          const label = desiredLabels[idx];
+          const label = COMPONENT_LABELS[idx];
           compSrc =
             pd.components.find((c) => {
               const cNum = (c.c_num || c.comp || "").toString().toLowerCase();
               return cNum === label.toLowerCase();
             }) || null;
         } else if (pd.components && typeof pd.components === "object") {
-          compSrc = pd.components[desiredLabels[idx]] || null;
+          compSrc = pd.components[COMPONENT_LABELS[idx]] || null;
         }
         if (compSrc) {
           // Core identifiers
@@ -4565,6 +4594,11 @@ watch(
             compSrc.fullBlockPrint !== undefined
               ? !!compSrc.fullBlockPrint
               : cf.fullBlockPrint;
+          
+          // Hydrate moreDescriptions per component
+          if (Array.isArray(compSrc.moreDescriptions) && compSrc.moreDescriptions.length > 0) {
+            cf.moreDescriptions = compSrc.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "");
+          }
         }
         componentForms.value[idx] = { ...makeEmptyPdState(), ...cf };
       }
@@ -4677,18 +4711,6 @@ const fetchMcComponentsFromDb = async () => {
 
     // Update localComponents with fetched data
     if (Array.isArray(data) && data.length > 0) {
-      const desiredLabels = [
-        "Main",
-        "Fit1",
-        "Fit2",
-        "Fit3",
-        "Fit4",
-        "Fit5",
-        "Fit6",
-        "Fit7",
-        "Fit8",
-        "Fit9",
-      ];
       const updated = [];
       const nextComponentForms = [...componentForms.value];
 
@@ -4702,18 +4724,18 @@ const fetchMcComponentsFromDb = async () => {
         })),
       });
 
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < COMPONENT_LABELS.length; i++) {
         const fetchedComp = data.find((c) => {
           const cNum = c.c_num || c.comp_no || "";
-          const match = cNum === desiredLabels[i];
+          const match = cNum === COMPONENT_LABELS[i];
           if (match) {
-            console.log(`✓ Found ${desiredLabels[i]} at index ${i}:`, cNum);
+            console.log(`✓ Found ${COMPONENT_LABELS[i]} at index ${i}:`, cNum);
           }
           return match;
         });
 
         const componentData = {
-          c_num: desiredLabels[i],
+          c_num: COMPONENT_LABELS[i],
           pd: fetchedComp?.pd || fetchedComp?.p_design || "",
           pcs_set: fetchedComp?.pcs_set || fetchedComp?.pcs || "",
           part_num: fetchedComp?.part_num || fetchedComp?.part_no || "",
@@ -4722,7 +4744,7 @@ const fetchMcComponentsFromDb = async () => {
         };
 
         if (fetchedComp) {
-          console.log(`📍 Row ${i} (${desiredLabels[i]}):`, componentData);
+          console.log(`📍 Row ${i} (${COMPONENT_LABELS[i]}):`, componentData);
 
           // Hydrate full PD state for this component from fetchedComp
           const cf = nextComponentForms[i] || makeEmptyPdState();
@@ -4873,6 +4895,11 @@ const fetchMcComponentsFromDb = async () => {
             fetchedComp.fullBlockPrint !== undefined
               ? !!fetchedComp.fullBlockPrint
               : cf.fullBlockPrint;
+          
+          // Hydrate moreDescriptions per component from fetched data
+          if (Array.isArray(fetchedComp.moreDescriptions) && fetchedComp.moreDescriptions.length > 0) {
+            cf.moreDescriptions = fetchedComp.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "");
+          }
 
           nextComponentForms[i] = { ...makeEmptyPdState(), ...cf };
         }
@@ -4942,10 +4969,12 @@ const onSelectComponent = (component, index) => {
   console.log("📡 UpdateMcModal - Emitting selectComponent to parent");
   emit("selectComponent", component, index);
 
-  // When selecting a component, reflect its SO/WO into parent UI state
+  // When selecting a component, reflect its SO/WO and moreDescriptions into parent UI state
   try {
     const idx = selectedComponentIndex.value;
     const cf = componentForms.value[idx] || makeEmptyPdState();
+    
+    // Hydrate SO/WO values
     if (!cf.soValues?.some((v) => v) && !cf.woValues?.some((v) => v)) {
       emit("requestClearSoWo");
     } else {
@@ -4954,7 +4983,20 @@ const onSelectComponent = (component, index) => {
         wo: Array.isArray(cf.woValues) ? cf.woValues : ["", "", "", "", ""],
       });
     }
-  } catch (e) {}
+    
+    // Hydrate moreDescriptions for the selected component - ALWAYS hydrate, even if empty
+    moreDescriptions.value = Array.isArray(cf.moreDescriptions) 
+      ? cf.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "")
+      : ["", "", "", "", ""];
+    
+    console.log("✅ Component selected - moreDescriptions hydrated:", {
+      componentIndex: idx,
+      componentName: component?.c_num,
+      moreDescriptions: moreDescriptions.value,
+    });
+  } catch (e) {
+    console.error("Error in onSelectComponent:", e);
+  }
 };
 
 const openSetupPd = () => {
@@ -5141,12 +5183,18 @@ const openSetupPd = () => {
     handHole.value = !!(cf.handHole ?? handHole.value);
     rotaryDCut.value = !!(cf.rotaryDCut ?? rotaryDCut.value);
     fullBlockPrint.value = !!(cf.fullBlockPrint ?? fullBlockPrint.value);
+    
+    // Hydrate moreDescriptions from component form (always reflect selection)
+    moreDescriptions.value = Array.isArray(cf.moreDescriptions)
+      ? cf.moreDescriptions.slice(0, 5).map((v) => (v ?? "") + "")
+      : ["", "", "", "", ""];
   }
 
   console.log("✅ openSetupPd - PD fields hydrated:", {
     partNo: partNo.value,
     selectedProductDesign: selectedProductDesign.value,
     pcsPerSet: pcsPerSet.value,
+    moreDescriptions: moreDescriptions.value,
   });
 
   emit("setupPD");
@@ -5163,6 +5211,47 @@ watch([partNo, selectedProductDesign, pcsPerSet], () => {
   next.selectedProductDesign = selectedProductDesign.value;
   next.pcsPerSet = pcsPerSet.value;
   componentForms.value[idx] = next;
+});
+
+// Persist moreDescriptions per component
+watch(moreDescriptions, () => {
+  if (selectedComponentIndex.value === null) return;
+  // Only persist edits while Setup PD modal is open, so closing/clearing doesn't wipe saved component data
+  if (!props.showSetupPdModal) return;
+  const idx = selectedComponentIndex.value;
+  const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
+  next.moreDescriptions = Array.isArray(moreDescriptions.value) 
+    ? moreDescriptions.value.slice(0, 5).map(v => (v ?? "") + "")
+    : ["", "", "", "", ""];
+  componentForms.value[idx] = next;
+  
+  console.log("💾 Persisting moreDescriptions for component:", {
+    componentIndex: idx,
+    componentName: localComponents.value[idx]?.c_num,
+    moreDescriptions: next.moreDescriptions,
+  });
+}, { deep: true });
+
+// Hydrate moreDescriptions when component selection changes
+watch(selectedComponentIndex, (newIdx) => {
+  try {
+    const idx = newIdx ?? 0;
+    const cf = componentForms.value[idx];
+    if (cf) {
+      // Always hydrate moreDescriptions from the selected component
+      moreDescriptions.value = Array.isArray(cf.moreDescriptions) 
+        ? cf.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "")
+        : ["", "", "", "", ""];
+      
+      console.log("🔄 Component switched - moreDescriptions hydrated:", {
+        componentIndex: idx,
+        componentName: localComponents.value[idx]?.c_num,
+        moreDescriptions: moreDescriptions.value,
+      });
+    }
+  } catch (e) {
+    console.error("Error hydrating moreDescriptions on component switch:", e);
+  }
 });
 
 // Persist corrugating / converting fields per component
@@ -5335,6 +5424,7 @@ const buildPdSetupPayload = () => {
         "",
         "",
       ],
+      moreDescriptions: componentForms.value[idx]?.moreDescriptions || ["", "", "", "", ""],
     })),
   };
 };
