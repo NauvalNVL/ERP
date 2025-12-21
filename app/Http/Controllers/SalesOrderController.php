@@ -117,6 +117,38 @@ class SalesOrderController extends Controller
         }
     }
 
+    private function normalizeCustomerStatus(?string $status): array
+    {
+        $raw = trim((string) $status);
+        $lower = strtolower($raw);
+
+        if ($raw === '' || in_array($lower, ['a', 'active', 'y'], true)) {
+            return ['label' => $raw ?: 'Active', 'category' => 'active'];
+        }
+
+        if (in_array($lower, ['i', 'inactive', 'n'], true)) {
+            return ['label' => 'Inactive', 'category' => 'inactive'];
+        }
+
+        if (in_array($lower, ['obsolete', 'obs', 'o'], true)) {
+            return ['label' => 'Obsolete', 'category' => 'inactive'];
+        }
+
+        return ['label' => $raw ?: 'Active', 'category' => 'other'];
+    }
+
+    private function isCustomerActive(?string $status): bool
+    {
+        return $this->normalizeCustomerStatus($status)['category'] === 'active';
+    }
+
+    private function isMasterCardActive(?string $status): bool
+    {
+        $raw = trim((string) $status);
+        $lower = strtolower($raw);
+        return $raw === '' || in_array($lower, ['act', 'active', 'a'], true);
+    }
+
     private function normalizeProductDesignUnit($unit): ?string
     {
         $u = strtoupper(trim((string) $unit));
@@ -177,6 +209,21 @@ class SalesOrderController extends Controller
         }
 
         $validated = $request->all();
+
+        $customer = Customer::where('CODE', $validated['customer_code'])->first();
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found. Please select a valid customer.'
+            ], 422);
+        }
+
+        if (!$this->isCustomerActive($customer->AC_STS ?? '')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot create Sales Order because customer status is ' . $this->normalizeCustomerStatus($customer->AC_STS)['label']
+            ], 422);
+        }
 
         $headerUom = $this->normalizeProductDesignUnit($validated['details'][0]['uom'] ?? null) ?? 'PCS';
 
@@ -245,6 +292,20 @@ class SalesOrderController extends Controller
             ->where('MCS_Num', $validated['master_card_seq'])
             ->where('AC_NUM', $validated['customer_code'])
             ->first();
+
+        if (!$masterCardData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Master Card not found for selected customer.'
+            ], 422);
+        }
+
+        if (!$this->isMasterCardActive($masterCardData->STS ?? '')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot create Sales Order because Master Card status is ' . ($masterCardData->STS ?? 'Inactive')
+            ], 422);
+        }
 
         // Log MC data fetch result
         Log::info('MC Data Fetch', [
@@ -1495,6 +1556,8 @@ class SalesOrderController extends Controller
             ], 404);
         }
 
+        $statusMeta = $this->normalizeCustomerStatus($customer->AC_STS ?? '');
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -1504,7 +1567,10 @@ class SalesOrderController extends Controller
                 'address2' => $customer->ADDRESS2 ?? '',
                 'address3' => $customer->ADDRESS3 ?? '',
                 'salesperson_code' => $customer->SLM ?? '',
-                'currency_code' => $customer->CURRENCY ?? ''
+                'currency_code' => $customer->CURRENCY ?? '',
+                'status_raw' => $customer->AC_STS ?? '',
+                'status_label' => $statusMeta['label'],
+                'status_category' => $statusMeta['category'],
             ]
         ]);
     }

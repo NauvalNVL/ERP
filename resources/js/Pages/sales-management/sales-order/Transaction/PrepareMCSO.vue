@@ -619,7 +619,10 @@ const selectedCustomer = reactive({
   name: '',
   address: '',
   salesperson: '',
-  currency: 'IDR'
+  currency: 'IDR',
+  statusRaw: '',
+  statusLabel: '',
+  statusCategory: '',
 })
 
 // Master Card Information
@@ -627,11 +630,50 @@ const selectedMasterCard = reactive({
   seq: '',
   model: '',
   status: '',
+  statusRaw: '',
+  statusCategory: '',
   approval: '',
   partNo: '',
   compNo: '',
-  pDesign: ''
+  pDesign: '',
 })
+
+const resetSelectedMasterCard = () => {
+  Object.assign(selectedMasterCard, {
+    seq: '',
+    model: '',
+    status: '',
+    statusRaw: '',
+    statusCategory: '',
+    approval: '',
+    partNo: '',
+    compNo: '',
+    pDesign: '',
+  })
+}
+
+const clearCustomerSelectionState = (options = { clearCode: true }) => {
+  if (!options || options.clearCode !== false) {
+    selectedCustomer.code = ''
+  }
+  selectedCustomer.name = ''
+  selectedCustomer.address = ''
+  selectedCustomer.salesperson = ''
+  selectedCustomer.currency = 'IDR'
+  selectedCustomer.statusRaw = ''
+  selectedCustomer.statusLabel = ''
+  selectedCustomer.statusCategory = ''
+
+  orderDetails.salesperson.code = ''
+  orderDetails.salesperson.name = ''
+  orderDetails.currency = 'IDR'
+
+  lastSOOrder.prefix = ''
+  lastSOOrder.year = ''
+  lastSOOrder.number = ''
+
+  resetSelectedMasterCard()
+}
 
 // Order Details
 const orderDetails = reactive({
@@ -707,6 +749,51 @@ const mcsLastPage = ref(1)
 // MC components for Product Design Screen (Main, Fit1-9)
 const mcComponentsForDesign = ref([])
 
+const normalizeCustomerStatus = (status) => {
+  const raw = (status ?? '').toString().trim()
+  const lower = raw.toLowerCase()
+  if (!raw || ['a', 'active', 'y'].includes(lower)) {
+    return { label: raw || 'Active', category: 'active' }
+  }
+  if (['i', 'inactive', 'n'].includes(lower)) {
+    return { label: 'Inactive', category: 'inactive' }
+  }
+  if (['obsolete', 'obs', 'o'].includes(lower)) {
+    return { label: 'Obsolete', category: 'inactive' }
+  }
+  return { label: raw, category: 'other' }
+}
+
+const normalizeMasterCardStatus = (status) => {
+  const raw = (status ?? '').toString().trim()
+  const lower = raw.toLowerCase()
+  if (!raw || ['act', 'active', 'a'].includes(lower)) {
+    return { label: raw || 'Active', category: 'active' }
+  }
+  return { label: raw || 'Unknown', category: 'inactive' }
+}
+
+const isCustomerStatusAllowed = (status) =>
+  normalizeCustomerStatus(status).category === 'active'
+
+const isMasterCardStatusAllowed = (status) =>
+  normalizeMasterCardStatus(status).category === 'active'
+
+const extractCustomerStatusMeta = (payload) => {
+  const raw =
+    payload?.status_raw ??
+    payload?.status ??
+    payload?.statusLabel ??
+    payload?.status_label ??
+    ''
+  const normalized = normalizeCustomerStatus(raw)
+  return {
+    raw,
+    label: payload?.status_label || payload?.statusLabel || normalized.label,
+    category:
+      payload?.status_category || payload?.statusCategory || normalized.category,
+  }
+}
 
 // Computed properties
 const canProceed = computed(() => {
@@ -989,7 +1076,9 @@ const refreshPage = () => {
     name: '',
     address: '',
     salesperson: '',
-    currency: 'IDR'
+    currency: 'IDR',
+    statusLabel: '',
+    statusCategory: '',
   })
   Object.assign(selectedMasterCard, {
     seq: '',
@@ -998,7 +1087,8 @@ const refreshPage = () => {
     approval: '',
     partNo: '',
     compNo: '',
-    pDesign: ''
+    pDesign: '',
+    statusCategory: '',
   })
   Object.assign(orderDetails, {
     orderMode: '0',
@@ -1065,11 +1155,26 @@ const openCustomerLookup = () => {
 }
 
 const selectCustomer = async (customer) => {
+  if (!customer) return
+
+  const statusMeta = extractCustomerStatusMeta(customer)
+  if (statusMeta.category !== 'active') {
+    error(
+      `Customer ${
+        customer.customer_code ?? customer.code ?? ''
+      } is ${statusMeta.label || 'Inactive'} and cannot be used for Sales Order.`
+    )
+    return
+  }
+
   selectedCustomer.code = customer.customer_code
   selectedCustomer.name = customer.customer_name
   selectedCustomer.address = customer.address || ''
   selectedCustomer.salesperson = customer.salesperson_code || ''
   selectedCustomer.currency = customer.currency_code || 'IDR'
+  selectedCustomer.statusRaw = statusMeta.raw || ''
+  selectedCustomer.statusLabel = statusMeta.label || ''
+  selectedCustomer.statusCategory = statusMeta.category || ''
 
   // Update order details
   orderDetails.salesperson.code = customer.salesperson_code || ''
@@ -1094,15 +1199,7 @@ const selectCustomer = async (customer) => {
   }
 
   // Reset previously selected Master Card when customer changes
-  Object.assign(selectedMasterCard, {
-    seq: '',
-    model: '',
-    status: '',
-    approval: '',
-    partNo: '',
-    compNo: '',
-    pDesign: ''
-  })
+  resetSelectedMasterCard()
 
   showCustomerModal.value = false
 }
@@ -1116,25 +1213,32 @@ const validateCustomer = async () => {
 
     if (data.success && data.data) {
       const customer = data.data
+      const statusMeta = extractCustomerStatusMeta(customer)
+
+      if (statusMeta.category !== 'active') {
+        error(
+          `Customer ${customer.customer_code || selectedCustomer.code} is ${
+            statusMeta.label || 'Inactive'
+          } and cannot be used for Sales Order.`
+        )
+        clearCustomerSelectionState()
+        return
+      }
+
       selectedCustomer.name = customer.customer_name
       selectedCustomer.address = customer.address || ''
       selectedCustomer.salesperson = customer.salesperson_code || ''
       selectedCustomer.currency = customer.currency_code || 'IDR'
+      selectedCustomer.statusRaw = statusMeta.raw || ''
+      selectedCustomer.statusLabel = statusMeta.label || ''
+      selectedCustomer.statusCategory = statusMeta.category || ''
 
       // Update order details with customer info
       orderDetails.salesperson.code = customer.salesperson_code || ''
       orderDetails.currency = customer.currency_code || 'IDR'
 
       // Reset previously selected Master Card when customer validated
-      Object.assign(selectedMasterCard, {
-        seq: '',
-        model: '',
-        status: '',
-        approval: '',
-        partNo: '',
-        compNo: '',
-        pDesign: ''
-      })
+      resetSelectedMasterCard()
 
       // Fetch salesperson name if available
       if (customer.salesperson_code) {
@@ -1173,24 +1277,12 @@ const validateCustomer = async () => {
       success('Customer validated successfully')
     } else {
       error(data.message || 'Customer not found')
-      selectedCustomer.name = ''
-      selectedCustomer.address = ''
-      selectedCustomer.salesperson = ''
-      selectedCustomer.currency = 'IDR'
-      lastSOOrder.prefix = ''
-      lastSOOrder.year = ''
-      lastSOOrder.number = ''
+      clearCustomerSelectionState()
     }
   } catch (err) {
     console.error('Error validating customer:', err)
     error('Error validating customer: ' + (err.message || 'Network error'))
-    selectedCustomer.name = ''
-    selectedCustomer.address = ''
-    selectedCustomer.salesperson = ''
-    selectedCustomer.currency = 'IDR'
-    lastSOOrder.prefix = ''
-    lastSOOrder.year = ''
-    lastSOOrder.number = ''
+    clearCustomerSelectionState()
   }
 }
 
