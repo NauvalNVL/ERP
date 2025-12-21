@@ -434,12 +434,12 @@ const handleNew = () => {
     showEditModal.value = true;
 };
 
-const handleCodeInput = () => {
-    // User is typing a code
-    const code = form.value.code?.trim();
-    if (code && recordMode.value === 'select') {
-        // Prepare to check if this is new or existing when Enter is pressed
-    }
+const handleObsoleteSelection = (code, message) => {
+    showNotification(
+        message || `Tax group ${code || ''} is obsolete and cannot be used.`,
+        'error'
+    );
+    handleCancel();
 };
 
 const handleEnterKey = async () => {
@@ -454,8 +454,13 @@ const handleEnterKey = async () => {
             onTaxGroupSelected(response.data.data);
         }
     } catch (e) {
+        const status = e.response?.status;
+        if (status === 422) {
+            handleObsoleteSelection(code, e.response?.data?.message);
+            return;
+        }
         // Not found, treat as new
-        if (e.response?.status === 404) {
+        if (status === 404) {
             form.value.code = code;
             form.value.name = '';
             form.value.sales_tax_applied = 'Y';

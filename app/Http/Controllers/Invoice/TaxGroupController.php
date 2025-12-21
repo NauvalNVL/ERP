@@ -176,6 +176,13 @@ class TaxGroupController extends Controller
         try {
             $taxGroup = TaxGroup::with('taxTypes')->findOrFail($code);
 
+            if (strtoupper($taxGroup->status ?? '') === 'O') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot use this tax group because it is marked as Obsolete.',
+                ], 422);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $taxGroup
