@@ -10,6 +10,7 @@ use App\Models\McLog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Arr;
 
 class UpdateMcController extends Controller
@@ -2304,39 +2305,217 @@ class UpdateMcController extends Controller
 
     public function obsoleteReactiveApiIndex()
     {
+        $mcMcsCol = Schema::hasColumn('MC', 'MCS_Num')
+            ? 'MCS_Num'
+            : (Schema::hasColumn('MC', 'MCS_NUM') ? 'MCS_NUM' : 'MCS_Num');
+
+        $mcFallbackExpr = null;
+        if (Schema::hasColumn('MC', 'updated_at')) {
+            $mcFallbackExpr = '`MC`.`updated_at`';
+        } elseif (Schema::hasColumn('MC', 'UPDATED_AT')) {
+            $mcFallbackExpr = '`MC`.`UPDATED_AT`';
+        } elseif (Schema::hasColumn('MC', 'created_at')) {
+            $mcFallbackExpr = '`MC`.`created_at`';
+        } elseif (Schema::hasColumn('MC', 'CREATED_AT')) {
+            $mcFallbackExpr = '`MC`.`CREATED_AT`';
+        } elseif (Schema::hasColumn('MC', 'DateSK') && Schema::hasColumn('MC', 'TIME')) {
+            $mcFallbackExpr = "STR_TO_DATE(CONCAT(`MC`.`DateSK`,' ',`MC`.`TIME`),'%Y%m%d %H:%i:%s')";
+        } elseif (Schema::hasColumn('MC', 'DATE') && Schema::hasColumn('MC', 'TIME')) {
+            $mcFallbackExpr = "STR_TO_DATE(CONCAT(`MC`.`DATE`,' ',`MC`.`TIME`),'%Y-%m-%d %H:%i:%s')";
+        } elseif (Schema::hasColumn('MC', 'DateSK')) {
+            $mcFallbackExpr = "STR_TO_DATE(`MC`.`DateSK`,'%Y%m%d')";
+        } elseif (Schema::hasColumn('MC', 'DATE')) {
+            $mcFallbackExpr = "STR_TO_DATE(`MC`.`DATE`,'%Y-%m-%d')";
+        }
+
+        $logMcsCol = null;
+        if (Schema::hasColumn('MC_UPDATE_LOG', 'MCS_Num')) {
+            $logMcsCol = 'MCS_Num';
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'MCS_NUM')) {
+            $logMcsCol = 'MCS_NUM';
+        }
+
+        $logAggExpr = null;
+        if (Schema::hasColumn('MC_UPDATE_LOG', 'created_at')) {
+            $logAggExpr = 'MAX(`MC_UPDATE_LOG`.`created_at`)';
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'CREATED_AT')) {
+            $logAggExpr = 'MAX(`MC_UPDATE_LOG`.`CREATED_AT`)';
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DateSK') && Schema::hasColumn('MC_UPDATE_LOG', 'TIME')) {
+            $logAggExpr = "MAX(STR_TO_DATE(CONCAT(`MC_UPDATE_LOG`.`DateSK`,' ',`MC_UPDATE_LOG`.`TIME`),'%Y%m%d %H:%i:%s'))";
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DATE') && Schema::hasColumn('MC_UPDATE_LOG', 'TIME')) {
+            $logAggExpr = "MAX(STR_TO_DATE(CONCAT(`MC_UPDATE_LOG`.`DATE`,' ',`MC_UPDATE_LOG`.`TIME`),'%Y-%m-%d %H:%i:%s'))";
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DateSK')) {
+            $logAggExpr = "MAX(STR_TO_DATE(`MC_UPDATE_LOG`.`DateSK`,'%Y%m%d'))";
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DATE')) {
+            $logAggExpr = "MAX(STR_TO_DATE(`MC_UPDATE_LOG`.`DATE`,'%Y-%m-%d'))";
+        }
+
+        if ($logMcsCol && $logAggExpr) {
+            try {
+                $logSub = DB::table('MC_UPDATE_LOG')
+                    ->select(
+                        DB::raw("`MC_UPDATE_LOG`.`{$logMcsCol}` as mcs_num"),
+                        DB::raw("{$logAggExpr} as last_updated_at")
+                    )
+                    ->groupBy(DB::raw("`MC_UPDATE_LOG`.`{$logMcsCol}`"));
+
+                $lastUpdatedSelect = $mcFallbackExpr
+                    ? "COALESCE(`log`.`last_updated_at`, {$mcFallbackExpr}) as last_updated_at"
+                    : "`log`.`last_updated_at` as last_updated_at";
+
+                $masterCards = DB::table('MC')
+                    ->leftJoinSub($logSub, 'log', function ($join) use ($mcMcsCol) {
+                        $join->on('MC.' . $mcMcsCol, '=', 'log.mcs_num');
+                    })
+                    ->select(
+                        DB::raw('MC.' . $mcMcsCol . ' as MCS_Num'),
+                        'MC.AC_NUM',
+                        'MC.AC_NAME',
+                        'MC.MODEL',
+                        'MC.STS',
+                        'MC.COMP',
+                        'MC.P_DESIGN',
+                        DB::raw($lastUpdatedSelect)
+                    )
+                    ->where('MC.COMP', 'Main')
+                    ->orderBy('MC.' . $mcMcsCol)
+                    ->get();
+
+                return response()->json($masterCards);
+            } catch (\Exception $e) {
+                Log::warning('obsoleteReactiveApiIndex joinSub failed', [
+                    'mc_mcs_col' => $mcMcsCol,
+                    'log_mcs_col' => $logMcsCol,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        try {
+            $masterCards = DB::table('MC')
+                ->select(
+                    DB::raw('MC.' . $mcMcsCol . ' as MCS_Num'),
+                    'MC.AC_NUM',
+                    'MC.AC_NAME',
+                    'MC.MODEL',
+                    'MC.STS',
+                    'MC.COMP',
+                    'MC.P_DESIGN',
+                    DB::raw(($mcFallbackExpr ? $mcFallbackExpr : 'NULL') . ' as last_updated_at')
+                )
+                ->where('MC.COMP', 'Main')
+                ->orderBy('MC.' . $mcMcsCol)
+                ->get();
+
+            return response()->json($masterCards);
+        } catch (\Exception $e) {
+            Log::error('obsoleteReactiveApiIndex failed', [
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json([], 200);
+        }
+    }
+
+    public function getByCustomer($customerCode)
+    {
+        $mcMcsCol = Schema::hasColumn('MC', 'MCS_Num')
+            ? 'MCS_Num'
+            : (Schema::hasColumn('MC', 'MCS_NUM') ? 'MCS_NUM' : 'MCS_Num');
+
+        $mcFallbackExpr = null;
+        if (Schema::hasColumn('MC', 'updated_at')) {
+            $mcFallbackExpr = '`MC`.`updated_at`';
+        } elseif (Schema::hasColumn('MC', 'UPDATED_AT')) {
+            $mcFallbackExpr = '`MC`.`UPDATED_AT`';
+        } elseif (Schema::hasColumn('MC', 'created_at')) {
+            $mcFallbackExpr = '`MC`.`created_at`';
+        } elseif (Schema::hasColumn('MC', 'CREATED_AT')) {
+            $mcFallbackExpr = '`MC`.`CREATED_AT`';
+        } elseif (Schema::hasColumn('MC', 'DateSK') && Schema::hasColumn('MC', 'TIME')) {
+            $mcFallbackExpr = "STR_TO_DATE(CONCAT(`MC`.`DateSK`,' ',`MC`.`TIME`),'%Y%m%d %H:%i:%s')";
+        } elseif (Schema::hasColumn('MC', 'DATE') && Schema::hasColumn('MC', 'TIME')) {
+            $mcFallbackExpr = "STR_TO_DATE(CONCAT(`MC`.`DATE`,' ',`MC`.`TIME`),'%Y-%m-%d %H:%i:%s')";
+        } elseif (Schema::hasColumn('MC', 'DateSK')) {
+            $mcFallbackExpr = "STR_TO_DATE(`MC`.`DateSK`,'%Y%m%d')";
+        } elseif (Schema::hasColumn('MC', 'DATE')) {
+            $mcFallbackExpr = "STR_TO_DATE(`MC`.`DATE`,'%Y-%m-%d')";
+        }
+
+        $logMcsCol = null;
+        if (Schema::hasColumn('MC_UPDATE_LOG', 'MCS_Num')) {
+            $logMcsCol = 'MCS_Num';
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'MCS_NUM')) {
+            $logMcsCol = 'MCS_NUM';
+        }
+
+        $logAggExpr = null;
+        if (Schema::hasColumn('MC_UPDATE_LOG', 'created_at')) {
+            $logAggExpr = 'MAX(`MC_UPDATE_LOG`.`created_at`)';
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'CREATED_AT')) {
+            $logAggExpr = 'MAX(`MC_UPDATE_LOG`.`CREATED_AT`)';
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DateSK') && Schema::hasColumn('MC_UPDATE_LOG', 'TIME')) {
+            $logAggExpr = "MAX(STR_TO_DATE(CONCAT(`MC_UPDATE_LOG`.`DateSK`,' ',`MC_UPDATE_LOG`.`TIME`),'%Y%m%d %H:%i:%s'))";
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DATE') && Schema::hasColumn('MC_UPDATE_LOG', 'TIME')) {
+            $logAggExpr = "MAX(STR_TO_DATE(CONCAT(`MC_UPDATE_LOG`.`DATE`,' ',`MC_UPDATE_LOG`.`TIME`),'%Y-%m-%d %H:%i:%s'))";
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DateSK')) {
+            $logAggExpr = "MAX(STR_TO_DATE(`MC_UPDATE_LOG`.`DateSK`,'%Y%m%d'))";
+        } elseif (Schema::hasColumn('MC_UPDATE_LOG', 'DATE')) {
+            $logAggExpr = "MAX(STR_TO_DATE(`MC_UPDATE_LOG`.`DATE`,'%Y-%m-%d'))";
+        }
+
+        if ($logMcsCol && $logAggExpr) {
+            try {
+                $logSub = DB::table('MC_UPDATE_LOG')
+                    ->select(
+                        DB::raw("`MC_UPDATE_LOG`.`{$logMcsCol}` as mcs_num"),
+                        DB::raw("{$logAggExpr} as last_updated_at")
+                    )
+                    ->groupBy(DB::raw("`MC_UPDATE_LOG`.`{$logMcsCol}`"));
+
+                $lastUpdatedSelect = $mcFallbackExpr
+                    ? "COALESCE(`log`.`last_updated_at`, {$mcFallbackExpr}) as last_updated_at"
+                    : "`log`.`last_updated_at` as last_updated_at";
+
+                $masterCards = DB::table('MC')
+                    ->leftJoinSub($logSub, 'log', function ($join) use ($mcMcsCol) {
+                        $join->on('MC.' . $mcMcsCol, '=', 'log.mcs_num');
+                    })
+                    ->select(
+                        DB::raw('MC.' . $mcMcsCol . ' as MCS_Num'),
+                        'MC.AC_NUM',
+                        'MC.AC_NAME',
+                        'MC.MODEL',
+                        'MC.STS',
+                        'MC.COMP',
+                        'MC.P_DESIGN',
+                        DB::raw($lastUpdatedSelect)
+                    )
+                    ->where('MC.AC_NUM', $customerCode)
+                    ->orderBy('MC.' . $mcMcsCol)
+                    ->get();
+
+                return response()->json($masterCards);
+            } catch (\Exception $e) {
+                Log::warning('getByCustomer joinSub failed', [
+                    'customer_code' => $customerCode,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         $masterCards = DB::table('MC')
-            ->leftJoin('MC_UPDATE_LOG', 'MC.MCS_Num', '=', 'MC_UPDATE_LOG.MCS_Num')
             ->select(
-                'MC.MCS_Num',
+                DB::raw('MC.' . $mcMcsCol . ' as MCS_Num'),
                 'MC.AC_NUM',
                 'MC.AC_NAME',
                 'MC.MODEL',
                 'MC.STS',
                 'MC.COMP',
                 'MC.P_DESIGN',
-                DB::raw('MAX(MC_UPDATE_LOG.created_at) as last_updated_at')
+                DB::raw(($mcFallbackExpr ? $mcFallbackExpr : 'NULL') . ' as last_updated_at')
             )
-            ->groupBy(
-                'MC.MCS_Num',
-                'MC.AC_NUM',
-                'MC.AC_NAME',
-                'MC.MODEL',
-                'MC.STS',
-                'MC.COMP',
-                'MC.P_DESIGN'
-            )
-            ->orderBy('MC.MCS_Num')
-            ->get();
-
-        return response()->json($masterCards);
-    }
-
-    public function getByCustomer($customerCode)
-    {
-        $masterCards = DB::table('MC')
-            ->select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
-            ->where('AC_NUM', $customerCode)
-            ->orderBy('MCS_Num')
+            ->where('MC.AC_NUM', $customerCode)
+            ->orderBy('MC.' . $mcMcsCol)
             ->get();
 
         return response()->json($masterCards);
