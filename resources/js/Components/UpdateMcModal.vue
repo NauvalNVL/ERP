@@ -4054,9 +4054,9 @@ const hydratePdFromObject = (pd, loaded) => {
   bdlPerPallet.value = pd.bdlPerPallet || "";
   peelOffPercent.value = formatTrimZeros(pd.peelOffPercent || "");
   itemRemark.value = pd.itemRemark || loaded.ITEM_REMARK || "";
-  handHole.value = !!pd.handHole;
-  rotaryDCut.value = !!pd.rotaryDCut;
-  fullBlockPrint.value = !!pd.fullBlockPrint;
+  handHole.value = toBool(pd.handHole ?? pd.hand_hole ?? loaded.HAND_HOLE);
+  rotaryDCut.value = toBool(pd.rotaryDCut ?? pd.rotary_dc ?? loaded.ROTARY_DC);
+  fullBlockPrint.value = toBool(pd.fullBlockPrint ?? pd.fb_printing ?? loaded.FB_PRINTING);
   selectedFinishingCode.value = pd.selectedFinishingCode || "";
   selectedStitchWireCode.value = pd.selectedStitchWireCode || loaded.SWIRE || "";
   // Re-apply formatting so pcs stay trimmed
@@ -4609,12 +4609,12 @@ watch(
           // Other flags / remarks
           cf.itemRemark = compSrc.itemRemark ?? cf.itemRemark;
           cf.peelOffPercent = compSrc.peelOffPercent ?? cf.peelOffPercent;
-          cf.handHole = compSrc.handHole !== undefined ? !!compSrc.handHole : cf.handHole;
+          cf.handHole = compSrc.handHole !== undefined ? toBool(compSrc.handHole) : cf.handHole;
           cf.rotaryDCut =
-            compSrc.rotaryDCut !== undefined ? !!compSrc.rotaryDCut : cf.rotaryDCut;
+            compSrc.rotaryDCut !== undefined ? toBool(compSrc.rotaryDCut) : cf.rotaryDCut;
           cf.fullBlockPrint =
             compSrc.fullBlockPrint !== undefined
-              ? !!compSrc.fullBlockPrint
+              ? toBool(compSrc.fullBlockPrint)
               : cf.fullBlockPrint;
 
           // Hydrate moreDescriptions per component
@@ -4927,14 +4927,14 @@ const fetchMcComponentsFromDb = async () => {
           cf.itemRemark = fetchedComp.itemRemark ?? cf.itemRemark;
           cf.peelOffPercent = fetchedComp.peelOffPercent ?? cf.peelOffPercent;
           cf.handHole =
-            fetchedComp.handHole !== undefined ? !!fetchedComp.handHole : cf.handHole;
+            fetchedComp.handHole !== undefined ? toBool(fetchedComp.handHole) : cf.handHole;
           cf.rotaryDCut =
             fetchedComp.rotaryDCut !== undefined
-              ? !!fetchedComp.rotaryDCut
+              ? toBool(fetchedComp.rotaryDCut)
               : cf.rotaryDCut;
           cf.fullBlockPrint =
             fetchedComp.fullBlockPrint !== undefined
-              ? !!fetchedComp.fullBlockPrint
+              ? toBool(fetchedComp.fullBlockPrint)
               : cf.fullBlockPrint;
 
           // Hydrate moreDescriptions per component from fetched data
@@ -5239,9 +5239,9 @@ const openSetupPd = () => {
 
     // Ensure score totals reflect hydrated score arrays for selected component
     recalcScoreTotals();
-    handHole.value = !!(cf.handHole ?? handHole.value);
-    rotaryDCut.value = !!(cf.rotaryDCut ?? rotaryDCut.value);
-    fullBlockPrint.value = !!(cf.fullBlockPrint ?? fullBlockPrint.value);
+    handHole.value = toBool(cf.handHole ?? handHole.value);
+    rotaryDCut.value = toBool(cf.rotaryDCut ?? rotaryDCut.value);
+    fullBlockPrint.value = toBool(cf.fullBlockPrint ?? fullBlockPrint.value);
 
     // Hydrate moreDescriptions from component form (always reflect selection)
     moreDescriptions.value = Array.isArray(cf.moreDescriptions)

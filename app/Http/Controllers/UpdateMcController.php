@@ -324,6 +324,13 @@ class UpdateMcController extends Controller
         // Add components array with all Fit data (full PD fields per component)
         $components = [];
 
+        $toBool = function ($v) {
+            if ($v === true || $v === false) return (bool) $v;
+            if ($v === null || $v === '') return false;
+            $s = strtolower(trim((string) $v));
+            return in_array($s, ['y', 'yes', 'true', '1'], true);
+        };
+
         $buildMspPayload = function ($row) {
             $machines = [];
             // Preserve CPS step convention: 10,20,...,120 for MSP1..MSP12
@@ -478,9 +485,9 @@ class UpdateMcController extends Controller
             // Other PD flags and remarks
             'itemRemark' => $main->ITEM_REMARK ?? null,
             'peelOffPercent' => $main->PEEL_OFF_PERCENT ?? null,
-            'handHole' => $main->HAND_HOLE ?? null,
-            'rotaryDCut' => $main->ROTARY_DC ?? null,
-            'fullBlockPrint' => $main->FB_PRINTING ?? null,
+            'handHole' => $toBool($main->HAND_HOLE ?? null),
+            'rotaryDCut' => $toBool($main->ROTARY_DC ?? null),
+            'fullBlockPrint' => $toBool($main->FB_PRINTING ?? null),
         ];
 
         // Then, push all Fit components
@@ -608,9 +615,9 @@ class UpdateMcController extends Controller
                 // Other PD flags and remarks
                 'itemRemark' => $fit->ITEM_REMARK ?? null,
                 'peelOffPercent' => $fit->PEEL_OFF_PERCENT ?? null,
-                'handHole' => $fit->HAND_HOLE ?? null,
-                'rotaryDCut' => $fit->ROTARY_DC ?? null,
-                'fullBlockPrint' => $fit->FB_PRINTING ?? null,
+                'handHole' => $toBool($fit->HAND_HOLE ?? null),
+                'rotaryDCut' => $toBool($fit->ROTARY_DC ?? null),
+                'fullBlockPrint' => $toBool($fit->FB_PRINTING ?? null),
             ];
         }
 
@@ -1807,6 +1814,13 @@ class UpdateMcController extends Controller
         try {
             $customerCode = $request->input('customer_code');
 
+            $toBool = function ($v) {
+                if ($v === true || $v === false) return (bool) $v;
+                if ($v === null || $v === '') return false;
+                $s = strtolower(trim((string) $v));
+                return in_array($s, ['y', 'yes', 'true', '1'], true);
+            };
+
             Log::info('apiShowComponents called', [
                 'mcs_num' => $mcSeq,
                 'customer_code' => $customerCode
@@ -1867,7 +1881,7 @@ class UpdateMcController extends Controller
             };
 
             // Transform components data (full PD fields per component)
-            $result = $components->map(function ($comp) use ($buildMspPayload) {
+            $result = $components->map(function ($comp) use ($buildMspPayload, $toBool) {
                 return [
                     'c_num' => $comp->COMP ?? 'Main',
                     'comp_no' => $comp->COMP ?? 'Main',
@@ -1991,9 +2005,9 @@ class UpdateMcController extends Controller
                     // Other PD flags and remarks
                     'itemRemark' => $comp->ITEM_REMARK ?? null,
                     'peelOffPercent' => $comp->PEEL_OFF_PERCENT ?? null,
-                    'handHole' => $comp->HAND_HOLE ?? null,
-                    'rotaryDCut' => $comp->ROTARY_DC ?? null,
-                    'fullBlockPrint' => $comp->FB_PRINTING ?? null,
+                    'handHole' => $toBool($comp->HAND_HOLE ?? null),
+                    'rotaryDCut' => $toBool($comp->ROTARY_DC ?? null),
+                    'fullBlockPrint' => $toBool($comp->FB_PRINTING ?? null),
                     // Corrugating / converting fields per component
                     'selectedPaperFlute' => $comp->FLUTE ?? null,
                     'selectedScoringToolCode' => $comp->S_TOOL ?? null,
