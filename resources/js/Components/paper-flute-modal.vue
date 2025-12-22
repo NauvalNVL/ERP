@@ -1,6 +1,6 @@
 <template>
   <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl my-8">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl my-8 flex flex-col max-h-[90vh]">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -14,7 +14,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-3 md:p-5">
+      <div class="p-3 md:p-5 flex-1 flex flex-col min-h-0">
         <div class="mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -24,37 +24,102 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-[60vh]">
-          <table class="w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 sticky top-0 z-10">
-              <tr>
-                <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Flute')">
-                  <div class="flex items-center gap-1">
-                    Paper Flute
-                    <i class="fas fa-sort text-gray-400"></i>
-                  </div>
-                </th>
-                <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Descr')">
-                  <div class="flex items-center gap-1">
-                    Description
-                    <i class="fas fa-sort text-gray-400"></i>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 text-sm">
-              <tr v-for="flute in filteredFlutes" :key="flute.Flute"
-                :class="['hover:bg-emerald-50 cursor-pointer transition-colors', selectedFlute && selectedFlute.Flute === flute.Flute ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                @click="selectRow(flute)"
-                @dblclick="selectAndClose(flute)">
-                <td class="px-3 md:px-6 py-2 md:py-3 whitespace-nowrap font-medium text-gray-900">{{ flute.Flute }}</td>
-                <td class="px-3 md:px-6 py-2 md:py-3 text-gray-700">{{ flute.Descr }}</td>
-              </tr>
-              <tr v-if="filteredFlutes.length === 0">
-                <td colspan="2" class="px-3 md:px-6 py-4 text-center text-gray-500">No paper flute data available.</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="flex-1 min-h-0">
+          <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+            <div class="flex items-center space-x-3 text-emerald-600">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+              <span class="text-sm font-medium">Loading paper flute data...</span>
+            </div>
+            <p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
+          </div>
+          <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-[60vh]">
+            <table class="w-full min-w-[960px] divide-y divide-gray-200">
+              <thead class="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Flute')">
+                    <div class="flex items-center gap-1">
+                      Paper Flute
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Descr')">
+                    <div class="flex items-center gap-1">
+                      Description
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('DB')">
+                    <div class="flex items-center gap-1 justify-end">
+                      DB
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('B')">
+                    <div class="flex items-center gap-1 justify-end">
+                      B
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('_1L')">
+                    <div class="flex items-center gap-1 justify-end">
+                      1L
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('A_C_E')">
+                    <div class="flex items-center gap-1 justify-end">
+                      A/C/E
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('_2L')">
+                    <div class="flex items-center gap-1 justify-end">
+                      2L
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Height')">
+                    <div class="flex items-center gap-1 justify-end">
+                      Height
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Starch')">
+                    <div class="flex items-center gap-1 justify-end">
+                      Starch
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                  <th class="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('status')">
+                    <div class="flex items-center gap-1">
+                      Status
+                      <i class="fas fa-sort text-gray-400"></i>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                <tr v-for="flute in filteredFlutes" :key="flute.Flute"
+                  :class="['hover:bg-emerald-50 cursor-pointer transition-colors', selectedFlute && selectedFlute.Flute === flute.Flute ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                  @click="selectRow(flute)"
+                  @dblclick="selectAndClose(flute)">
+                  <td class="px-3 md:px-6 py-2 md:py-3 whitespace-nowrap font-medium text-gray-900">{{ flute.Flute }}</td>
+                  <td class="px-3 md:px-6 py-2 md:py-3 text-gray-700">{{ flute.Descr }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.DB) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.B) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute._1L) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.A_C_E) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute._2L) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.Height) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.Starch) }}</td>
+                  <td class="px-3 md:px-4 py-2 md:py-3 text-gray-700">{{ getStatusValue(flute) }}</td>
+                </tr>
+                <tr v-if="filteredFlutes.length === 0">
+                  <td colspan="10" class="px-3 md:px-6 py-4 text-center text-gray-500">No paper flute data available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
           <p class="hidden md:block">Click on a row to select and edit its details. Double-click to select quickly.</p>
@@ -81,6 +146,10 @@ const props = defineProps({
   flutes: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -90,6 +159,22 @@ const searchQuery = ref('');
 const selectedFlute = ref(null);
 const sortKey = ref('Flute');
 const sortAsc = ref(true);
+const numberColumns = ['DB', 'B', '_1L', 'A_C_E', '_2L', 'Height', 'Starch'];
+const loading = computed(() => props.loading);
+
+const formatNumber = (value) => {
+  if (value === null || value === undefined || value === '') return '0.00';
+  const num = Number(value);
+  return Number.isNaN(num) ? '0.00' : num.toFixed(2);
+};
+
+const getStatusValue = (row) => {
+  if (!row) return '';
+  if (row.status) return String(row.status).trim();
+  if (row.STATUS) return String(row.STATUS).trim();
+  if (typeof row.is_active === 'boolean') return row.is_active ? 'Act' : 'Obs';
+  return '';
+};
 
 const isActiveFlute = (flute) => {
   const status = flute?.status ?? flute?.STATUS;
@@ -112,7 +197,15 @@ const filteredFlutes = computed(() => {
     const q = searchQuery.value.toLowerCase();
     flutes = flutes.filter(f =>
       f.Flute?.toLowerCase().includes(q) ||
-      f.Descr?.toLowerCase().includes(q)
+      f.Descr?.toLowerCase().includes(q) ||
+      String(formatNumber(f.DB)).toLowerCase().includes(q) ||
+      String(formatNumber(f.B)).toLowerCase().includes(q) ||
+      String(formatNumber(f._1L)).toLowerCase().includes(q) ||
+      String(formatNumber(f.A_C_E)).toLowerCase().includes(q) ||
+      String(formatNumber(f._2L)).toLowerCase().includes(q) ||
+      String(formatNumber(f.Height)).toLowerCase().includes(q) ||
+      String(formatNumber(f.Starch)).toLowerCase().includes(q) ||
+      getStatusValue(f).toLowerCase().includes(q)
     );
   }
   
@@ -120,7 +213,15 @@ const filteredFlutes = computed(() => {
   return [...flutes].sort((a, b) => {
     let valA = a[sortKey.value] || '';
     let valB = b[sortKey.value] || '';
-    
+    if (numberColumns.includes(sortKey.value)) {
+      valA = parseFloat(valA) || 0;
+      valB = parseFloat(valB) || 0;
+      return sortAsc.value ? valA - valB : valB - valA;
+    }
+
+    valA = valA.toString().toLowerCase();
+    valB = valB.toString().toLowerCase();
+
     if (valA < valB) return sortAsc.value ? -1 : 1;
     if (valA > valB) return sortAsc.value ? 1 : -1;
     return 0;

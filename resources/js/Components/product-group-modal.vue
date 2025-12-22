@@ -1,6 +1,6 @@
 <template>
   <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl flex flex-col max-h-[90vh]">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -14,7 +14,7 @@
         </button>
       </div>
       <!-- Modal Content -->
-      <div class="p-5">
+      <div class="p-5 flex-1 flex flex-col min-h-0">
         <div class="mb-4">
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -24,44 +24,45 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50 sticky top-0">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('code')">Group ID</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer" @click="sortTable('name')">Group Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('is_active')">Status</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 text-xs">
-              <tr v-for="group in filteredGroups" :key="group.id"
-                :class="['hover:bg-emerald-50 cursor-pointer', selectedGroup && selectedGroup.id === group.id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                @click="selectRow(group)"
-                @dblclick="selectAndClose(group)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.code }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ group.name }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span 
-                    :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full', 
-                      group.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    ]"
-                  >{{ group.is_active ? 'Active' : 'Inactive' }}</span>
-                </td>
-              </tr>
-              <tr v-if="loading">
-                <td colspan="3" class="px-6 py-4 text-center">
-                  <div class="flex items-center justify-center">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
-                    <span class="ml-2 text-gray-500">Loading data...</span>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="filteredGroups.length === 0">
-                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No product group data available.</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="flex-1 min-h-0">
+          <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+            <div class="flex items-center space-x-3 text-emerald-600">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+              <span class="text-sm font-medium">Loading product group data...</span>
+            </div>
+            <p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
+          </div>
+          <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
+            <table class="w-full divide-y divide-gray-200 table-fixed">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('code')">Group ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer" @click="sortTable('name')">Group Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('is_active')">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                <tr v-for="group in filteredGroups" :key="group.id"
+                  :class="['hover:bg-emerald-50 cursor-pointer', selectedGroup && selectedGroup.id === group.id ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                  @click="selectRow(group)"
+                  @dblclick="selectAndClose(group)">
+                  <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.code }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ group.name }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap">
+                    <span 
+                      :class="[
+                        'px-2 py-1 text-xs font-medium rounded-full', 
+                        group.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      ]"
+                    >{{ group.is_active ? 'Active' : 'Inactive' }}</span>
+                  </td>
+                </tr>
+                <tr v-if="filteredGroups.length === 0">
+                  <td colspan="3" class="px-6 py-4 text-center text-gray-500">No product group data available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select and edit its details.</p>
@@ -94,7 +95,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  loading: Boolean
+  loading: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const emit = defineEmits(['close', 'select']);

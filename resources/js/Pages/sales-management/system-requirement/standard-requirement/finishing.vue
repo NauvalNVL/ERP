@@ -42,7 +42,7 @@
                                             <i class="fas fa-tools"></i>
                                         </span>
                                         <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type finishing code">
-                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                        <button type="button" @click="openFinishingModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
@@ -134,6 +134,7 @@
     <FinishingModal
         :show="showModal"
         :finishings="finishings"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onFinishingSelected"
     />
@@ -231,6 +232,7 @@ const props = defineProps({
 
 const finishings = ref(props.finishings || []);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -259,8 +261,13 @@ const getCsrfToken = () => {
     return token || '';
 };
 
-const fetchFinishings = async () => {
-    loading.value = true;
+const fetchFinishings = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const res = await fetch('/api/finishings', { 
             headers: { 
@@ -306,7 +313,11 @@ const fetchFinishings = async () => {
         console.error('Error fetching finishings:', e);
         finishings.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -342,6 +353,11 @@ const onFinishingSelected = (finishing) => {
     };
     console.log('Selected finishing for editing:', editForm.value);
     showEditModal.value = true;
+};
+
+const openFinishingModal = async () => {
+    showModal.value = true;
+    await fetchFinishings({ showGlobal: false });
 };
 
 const createNewFinishing = () => {

@@ -61,7 +61,7 @@
                       />
                       <button
                         type="button"
-                        @click="showModal = true"
+                        @click="openProductDesignModal"
                         class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
                       >
                         <i class="fas fa-table"></i>
@@ -199,6 +199,7 @@
       :products="products"
       :doubleClickAction="'edit'"
       :isCreating="isCreatingNewDesign"
+      :loading="modalLoading"
       @close="closeModal"
       @select="onDesignSelected"
       @data-changed="fetchDesigns"
@@ -222,13 +223,19 @@ const props = defineProps({
 const designs = ref([]);
 const products = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const showModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref("");
 const isCreatingNewDesign = ref(false);
 
-const fetchDesigns = async () => {
-  loading.value = true;
+const fetchDesigns = async (options = {}) => {
+  const { showGlobal = true } = options;
+  if (showGlobal) {
+    loading.value = true;
+  } else {
+    modalLoading.value = true;
+  }
   try {
     const res = await fetch("/api/product-designs", {
       headers: {
@@ -253,7 +260,11 @@ const fetchDesigns = async () => {
     console.error("Error fetching product designs:", e);
     designs.value = [];
   } finally {
-    loading.value = false;
+    if (showGlobal) {
+      loading.value = false;
+    } else {
+      modalLoading.value = false;
+    }
   }
 };
 
@@ -282,6 +293,11 @@ const fetchProducts = async () => {
     console.error("Error fetching products:", e);
     products.value = [];
   }
+};
+
+const openProductDesignModal = async () => {
+  showModal.value = true;
+  await fetchDesigns({ showGlobal: false });
 };
 
 onMounted(() => {

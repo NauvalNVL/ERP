@@ -28,35 +28,44 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
-          <table class="min-w-[720px] w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50 sticky top-0">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%] cursor-pointer" @click="sortTable('code')">Code</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[22%] cursor-pointer" @click="sortTable('name')">Name</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%] cursor-pointer" @click="sortTable('grup')">Group</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Code Group</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[17%]">Target Sales</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Email</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 text-xs">
-              <tr v-for="person in filteredSalespersons" :key="person.code"
-                :class="['hover:bg-emerald-50 cursor-pointer', selectedPerson && selectedPerson.code === person.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                @click="selectRow(person)"
-                @dblclick="selectAndClose(person)">
-                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ person.code }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]">{{ person.name }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[110px]">{{ person.grup || '-' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.code_grup || '-' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.target_sales ? Number(person.target_sales).toFixed(2) : '0.00' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[180px]" :title="person.email">{{ person.email || '-' }}</td>
-              </tr>
-              <tr v-if="filteredSalespersons.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No salesperson data available.</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="flex-1 min-h-0">
+          <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+            <div class="flex items-center space-x-3 text-emerald-600">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+              <span class="text-sm font-medium">Loading salesperson data...</span>
+            </div>
+            <p class="text-xs text-emerald-500 mt-2">Please wait, fetching latest records.</p>
+          </div>
+          <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+            <table class="min-w-[720px] w-full divide-y divide-gray-200 table-fixed">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%] cursor-pointer" @click="sortTable('code')">Code</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[22%] cursor-pointer" @click="sortTable('name')">Name</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%] cursor-pointer" @click="sortTable('grup')">Group</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Code Group</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[17%]">Target Sales</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Email</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                <tr v-for="person in filteredSalespersons" :key="person.code"
+                  :class="['hover:bg-emerald-50 cursor-pointer', selectedPerson && selectedPerson.code === person.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                  @click="selectRow(person)"
+                  @dblclick="selectAndClose(person)">
+                  <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ person.code }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]">{{ person.name }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[110px]">{{ person.grup || '-' }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.code_grup || '-' }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.target_sales ? Number(person.target_sales).toFixed(2) : '0.00' }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[180px]" :title="person.email">{{ person.email || '-' }}</td>
+                </tr>
+                <tr v-if="filteredSalespersons.length === 0">
+                  <td colspan="6" class="px-6 py-4 text-center text-gray-500">No salesperson data available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select and edit its details.</p>
@@ -88,6 +97,10 @@ const props = defineProps({
   salespersons: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 

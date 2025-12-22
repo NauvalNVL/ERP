@@ -28,48 +28,49 @@
                 </div>
 
                 <!-- Table -->
-                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
-                    <table class="w-full divide-y divide-gray-200 table-fixed">
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="toggleSort('code')">Code</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="toggleSort('name')">Name</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-xs">
-                            <tr v-if="loading">
-                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">
-                                    <div class="flex items-center justify-center">
-                                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500 mr-2"></div>
-                                        Loading...
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr v-else v-for="item in filteredItems" :key="item.code"
-                                :class="['hover:bg-emerald-50 cursor-pointer', selected && selected.code === item.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                                @click="selectRow(item)"
-                                @dblclick="selectAndClose(item)">
-                                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
-                                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
-                                <td class="px-6 py-3 whitespace-nowrap text-center">
-                                    <span
-                                      :class="[
-                                        item.status === 'Obs'
-                                          ? 'bg-red-100 text-red-800'
-                                          : 'bg-emerald-100 text-emerald-800',
-                                        'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
-                                      ]"
-                                    >
-                                      {{ item.status === 'Obs' ? 'Obsolete' : 'Active' }}
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr v-if="!loading && filteredItems.length === 0">
-                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No data available.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="flex-1 min-h-0">
+                    <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+                        <div class="flex items-center space-x-3 text-emerald-600">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+                            <span class="text-sm font-medium">Loading stitch wire data...</span>
+                        </div>
+                        <p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
+                    </div>
+                    <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+                        <table class="w-full divide-y divide-gray-200 table-fixed">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="toggleSort('code')">Code</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="toggleSort('name')">Name</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                                <tr v-for="item in filteredItems" :key="item.code"
+                                    :class="['hover:bg-emerald-50 cursor-pointer', selected && selected.code === item.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                                    @click="selectRow(item)"
+                                    @dblclick="selectAndClose(item)">
+                                    <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-center">
+                                        <span
+                                          :class="[
+                                            item.status === 'Obs'
+                                              ? 'bg-red-100 text-red-800'
+                                              : 'bg-emerald-100 text-emerald-800',
+                                            'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
+                                          ]"
+                                        >
+                                          {{ item.status === 'Obs' ? 'Obsolete' : 'Active' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredItems.length === 0">
+                                    <td colspan="3" class="px-6 py-4 text-center text-gray-500">No data available.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Footer -->
@@ -95,10 +96,18 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
-    show: Boolean
+    show: Boolean,
+    stitchWires: {
+        type: Array,
+        default: () => []
+    },
+    loading: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const emit = defineEmits(['close', 'select']);
@@ -107,46 +116,10 @@ const searchQuery = ref('');
 const selected = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
-const stitchWires = ref([]);
-const loading = ref(false);
-
-// Fetch stitch wires from API
-const fetchStitchWires = async () => {
-    loading.value = true;
-    try {
-        const response = await fetch('/api/stitch-wires', {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch stitch wires');
-        }
-
-        const data = await response.json();
-
-        // Handle different response formats
-        if (Array.isArray(data)) {
-            stitchWires.value = data;
-        } else if (data.data && Array.isArray(data.data)) {
-            stitchWires.value = data.data;
-        } else {
-            stitchWires.value = [];
-        }
-    } catch (error) {
-        console.error('Error fetching stitch wires:', error);
-        stitchWires.value = [];
-    } finally {
-        loading.value = false;
-    }
-};
 
 const filteredItems = computed(() => {
     const query = searchQuery.value.toLowerCase();
-    let list = stitchWires.value || [];
+    let list = props.stitchWires || [];
 
     // Only show active stitch wires (hide obsolete ones) in selection modal
     list = list.filter(it => !it.status || it.status === 'Act' || it.status === 'Active');
@@ -189,14 +162,6 @@ watch(() => props.show, (val) => {
     if (val) {
         selected.value = null;
         searchQuery.value = '';
-        fetchStitchWires(); // Fetch fresh data when modal opens
-    }
-});
-
-// Initial fetch on mount
-onMounted(() => {
-    if (props.show) {
-        fetchStitchWires();
     }
 });
 </script>

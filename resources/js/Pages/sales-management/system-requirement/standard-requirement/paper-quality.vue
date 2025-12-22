@@ -45,7 +45,7 @@
                                         >
                                         <button
                                             type="button"
-                                            @click="showModal = true"
+                                            @click="openPaperQualityModal"
                                             class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
                                         >
                                             <i class="fas fa-table"></i>
@@ -142,6 +142,7 @@
     <PaperQualityModal
         :show="showModal"
         :qualities="paperQualities"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onPaperQualitySelected"
         @create="createNewPaperQuality"
@@ -269,6 +270,7 @@ const props = defineProps({
 
 const paperQualities = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -307,8 +309,13 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
-const fetchPaperQualities = async () => {
-    loading.value = true;
+const fetchPaperQualities = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const response = await fetch('/api/paper-qualities');
 
@@ -328,8 +335,17 @@ const fetchPaperQualities = async () => {
         console.error('Error fetching paper qualities:', e);
         paperQualities.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
+};
+
+const openPaperQualityModal = async () => {
+    showModal.value = true;
+    await fetchPaperQualities({ showGlobal: false });
 };
 
 onMounted(fetchPaperQualities);

@@ -64,7 +64,7 @@
                       />
                       <button
                         type="button"
-                        @click="showModal = true"
+                        @click="openWrappingMaterialModal"
                         class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
                       >
                         <i class="fas fa-table"></i>
@@ -195,6 +195,7 @@
       v-if="showModal"
       :show="showModal"
       :items="wrappingMaterials"
+      :loading="modalLoading"
       @close="showModal = false"
       @select="onWrappingMaterialSelected"
     />
@@ -402,6 +403,7 @@ const getCsrfToken = () => {
 
 const wrappingMaterials = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -419,8 +421,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: "", type: "success" });
 
 // Fetch Wrapping Materials from API
-const fetchWrappingMaterials = async () => {
-  loading.value = true;
+const fetchWrappingMaterials = async (options = {}) => {
+  const { showGlobal = true } = options;
+  if (showGlobal) {
+    loading.value = true;
+  } else {
+    modalLoading.value = true;
+  }
   try {
     const response = await fetch("/api/wrapping-materials", {
       headers: {
@@ -450,7 +457,11 @@ const fetchWrappingMaterials = async () => {
     console.error("Error fetching Wrapping Materials:", error);
     wrappingMaterials.value = [];
   } finally {
-    loading.value = false;
+    if (showGlobal) {
+      loading.value = false;
+    } else {
+      modalLoading.value = false;
+    }
   }
 };
 
@@ -473,13 +484,6 @@ watch(searchQuery, (newQuery) => {
   }
 });
 
-// Watch for modal opening to refresh data
-watch(showModal, (isOpen) => {
-  if (isOpen) {
-    fetchWrappingMaterials();
-  }
-});
-
 const onWrappingMaterialSelected = (string) => {
   selectedRow.value = string;
   searchQuery.value = string.code;
@@ -489,6 +493,11 @@ const onWrappingMaterialSelected = (string) => {
   isCreating.value = false;
   editForm.value = { ...string };
   showEditModal.value = true;
+};
+
+const openWrappingMaterialModal = async () => {
+  showModal.value = true;
+  await fetchWrappingMaterials({ showGlobal: false });
 };
 
 const createNewWrappingMaterial = () => {

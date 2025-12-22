@@ -23,50 +23,51 @@
 					<input type="text" v-model="searchQuery" placeholder="Search chemical coats..."
 						class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
 				</div>
-				<div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
-					<table class="w-full divide-y divide-gray-200 table-fixed min-w-[560px] md:min-w-0">
-						<thead class="bg-gray-50 sticky top-0 z-10">
-							<tr>
-								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[16%] cursor-pointer" @click="sortTable('code')">Code</th>
-								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[46%] cursor-pointer" @click="sortTable('name')">Name</th>
-								<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Status</th>
-								<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%] cursor-pointer" @click="sortTable('dry_end_code')">Dry-End Code</th>
-							</tr>
-						</thead>
-						<tbody class="bg-white divide-y divide-gray-200 text-xs">
-							<tr v-if="isLoading">
-								<td colspan="4" class="px-4 py-4 text-center text-gray-500">
-									<div class="flex items-center justify-center">
-										<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500 mr-3"></div>
-										<span>Loading chemical coat data...</span>
-									</div>
-								</td>
-							</tr>
-							<tr v-else-if="filteredCoats.length === 0">
-								<td colspan="4" class="px-4 py-4 text-center text-gray-500">No chemical coat data available.</td>
-							</tr>
-							<tr v-else v-for="coat in filteredCoats" :key="coat.id || coat.code"
-								:class="['hover:bg-emerald-50 cursor-pointer', selectedCoat && (selectedCoat.id || selectedCoat.code) === (coat.id || coat.code) ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-								@click="selectRow(coat)"
-								@dblclick="selectAndClose(coat)">
-								<td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ coat.code }}</td>
-								<td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[260px] md:max-w-none">{{ coat.name }}</td>
-								<td class="px-4 py-3 whitespace-nowrap text-center">
-									<span
-										:class="[
-											coat.status === 'Obs'
-												? 'bg-red-100 text-red-800'
-												: 'bg-emerald-100 text-emerald-800',
-											'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
-										]"
-									>
-										{{ coat.status === 'Obs' ? 'Obsolete' : 'Active' }}
-									</span>
-								</td>
-								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.dry_end_code || '-' }}</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="flex-1 min-h-0">
+					<div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+						<div class="flex items-center space-x-3 text-emerald-600">
+							<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+							<span class="text-sm font-medium">Loading chemical coat data...</span>
+						</div>
+						<p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
+					</div>
+					<div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+						<table class="w-full divide-y divide-gray-200 table-fixed min-w-[560px] md:min-w-0">
+							<thead class="bg-gray-50 sticky top-0 z-10">
+								<tr>
+									<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[16%] cursor-pointer" @click="sortTable('code')">Code</th>
+									<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[46%] cursor-pointer" @click="sortTable('name')">Name</th>
+									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Status</th>
+									<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%] cursor-pointer" @click="sortTable('dry_end_code')">Dry-End Code</th>
+								</tr>
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-200 text-xs">
+								<tr v-if="filteredCoats.length === 0">
+									<td colspan="4" class="px-4 py-4 text-center text-gray-500">No chemical coat data available.</td>
+								</tr>
+								<tr v-else v-for="coat in filteredCoats" :key="coat.id || coat.code"
+									:class="['hover:bg-emerald-50 cursor-pointer', selectedCoat && (selectedCoat.id || selectedCoat.code) === (coat.id || coat.code) ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+									@click="selectRow(coat)"
+									@dblclick="selectAndClose(coat)">
+									<td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ coat.code }}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[260px] md:max-w-none">{{ coat.name }}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-center">
+										<span
+											:class="[
+												coat.status === 'Obs'
+													? 'bg-red-100 text-red-800'
+													: 'bg-emerald-100 text-emerald-800',
+												'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
+											]"
+										>
+											{{ coat.status === 'Obs' ? 'Obsolete' : 'Active' }}
+										</span>
+									</td>
+									<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.dry_end_code || '-' }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 				<div class="mt-4 flex items-center justify-end space-x-3">
 					<button type="button" @click="$emit('close')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg border border-gray-300 transform active:translate-y-px">

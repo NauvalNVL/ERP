@@ -46,7 +46,7 @@
 											/>
 											<button
 												type="button"
-												@click="showModal = true"
+												@click="openProductModal"
 												class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
 											>
 												<i class="fas fa-table"></i>
@@ -143,7 +143,7 @@
 			:show="showModal"
 			:products="products"
 			:categories="categories"
-			:loading="loading"
+			:loading="modalLoading"
 			@close="showModal = false"
 			@select="onProductSelected"
 		/>
@@ -393,6 +393,7 @@ const props = defineProps({
 const products = ref([]);
 const categories = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -422,8 +423,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 const productGroups = ref([]);
 
-const fetchProducts = async () => {
-    loading.value = true;
+const fetchProducts = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         console.log('Fetching products from API...');
         const res = await fetch('/api/products', { 
@@ -459,7 +465,11 @@ const fetchProducts = async () => {
         console.error('Error fetching products:', e);
         products.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -542,6 +552,11 @@ const fetchProductGroups = async () => {
         console.error('Error fetching product groups:', e);
         productGroups.value = [];
     }
+};
+
+const openProductModal = async () => {
+    showModal.value = true;
+    await fetchProducts({ showGlobal: false });
 };
 
 onMounted(() => {

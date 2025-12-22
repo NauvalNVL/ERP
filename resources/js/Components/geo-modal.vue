@@ -28,47 +28,56 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
-          <table class="min-w-[720px] w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50 sticky top-0">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer" @click="sortTable('code')">Geo Code</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[22%] cursor-pointer" @click="sortTable('country')">Country</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%] cursor-pointer" @click="sortTable('state')">State</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('town')">Town</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('town_section')">Town Section</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%] cursor-pointer" @click="sortTable('area')">Area</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 text-xs">
-              <tr v-for="geo in filteredGeos" :key="geo.code"
-                :class="['hover:bg-emerald-50 cursor-pointer', selectedGeo && selectedGeo.code === geo.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                @click="selectRow(geo)"
-                @dblclick="selectAndClose(geo)">
-                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ geo.code }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px]" :title="geo.country">{{ geo.country }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]" :title="geo.state">{{ geo.state }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]" :title="geo.town">{{ geo.town }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px]" :title="geo.town_section">{{ geo.town_section }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-left">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full truncate max-w-[80px] inline-flex items-center justify-start align-middle text-left" 
-                    :class="{
-                      'bg-blue-100 text-blue-800': geo.country === 'Indonesia',
-                      'bg-red-100 text-red-800': geo.country === 'Malaysia',
-                      'bg-green-100 text-green-800': geo.country === 'Singapore',
-                      'bg-yellow-100 text-yellow-800': geo.country === 'Thailand',
-                      'bg-purple-100 text-purple-800': geo.country === 'Vietnam',
-                      'bg-gray-100 text-gray-800': !['Indonesia', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam'].includes(geo.country)
-                    }">
-                    {{ geo.area }}
-                  </span>
-                </td>
-              </tr>
-              <tr v-if="filteredGeos.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No geo data available.</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="flex-1 min-h-0">
+          <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+            <div class="flex items-center space-x-3 text-emerald-600">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+              <span class="text-sm font-medium">Loading geo data...</span>
+            </div>
+            <p class="text-xs text-emerald-500 mt-2">Please wait while we fetch the latest records.</p>
+          </div>
+          <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+            <table class="min-w-[720px] w-full divide-y divide-gray-200 table-fixed">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%] cursor-pointer" @click="sortTable('code')">Geo Code</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[22%] cursor-pointer" @click="sortTable('country')">Country</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%] cursor-pointer" @click="sortTable('state')">State</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('town')">Town</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="sortTable('town_section')">Town Section</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%] cursor-pointer" @click="sortTable('area')">Area</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                <tr v-for="geo in filteredGeos" :key="geo.code"
+                  :class="['hover:bg-emerald-50 cursor-pointer', selectedGeo && selectedGeo.code === geo.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                  @click="selectRow(geo)"
+                  @dblclick="selectAndClose(geo)">
+                  <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ geo.code }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px]" :title="geo.country">{{ geo.country }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]" :title="geo.state">{{ geo.state }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[140px]" :title="geo.town">{{ geo.town }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px]" :title="geo.town_section">{{ geo.town_section }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap text-left">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full truncate max-w-[80px] inline-flex items-center justify-start align-middle text-left" 
+                      :class="{
+                        'bg-blue-100 text-blue-800': geo.country === 'Indonesia',
+                        'bg-red-100 text-red-800': geo.country === 'Malaysia',
+                        'bg-green-100 text-green-800': geo.country === 'Singapore',
+                        'bg-yellow-100 text-yellow-800': geo.country === 'Thailand',
+                        'bg-purple-100 text-purple-800': geo.country === 'Vietnam',
+                        'bg-gray-100 text-gray-800': !['Indonesia', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam'].includes(geo.country)
+                      }">
+                      {{ geo.area }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="filteredGeos.length === 0">
+                  <td colspan="6" class="px-6 py-4 text-center text-gray-500">No geo data available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select and edit its details.</p>
@@ -104,6 +113,10 @@ const props = defineProps({
   geos: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 

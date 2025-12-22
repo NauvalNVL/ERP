@@ -46,7 +46,7 @@
                                         >
                                         <button
                                             type="button"
-                                            @click="showModal = true"
+                                            @click="openPaperFluteModal"
                                             class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
                                         >
                                             <i class="fas fa-table"></i>
@@ -145,6 +145,7 @@
     <PaperFluteModal
         :show="showModal"
         :flutes="flutes"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onFluteSelected"
     />
@@ -293,6 +294,7 @@ const props = defineProps({
 
 const flutes = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -312,8 +314,13 @@ const editForm = ref({
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-const fetchFlutes = async () => {
-    loading.value = true;
+const fetchFlutes = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const res = await fetch('/api/paper-flutes', { 
             headers: { 
@@ -351,8 +358,17 @@ const fetchFlutes = async () => {
         flutes.value = [];
         showNotification('Error loading paper flutes: ' + e.message, 'error');
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
+};
+
+const openPaperFluteModal = async () => {
+    showModal.value = true;
+    await fetchFlutes({ showGlobal: false });
 };
 
 onMounted(fetchFlutes);

@@ -43,7 +43,7 @@
 											<i class="fas fa-layer-group"></i>
 										</span>
 										<input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type color group code">
-										<button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+										<button type="button" @click="openColorGroupModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
 											<i class="fas fa-table"></i>
 										</button>
 									</div>
@@ -128,9 +128,9 @@
         v-if="showModal"
         :show="showModal"
         :colorGroups="colorGroups"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onColorGroupSelected"
-        @refresh="fetchColorGroups"
     />
 
     <!-- Edit Modal -->
@@ -282,8 +282,14 @@ const getCsrfToken = () => {
     return token || '';
 };
 
+const openColorGroupModal = async () => {
+    showModal.value = true;
+    await fetchColorGroups({ showGlobal: false });
+};
+
 const colorGroups = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -351,8 +357,13 @@ watch([searchQuery, colorGroups], ([newQuery]) => {
     tryAutoDetectColorGroupByCode(newQuery);
 });
 
-const fetchColorGroups = async () => {
-    loading.value = true;
+const fetchColorGroups = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         // Updated API path and headers to match how your backend expects the request
         const response = await fetch('/api/color-groups', { 
@@ -381,7 +392,11 @@ const fetchColorGroups = async () => {
         console.error('Error fetching color groups:', e);
         colorGroups.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 

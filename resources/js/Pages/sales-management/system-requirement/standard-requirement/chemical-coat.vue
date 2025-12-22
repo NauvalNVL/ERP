@@ -43,7 +43,7 @@
                                             <i class="fas fa-vial"></i>
                                         </span>
                                         <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type chemical coat code">
-                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                        <button type="button" @click="openChemicalCoatModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
@@ -137,6 +137,7 @@
         v-if="showModal"
         :show="showModal"
         :items="chemicalCoats"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onChemicalCoatSelected"
     />
@@ -276,6 +277,7 @@ const getCsrfToken = () => {
 
 const chemicalCoats = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -290,8 +292,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Fetch chemical coats from API
-const fetchChemicalCoats = async () => {
-    loading.value = true;
+const fetchChemicalCoats = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const response = await fetch('/api/chemical-coats', {
             headers: {
@@ -319,7 +326,11 @@ const fetchChemicalCoats = async () => {
         console.error('Error fetching chemical coats:', error);
         chemicalCoats.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -341,13 +352,6 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
-// Watch for modal opening to refresh data
-watch(showModal, (isOpen) => {
-    if (isOpen) {
-        fetchChemicalCoats();
-    }
-});
-
 const onChemicalCoatSelected = (coat) => {
     selectedRow.value = coat;
     searchQuery.value = coat.code;
@@ -357,6 +361,11 @@ const onChemicalCoatSelected = (coat) => {
     isCreating.value = false;
     editForm.value = { ...coat };
     showEditModal.value = true;
+};
+
+const openChemicalCoatModal = async () => {
+    showModal.value = true;
+    await fetchChemicalCoats({ showGlobal: false });
 };
 
 const createNewChemicalCoat = () => {

@@ -43,7 +43,7 @@
                                             <i class="fas fa-palette"></i>
                                         </span>
                                         <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type color code">
-                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                        <button type="button" @click="openColorModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
@@ -140,9 +140,9 @@
       :show="showModal"
       :colors="colors"
       :colorGroups="colorGroups"
+      :loading="modalLoading"
       @close="showModal = false"
       @select="onColorSelected"
-      @refresh="refreshColors"
     />
 
     <!-- Edit Modal -->
@@ -373,6 +373,7 @@ const getCsrfToken = () => {
 const colors = ref(props.colors || []);
 const colorGroups = ref(props.colorGroups || []);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -394,8 +395,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Fetch colors from API
-const fetchColors = async () => {
-    loading.value = true;
+const fetchColors = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const response = await fetch('/api/colors', {
             headers: {
@@ -430,7 +436,11 @@ const fetchColors = async () => {
         showNotification('Failed to load colors data', 'error');
         colors.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -506,14 +516,6 @@ watch(searchQuery, (newQuery) => {
         if (foundColor) {
             selectedRow.value = foundColor;
         }
-    }
-});
-
-// Watch for modal opening to refresh data
-watch(showModal, (isOpen) => {
-    if (isOpen) {
-        // Refresh colors data when modal opens
-        fetchColors();
     }
 });
 
@@ -772,6 +774,11 @@ const filteredColors = computed(() => {
 const selectColor = (color) => {
     selectedRow.value = color;
     searchQuery.value = color.color_id;
+};
+
+const openColorModal = async () => {
+    showModal.value = true;
+    await fetchColors({ showGlobal: false });
 };
 
 </script>

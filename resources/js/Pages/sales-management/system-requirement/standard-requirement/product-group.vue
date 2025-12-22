@@ -45,7 +45,7 @@
 											/>
 											<button
 												type="button"
-												@click="showModal = true"
+												@click="openProductGroupModal"
 												class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
 											>
 												<i class="fas fa-table"></i>
@@ -149,7 +149,7 @@
 		<ProductGroupModal
 			:show="showModal"
 			:product-groups="productGroups"
-			:loading="loading"
+			:loading="modalLoading"
 			@close="showModal = false"
 			@select="onGroupSelected"
 		/>
@@ -249,6 +249,7 @@ const props = defineProps({
 
 const productGroups = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -263,8 +264,13 @@ const editForm = ref({
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-const fetchProductGroups = async () => {
-    loading.value = true;
+const fetchProductGroups = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         console.log('Fetching product groups from API...');
         const res = await fetch('/api/product-groups', { 
@@ -308,8 +314,17 @@ const fetchProductGroups = async () => {
         console.error('Error fetching product groups:', e);
         productGroups.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
+};
+
+const openProductGroupModal = async () => {
+    showModal.value = true;
+    await fetchProductGroups({ showGlobal: false });
 };
 
 onMounted(() => {

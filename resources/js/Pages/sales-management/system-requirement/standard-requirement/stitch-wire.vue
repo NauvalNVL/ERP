@@ -43,7 +43,7 @@
                                             <i class="fas fa-hashtag"></i>
                                         </span>
                                         <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type stitch wire code">
-                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                        <button type="button" @click="openStitchWireModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
@@ -128,6 +128,8 @@
     <StitchWireModal
       v-if="showModal"
       :show="showModal"
+      :stitch-wires="stitchWires"
+      :loading="modalLoading"
       @close="showModal = false"
       @select="onStitchWireSelected"
     />
@@ -273,6 +275,7 @@ const getCsrfToken = () => {
 
 const stitchWires = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -286,8 +289,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Fetch stitch wires from API
-const fetchStitchWires = async () => {
-    loading.value = true;
+const fetchStitchWires = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const response = await fetch('/api/stitch-wires', {
             headers: {
@@ -319,7 +327,11 @@ const fetchStitchWires = async () => {
         showNotification('Failed to load stitch wires data', 'error');
         stitchWires.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -341,13 +353,6 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
-// Watch for modal opening to refresh data
-watch(showModal, (isOpen) => {
-    if (isOpen) {
-        fetchStitchWires();
-    }
-});
-
 const onStitchWireSelected = (stitchWire) => {
     selectedRow.value = stitchWire;
     searchQuery.value = stitchWire.code;
@@ -357,6 +362,11 @@ const onStitchWireSelected = (stitchWire) => {
     isCreating.value = false;
     editForm.value = { ...stitchWire };
     showEditModal.value = true;
+};
+
+const openStitchWireModal = async () => {
+    showModal.value = true;
+    await fetchStitchWires({ showGlobal: false });
 };
 
 const createNewStitchWire = () => {

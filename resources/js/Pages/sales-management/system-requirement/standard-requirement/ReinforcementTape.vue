@@ -43,7 +43,7 @@
                                             <i class="fas fa-tape"></i>
                                         </span>
                                         <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type reinforcement tape code">
-                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                        <button type="button" @click="openReinforcementTapeModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
@@ -133,6 +133,7 @@
         v-if="showModal"
         :show="showModal"
         :rows="reinforcementTapes"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onReinforcementTapeSelected"
     />
@@ -272,6 +273,7 @@ const getCsrfToken = () => {
 
 const reinforcementTapes = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -286,8 +288,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Fetch reinforcement tapes from API
-const fetchReinforcementTapes = async () => {
-    loading.value = true;
+const fetchReinforcementTapes = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const response = await fetch('/api/reinforcement-tapes', {
             headers: {
@@ -315,7 +322,11 @@ const fetchReinforcementTapes = async () => {
         console.error('Error fetching reinforcement tapes:', error);
         reinforcementTapes.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -337,13 +348,6 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
-// Watch for modal opening to refresh data
-watch(showModal, (isOpen) => {
-    if (isOpen) {
-        fetchReinforcementTapes();
-    }
-});
-
 const onReinforcementTapeSelected = (tape) => {
     selectedRow.value = tape;
     searchQuery.value = tape.code;
@@ -353,6 +357,11 @@ const onReinforcementTapeSelected = (tape) => {
     isCreating.value = false;
     editForm.value = { ...tape };
     showEditModal.value = true;
+};
+
+const openReinforcementTapeModal = async () => {
+    showModal.value = true;
+    await fetchReinforcementTapes({ showGlobal: false });
 };
 
 const createNewReinforcementTape = () => {

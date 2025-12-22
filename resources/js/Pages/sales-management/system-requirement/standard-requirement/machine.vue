@@ -60,7 +60,7 @@
                       />
                       <button
                         type="button"
-                        @click="showModal = true"
+                        @click="openMachineModal"
                         class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
                       >
                         <i class="fas fa-table"></i>
@@ -195,9 +195,9 @@
       v-if="showModal"
       :show="showModal"
       :machines="machines"
+      :loading="modalLoading"
       @close="showModal = false"
       @select="onMachineSelected"
-      @refresh="refreshMachines"
     />
 
     <!-- Edit Modal -->
@@ -456,6 +456,7 @@ const machines = ref(
   (props.machines || []).filter((item) => !item.status || item.status === "Act")
 );
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -475,8 +476,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: "", type: "success" });
 
 // Fetch machines from API
-const fetchMachines = async () => {
-  loading.value = true;
+const fetchMachines = async (options = {}) => {
+  const { showGlobal = true } = options;
+  if (showGlobal) {
+    loading.value = true;
+  } else {
+    modalLoading.value = true;
+  }
   try {
     const response = await fetch("/api/machines", {
       headers: {
@@ -498,12 +504,16 @@ const fetchMachines = async () => {
     showNotification("Failed to load machines data", "error");
     machines.value = [];
   } finally {
-    loading.value = false;
+    if (showGlobal) {
+      loading.value = false;
+    } else {
+      modalLoading.value = false;
+    }
   }
 };
 
-const refreshMachines = async () => {
-  await fetchMachines();
+const refreshMachines = async (options = {}) => {
+  await fetchMachines(options);
 };
 
 const createNewMachine = () => {
@@ -528,6 +538,11 @@ const onMachineSelected = (machine) => {
   isCreating.value = false;
   showModal.value = false;
   showEditModal.value = true;
+};
+
+const openMachineModal = async () => {
+  showModal.value = true;
+  await fetchMachines({ showGlobal: false });
 };
 
 const closeEditModal = () => {
@@ -656,12 +671,6 @@ watch([searchQuery, machines], ([newQuery, newMachines]) => {
   });
 
   selectedRow.value = foundMachine || null;
-});
-
-watch(showModal, (isOpen) => {
-  if (isOpen) {
-    fetchMachines();
-  }
 });
 
 onMounted(() => {

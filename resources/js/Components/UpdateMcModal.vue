@@ -2904,7 +2904,7 @@ const getWoDisplay = (index) => {
 import { ref, computed, watch, onMounted } from "vue";
 // defineProps and defineEmits are compiler macros and don't need to be imported
 import ProductDesignModal from "@/Components/product-design-modal.vue";
-import PaperFluteModal from "@/Components/paper-flute-selector-modal.vue";
+import PaperFluteModal from "@/Components/paper-flute-modal.vue";
 import ScoringToolModal from "@/Components/scoring-tool-modal.vue";
 import ColorModal from "@/Components/color-modal.vue";
 import FinishingModal from "@/Components/finishing-modal.vue";
@@ -3663,7 +3663,9 @@ const onProductDesignSelected = (design) => {
 };
 
 const onPaperFluteSelected = (flute) => {
-  selectedPaperFlute.value = flute.code;
+  const code =
+    flute?.code ?? flute?.Flute ?? flute?.Flute_Code ?? flute?.flute ?? "";
+  selectedPaperFlute.value = code;
   showPaperFluteModal.value = false;
   emit("paperFluteSelected", flute);
 };

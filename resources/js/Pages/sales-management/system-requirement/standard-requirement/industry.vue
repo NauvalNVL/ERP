@@ -48,7 +48,7 @@
 											/>
 											<button
 												type="button"
-												@click="showModal = true"
+												@click="openIndustryModal"
 												class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px"
 											>
 												<i class="fas fa-table"></i>
@@ -148,6 +148,7 @@
 		<IndustryModal
 			:show="showModal"
 			:industries="industries"
+			:loading="modalLoading"
 			@close="showModal = false"
 			@select="onIndustrySelected"
 			@edit="onIndustryEdit"
@@ -312,6 +313,7 @@ const isActiveIndustry = (industry) => {
 
 const industries = ref((props.industries || []).filter(isActiveIndustry));
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -326,8 +328,13 @@ const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Fetch industries from API
-const fetchIndustries = async () => {
-    loading.value = true;
+const fetchIndustries = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         console.log('Fetching industry data from API...');
 
@@ -371,8 +378,17 @@ const fetchIndustries = async () => {
         console.error('Error fetching industries:', e);
         industries.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
+};
+
+const openIndustryModal = async () => {
+    showModal.value = true;
+    await fetchIndustries({ showGlobal: false });
 };
 
 onMounted(() => {

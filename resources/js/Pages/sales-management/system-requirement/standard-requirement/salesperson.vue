@@ -44,7 +44,7 @@
                                     <i class="fas fa-user-tie"></i>
                                 </span>
                                 <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                <button type="button" @click="openSalespersonModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
@@ -128,6 +128,7 @@
     <SalespersonModal
         :show="showModal"
         :salespersons="salespersons"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onSalespersonSelected"
     />
@@ -281,6 +282,7 @@ const salesTeams = ref([
     { code: '03', name: 'KIM' },
 ]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -320,8 +322,13 @@ const getCsrfToken = () => {
     return token || '';
 };
 
-const fetchSalespersons = async () => {
-    loading.value = true;
+const fetchSalespersons = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const res = await fetch('/api/salespersons', {
             headers: {
@@ -350,7 +357,11 @@ const fetchSalespersons = async () => {
         console.error('Error fetching salespersons:', e);
         salespersons.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -386,6 +397,11 @@ const selectGroupOption = (team) => {
 };
 
 
+
+const openSalespersonModal = async () => {
+    showModal.value = true;
+    await fetchSalespersons({ showGlobal: false });
+};
 
 onMounted(async () => {
     await fetchSalespersons();

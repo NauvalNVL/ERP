@@ -28,39 +28,40 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed" id="industryDataTable">
-            <thead class="bg-gray-50 sticky top-0">
-              <tr>
-                <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
-                  Code <i class="fas fa-sort ml-1"></i>
-                </th>
-                <th @click="sortTable('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/4 cursor-pointer">
-                  Industry Name <i class="fas fa-sort ml-1"></i>
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 text-xs">
-              <tr v-for="industry in filteredIndustries" :key="industry.code"
-                :class="['hover:bg-emerald-50 cursor-pointer', selectedIndustry && selectedIndustry.code === industry.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                @click="selectRow(industry)"
-                @dblclick="selectAndClose(industry)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ industry.code }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ industry.name }}</td>
-              </tr>
-              <tr v-if="loading">
-                <td colspan="2" class="px-6 py-4 text-center">
-                  <div class="flex items-center justify-center">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
-                    <span class="ml-2 text-gray-500">Loading data...</span>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="filteredIndustries.length === 0">
-                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No industry data available.</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="flex-1 min-h-0">
+          <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+            <div class="flex items-center space-x-3 text-emerald-600">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+              <span class="text-sm font-medium">Loading industry data...</span>
+            </div>
+            <p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
+          </div>
+          <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
+            <table class="w-full divide-y divide-gray-200 table-fixed" id="industryDataTable">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
+                    Code <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/4 cursor-pointer">
+                    Industry Name <i class="fas fa-sort ml-1"></i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                <tr v-for="industry in filteredIndustries" :key="industry.code"
+                  :class="['hover:bg-emerald-50 cursor-pointer', selectedIndustry && selectedIndustry.code === industry.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                  @click="selectRow(industry)"
+                  @dblclick="selectAndClose(industry)">
+                  <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ industry.code }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ industry.name }}</td>
+                </tr>
+                <tr v-if="filteredIndustries.length === 0">
+                  <td colspan="2" class="px-6 py-4 text-center text-gray-500">No industry data available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select, double-click to edit the industry.</p>
@@ -92,6 +93,10 @@ const props = defineProps({
   industries: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -101,7 +106,6 @@ const searchQuery = ref('');
 const selectedIndustry = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
-const loading = ref(false);
 
 const isActiveIndustry = (industry) => {
   const status = industry?.status ?? industry?.STATUS;
@@ -183,11 +187,6 @@ watch(() => props.show, (val) => {
   if (val) {
     selectedIndustry.value = null;
     searchQuery.value = '';
-    loading.value = true;
-    // Simulate loading time for better UX
-    setTimeout(() => {
-      loading.value = false;
-    }, 300);
   }
 });
 </script>

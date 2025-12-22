@@ -43,7 +43,7 @@
                                             <i class="fas fa-vial"></i>
                                         </span>
                                         <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Search or type glueing material code">
-                                        <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                        <button type="button" @click="openGlueingMaterialModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
@@ -124,6 +124,7 @@
         v-if="showModal"
         :show="showModal"
         :items="glueingMaterials"
+        :loading="modalLoading"
         @close="showModal = false"
         @select="onglueingMaterialSelected"
     />
@@ -263,6 +264,7 @@ const getCsrfToken = () => {
 
 const glueingMaterials = ref([]);
 const loading = ref(false);
+const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -287,8 +289,13 @@ const commonGlueingNames = computed(() => {
 });
 
 // Fetch Glueing Materials from API
-const fetchglueingMaterials = async () => {
-    loading.value = true;
+const fetchglueingMaterials = async (options = {}) => {
+    const { showGlobal = true } = options;
+    if (showGlobal) {
+        loading.value = true;
+    } else {
+        modalLoading.value = true;
+    }
     try {
         const response = await fetch('/api/glueing-materials', {
             headers: {
@@ -316,7 +323,11 @@ const fetchglueingMaterials = async () => {
         console.error('Error fetching Glueing Materials:', error);
         glueingMaterials.value = [];
     } finally {
-        loading.value = false;
+        if (showGlobal) {
+            loading.value = false;
+        } else {
+            modalLoading.value = false;
+        }
     }
 };
 
@@ -338,13 +349,6 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
-// Watch for modal opening to refresh data
-watch(showModal, (isOpen) => {
-    if (isOpen) {
-        fetchglueingMaterials();
-    }
-});
-
 const onglueingMaterialSelected = (string) => {
     selectedRow.value = string;
     searchQuery.value = string.code;
@@ -354,6 +358,11 @@ const onglueingMaterialSelected = (string) => {
     isCreating.value = false;
     editForm.value = { ...string };
     showEditModal.value = true;
+};
+
+const openGlueingMaterialModal = async () => {
+    showModal.value = true;
+    await fetchglueingMaterials({ showGlobal: false });
 };
 
 const createNewglueingMaterial = () => {

@@ -28,40 +28,49 @@
                 </div>
 
                 <!-- Table -->
-                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
-                    <table class="w-full divide-y divide-gray-200 table-fixed min-w-[480px] md:min-w-0">
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="toggleSort('code')">Code</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[57%] cursor-pointer" @click="toggleSort('name')">Name</th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-xs">
-                            <tr v-for="item in filteredItems" :key="item.code"
-                                :class="['hover:bg-emerald-50 cursor-pointer', selected && selected.code === item.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                                @click="selectRow(item)"
-                                @dblclick="selectAndClose(item)">
-                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ item.name }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-center">
-                                    <span
-                                        :class="[
-                                            item.status === 'Obs'
-                                                ? 'bg-red-100 text-red-800'
-                                                : 'bg-emerald-100 text-emerald-800',
-                                            'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
-                                        ]"
-                                    >
-                                        {{ item.status === 'Obs' ? 'Obsolete' : 'Active' }}
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr v-if="filteredItems.length === 0">
-                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No data available.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="flex-1 min-h-0">
+                    <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
+                        <div class="flex items-center space-x-3 text-emerald-600">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
+                            <span class="text-sm font-medium">Loading bundling string data...</span>
+                        </div>
+                        <p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
+                    </div>
+                    <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
+                        <table class="w-full divide-y divide-gray-200 table-fixed min-w-[480px] md:min-w-0">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="toggleSort('code')">Code</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[57%] cursor-pointer" @click="toggleSort('name')">Name</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                                <tr v-for="item in filteredItems" :key="item.code"
+                                    :class="['hover:bg-emerald-50 cursor-pointer', selected && selected.code === item.code ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                                    @click="selectRow(item)"
+                                    @dblclick="selectAndClose(item)">
+                                    <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ item.name }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-center">
+                                        <span
+                                            :class="[
+                                                item.status === 'Obs'
+                                                    ? 'bg-red-100 text-red-800'
+                                                    : 'bg-emerald-100 text-emerald-800',
+                                                'px-2 py-1 text-[10px] font-semibold rounded-full inline-flex items-center justify-center'
+                                            ]"
+                                        >
+                                            {{ item.status === 'Obs' ? 'Obsolete' : 'Active' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredItems.length === 0">
+                                    <td colspan="3" class="px-6 py-4 text-center text-gray-500">No data available.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Footer -->
@@ -94,6 +103,10 @@ const props = defineProps({
     items: {
         type: Array,
         default: () => []
+    },
+    loading: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -103,6 +116,7 @@ const searchQuery = ref('');
 const selected = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
+const loading = computed(() => props.loading);
 
 const filteredItems = computed(() => {
     const query = searchQuery.value.toLowerCase();
