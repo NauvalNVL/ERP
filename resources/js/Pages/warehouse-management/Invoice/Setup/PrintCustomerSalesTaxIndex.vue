@@ -5,9 +5,13 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4">
+        <div
+          class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700 mb-4"
+        >
           <div class="px-4 py-3 sm:px-6 flex items-center gap-3">
-            <div class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center">
+            <div
+              class="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center"
+            >
               <i class="fas fa-print text-white text-sm"></i>
             </div>
             <div>
@@ -44,7 +48,9 @@
               </div>
 
               <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <div
+                  class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                   <i class="fas fa-search text-gray-400 text-sm"></i>
                 </div>
                 <input
@@ -59,7 +65,9 @@
             <!-- Customer Selector -->
             <div class="grid grid-cols-1 md:grid-cols-[2fr,3fr,auto] gap-3 items-center">
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Customer Code</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1"
+                  >Customer Code</label
+                >
                 <div class="flex gap-2">
                   <input
                     v-model="form.customer_code"
@@ -79,9 +87,13 @@
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Customer Name</label>
-                <div class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm text-slate-800 min-h-[40px] flex items-center">
-                  {{ selectedCustomer?.name || '-' }}
+                <label class="block text-sm font-semibold text-slate-700 mb-1"
+                  >Customer Name</label
+                >
+                <div
+                  class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm text-slate-800 min-h-[40px] flex items-center"
+                >
+                  {{ selectedCustomer?.name || "-" }}
                 </div>
               </div>
               <div class="flex items-end">
@@ -100,10 +112,7 @@
 
           <!-- Table Section -->
           <div class="overflow-x-auto rounded-lg border border-gray-200">
-            <div
-              id="printableTable"
-              class="min-w-full bg-white overflow-hidden"
-            >
+            <div id="printableTable" class="min-w-full bg-white overflow-hidden">
               <!-- Table Header Banner -->
               <div
                 class="bg-blue-600 text-white py-3 px-4 flex items-center justify-between"
@@ -115,7 +124,11 @@
                   <div>
                     <h2 class="text-base font-semibold">CUSTOMER SALES TAX INDEX</h2>
                     <p class="text-xs opacity-90">
-                      {{ form.customer_code ? `Customer: ${form.customer_code}` : 'Select a customer' }}
+                      {{
+                        form.customer_code
+                          ? `Customer: ${form.customer_code}`
+                          : "Select a customer"
+                      }}
                     </p>
                   </div>
                 </div>
@@ -179,9 +192,7 @@
                     >
                       No tax indices found.
                       <template v-if="searchQuery">
-                        <p class="mt-2">
-                          No results: "{{ searchQuery }}"
-                        </p>
+                        <p class="mt-2">No results: "{{ searchQuery }}"</p>
                         <button
                           @click="searchQuery = ''"
                           class="mt-2 text-blue-600 hover:underline text-sm"
@@ -212,16 +223,18 @@
                       {{ row.tax_group_code }}
                     </td>
                     <td class="px-4 py-2 border border-gray-200 text-sm text-slate-900">
-                      {{ row.tax_group_name || '-' }}
+                      {{ row.tax_group_name || "-" }}
                     </td>
                     <td class="px-4 py-2 border border-gray-200">
                       <span
                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                        :class="row.status === 'A'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-200 text-gray-700'"
+                        :class="
+                          row.status === 'A'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-200 text-gray-700'
+                        "
                       >
-                        {{ row.status === 'A' ? 'A-Active' : 'O-Obsolete' }}
+                        {{ row.status === "A" ? "A-Active" : "O-Obsolete" }}
                       </span>
                     </td>
                   </tr>
@@ -233,9 +246,7 @@
                 class="bg-gray-50 px-4 py-2 border-t border-gray-200 text-xs text-slate-500"
               >
                 <div class="flex items-center justify-between">
-                  <div>
-                    Total: {{ filteredIndices.length }}
-                  </div>
+                  <div>Total: {{ filteredIndices.length }}</div>
                   <div class="text-xs text-slate-400">{{ currentDate }}</div>
                 </div>
               </div>
@@ -271,242 +282,242 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import axios from 'axios'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+import { ref, computed } from "vue";
+import { Head, Link } from "@inertiajs/vue3";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import CustomerAccountModal from "@/Components/customer-account-modal.vue";
+import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const form = ref({
-  customer_code: ''
-})
+  customer_code: "",
+});
 
-const selectedCustomer = ref(null)
-const indices = ref([])
-const loading = ref(false)
-const searchQuery = ref('')
-const sortColumn = ref('index_number')
-const sortDirection = ref('asc')
-const currentDate = new Date().toLocaleString()
+const selectedCustomer = ref(null);
+const indices = ref([]);
+const loading = ref(false);
+const searchQuery = ref("");
+const sortColumn = ref("index_number");
+const sortDirection = ref("asc");
+const currentDate = new Date().toLocaleString();
 
 // Customer modal state
-const showCustomerModal = ref(false)
-const customers = ref([])
-const customerSearch = ref('')
+const showCustomerModal = ref(false);
+const customers = ref([]);
+const customerSearch = ref("");
 
 const openCustomerModal = async () => {
   if (customers.value.length === 0) {
-    await loadCustomers()
+    await loadCustomers();
   }
-  showCustomerModal.value = true
-}
+  showCustomerModal.value = true;
+};
 
 const loadCustomers = async () => {
   try {
-    const response = await axios.get('/api/customers-with-status?status=active')
-    const data = response.data
+    const response = await axios.get("/api/customers-with-status?status=active");
+    const data = response.data;
 
     if (Array.isArray(data)) {
-      customers.value = data
+      customers.value = data;
     } else if (data.data && Array.isArray(data.data)) {
-      customers.value = data.data
+      customers.value = data.data;
     }
   } catch (error) {
-    console.error('Error loading customers:', error)
-    alert('Failed to load customer accounts.')
+    console.error("Error loading customers:", error);
+    alert("Failed to load customer accounts.");
   }
-}
+};
 
-const handleCustomerSelect = account => {
-  form.value.customer_code = account.customer_code
+const handleCustomerSelect = (account) => {
+  form.value.customer_code = account.customer_code;
   selectedCustomer.value = {
     code: account.customer_code,
-    name: account.customer_name
-  }
-  showCustomerModal.value = false
-  loadIndices()
-}
+    name: account.customer_name,
+  };
+  showCustomerModal.value = false;
+  loadIndices();
+};
 
 const loadIndices = async () => {
-  if (!form.value.customer_code) return
+  if (!form.value.customer_code) return;
 
-  loading.value = true
-  indices.value = []
+  loading.value = true;
+  indices.value = [];
 
   try {
     const response = await axios.get(
       `/api/invoices/customer-tax-indices/${encodeURIComponent(form.value.customer_code)}`
-    )
-    const data = response.data
+    );
+    const data = response.data;
 
     if (data && data.success && Array.isArray(data.data)) {
-      indices.value = data.data.map(row => ({
+      indices.value = data.data.map((row) => ({
         customer_code: row.customer_code,
         index_number: row.index_number,
         tax_group_code: row.tax_group_code,
-        tax_group_name: row.tax_group?.name || '',
-        status: row.status || 'A'
-      }))
+        tax_group_name: row.tax_group?.name || "",
+        status: row.status || "A",
+      }));
     } else if (Array.isArray(data)) {
-      indices.value = data
+      indices.value = data;
     } else {
-      indices.value = []
+      indices.value = [];
     }
   } catch (error) {
-    console.error('Error loading customer tax indices:', error)
-    alert('Failed to load customer tax indices.')
+    console.error("Error loading customer tax indices:", error);
+    alert("Failed to load customer tax indices.");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
-const sortTable = column => {
+const sortTable = (column) => {
   if (sortColumn.value === column) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
   } else {
-    sortColumn.value = column
-    sortDirection.value = 'asc'
+    sortColumn.value = column;
+    sortDirection.value = "asc";
   }
-}
+};
 
-const getSortIcon = column => {
+const getSortIcon = (column) => {
   if (sortColumn.value !== column) {
-    return 'fas fa-sort text-black'
+    return "fas fa-sort text-black";
   }
-  return sortDirection.value === 'asc'
-    ? 'fas fa-sort-up text-black'
-    : 'fas fa-sort-down text-black'
-}
+  return sortDirection.value === "asc"
+    ? "fas fa-sort-up text-black"
+    : "fas fa-sort-down text-black";
+};
 
 const filteredIndices = computed(() => {
-  let filtered = [...indices.value]
+  let filtered = [...indices.value];
 
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(row => {
-      const idx = String(row.index_number ?? '').toLowerCase()
-      const group = String(row.tax_group_code ?? '').toLowerCase()
-      const groupName = String(row.tax_group_name ?? '').toLowerCase()
-      const status = String(row.status ?? '').toLowerCase()
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter((row) => {
+      const idx = String(row.index_number ?? "").toLowerCase();
+      const group = String(row.tax_group_code ?? "").toLowerCase();
+      const groupName = String(row.tax_group_name ?? "").toLowerCase();
+      const status = String(row.status ?? "").toLowerCase();
       return (
         idx.includes(query) ||
         group.includes(query) ||
         groupName.includes(query) ||
         status.includes(query)
-      )
-    })
+      );
+    });
   }
 
   filtered.sort((a, b) => {
-    let valueA = a[sortColumn.value]
-    let valueB = b[sortColumn.value]
+    let valueA = a[sortColumn.value];
+    let valueB = b[sortColumn.value];
 
-    if (valueA === null || valueA === undefined) valueA = ''
-    if (valueB === null || valueB === undefined) valueB = ''
+    if (valueA === null || valueA === undefined) valueA = "";
+    if (valueB === null || valueB === undefined) valueB = "";
 
-    if (typeof valueA !== 'string' && typeof valueA !== 'number') {
-      valueA = String(valueA || '')
+    if (typeof valueA !== "string" && typeof valueA !== "number") {
+      valueA = String(valueA || "");
     }
-    if (typeof valueB !== 'string' && typeof valueB !== 'number') {
-      valueB = String(valueB || '')
+    if (typeof valueB !== "string" && typeof valueB !== "number") {
+      valueB = String(valueB || "");
     }
 
-    valueA = String(valueA).toLowerCase()
-    valueB = String(valueB).toLowerCase()
+    valueA = String(valueA).toLowerCase();
+    valueB = String(valueB).toLowerCase();
 
-    if (sortDirection.value === 'asc') {
-      return valueA.localeCompare(valueB)
+    if (sortDirection.value === "asc") {
+      return valueA.localeCompare(valueB);
     }
-    return valueB.localeCompare(valueA)
-  })
+    return valueB.localeCompare(valueA);
+  });
 
-  return filtered
-})
+  return filtered;
+});
 
 const printTable = () => {
   if (!form.value.customer_code || filteredIndices.value.length === 0) {
-    alert('Please select a customer and ensure there is data to print.')
-    return
+    alert("Please select a customer and ensure there is data to print.");
+    return;
   }
 
   try {
     const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
-    })
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
 
-    doc.setFontSize(16)
-    doc.setTextColor(37, 99, 235)
-    doc.text('CUSTOMER SALES TAX INDEX', 10, 15)
+    doc.setFontSize(16);
+    doc.setTextColor(37, 99, 235);
+    doc.text("CUSTOMER SALES TAX INDEX", 10, 15);
 
-    doc.setFontSize(10)
-    doc.setTextColor(100)
+    doc.setFontSize(10);
+    doc.setTextColor(100);
     const subtitle = selectedCustomer.value
       ? `Customer: ${form.value.customer_code} - ${selectedCustomer.value.name}`
-      : `Customer: ${form.value.customer_code}`
-    doc.text(subtitle, 10, 22)
+      : `Customer: ${form.value.customer_code}`;
+    doc.text(subtitle, 10, 22);
 
-    const tableData = filteredIndices.value.map(row => [
+    const tableData = filteredIndices.value.map((row) => [
       row.index_number,
       row.tax_group_code,
-      row.tax_group_name || '',
-      row.status === 'A' ? 'A-Active' : 'O-Obsolete'
-    ])
+      row.tax_group_name || "",
+      row.status === "A" ? "A-Active" : "O-Obsolete",
+    ]);
 
     autoTable(doc, {
       startY: 28,
-      head: [['Index#', 'Tax Group', 'Tax Group Name', 'Status']],
+      head: [["Index#", "Tax Group", "Tax Group Name", "Status"]],
       body: tableData,
-      theme: 'grid',
-      tableWidth: 'auto',
+      theme: "grid",
+      tableWidth: "auto",
       headStyles: {
         fillColor: [37, 99, 235],
         textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        halign: 'left',
-        fontSize: 10
+        fontStyle: "bold",
+        halign: "left",
+        fontSize: 10,
       },
       bodyStyles: {
         textColor: [50, 50, 50],
-        halign: 'left',
-        fontSize: 9
+        halign: "left",
+        fontSize: 9,
       },
       alternateRowStyles: {
-        fillColor: [219, 234, 254]
+        fillColor: [219, 234, 254],
       },
-      margin: { top: 28, left: 10, right: 10 }
-    })
+      margin: { top: 28, left: 10, right: 10 },
+    });
 
-    const pageCount = doc.internal.getNumberOfPages()
-    const pageHeight = doc.internal.pageSize.height
+    const pageCount = doc.internal.getNumberOfPages();
+    const pageHeight = doc.internal.pageSize.height;
 
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i)
-      doc.setFontSize(8)
-      doc.setTextColor(100)
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(100);
       doc.text(
         `Customer: ${form.value.customer_code} | Total Indices: ${filteredIndices.value.length} | Generated: ${currentDate}`,
         10,
         pageHeight - 10
-      )
+      );
       doc.text(
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width - 35,
         pageHeight - 10
-      )
+      );
     }
 
     doc.save(
       `customer-sales-tax-index-${form.value.customer_code}-${new Date().getTime()}.pdf`
-    )
+    );
   } catch (error) {
-    console.error('Error generating PDF:', error)
-    alert('Error generating PDF. Please try again.')
+    console.error("Error generating PDF:", error);
+    alert("Error generating PDF. Please try again.");
   }
-}
+};
 </script>
 
 <style scoped>
@@ -526,4 +537,3 @@ const printTable = () => {
   }
 }
 </style>
-

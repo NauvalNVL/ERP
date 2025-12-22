@@ -93,28 +93,63 @@
           <div class="p-6">
             <!-- Actions Bar -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
-              <!-- Search Field -->
               <div class="space-y-2">
                 <label class="text-sm font-medium text-blue-700 mb-2 flex items-center">
                   <div
                     class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm"
                   >
-                    <i class="fas fa-search text-white text-sm"></i>
+                    <i class="fas fa-user text-white text-sm"></i>
                   </div>
-                  Search:
+                  Customer:
                 </label>
-                <div class="relative flex-grow">
-                  <input
-                    type="text"
-                    v-model="searchTerm"
-                    class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                    placeholder="Search by customer name, code, or address..."
-                  />
+                <div class="relative">
                   <div
-                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    class="flex items-stretch h-12 bg-white rounded-lg border border-gray-300"
                   >
-                    <i class="fas fa-search text-gray-400"></i>
+                    <input
+                      v-model="customerQuery"
+                      type="text"
+                      placeholder="Type customer number or name"
+                      class="flex-grow min-w-0 px-3 text-sm h-12 focus:ring-blue-500 focus:border-blue-500 border-0 rounded-l-lg"
+                      @focus="onCustomerQueryFocus"
+                      @input="onCustomerQueryInput"
+                      @blur="onCustomerQueryBlur"
+                      @keydown.enter.prevent="handleCustomerEnter"
+                    />
+                    <button
+                      type="button"
+                      @click="openCustomerModal"
+                      class="w-12 h-12 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg"
+                    >
+                      <i class="fas fa-table"></i>
+                    </button>
                   </div>
+
+                  <div
+                    v-if="showCustomerSuggestions && customerSuggestions.length"
+                    class="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-auto"
+                  >
+                    <button
+                      v-for="account in customerSuggestions"
+                      :key="account.customer_code"
+                      type="button"
+                      class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                      @mousedown.prevent="selectCustomerSuggestion(account)"
+                    >
+                      <div class="text-sm text-slate-900">
+                        <span class="font-semibold">{{ account.customer_code }}</span>
+                        <span class="text-slate-500"> - {{ account.customer_name }}</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <div
+                  class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm text-slate-800 min-h-[40px] flex items-center"
+                >
+                  {{ selectedCustomer?.name || "-" }}
+                </div>
+                <div v-if="!form.customer_code" class="text-xs text-slate-500">
+                  Please select a customer first to display alternate addresses.
                 </div>
               </div>
 
@@ -122,7 +157,13 @@
               <div class="flex items-end">
                 <button
                   @click="fetchData()"
-                  class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-300 shadow-md flex items-center"
+                  :disabled="!form.customer_code"
+                  class="px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md flex items-center"
+                  :class="
+                    !form.customer_code
+                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white'
+                  "
                 >
                   <i class="fas fa-sync mr-2"></i>
                   Refresh Data
@@ -302,25 +343,24 @@
                     <div class="flex flex-col items-center">
                       <i class="fas fa-map-marker-alt text-4xl text-gray-300 mb-2"></i>
                       <p class="text-lg font-medium">
-                        No customer alternate addresses found
-                      </p>
-                      <template v-if="searchTerm">
-                        <p class="text-sm text-gray-500">
-                          Try adjusting your search criteria.
-                        </p>
-                      </template>
-                      <template v-else>
-                        <p class="mt-2 text-sm">No results match your search criteria</p>
-                        <button
-                          @click="
-                            searchTerm = '';
-                            recordStatus = 'both';
-                          "
-                          class="mt-2 text-blue-500 hover:underline"
+                        <span v-if="!form.customer_code"
+                          >Please select a customer first.</span
                         >
-                          Clear filters
-                        </button>
-                      </template>
+                        <span v-else>No customer alternate addresses found</span>
+                      </p>
+                      <p class="mt-2 text-sm">
+                        <span v-if="!form.customer_code"
+                          >Customer selection is required to load data.</span
+                        >
+                        <span v-else>No results match your filter criteria</span>
+                      </p>
+                      <button
+                        v-if="form.customer_code"
+                        @click="resetFilters"
+                        class="mt-2 text-blue-500 hover:underline"
+                      >
+                        Clear filters
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -451,24 +491,35 @@
                 Instructions
               </h4>
               <ul class="list-disc pl-5 text-sm text-teal-900 space-y-2">
-                <li>Use the search box to filter by customer name, code, or address</li>
+                <li>
+                  Select a customer first (required) to load and display alternate address
+                  data
+                </li>
                 <li>Click the column headers to sort the data</li>
-                <li>Use the status filter to show active or obsolete records</li>
-                <li>Click the print button to print the current view</li>
-                <li>Use the export button to download data in Excel format</li>
+                <li>Click the print button to download the current view as PDF</li>
               </ul>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <CustomerAccountModal
+      v-if="showCustomerModal"
+      :show="showCustomerModal"
+      :customer-accounts="customers"
+      :initial-search="customerSearch"
+      @close="showCustomerModal = false"
+      @select="handleCustomerSelect"
+    />
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import CustomerAccountModal from "@/Components/customer-account-modal.vue";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -476,16 +527,183 @@ import autoTable from "jspdf-autotable";
 // Data
 const addresses = ref([]);
 const loading = ref(true);
-const searchTerm = ref("");
 const sortColumn = ref("customer_code");
 const sortDirection = ref("asc");
+
+const form = ref({
+  customer_code: "",
+});
+
+const customerQuery = ref("");
+const showCustomerSuggestions = ref(false);
+const loadingCustomers = ref(false);
+
+const selectedCustomer = ref(null);
+const showCustomerModal = ref(false);
+const customers = ref([]);
+const customerSearch = ref("");
+
+const openCustomerModal = async () => {
+  customerSearch.value = String(customerQuery.value ?? "").trim();
+  if (customers.value.length === 0) {
+    await loadCustomers();
+  }
+  showCustomerModal.value = true;
+};
+
+const loadCustomers = async () => {
+  try {
+    loadingCustomers.value = true;
+    const response = await axios.get("/api/customers-with-status?status=active");
+    const data = response.data;
+    if (Array.isArray(data)) {
+      customers.value = data;
+    } else if (data?.data && Array.isArray(data.data)) {
+      customers.value = data.data;
+    } else {
+      customers.value = [];
+    }
+  } catch (error) {
+    console.error("Error loading customers:", error);
+    customers.value = [];
+  } finally {
+    loadingCustomers.value = false;
+  }
+};
+
+const ensureCustomersLoaded = async () => {
+  if (customers.value.length > 0 || loadingCustomers.value) {
+    return;
+  }
+  await loadCustomers();
+};
+
+const normalizeCustomerAccount = (account) => {
+  return {
+    customer_code: account?.customer_code ?? account?.code ?? "",
+    customer_name: account?.customer_name ?? account?.name ?? "",
+  };
+};
+
+const customerSuggestions = computed(() => {
+  const q = String(customerQuery.value ?? "")
+    .trim()
+    .toLowerCase();
+  if (!q) {
+    return [];
+  }
+
+  return (customers.value || [])
+    .map((c) => normalizeCustomerAccount(c))
+    .filter(
+      (c) =>
+        c.customer_code &&
+        (String(c.customer_code).toLowerCase().includes(q) ||
+          String(c.customer_name).toLowerCase().includes(q))
+    )
+    .slice(0, 20);
+});
+
+const selectCustomerSuggestion = (account) => {
+  const normalized = normalizeCustomerAccount(account);
+  if (!normalized.customer_code) {
+    return;
+  }
+
+  form.value.customer_code = normalized.customer_code;
+  customerQuery.value = normalized.customer_code;
+  selectedCustomer.value = {
+    code: normalized.customer_code,
+    name: normalized.customer_name,
+  };
+  showCustomerSuggestions.value = false;
+  fetchData();
+};
+
+const onCustomerQueryFocus = async () => {
+  await ensureCustomersLoaded();
+  if (String(customerQuery.value ?? "").trim()) {
+    showCustomerSuggestions.value = true;
+  }
+};
+
+const onCustomerQueryInput = async () => {
+  await ensureCustomersLoaded();
+  showCustomerSuggestions.value = true;
+};
+
+const onCustomerQueryBlur = () => {
+  setTimeout(() => {
+    showCustomerSuggestions.value = false;
+  }, 120);
+};
+
+const handleCustomerEnter = async () => {
+  const q = String(customerQuery.value ?? "").trim();
+  if (!q) {
+    return;
+  }
+
+  await ensureCustomersLoaded();
+
+  const qLower = q.toLowerCase();
+  const normalizedCustomers = (customers.value || []).map((c) =>
+    normalizeCustomerAccount(c)
+  );
+  const exactCode = normalizedCustomers.find(
+    (c) => String(c.customer_code ?? "").toLowerCase() === qLower
+  );
+  if (exactCode) {
+    selectCustomerSuggestion(exactCode);
+    return;
+  }
+
+  if (customerSuggestions.value.length === 1) {
+    selectCustomerSuggestion(customerSuggestions.value[0]);
+    return;
+  }
+
+  customerSearch.value = q;
+  await openCustomerModal();
+};
+
+const handleCustomerSelect = (account) => {
+  customerQuery.value = account.customer_code;
+  form.value.customer_code = account.customer_code;
+  selectedCustomer.value = {
+    code: account.customer_code,
+    name: account.customer_name,
+  };
+  showCustomerModal.value = false;
+  fetchData();
+};
+
+const resetFilters = () => {
+  form.value.customer_code = "";
+  customerQuery.value = "";
+  selectedCustomer.value = null;
+  addresses.value = [];
+  loading.value = false;
+};
 
 // Fetch data
 const fetchData = async () => {
   loading.value = true;
   try {
+    const code = String(form.value.customer_code ?? "").trim();
+    if (!code) {
+      addresses.value = [];
+      return;
+    }
     const response = await axios.get("/api/customer-alternate-addresses");
-    addresses.value = response.data;
+    const data = response.data;
+    if (Array.isArray(data)) {
+      addresses.value = data;
+    } else if (data?.data && Array.isArray(data.data)) {
+      addresses.value = data.data;
+    } else {
+      addresses.value = [];
+    }
   } catch (error) {
     console.error("Error fetching customer alternate addresses:", error);
   } finally {
@@ -493,44 +711,36 @@ const fetchData = async () => {
   }
 };
 
+watch(customerQuery, (val) => {
+  const q = String(val ?? "").trim();
+  if (!q) {
+    form.value.customer_code = "";
+    selectedCustomer.value = null;
+    addresses.value = [];
+    return;
+  }
+
+  if (
+    selectedCustomer.value?.code &&
+    String(selectedCustomer.value.code).toLowerCase() !== q.toLowerCase()
+  ) {
+    form.value.customer_code = "";
+    selectedCustomer.value = null;
+    addresses.value = [];
+  }
+});
+
 // Computed properties
 const filteredAddresses = computed(() => {
   let filtered = addresses.value;
 
-  // Filter by search term (defensively handle null/undefined fields)
-  if (searchTerm.value) {
-    const term = searchTerm.value.toLowerCase();
-    filtered = filtered.filter((address) => {
-      const code = (address.customer_code ?? "").toString().toLowerCase();
-      const delivery = (address.delivery_code ?? "").toString().toLowerCase();
-      const country = (address.country ?? "").toString().toLowerCase();
-      const state = (address.state ?? "").toString().toLowerCase();
-      const town = (address.town ?? "").toString().toLowerCase();
-      const billName = (address.bill_to_name ?? "").toString().toLowerCase();
-      const billAddr = (address.bill_to_address ?? "").toString().toLowerCase();
-      const shipName = (address.ship_to_name ?? "").toString().toLowerCase();
-      const shipAddr = (address.ship_to_address ?? "").toString().toLowerCase();
-      const contact = (address.contact_person ?? "").toString().toLowerCase();
-      const tel = (address.tel_no ?? "").toString().toLowerCase();
-      const fax = (address.fax_no ?? "").toString().toLowerCase();
-      const email = (address.email ?? "").toString().toLowerCase();
-
-      return (
-        code.includes(term) ||
-        delivery.includes(term) ||
-        country.includes(term) ||
-        state.includes(term) ||
-        town.includes(term) ||
-        billName.includes(term) ||
-        billAddr.includes(term) ||
-        shipName.includes(term) ||
-        shipAddr.includes(term) ||
-        contact.includes(term) ||
-        tel.includes(term) ||
-        fax.includes(term) ||
-        email.includes(term)
-      );
-    });
+  if (form.value.customer_code) {
+    const code = String(form.value.customer_code ?? "").toLowerCase();
+    filtered = filtered.filter((address) =>
+      String(address.customer_code ?? "")
+        .toLowerCase()
+        .includes(code)
+    );
   }
 
   // Sort (normalize null and mixed types before comparison)
@@ -639,7 +849,8 @@ const printPdf = () => {
 
 // Lifecycle hooks
 onMounted(() => {
-  fetchData();
+  loading.value = false;
+  addresses.value = [];
 });
 </script>
 

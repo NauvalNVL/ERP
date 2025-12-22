@@ -620,6 +620,7 @@
     <PaperQualityModal
       :show="showPaperQualityModal"
       :qualities="paperQualities"
+      :loading="paperQualityLoading"
       @close="showPaperQualityModal = false"
       @select="onPaperQualitySelected"
     />
