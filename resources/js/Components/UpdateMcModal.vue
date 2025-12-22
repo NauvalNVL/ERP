@@ -863,7 +863,7 @@
                       readonly
                     />
                     <button
-                      @click="showPaperFluteModal = true"
+                      @click="openPaperFluteModal"
                       class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300"
                     >
                       <i class="fas fa-search"></i>
@@ -1325,7 +1325,7 @@
                   readonly
                 />
                 <button
-                  @click="showPaperFluteModal = true"
+                  @click="openPaperFluteModal"
                   class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300"
                 >
                   <i class="fas fa-search"></i>
@@ -2695,7 +2695,8 @@
   <!-- Paper Flute Modal -->
   <PaperFluteModal
     :show="showPaperFluteModal"
-    :flutes="paperFlutes"
+    :flutes="paperFluteRows"
+    :loading="paperFluteLoading"
     @close="showPaperFluteModal = false"
     @select="onPaperFluteSelected"
   />
@@ -2718,6 +2719,7 @@
   <ReinforcementTapeModal
     :show="showReinforcementTapeModal"
     :rows="reinforcementTapeRows"
+    :loading="reinforcementTapeLoading"
     @close="showReinforcementTapeModal = false"
     @select="
       (row) => {
@@ -2731,6 +2733,7 @@
   <PaperSizeModal
     :show="showPaperSizeModal"
     :paperSizes="paperSizeRows"
+    :loading="paperSizeLoading"
     @close="showPaperSizeModal = false"
     @select="
       (size) => {
@@ -2743,35 +2746,42 @@
     :show="showColorModal"
     :colors="colors"
     :color-groups="colorGroups"
+    :loading="colorModalLoading"
     @close="showColorModal = false"
     @select="onColorSelected"
   />
   <FinishingModal
     :show="showFinishingModal"
     :finishings="finishings"
+    :loading="finishingLoading"
     @close="showFinishingModal = false"
     @select="onFinishingSelected"
   />
   <ScoringToolModal
     :show="showScoringToolModal"
     :scoring-tools="scoringTools"
+    :loading="scoringToolsLoading"
     @close="showScoringToolModal = false"
     @select="onScoringToolSelected"
   />
   <StitchWireModal
     :show="showStitchWireModal"
+    :stitch-wires="stitchWireItems"
+    :loading="stitchWireLoading"
     @close="showStitchWireModal = false"
     @select="onStitchWireSelected"
   />
   <BundlingStringModal
     :show="showBundlingStringModal"
     :items="bundlingStringItems"
+    :loading="bundlingStringLoading"
     @close="showBundlingStringModal = false"
     @select="onBundlingStringSelected"
   />
   <GlueingMaterialModal
     :show="showGlueingModal"
     :items="glueingItems"
+    :loading="glueingLoading"
     @close="showGlueingModal = false"
     @select="onGlueingSelected"
   />
@@ -2784,6 +2794,7 @@
   <WrappingMaterialModal
     :show="showWrappingModal"
     :items="wrappingItems"
+    :loading="wrappingLoading"
     @close="showWrappingModal = false"
     @select="onWrappingSelected"
   />
@@ -2963,15 +2974,44 @@ const fetchProductDesigns = async () => {
 
 // Open product design modal and fetch data
 const openProductDesignModal = async () => {
-  if (productDesigns.value.length === 0) {
-    await fetchProductDesigns();
-  }
   showProductDesignModal.value = true;
+  await fetchProductDesigns();
 };
 
 // Paper Flute Modal
 const showPaperFluteModal = ref(false);
 const selectedPaperFlute = ref("");
+const paperFluteRows = ref([]);
+const paperFluteLoading = ref(false);
+
+const fetchPaperFlutes = async () => {
+  try {
+    paperFluteLoading.value = true;
+    const response = await fetch("/api/paper-flutes", {
+      headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      paperFluteRows.value = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+    } else {
+      paperFluteRows.value = [];
+    }
+  } catch (e) {
+    console.error("Error fetching paper flutes:", e);
+    paperFluteRows.value = [];
+  } finally {
+    paperFluteLoading.value = false;
+  }
+};
+
+const openPaperFluteModal = async () => {
+  showPaperFluteModal.value = true;
+  await fetchPaperFlutes();
+};
 
 // Chemical Coat Modal
 const showChemicalCoatModal = ref(false);
@@ -3006,10 +3046,8 @@ const fetchChemicalCoats = async () => {
 
 // Open chemical coat modal and fetch data
 const openChemicalCoatModal = async () => {
-  if (chemicalCoatRows.value.length === 0) {
-    await fetchChemicalCoats();
-  }
   showChemicalCoatModal.value = true;
+  await fetchChemicalCoats();
 };
 
 // Helper functions removed - now displaying codes directly
@@ -3018,10 +3056,12 @@ const openChemicalCoatModal = async () => {
 const showReinforcementTapeModal = ref(false);
 const selectedReinforcementTape = ref("");
 const reinforcementTapeRows = ref([]);
+const reinforcementTapeLoading = ref(false);
 
 // Fetch reinforcement tapes from API
 const fetchReinforcementTapes = async () => {
   try {
+    reinforcementTapeLoading.value = true;
     const response = await fetch("/api/reinforcement-tapes", {
       headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
     });
@@ -3038,15 +3078,15 @@ const fetchReinforcementTapes = async () => {
   } catch (e) {
     console.error("Error fetching reinforcement tapes:", e);
     reinforcementTapeRows.value = [];
+  } finally {
+    reinforcementTapeLoading.value = false;
   }
 };
 
 // Open reinforcement tape modal and fetch data
 const openReinforcementTapeModal = async () => {
-  if (reinforcementTapeRows.value.length === 0) {
-    await fetchReinforcementTapes();
-  }
   showReinforcementTapeModal.value = true;
+  await fetchReinforcementTapes();
 };
 
 // Paper Size Modal
@@ -3080,38 +3120,43 @@ const fetchPaperSizes = async () => {
 };
 
 const openPaperSizeModal = async () => {
-  if (paperSizeRows.value.length === 0) {
-    await fetchPaperSizes();
-  }
   showPaperSizeModal.value = true;
+  await fetchPaperSizes();
 };
 
 // Scoring Tool Modal
 const showScoringToolModal = ref(false);
 const selectedScoringToolCode = ref("");
 const scoringTools = ref([]);
+const scoringToolsLoading = ref(false);
 
-const openScoringToolModal = async () => {
-  if (scoringTools.value.length === 0) {
-    try {
-      const response = await fetch("/api/scoring-tools", {
-        headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        scoringTools.value = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-          ? data.data
-          : [];
-      } else {
-        scoringTools.value = [];
-      }
-    } catch (e) {
+const fetchScoringTools = async () => {
+  try {
+    scoringToolsLoading.value = true;
+    const response = await fetch("/api/scoring-tools", {
+      headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      scoringTools.value = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+    } else {
       scoringTools.value = [];
     }
+  } catch (e) {
+    console.error("Error fetching scoring tools:", e);
+    scoringTools.value = [];
+  } finally {
+    scoringToolsLoading.value = false;
   }
+};
+
+const openScoringToolModal = async () => {
   showScoringToolModal.value = true;
+  await fetchScoringTools();
 };
 
 const onScoringToolSelected = (tool) => {
@@ -3123,36 +3168,47 @@ const onScoringToolSelected = (tool) => {
 const showColorModal = ref(false);
 const colors = ref([]);
 const colorGroups = ref([]);
+const colorModalLoading = ref(false);
 const activePrintColorIndex = ref(0);
 const printColorCodes = ref(["", "", "", "", "", "", ""]);
 
+const fetchColorsAndGroups = async () => {
+  try {
+    colorModalLoading.value = true;
+    const res = await fetch("/api/colors", {
+      headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const colorsData = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.colors)
+        ? data.colors
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+      const groupsData = Array.isArray(data?.color_groups) ? data.color_groups : [];
+
+      colors.value = colorsData;
+      colorGroups.value = groupsData;
+    } else {
+      colors.value = [];
+      colorGroups.value = [];
+    }
+  } catch (e) {
+    console.error("Error fetching colors:", e);
+    colors.value = [];
+    colorGroups.value = [];
+  } finally {
+    colorModalLoading.value = false;
+  }
+};
+
 const openColorModal = async (index) => {
   activePrintColorIndex.value = index;
-  if (colors.value.length === 0) {
-    try {
-      const res = await fetch("/api/colors", {
-        headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        // API returns an object: { colors: [...], color_groups: [...] }
-        colors.value = Array.isArray(data?.colors) ? data.colors : [];
-      }
-    } catch (e) {}
-  }
-  if (colorGroups.value.length === 0) {
-    try {
-      // Reuse the same endpoint which already includes color_groups
-      const res = await fetch("/api/colors", {
-        headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        colorGroups.value = Array.isArray(data?.color_groups) ? data.color_groups : [];
-      }
-    } catch (e) {}
-  }
   showColorModal.value = true;
+  await fetchColorsAndGroups();
 };
 
 const onColorSelected = (color) => {
@@ -3226,24 +3282,35 @@ const calculateScoreW = () => {
 const showFinishingModal = ref(false);
 const finishings = ref([]);
 const selectedFinishingCode = ref("");
+const finishingLoading = ref(false);
+
+const fetchFinishings = async () => {
+  try {
+    finishingLoading.value = true;
+    const res = await fetch("/api/finishings", {
+      headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      finishings.value = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+    } else {
+      finishings.value = [];
+    }
+  } catch (e) {
+    console.error("Error fetching finishings:", e);
+    finishings.value = [];
+  } finally {
+    finishingLoading.value = false;
+  }
+};
 
 const openFinishingModal = async () => {
-  if (finishings.value.length === 0) {
-    try {
-      const res = await fetch("/api/finishings", {
-        headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        finishings.value = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-          ? data.data
-          : [];
-      }
-    } catch (e) {}
-  }
   showFinishingModal.value = true;
+  await fetchFinishings();
 };
 
 const onFinishingSelected = (finishing) => {
@@ -3255,9 +3322,36 @@ const onFinishingSelected = (finishing) => {
 const showStitchWireModal = ref(false);
 const selectedStitchWireCode = ref("");
 const stitchWirePieces = ref("");
+const stitchWireItems = ref([]);
+const stitchWireLoading = ref(false);
+
+const fetchStitchWires = async () => {
+  try {
+    stitchWireLoading.value = true;
+    const response = await fetch("/api/stitch-wires", {
+      headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      stitchWireItems.value = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+    } else {
+      stitchWireItems.value = [];
+    }
+  } catch (e) {
+    console.error("Error fetching stitch wires:", e);
+    stitchWireItems.value = [];
+  } finally {
+    stitchWireLoading.value = false;
+  }
+};
 
 const openStitchWireModal = async () => {
   showStitchWireModal.value = true;
+  await fetchStitchWires();
 };
 
 const onStitchWireSelected = (item) => {
@@ -3270,10 +3364,12 @@ const showBundlingStringModal = ref(false);
 const selectedBundlingStringCode = ref("");
 const bundlingStringItems = ref([]);
 const bundlingStringQty = ref("");
+const bundlingStringLoading = ref(false);
 
 // Fetch bundling strings from API
 const fetchBundlingStrings = async () => {
   try {
+    bundlingStringLoading.value = true;
     const response = await fetch("/api/bundling-strings", {
       headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
     });
@@ -3290,14 +3386,14 @@ const fetchBundlingStrings = async () => {
   } catch (e) {
     console.error("Error fetching bundling strings:", e);
     bundlingStringItems.value = [];
+  } finally {
+    bundlingStringLoading.value = false;
   }
 };
 
 const openBundlingStringModal = async () => {
-  if (bundlingStringItems.value.length === 0) {
-    await fetchBundlingStrings();
-  }
   showBundlingStringModal.value = true;
+  await fetchBundlingStrings();
 };
 
 const onBundlingStringSelected = (item) => {
@@ -3350,10 +3446,12 @@ const onMspSave = (data) => {
 const showGlueingModal = ref(false);
 const selectedGlueingCode = ref("");
 const glueingItems = ref([]);
+const glueingLoading = ref(false);
 
 // Fetch glueing materials from API
 const fetchGlueingMaterials = async () => {
   try {
+    glueingLoading.value = true;
     const response = await fetch("/api/glueing-materials", {
       headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
     });
@@ -3370,14 +3468,14 @@ const fetchGlueingMaterials = async () => {
   } catch (e) {
     console.error("Error fetching glueing materials:", e);
     glueingItems.value = [];
+  } finally {
+    glueingLoading.value = false;
   }
 };
 
 const openGlueingModal = async () => {
-  if (glueingItems.value.length === 0) {
-    await fetchGlueingMaterials();
-  }
   showGlueingModal.value = true;
+  await fetchGlueingMaterials();
 };
 
 const onGlueingSelected = (item) => {
@@ -3389,10 +3487,12 @@ const onGlueingSelected = (item) => {
 const showWrappingModal = ref(false);
 const selectedWrappingCode = ref("");
 const wrappingItems = ref([]);
+const wrappingLoading = ref(false);
 
 // Fetch wrapping materials from API
 const fetchWrappingMaterials = async () => {
   try {
+    wrappingLoading.value = true;
     const response = await fetch("/api/wrapping-materials", {
       headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
     });
@@ -3409,14 +3509,14 @@ const fetchWrappingMaterials = async () => {
   } catch (e) {
     console.error("Error fetching wrapping materials:", e);
     wrappingItems.value = [];
+  } finally {
+    wrappingLoading.value = false;
   }
 };
 
 const openWrappingModal = async () => {
-  if (wrappingItems.value.length === 0) {
-    await fetchWrappingMaterials();
-  }
   showWrappingModal.value = true;
+  await fetchWrappingMaterials();
 };
 
 const onWrappingSelected = (item) => {
