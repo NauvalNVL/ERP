@@ -324,6 +324,29 @@ class UpdateMcController extends Controller
         // Add components array with all Fit data (full PD fields per component)
         $components = [];
 
+        $buildMspPayload = function ($row) {
+            $machines = [];
+            // Preserve CPS step convention: 10,20,...,120 for MSP1..MSP12
+            for ($i = 1; $i <= 12; $i++) {
+                $step = $i * 10;
+                $mchKey = "MSP{$i}_MCH";
+                $upKey = "MSP{$i}_UP";
+                $instKey = "MSP{$i}_SPECIAL_INST";
+
+                $machines[] = [
+                    'step' => $step,
+                    'mchCode' => $row->{$mchKey} ?? null,
+                    'machineName' => '',
+                    'noUp' => $row->{$upKey} ?? null,
+                    'specialInstruction' => $row->{$instKey} ?? null,
+                ];
+            }
+
+            return [
+                'machines' => $machines,
+            ];
+        };
+
         // First, push Main component with full PD mapping
         $components[] = [
             'c_num' => $main->COMP ?? 'Main',
@@ -336,6 +359,13 @@ class UpdateMcController extends Controller
             'part_no' => $main->PART_NO ?? '',
             'model' => $main->MODEL ?? '',
             'status' => $main->STS ?? 'Active',
+            'specialInstructions' => [
+                $main->MC_SPECIAL_INST1 ?? '',
+                $main->MC_SPECIAL_INST2 ?? '',
+                $main->MC_SPECIAL_INST3 ?? '',
+                $main->MC_SPECIAL_INST4 ?? '',
+            ],
+            'mspData' => $buildMspPayload($main),
             // SO / WO paper qualities
             'soValues' => [
                 $main->SO_PQ1 ?? '',
@@ -466,6 +496,13 @@ class UpdateMcController extends Controller
                 'part_no' => $fit->PART_NO ?? '',
                 'model' => $fit->MODEL ?? '',
                 'status' => $fit->STS ?? 'Active',
+                'specialInstructions' => [
+                    $fit->MC_SPECIAL_INST1 ?? '',
+                    $fit->MC_SPECIAL_INST2 ?? '',
+                    $fit->MC_SPECIAL_INST3 ?? '',
+                    $fit->MC_SPECIAL_INST4 ?? '',
+                ],
+                'mspData' => $buildMspPayload($fit),
                 // SO / WO paper qualities
                 'soValues' => [
                     $fit->SO_PQ1 ?? '',
@@ -1807,8 +1844,30 @@ class UpdateMcController extends Controller
                 return response()->json([], 200); // Return empty array if no components found
             }
 
+            $buildMspPayload = function ($row) {
+                $machines = [];
+                for ($i = 1; $i <= 12; $i++) {
+                    $step = $i * 10;
+                    $mchKey = "MSP{$i}_MCH";
+                    $upKey = "MSP{$i}_UP";
+                    $instKey = "MSP{$i}_SPECIAL_INST";
+
+                    $machines[] = [
+                        'step' => $step,
+                        'mchCode' => $row->{$mchKey} ?? null,
+                        'machineName' => '',
+                        'noUp' => $row->{$upKey} ?? null,
+                        'specialInstruction' => $row->{$instKey} ?? null,
+                    ];
+                }
+
+                return [
+                    'machines' => $machines,
+                ];
+            };
+
             // Transform components data (full PD fields per component)
-            $result = $components->map(function ($comp) {
+            $result = $components->map(function ($comp) use ($buildMspPayload) {
                 return [
                     'c_num' => $comp->COMP ?? 'Main',
                     'comp_no' => $comp->COMP ?? 'Main',
@@ -1820,6 +1879,13 @@ class UpdateMcController extends Controller
                     'part_no' => $comp->PART_NO ?? '',
                     'model' => $comp->MODEL ?? '',
                     'status' => $comp->STS ?? 'Active',
+                    'specialInstructions' => [
+                        $comp->MC_SPECIAL_INST1 ?? '',
+                        $comp->MC_SPECIAL_INST2 ?? '',
+                        $comp->MC_SPECIAL_INST3 ?? '',
+                        $comp->MC_SPECIAL_INST4 ?? '',
+                    ],
+                    'mspData' => $buildMspPayload($comp),
                     // SO / WO paper qualities
                     'soValues' => [
                         $comp->SO_PQ1 ?? '',

@@ -2823,16 +2823,18 @@ const normalizeDisplay = (vals) => {
 };
 
 const openSpecialInstructionsModal = () => {
-  let base = Array.isArray(specialInstructions.value)
-    ? [...specialInstructions.value]
-    : [];
+  const idx = selectedComponentIndex.value ?? 0;
+  const cf = componentForms.value[idx] || {};
+
+  let base = Array.isArray(cf.specialInstructions) ? [...cf.specialInstructions] : [];
   const hasValue = base.some((v) => v && String(v).trim() !== "");
+
   if (!hasValue) {
     const loaded = props.mcLoaded || {};
     const pd = loaded.pd_setup || {};
     if (Array.isArray(pd.specialInstructions) && pd.specialInstructions.length) {
       base = pd.specialInstructions;
-    } else {
+    } else if (idx === 0) {
       base = [
         loaded.MC_SPECIAL_INST1,
         loaded.MC_SPECIAL_INST2,
@@ -2841,6 +2843,7 @@ const openSpecialInstructionsModal = () => {
       ];
     }
   }
+
   specialInstructions.value = Array.from({ length: 4 }, (_, i) => (base[i] ?? "") + "");
   showSpecialInstructionsModal.value = true;
 };
@@ -2850,6 +2853,12 @@ const onSpecialInstructionsSave = (rows) => {
     ? rows.slice(0, 4).map((v) => (v ?? "") + "")
     : ["", "", "", ""];
   specialInstructions.value = normalized;
+  try {
+    const idx = selectedComponentIndex.value ?? 0;
+    const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
+    next.specialInstructions = normalized;
+    componentForms.value[idx] = next;
+  } catch (e) {}
   emit("saveSpecialInstructions", normalized);
 };
 
@@ -3300,29 +3309,39 @@ const onBundlingStringSelected = (item) => {
 const showMspModal = ref(false);
 const mspData = ref({});
 const openMspModal = () => {
-  // Load existing MSP data from mcLoaded if available
-  const loaded = props.mcLoaded || {};
-  const existingMspData = {};
+  const idx = selectedComponentIndex.value ?? 0;
+  const cf = componentForms.value[idx] || {};
 
-  // Load MSP1 to MSP12 fields from loaded MC data
-  for (let i = 1; i <= 12; i++) {
-    const mchKey = `MSP${i}_MCH`;
-    const upKey = `MSP${i}_UP`;
-    const instKey = `MSP${i}_SPECIAL_INST`;
+  if (cf.mspData && Object.keys(cf.mspData).length > 0) {
+    mspData.value = cf.mspData;
+  } else {
+    const loaded = props.mcLoaded || {};
+    const existingMspData = {};
+    if (idx === 0) {
+      for (let i = 1; i <= 12; i++) {
+        const mchKey = `MSP${i}_MCH`;
+        const upKey = `MSP${i}_UP`;
+        const instKey = `MSP${i}_SPECIAL_INST`;
 
-    if (loaded[mchKey]) {
-      existingMspData[`msp${i}_mch`] = loaded[mchKey];
-      existingMspData[`msp${i}_up`] = loaded[upKey] || "";
-      existingMspData[`msp${i}_special_inst`] = loaded[instKey] || "";
+        if (loaded[mchKey]) {
+          existingMspData[`msp${i}_mch`] = loaded[mchKey];
+          existingMspData[`msp${i}_up`] = loaded[upKey] || "";
+          existingMspData[`msp${i}_special_inst`] = loaded[instKey] || "";
+        }
+      }
     }
+    mspData.value = existingMspData;
   }
-
-  // Pass existing data to modal
-  mspData.value = existingMspData;
   showMspModal.value = true;
 };
 const onMspSave = (data) => {
   mspData.value = data;
+  try {
+    const idx = selectedComponentIndex.value ?? 0;
+    const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
+    next.mspData = data;
+    componentForms.value[idx] = next;
+  } catch (e) {}
   console.log("MSP Data saved:", data);
   showMspModal.value = false;
 };
@@ -3436,7 +3455,7 @@ const onMoreDescriptionSave = (rows) => {
     console.debug("[UpdateMcModal] MoreDescription saved");
   }
   moreDescriptions.value = normalized;
-  
+
   // Also save to the current component form
   const idx = selectedComponentIndex.value ?? 0;
   if (componentForms.value[idx]) {
@@ -3663,8 +3682,7 @@ const onProductDesignSelected = (design) => {
 };
 
 const onPaperFluteSelected = (flute) => {
-  const code =
-    flute?.code ?? flute?.Flute ?? flute?.Flute_Code ?? flute?.flute ?? "";
+  const code = flute?.code ?? flute?.Flute ?? flute?.Flute_Code ?? flute?.flute ?? "";
   selectedPaperFlute.value = code;
   showPaperFluteModal.value = false;
   emit("paperFluteSelected", flute);
@@ -4174,6 +4192,8 @@ const makeEmptyPdState = () => ({
   fullBlockPrint: false,
   // More descriptions (5 lines) per component
   moreDescriptions: ["", "", "", "", ""],
+  specialInstructions: ["", "", "", ""],
+  mspData: {},
 });
 const componentForms = ref(makeEmptyComponentForms());
 // Now safe to hydrate PD from loaded MC/PD data
@@ -4596,13 +4616,32 @@ watch(
             compSrc.fullBlockPrint !== undefined
               ? !!compSrc.fullBlockPrint
               : cf.fullBlockPrint;
-          
+
           // Hydrate moreDescriptions per component
-          if (Array.isArray(compSrc.moreDescriptions) && compSrc.moreDescriptions.length > 0) {
-            cf.moreDescriptions = compSrc.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "");
+          if (
+            Array.isArray(compSrc.moreDescriptions) &&
+            compSrc.moreDescriptions.length > 0
+          ) {
+            cf.moreDescriptions = compSrc.moreDescriptions
+              .slice(0, 5)
+              .map((v) => (v ?? "") + "");
           }
+
+          if (
+            Array.isArray(compSrc.specialInstructions) &&
+            compSrc.specialInstructions.length > 0
+          ) {
+            cf.specialInstructions = compSrc.specialInstructions
+              .slice(0, 4)
+              .map((v) => (v ?? "") + "");
+          }
+
+          if (compSrc.mspData && typeof compSrc.mspData === "object") {
+            cf.mspData = compSrc.mspData;
+          }
+
+          componentForms.value[idx] = { ...makeEmptyPdState(), ...cf };
         }
-        componentForms.value[idx] = { ...makeEmptyPdState(), ...cf };
       }
     }
     // Fallback hydration from MC table fields for Main row when no components exist
@@ -4897,10 +4936,28 @@ const fetchMcComponentsFromDb = async () => {
             fetchedComp.fullBlockPrint !== undefined
               ? !!fetchedComp.fullBlockPrint
               : cf.fullBlockPrint;
-          
+
           // Hydrate moreDescriptions per component from fetched data
-          if (Array.isArray(fetchedComp.moreDescriptions) && fetchedComp.moreDescriptions.length > 0) {
-            cf.moreDescriptions = fetchedComp.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "");
+          if (
+            Array.isArray(fetchedComp.moreDescriptions) &&
+            fetchedComp.moreDescriptions.length > 0
+          ) {
+            cf.moreDescriptions = fetchedComp.moreDescriptions
+              .slice(0, 5)
+              .map((v) => (v ?? "") + "");
+          }
+
+          if (
+            Array.isArray(fetchedComp.specialInstructions) &&
+            fetchedComp.specialInstructions.length > 0
+          ) {
+            cf.specialInstructions = fetchedComp.specialInstructions
+              .slice(0, 4)
+              .map((v) => (v ?? "") + "");
+          }
+
+          if (fetchedComp.mspData && typeof fetchedComp.mspData === "object") {
+            cf.mspData = fetchedComp.mspData;
           }
 
           nextComponentForms[i] = { ...makeEmptyPdState(), ...cf };
@@ -4975,7 +5032,7 @@ const onSelectComponent = (component, index) => {
   try {
     const idx = selectedComponentIndex.value;
     const cf = componentForms.value[idx] || makeEmptyPdState();
-    
+
     // Hydrate SO/WO values
     if (!cf.soValues?.some((v) => v) && !cf.woValues?.some((v) => v)) {
       emit("requestClearSoWo");
@@ -4985,12 +5042,12 @@ const onSelectComponent = (component, index) => {
         wo: Array.isArray(cf.woValues) ? cf.woValues : ["", "", "", "", ""],
       });
     }
-    
+
     // Hydrate moreDescriptions for the selected component - ALWAYS hydrate, even if empty
-    moreDescriptions.value = Array.isArray(cf.moreDescriptions) 
-      ? cf.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "")
+    moreDescriptions.value = Array.isArray(cf.moreDescriptions)
+      ? cf.moreDescriptions.slice(0, 5).map((v) => (v ?? "") + "")
       : ["", "", "", "", ""];
-    
+
     console.log("✅ Component selected - moreDescriptions hydrated:", {
       componentIndex: idx,
       componentName: component?.c_num,
@@ -5185,7 +5242,7 @@ const openSetupPd = () => {
     handHole.value = !!(cf.handHole ?? handHole.value);
     rotaryDCut.value = !!(cf.rotaryDCut ?? rotaryDCut.value);
     fullBlockPrint.value = !!(cf.fullBlockPrint ?? fullBlockPrint.value);
-    
+
     // Hydrate moreDescriptions from component form (always reflect selection)
     moreDescriptions.value = Array.isArray(cf.moreDescriptions)
       ? cf.moreDescriptions.slice(0, 5).map((v) => (v ?? "") + "")
@@ -5216,23 +5273,27 @@ watch([partNo, selectedProductDesign, pcsPerSet], () => {
 });
 
 // Persist moreDescriptions per component
-watch(moreDescriptions, () => {
-  if (selectedComponentIndex.value === null) return;
-  // Only persist edits while Setup PD modal is open, so closing/clearing doesn't wipe saved component data
-  if (!props.showSetupPdModal) return;
-  const idx = selectedComponentIndex.value;
-  const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
-  next.moreDescriptions = Array.isArray(moreDescriptions.value) 
-    ? moreDescriptions.value.slice(0, 5).map(v => (v ?? "") + "")
-    : ["", "", "", "", ""];
-  componentForms.value[idx] = next;
-  
-  console.log("💾 Persisting moreDescriptions for component:", {
-    componentIndex: idx,
-    componentName: localComponents.value[idx]?.c_num,
-    moreDescriptions: next.moreDescriptions,
-  });
-}, { deep: true });
+watch(
+  moreDescriptions,
+  () => {
+    if (selectedComponentIndex.value === null) return;
+    // Only persist edits while Setup PD modal is open, so closing/clearing doesn't wipe saved component data
+    if (!props.showSetupPdModal) return;
+    const idx = selectedComponentIndex.value;
+    const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
+    next.moreDescriptions = Array.isArray(moreDescriptions.value)
+      ? moreDescriptions.value.slice(0, 5).map((v) => (v ?? "") + "")
+      : ["", "", "", "", ""];
+    componentForms.value[idx] = next;
+
+    console.log("💾 Persisting moreDescriptions for component:", {
+      componentIndex: idx,
+      componentName: localComponents.value[idx]?.c_num,
+      moreDescriptions: next.moreDescriptions,
+    });
+  },
+  { deep: true }
+);
 
 // Hydrate moreDescriptions when component selection changes
 watch(selectedComponentIndex, (newIdx) => {
@@ -5241,10 +5302,10 @@ watch(selectedComponentIndex, (newIdx) => {
     const cf = componentForms.value[idx];
     if (cf) {
       // Always hydrate moreDescriptions from the selected component
-      moreDescriptions.value = Array.isArray(cf.moreDescriptions) 
-        ? cf.moreDescriptions.slice(0, 5).map(v => (v ?? "") + "")
+      moreDescriptions.value = Array.isArray(cf.moreDescriptions)
+        ? cf.moreDescriptions.slice(0, 5).map((v) => (v ?? "") + "")
         : ["", "", "", "", ""];
-      
+
       console.log("🔄 Component switched - moreDescriptions hydrated:", {
         componentIndex: idx,
         componentName: localComponents.value[idx]?.c_num,
@@ -5400,7 +5461,8 @@ const buildPdSetupPayload = () => {
     selectedWrappingCode: selectedWrappingCode.value,
     moreDescriptions: moreDescriptions.value,
     // MSP (Machine Selecting Procedure) data
-    mspData: mspData.value,
+    mspData:
+      componentForms.value[selectedComponentIndex.value ?? 0]?.mspData || mspData.value,
     // Calculated M2 and KG values
     mcGrossM2PerPcs: mcGrossM2PerPcs.value,
     mcNetM2PerPcs: mcNetM2PerPcs.value,
@@ -5426,7 +5488,13 @@ const buildPdSetupPayload = () => {
         "",
         "",
       ],
-      moreDescriptions: componentForms.value[idx]?.moreDescriptions || ["", "", "", "", ""],
+      moreDescriptions: componentForms.value[idx]?.moreDescriptions || [
+        "",
+        "",
+        "",
+        "",
+        "",
+      ],
     })),
   };
 };

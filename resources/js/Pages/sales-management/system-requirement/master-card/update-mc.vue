@@ -1103,7 +1103,7 @@ const saveSpecialInstructions = async (rows) => {
       return;
     }
 
-    const componentName = "Main";
+    const componentName = form.value.comp_no || "Main";
     const specialInstructions = Array.isArray(rows)
       ? rows.slice(0, 4).map((v) => (v ?? "") + "")
       : ["", "", "", ""];

@@ -379,188 +379,29 @@ const selectedRowIndex = ref(null);
 const machines = ref([]);
 
 // Initialize MSP rows (Steps 10-80, matching the image)
-const mspRows = ref([
-  {
-    step: 10,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 20,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 30,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 40,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 50,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 60,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 70,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 80,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 90,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 100,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 110,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-  {
-    step: 120,
-    mchCode: "",
-    machineName: "",
-    pDay: null,
-    noUp1: null,
-    noUp2: null,
-    setupMin: null,
-    setupAdjust: null,
-    netMin: null,
-    targetSpeed: null,
-    speedAdjust: null,
-    netSpeed: null,
-    specialInstruction: "",
-  },
-]);
+const createEmptyMspRow = (step) => ({
+  step,
+  mchCode: "",
+  machineName: "",
+  pDay: null,
+  noUp1: null,
+  noUp2: null,
+  setupMin: null,
+  setupAdjust: null,
+  netMin: null,
+  targetSpeed: null,
+  speedAdjust: null,
+  netSpeed: null,
+  specialInstruction: "",
+});
+
+const MSP_STEPS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+
+const mspRows = ref(MSP_STEPS.map((s) => createEmptyMspRow(s)));
+
+const resetMspRows = () => {
+  mspRows.value = MSP_STEPS.map((s) => createEmptyMspRow(s));
+};
 
 // Computed totals
 const totalAccumulated1 = computed(() => {
@@ -744,39 +585,69 @@ const close = () => {
 };
 
 // Load existing MSP data if provided
-watch(
-  () => props.existingMspData,
-  (newData) => {
-    if (newData && Object.keys(newData).length > 0) {
-      console.log("Loading existing MSP data:", newData);
-      // Load existing data into mspRows
-      for (let i = 1; i <= 12; i++) {
-        if (newData[`msp${i}_mch`]) {
-          // Find the row index (i-1 because array is 0-indexed)
-          const rowIndex = i - 1;
-          if (rowIndex < mspRows.value.length) {
-            mspRows.value[rowIndex].mchCode = newData[`msp${i}_mch`];
+const applyExistingMspData = (newData) => {
+  resetMspRows();
 
-            // Parse No/Up field
-            if (newData[`msp${i}_up`]) {
-              const upParts = String(newData[`msp${i}_up`]).split("/");
-              mspRows.value[rowIndex].noUp1 = upParts[0] ? parseInt(upParts[0]) : null;
-              mspRows.value[rowIndex].noUp2 = upParts[1] ? parseInt(upParts[1]) : null;
-            }
+  if (!newData || typeof newData !== "object") {
+    return;
+  }
 
-            // Load special instruction
-            if (newData[`msp${i}_special_inst`]) {
-              mspRows.value[rowIndex].specialInstruction =
-                newData[`msp${i}_special_inst`];
-            }
+  if (Array.isArray(newData.machines)) {
+    newData.machines.forEach((machine, idx) => {
+      const step = machine?.step ?? MSP_STEPS[idx];
+      const row = mspRows.value.find((r) => r.step === step) || mspRows.value[idx];
+      if (!row) return;
 
-            // Note: machineName will be loaded when we fetch machines
-          }
+      row.mchCode = (machine?.mchCode ?? "") + "";
+      row.machineName = (machine?.machineName ?? "") + "";
+
+      const noUpRaw = machine?.noUp ?? "";
+      const parts = String(noUpRaw).split("/");
+      row.noUp1 = parts[0] ? parseInt(parts[0]) : null;
+      row.noUp2 = parts[1] ? parseInt(parts[1]) : null;
+
+      row.specialInstruction = (machine?.specialInstruction ?? "") + "";
+    });
+    return;
+  }
+
+  for (let i = 1; i <= 12; i++) {
+    if (newData[`msp${i}_mch`]) {
+      const rowIndex = i - 1;
+      if (rowIndex < mspRows.value.length) {
+        mspRows.value[rowIndex].mchCode = newData[`msp${i}_mch`];
+
+        if (newData[`msp${i}_up`]) {
+          const upParts = String(newData[`msp${i}_up`]).split("/");
+          mspRows.value[rowIndex].noUp1 = upParts[0] ? parseInt(upParts[0]) : null;
+          mspRows.value[rowIndex].noUp2 = upParts[1] ? parseInt(upParts[1]) : null;
+        }
+
+        if (newData[`msp${i}_special_inst`]) {
+          mspRows.value[rowIndex].specialInstruction = newData[`msp${i}_special_inst`];
         }
       }
     }
+  }
+};
+
+watch(
+  () => props.show,
+  (val) => {
+    if (val) {
+      applyExistingMspData(props.existingMspData);
+    }
+  }
+);
+
+watch(
+  () => props.existingMspData,
+  (newData) => {
+    if (props.show) {
+      applyExistingMspData(newData);
+    }
   },
-  { immediate: true }
+  { deep: true }
 );
 
 // Fetch machines on mount
