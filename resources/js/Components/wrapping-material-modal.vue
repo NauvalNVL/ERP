@@ -22,12 +22,13 @@
                 </div>
 
                 <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96 flex-1 min-h-0">
-                    <table class="w-full divide-y divide-gray-200 table-fixed min-w-[480px] md:min-w-0">
+                    <table class="w-full divide-y divide-gray-200 table-fixed min-w-[640px] md:min-w-0">
                         <thead class="bg-gray-50 sticky top-0">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%] cursor-pointer" @click="toggleSort('code')">Code</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[57%] cursor-pointer" @click="toggleSort('name')">Name</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%] cursor-pointer" @click="toggleSort('name')">Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[32%] cursor-pointer" @click="toggleSort('description')">Description</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -36,7 +37,8 @@
                                 @click="selectRow(item)"
                                 @dblclick="selectAndClose(item)">
                                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[220px] md:max-w-none">{{ item.name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[160px] md:max-w-none">{{ item.name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate max-w-[200px] md:max-w-none">{{ item.description || '-' }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-left">
                                     <span
                                         :class="[
@@ -57,9 +59,10 @@
                     </table>
                 </div>
 
-                <div class="mt-4 grid grid-cols-3 gap-2">
+                <div class="mt-4 grid grid-cols-4 gap-2">
                     <button type="button" @click="toggleSort('code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg"><i class="fas fa-sort mr-1"></i>By Code</button>
                     <button type="button" @click="toggleSort('name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg"><i class="fas fa-sort mr-1"></i>By Name</button>
+                    <button type="button" @click="toggleSort('description')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg"><i class="fas fa-sort mr-1"></i>By Description</button>
                     <div class="flex gap-2">
                         <button type="button" @click="selectAndClose(selected)" class="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-xs rounded-lg"><i class="fas fa-edit mr-1"></i>Select</button>
                         <button type="button" @click="$emit('close')" class="flex-1 py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg"><i class="fas fa-times mr-1"></i>Exit</button>
@@ -90,7 +93,8 @@ const filteredItems = computed(() => {
     if (q) {
         list = list.filter(it =>
             (it.code || '').toLowerCase().includes(q) ||
-            (it.name || '').toLowerCase().includes(q)
+            (it.name || '').toLowerCase().includes(q) ||
+            (it.description || '').toLowerCase().includes(q)
         );
     }
 

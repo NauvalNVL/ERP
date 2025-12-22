@@ -62,7 +62,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th @click="sortTable('id')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
-                                        ID <i class="fas fa-sort ml-1"></i>
+                                        No <i class="fas fa-sort ml-1"></i>
                                     </th>
                                     <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
                                         Code <i class="fas fa-sort ml-1"></i>
@@ -271,7 +271,7 @@ const printTable = () => {
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['ID', 'Code', 'Description', 'Status']],
+            head: [['No', 'Code', 'Description', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',

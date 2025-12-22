@@ -100,25 +100,16 @@
                                 </div>
 
                                 <div class="p-4 bg-blue-50 rounded-lg">
-                                    <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Sizes</h4>
-                                    <div class="space-y-2 text-sm">
-                                        <div class="flex items-center">
-                                            <span class="w-6 h-6 flex items-center justify-center bg-orange-500 text-white rounded-full font-bold mr-2">5</span>
-                                            <span>5 MM</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <span class="w-6 h-6 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">7</span>
-                                            <span>7 MM</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">10</span>
-                                            <span>10 MM</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <span class="w-6 h-6 flex items-center justify-center bg-emerald-600 text-white rounded-full font-bold mr-2">12</span>
-                                            <span>12 MM</span>
+                                    <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Glueing</h4>
+                                    <div class="space-y-2 text-sm" v-if="commonGlueingNames.length">
+                                        <div v-for="(name, idx) in commonGlueingNames" :key="name + idx" class="flex items-center">
+                                            <span class="w-6 h-6 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">
+                                                {{ idx + 1 }}
+                                            </span>
+                                            <span>{{ name }}</span>
                                         </div>
                                     </div>
+                                    <div v-else class="text-sm text-gray-600">No glueing data available yet.</div>
                                 </div>
                             </div>
                         </div>
@@ -228,7 +219,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import glueingMaterialModal from '@/Components/glueing-material-modal.vue';
@@ -287,6 +278,13 @@ const editForm = ref({
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
+
+const commonGlueingNames = computed(() => {
+    return glueingMaterials.value
+        .map(item => item?.name)
+        .filter(name => !!name)
+        .slice(0, 4);
+});
 
 // Fetch Glueing Materials from API
 const fetchglueingMaterials = async () => {
