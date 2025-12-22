@@ -423,6 +423,7 @@
       :master-card="selectedSO ? { model: selectedSO.product } : null"
       :mc-components="mcComponentsForDesign"
       :read-only-quantity="selectedSO ? Number(selectedSO.setQuantity) > 0 : false"
+      :existing-component-data="productDesignComponentData"
       @close="showProductDesignModal = false"
       @save="handleProductDesignSave"
     />
@@ -483,6 +484,9 @@ import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue'
 import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue';
 import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue';
 
+const normalizeComponentKey = (label = '') =>
+  label.toString().replace(/\s+/g, '').toLowerCase();
+
 export default {
     name: 'AmendSO',
     components: {
@@ -515,10 +519,36 @@ export default {
             showDeliveryLocationModal: false,
             showDeliveryScheduleModal: false,
             selectedRowIndex: -1,
-            mcComponentsForDesign: []
+            mcComponentsForDesign: [],
+            productDesignComponentData: {}
         }
     },
     methods: {
+        assignComponentDataEntry(map, name, payload) {
+            if (!name) return;
+            map[name] = payload;
+            map[normalizeComponentKey(name)] = payload;
+        },
+        buildProductDesignComponentMap(soDetail) {
+            const map = {};
+            if (soDetail?.item_details) {
+                this.assignComponentDataEntry(map, 'Main', {
+                    unit: soDetail.item_details.unit || '',
+                    unitPrice: soDetail.item_details.unit_price ?? null
+                });
+            }
+            if (Array.isArray(soDetail?.fittings)) {
+                soDetail.fittings.forEach((fit, idx) => {
+                    if (idx > 8) return;
+                    const key = `Fit ${idx + 1}`;
+                    this.assignComponentDataEntry(map, key, {
+                        unit: fit.unit || '',
+                        unitPrice: fit.unit_price ?? null
+                    });
+                });
+            }
+            return map;
+        },
         openSalesOrderTableModal() {
             this.showSalesOrderTableModal = true;
             this.selectedRowIndex = -1;
@@ -639,6 +669,8 @@ export default {
                             _originalData: data
                         };
 
+                        this.productDesignComponentData = this.buildProductDesignComponentMap(data);
+
                         this.searchForm.soNumber = selectedOrder.soNumber;
                         this.searchPerformed = true;
                         this.showSalesOrderTableModal = false;
@@ -690,6 +722,19 @@ export default {
                 }
 
                 this.selectedSO.productDesignQuantities = componentQtyMap;
+
+                // Persist latest unit/unit price selections so reopening modal shows current data
+                if (Array.isArray(data.items)) {
+                    const updatedMap = { ...this.productDesignComponentData };
+                    data.items.forEach((item) => {
+                        if (!item?.name) return;
+                        this.assignComponentDataEntry(updatedMap, item.name, {
+                            unit: item.unit || '',
+                            unitPrice: item.unitPrice ?? null
+                        });
+                    });
+                    this.productDesignComponentData = updatedMap;
+                }
 
                 if (totalDesignQty > 0) {
                     this.selectedSO.mainQuantity = totalDesignQty;

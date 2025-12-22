@@ -281,11 +281,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Optional map from component name ("Main", "Fit 1", etc.) to existing SO data
+  existingComponentData: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const emit = defineEmits(["close", "save"]);
 
 const { success, error } = useToast();
+
+const normalizeComponentKey = (label = "") =>
+  label
+    .toString()
+    .replace(/\s+/g, "")
+    .toLowerCase();
 
 const normalizeDesignUnit = (unit) => {
   const u = String(unit || "")
@@ -395,7 +406,7 @@ const items = reactive([
     unitPrice: 3036.36,
     unit: "PCS",
     amount: 0,
-    hasComponent: false,
+    hasComponent: true,
   },
   {
     name: "Fit 1",
@@ -588,12 +599,9 @@ const hydrateFromMcComponents = () => {
     const comps = Array.isArray(props.mcComponents) ? props.mcComponents : [];
 
     items.forEach((item, index) => {
-      item.hasComponent = false;
-      if (index === 0) {
-        item.name = "Main";
-      } else {
-        item.name = `Fit ${index}`;
-      }
+      const isMain = index === 0;
+      item.hasComponent = isMain;
+      item.name = isMain ? "Main" : `Fit ${index}`;
       if (!item.hasComponent) {
         item.unit = "";
       }
@@ -833,6 +841,40 @@ const resetModalState = () => {
 
 defineExpose({ applyExternalQuantity, resetModalState });
 
+const applyExistingComponentData = () => {
+  const map = props.existingComponentData || {};
+  const hasData = map && Object.keys(map).length > 0;
+  if (!hasData) {
+    return;
+  }
+
+  items.forEach((item) => {
+    const entry =
+      map[item.name] ?? map[normalizeComponentKey(item.name)];
+    if (!entry) return;
+
+    item.hasComponent = true;
+    const isMain = normalizeComponentKey(item.name) === "main";
+
+    if (entry.unit) {
+      item.unit = normalizeDesignUnit(entry.unit);
+    }
+
+    if (
+      isMain &&
+      entry.unitPrice !== undefined &&
+      entry.unitPrice !== null
+    ) {
+      const price = Number(entry.unitPrice);
+      if (!isNaN(price)) {
+        item.unitPrice = price;
+      }
+    }
+  });
+
+  items.forEach(calculateAmount);
+};
+
 const saveDesign = () => {
   // Validate that at least main item has quantity and price
   const mainItem = items[0];
@@ -874,6 +916,7 @@ onMounted(() => {
 
   // Hydrate rows from MC components (Main, Fit1-9) when available
   hydrateFromMcComponents();
+  applyExistingComponentData();
 
   // Load master card data if available (fallback / default for Main)
   if (props.masterCard) {
@@ -912,6 +955,16 @@ watch(
   (newVal) => {
     console.log("mcComponents changed in ProductDesignScreenModal:", newVal);
     hydrateFromMcComponents();
+    applyExistingComponentData();
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.existingComponentData,
+  () => {
+    console.log("existingComponentData changed, applying overrides");
+    applyExistingComponentData();
   },
   { deep: true }
 );

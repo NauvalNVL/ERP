@@ -2332,6 +2332,7 @@ class SalesOrderController extends Controller
                 'pd' => $salesOrder->P_DESIGN ?? '',
                 'pcs' => $salesOrder->PER_SET ?? '1',
                 'unit' => $mainUnit,
+                'unit_price' => isset($mainSO->UNIT_PRICE) ? (float) $mainSO->UNIT_PRICE : null,
                 'order_qty' => $salesOrder->SO_QTY ?? '0',
                 'net_delivery' => '0',
                 'balance' => $salesOrder->SO_QTY ?? '0',
@@ -2438,6 +2439,7 @@ class SalesOrderController extends Controller
                             'design' => $componentRow->P_DESIGN ?? '',
                             'pcs' => $componentRow->PCS_SET ?? '',
                             'unit' => $componentUnit, // Use unit from SO table for this component
+                            'unit_price' => $componentSO && isset($componentSO->UNIT_PRICE) ? (float) $componentSO->UNIT_PRICE : null,
                             'part_number' => $componentRow->PART_NO ?? '',
                             // Add order, delivery, and balance per component
                             'order_qty' => $componentOrderQty,
