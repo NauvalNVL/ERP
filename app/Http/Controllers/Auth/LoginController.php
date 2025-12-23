@@ -58,7 +58,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'user_id' => 'Kredensial tidak valid',
+            'user_id' => 'Invalid Credentials',
         ]);
     }
 
