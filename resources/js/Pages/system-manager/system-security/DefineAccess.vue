@@ -1136,6 +1136,22 @@ export default {
                                     this.form.permissions[obsoleteKey] = true;
                                 }
                             });
+
+                            const sidebarRequiredPermissions = [
+                                'dashboard',
+                                'reactive_unobsolete_user',
+                                'define_machine',
+                                'obsolete_unobsolete_machine',
+                                'view_print_machine',
+                                'input_no_faktur',
+                                'export_to_coretax'
+                            ];
+
+                            sidebarRequiredPermissions.forEach((key) => {
+                                if (!permissionSet.has(key)) {
+                                    this.form.permissions[key] = true;
+                                }
+                            });
                         } finally {
                             // Use nextTick to ensure watchers don't fire on the immediate updates
                             this.$nextTick(() => {
