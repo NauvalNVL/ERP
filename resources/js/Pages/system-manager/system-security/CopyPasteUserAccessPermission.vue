@@ -263,14 +263,23 @@ export default {
                         official_name: user.official_name ?? user.officialName ?? userId,
                         official_title: user.official_title ?? user.officialTitle ?? ''
                     };
-                    this.showMessage('User found successfully', 'success');
+                    this.showMessage('Source user found successfully', 'success');
                 } else {
                     this.copyFromUser = null;
                     this.showMessage('User ID not found', 'error');
                 }
             } catch (error) {
                 console.error('Error searching user:', error);
-                this.showMessage('Error searching user', 'error');
+                this.copyFromUser = null;
+                const status = error?.response?.status;
+                const backendMsg = error?.response?.data?.message;
+                if (status === 403) {
+                    this.showMessage(backendMsg || 'This user is inactive or obsolete and cannot be used.', 'error');
+                } else if (status === 404) {
+                    this.showMessage('User ID not found.', 'error');
+                } else {
+                    this.showMessage('Error searching user', 'error');
+                }
             }
         },
         async searchPasteToUser() {
@@ -293,14 +302,23 @@ export default {
                         official_name: user.official_name ?? user.officialName ?? userId,
                         official_title: user.official_title ?? user.officialTitle ?? ''
                     };
-                    this.showMessage('User found successfully', 'success');
+                    this.showMessage('Target user found successfully', 'success');
                 } else {
                     this.pasteToUser = null;
                     this.showMessage('User ID not found', 'error');
                 }
             } catch (error) {
                 console.error('Error searching user:', error);
-                this.showMessage('Error searching user', 'error');
+                this.pasteToUser = null;
+                const status = error?.response?.status;
+                const backendMsg = error?.response?.data?.message;
+                if (status === 403) {
+                    this.showMessage(backendMsg || 'This user is inactive or obsolete and cannot be used.', 'error');
+                } else if (status === 404) {
+                    this.showMessage('User ID not found.', 'error');
+                } else {
+                    this.showMessage('Error searching user', 'error');
+                }
             }
         },
         async confirmPaste() {

@@ -142,22 +142,28 @@
                                         <div class="flex justify-end gap-1.5">
                                             <Link
                                                 :href="`/user/${user.user_id}/edit`"
-                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
-                                                title="Edit User"
+                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
+                                                :class="{ 'pointer-events-none opacity-60': !isActive(user) }"
+                                                :aria-disabled="!isActive(user)"
+                                                :title="isActive(user) ? 'Edit User' : inactiveTitle('edit user')"
                                             >
                                                 <PencilIcon class="h-4 w-4" />
                                             </Link>
                                             <Link
                                                 :href="`/system-security/amend-password?search_user_id=${user.user_id}`"
-                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600"
-                                                title="Change Password"
+                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
+                                                :class="{ 'pointer-events-none opacity-60': !isActive(user) }"
+                                                :aria-disabled="!isActive(user)"
+                                                :title="isActive(user) ? 'Change Password' : inactiveTitle('change password')"
                                             >
                                                 <KeyIcon class="h-4 w-4" />
                                             </Link>
                                             <Link
-                                                href="/system-security/define-access"
-                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-purple-50 hover:text-purple-600"
-                                                title="Define Access"
+                                                :href="isActive(user) ? `/system-security/define-access?search_user_id=${user.user_id}` : '#'"
+                                                class="inline-flex items-center justify-center rounded border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-purple-50 hover:text-purple-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
+                                                :class="{ 'pointer-events-none opacity-60': !isActive(user) }"
+                                                :aria-disabled="!isActive(user)"
+                                                :title="isActive(user) ? 'Define Access' : inactiveTitle('update access')"
                                             >
                                                 <LockClosedIcon class="h-4 w-4" />
                                             </Link>
@@ -277,6 +283,14 @@ export default {
                     (user.official_name && user.official_name.toLowerCase().includes(query))
                 );
             });
+        }
+    },
+    methods: {
+        isActive(user) {
+            return user.status === 'A';
+        },
+        inactiveTitle(action) {
+            return `Inactive users cannot ${action}. Please reactive the user first.`;
         }
     }
 }

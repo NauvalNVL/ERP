@@ -24,8 +24,8 @@
                 style="height: 4rem"
             >
                 <div class="px-4 sm:px-6 lg:px-8">
-                    <div class="flex items-center justify-between h-16">
-                        <div class="flex items-center min-w-0">
+                    <div class="flex items-center justify-between h-16 gap-3 flex-wrap sm:flex-nowrap">
+                        <div class="flex items-center min-w-0 gap-2 flex-shrink">
                             <button
                                 @click="toggleSidebar"
                                 class="p-2 -ml-2 mr-2 text-gray-500 rounded-full lg:hidden hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-300"
@@ -55,7 +55,7 @@
                         </div>
                         <!-- Header Search -->
                         <div
-                            class="hidden md:flex items-center w-full max-w-md ml-4 relative"
+                            class="flex items-center flex-1 min-w-[180px] w-full sm:max-w-md sm:ml-4 relative"
                             ref="searchContainer"
                         >
                             <div class="relative flex-1">
