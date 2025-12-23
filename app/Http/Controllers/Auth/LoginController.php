@@ -32,12 +32,12 @@ class LoginController extends Controller
             if (Auth::attempt($credentials, $request->remember)) {
                 $user = Auth::user();
 
-                // Cegah login jika status user tidak aktif/obsolete
+                // Prevent login if user status is inactive/obsolete
                 if ($user && $user->status !== 'A') {
                     Auth::logout();
 
                     return back()->withErrors([
-                        'user_id' => 'User tidak aktif/obsolete dan tidak dapat login. Silakan hubungi administrator.',
+                        'user_id' => 'Inactive or obsolete users cannot sign in. Please contact the administrator.',
                     ]);
                 }
 
@@ -54,7 +54,7 @@ class LoginController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Login error: '.$e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan sistem');
+            return back()->with('error', 'A system error occurred. Please try again later.');
         }
 
         return back()->withErrors([
