@@ -26,7 +26,7 @@ class UserController extends Controller
             return view('system-security/create');
         } catch (\Exception $e) {
             Log::error('Error in UserController@create: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat membuka form create');
+            return back()->with('error', 'An error occurred while opening the create form.');
         }
     }
 
@@ -66,14 +66,14 @@ class UserController extends Controller
             DB::commit();
 
             return redirect()->route('vue.system-security.index')
-                ->with('success', 'User '.$user->userID.' berhasil dibuat');
+                ->with('success', 'User '.$user->userID.' created successfully.');
 
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error creating user: '.$e->getMessage());
             return back()
                 ->withInput()
-                ->with('error', 'Gagal membuat user: '.$e->getMessage());
+                ->with('error', 'Failed to create user: '.$e->getMessage());
         }
     }
 
@@ -83,7 +83,7 @@ class UserController extends Controller
             return view('system-security/edit', compact('user'));
         } catch (\Exception $e) {
             Log::error('Error in UserController@edit: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat membuka form edit');
+            return back()->with('error', 'An error occurred while opening the edit form.');
         }
     }
 
@@ -152,12 +152,12 @@ class UserController extends Controller
             $user->update($updateData);
 
             return redirect()->route('vue.system-security.index')
-                ->with('success', 'User berhasil diperbarui');
+                ->with('success', 'User updated successfully.');
 
         } catch (\Exception $e) {
             Log::error('Error updating user: '.$e->getMessage());
             return back()->withInput()
-                ->with('error', 'Gagal memperbarui user. Silakan coba lagi.');
+                ->with('error', 'Failed to update user. Please try again.');
         }
     }
 
@@ -165,7 +165,7 @@ class UserController extends Controller
     {
         // Delete user is no longer allowed. Status should be managed via Reactive/Unobsolete User menu.
         return redirect()->route('vue.system-security.index')
-            ->with('error', 'Fungsi delete user sudah tidak digunakan. Silakan gunakan menu Reactive/Unobsolete User.');
+            ->with('error', 'Delete user function is no longer available. Please use the Reactive/Unobsolete User menu.');
     }
 
     public function showAmendForm(Request $request)
@@ -178,7 +178,7 @@ class UserController extends Controller
             if(!$user) {
                 return redirect()->route('users.amend-password')
                     ->withInput()
-                    ->with('error', 'User ID tidak ditemukan');
+                    ->with('error', 'User ID not found.');
             }
         }
 
@@ -199,12 +199,12 @@ class UserController extends Controller
             $user->updatePassword($request->new_password, 90);
 
             return redirect()->route('vue.system-security.amend-password')
-                ->with('success', 'Password berhasil diperbarui untuk user: '.$user->userID);
+                ->with('success', 'Password successfully updated for user: '.$user->userID);
         } catch (\Exception $e) {
             Log::error('Password update error: '.$e->getMessage());
             return back()
                 ->withInput()
-                ->with('error', 'Gagal memperbarui password: '.$e->getMessage());
+                ->with('error', 'Failed to update password: '.$e->getMessage());
         }
     }
 
@@ -358,14 +358,14 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Permissions berhasil disalin untuk user: ' . $user->userID
+                'message' => 'Permissions copied successfully for user: ' . $user->userID
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error copying permissions: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyalin permissions: ' . $e->getMessage()
+                'message' => 'Failed to copy permissions: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -403,7 +403,7 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Permissions berhasil disalin dari ' . $validated['from_user_id'] . ' ke ' . $validated['to_user_id'],
+                'message' => 'Permissions copied from ' . $validated['from_user_id'] . ' to ' . $validated['to_user_id'],
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -411,7 +411,7 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyalin permissions: ' . $e->getMessage(),
+                'message' => 'Failed to copy permissions: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -428,6 +428,14 @@ class UserController extends Controller
 
             if (!$user) {
                 return response()->json(['user' => null, 'permissions' => []], 404);
+            }
+
+            if ($user->status !== 'A') {
+                return response()->json([
+                    'user' => $user,
+                    'permissions' => [],
+                    'message' => 'This user is inactive/obsolete and cannot access Define User Access Permission.'
+                ], 403);
             }
 
             // Get user's current permissions
@@ -455,6 +463,22 @@ class UserController extends Controller
 
         try {
             DB::beginTransaction();
+
+            $user = UserCps::where('userID', $userId)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            if ($user->status !== 'A') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot update permissions for inactive or obsolete users.'
+                ], 422);
+            }
 
             // Delete existing permissions
             UserPermission::where('user_id', $userId)->delete();
@@ -491,7 +515,7 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Permissions berhasil diperbarui untuk user: ' . $userId
+                'message' => 'Permissions updated successfully for user: ' . $userId
             ]);
 
         } catch (\Exception $e) {
@@ -499,7 +523,7 @@ class UserController extends Controller
             Log::error('Error updating user permissions: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal memperbarui permissions: ' . $e->getMessage()
+                'message' => 'Failed to update permissions: ' . $e->getMessage()
             ], 500);
         }
     }

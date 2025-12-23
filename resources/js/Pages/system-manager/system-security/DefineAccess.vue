@@ -1087,6 +1087,15 @@ export default {
                     }
                 });
 
+                if (response.status === 403) {
+                    const errorData = await response.json();
+                    this.foundUser = null;
+                    this.searchMessage = errorData.message || 'Inactive or obsolete users cannot access this menu.';
+                    this.searchMessageType = 'error';
+                    this.searchMessageIcon = ExclamationCircleIcon;
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (response.ok && data.user) {
