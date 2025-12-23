@@ -451,6 +451,7 @@
                 <SalespersonModal
                     :show="showSalespersonModal"
                     :salespersons="salespersons"
+                    :loading="salespersonLoading"
                     @close="showSalespersonModal = false"
                     @select="selectSalesperson"
                 />
@@ -563,6 +564,7 @@ export default {
         return {
             showSalespersonModal: false,
             salespersons: [],
+            salespersonLoading: false,
             form: this.$inertia.form({
                 user_id: '',
                 username: '',
@@ -605,11 +607,15 @@ export default {
     },
     methods: {
         async openSalespersonModal() {
+            this.showSalespersonModal = true;
+            if (this.salespersons.length > 0) {
+                return;
+            }
+
+            this.salespersonLoading = true;
             try {
-                // Fetch salespersons data from the server
                 const response = await axios.get('/api/salespersons');
                 this.salespersons = response.data;
-                this.showSalespersonModal = true;
             } catch (error) {
                 console.error('Error fetching salespersons:', error);
                 Swal.fire({
@@ -627,6 +633,8 @@ export default {
                         confirmButton: 'px-6 py-2 rounded-lg'
                     },
                 });
+            } finally {
+                this.salespersonLoading = false;
             }
         },
         selectSalesperson(salesperson) {
