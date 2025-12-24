@@ -75,3 +75,6 @@ git clone https://github.com/NauvalNVL/ERP.git
 cd ERP
 test
 bahlil etanol
+
+php artisan bahlil etanol
+npm run rabowo
