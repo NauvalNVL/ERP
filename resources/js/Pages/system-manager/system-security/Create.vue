@@ -608,7 +608,9 @@ export default {
     methods: {
         async openSalespersonModal() {
             this.showSalespersonModal = true;
-            if (this.salespersons.length > 0) {
+
+            // Avoid duplicate fetches if one is already running
+            if (this.salespersonLoading) {
                 return;
             }
 

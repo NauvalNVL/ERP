@@ -631,7 +631,8 @@ export default {
     methods: {
         async openSalespersonModal() {
             this.showSalespersonModal = true;
-            if (this.salespersons.length > 0) {
+
+            if (this.salespersonLoading) {
                 return;
             }
 
