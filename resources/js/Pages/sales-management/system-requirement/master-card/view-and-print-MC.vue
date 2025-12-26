@@ -201,46 +201,46 @@
           <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white">
               <!-- Table Content -->
-              <table class="min-w-full divide-y divide-gray-200">
+              <table class="min-w-full border-collapse">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th @click="sortTable('mc_seq')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('mc_seq')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>MC Seq#</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortTable('comp')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('comp')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Comp</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortTable('mc_model')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('mc_model')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>MC Model</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortTable('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Customer</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Product Design</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Status</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors">
+                    <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider cursor-pointer hover:bg-indigo-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Last Updated</span>
                         <i class="fas fa-sort ml-1"></i>
@@ -248,9 +248,9 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white">
                   <tr v-if="loading" class="hover:bg-gray-50">
-                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                       <div class="flex justify-center">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
                       </div>
@@ -258,7 +258,7 @@
                     </td>
                   </tr>
                   <tr v-else-if="filteredMasterCards.length === 0" class="hover:bg-gray-50">
-                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                       <span v-if="!form.customer_code">Please select a customer first.</span>
                       <span v-else>No master cards found.</span>
                     </td>
@@ -266,22 +266,22 @@
                   <tr v-for="(card, index) in filteredMasterCards" :key="card.id"
                     :class="{'bg-gray-50': index % 2 === 0}"
                     class="hover:bg-indigo-50 transition-colors duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                       <div class="text-sm font-medium text-gray-900">{{ card.mc_seq }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">{{ card.comp || '-' }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">{{ card.mc_model }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">{{ card.customer_name }}</div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 border border-gray-200">
                       <div class="text-sm text-gray-900">{{ card.description || '-' }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                       <span
                         class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
                         :class="{
@@ -297,7 +297,7 @@
                         {{ card.status === 'active' ? 'Active' : 'Obsolete' }}
                       </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900 flex items-center">
                         <i class="fas fa-clock text-indigo-400 mr-2"></i>
                         {{ formatDate(card.updated_at) }}
