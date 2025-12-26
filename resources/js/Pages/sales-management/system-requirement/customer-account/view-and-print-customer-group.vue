@@ -136,16 +136,16 @@
           <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white">
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full border-collapse">
                 <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
                         <tr>
-                    <th @click="sortTable('group_code')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <th @click="sortTable('group_code')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Group Code</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
-                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200">
                       <div class="flex items-center">
                         <span>Description</span>
                         <i class="fas fa-sort ml-1"></i>
@@ -153,9 +153,9 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="2" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -163,7 +163,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredCustomerGroups.length === 0" class="hover:bg-gray-50">
-                            <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="2" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                       <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-300 mb-2"></i>
                         <p class="text-lg font-medium">No customer groups found</p>
@@ -177,10 +177,10 @@
                         <tr v-for="(group, index) in filteredCustomerGroups" :key="group.group_code"
                             :class="{'bg-blue-50': index % 2 === 0}"
                       class="hover:bg-blue-100 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                                 <div class="text-sm font-medium text-gray-900">{{ group.group_code }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                                 <div class="text-sm text-gray-900">{{ group.description }}</div>
                             </td>
                         </tr>
