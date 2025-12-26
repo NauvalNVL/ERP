@@ -58,44 +58,44 @@
                         </div>
 
                         <!-- Table Content -->
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full border-collapse">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th @click="sortTable('Flute')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('Flute')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Flute <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('Descr')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('Descr')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Description <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('DB')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('DB')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         DB <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('B')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('B')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         B <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('_1L')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('_1L')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         1L <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('A_C_E')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('A_C_E')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         A/C/E <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('_2L')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('_2L')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         2L <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('Height')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('Height')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Height <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('Starch')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('Starch')" class="px-3 py-3 text-right text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Starch <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('status')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('status')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Status <i class="fas fa-sort ml-1"></i>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white">
                                 <tr v-if="loading" class="hover:bg-gray-50">
-                                    <td colspan="10" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="10" class="px-3 py-4 text-center text-gray-500 border border-gray-200">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -103,7 +103,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredPaperFlutes.length === 0" class="hover:bg-gray-50">
-                                    <td colspan="10" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="10" class="px-3 py-4 text-center text-gray-500 border border-gray-200">
                                         No paper flutes found. 
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -114,34 +114,34 @@
                                 <tr v-for="(flute, index) in filteredPaperFlutes" :key="flute.Flute" 
                                     :class="{'bg-emerald-50': index % 2 === 0}" 
                                     class="hover:bg-emerald-100">
-                                    <td class="px-3 py-4 whitespace-nowrap">
+                                    <td class="px-3 py-4 whitespace-nowrap border border-gray-200">
                                         <div class="text-sm font-medium text-gray-900">{{ flute.Flute }}</div>
                                     </td>
-                                    <td class="px-3 py-4">
+                                    <td class="px-3 py-4 border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ flute.Descr }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute.DB) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute.B) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute._1L) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute.A_C_E) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute._2L) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute.Height) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-right">
+                                    <td class="px-3 py-4 whitespace-nowrap text-right border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ formatNumber(flute.Starch) }}</div>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap">
+                                    <td class="px-3 py-4 whitespace-nowrap border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ getStatusValue(flute) }}</div>
                                     </td>
                                 </tr>

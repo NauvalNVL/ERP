@@ -58,38 +58,38 @@
         </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full border-collapse">
                     <thead class="bg-gray-50">
                     <tr>
-                            <th @click="sortTable('code')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('code')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Code <i :class="getSortIcon('code')"></i>
                         </th>
-                            <th @click="sortTable('name')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('name')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Name <i :class="getSortIcon('name')"></i>
                         </th>
-                            <th @click="sortTable('grup')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('grup')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Group <i :class="getSortIcon('grup')"></i>
                         </th>
-                            <th @click="sortTable('code_grup')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('code_grup')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Code Group <i :class="getSortIcon('code_grup')"></i>
                         </th>
-                            <th @click="sortTable('target_sales')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('target_sales')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Target Sales <i :class="getSortIcon('target_sales')"></i>
                         </th>
-                            <th @click="sortTable('internal')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('internal')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Internal <i :class="getSortIcon('internal')"></i>
                         </th>
-                            <th @click="sortTable('email')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('email')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Email <i :class="getSortIcon('email')"></i>
                         </th>
-                            <th @click="sortTable('status')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('status')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200">
                             Status <i :class="getSortIcon('status')"></i>
                         </th>
                     </tr>
                 </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
@@ -97,7 +97,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredSalespersons.length === 0" class="hover:bg-gray-50">
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                                 No salespersons found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -108,14 +108,14 @@
                         <tr v-for="(person, index) in filteredSalespersons" :key="person.code"
                             :class="{'bg-emerald-50': index % 2 === 0}"
                             class="hover:bg-emerald-100">
-                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">{{ person.code || 'N/A' }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.name || 'N/A' }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.grup || '-' }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.code_grup || '-' }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-right">{{ formatTargetSales(person.target_sales) }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.internal || '-' }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.email || '-' }}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm">
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium border border-gray-200">{{ person.code || 'N/A' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm border border-gray-200">{{ person.name || 'N/A' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm border border-gray-200">{{ person.grup || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm border border-gray-200">{{ person.code_grup || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-right border border-gray-200">{{ formatTargetSales(person.target_sales) }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm border border-gray-200">{{ person.internal || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm border border-gray-200">{{ person.email || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm border border-gray-200">
                                 <span :class="getStatusClass(person.status)">{{ person.status || 'N/A' }}</span>
                             </td>
                     </tr>
