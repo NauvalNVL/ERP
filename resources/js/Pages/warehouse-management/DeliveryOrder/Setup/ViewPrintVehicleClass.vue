@@ -4,11 +4,11 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto space-y-4">
         <!-- Header -->
-        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700">
+        <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm rounded-xl border border-indigo-700">
           <div class="flex items-center justify-between px-4 py-3 sm:px-6">
             <div class="flex items-center gap-3">
               <div
-                class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center"
+                class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center shadow-inner"
               >
                 <i class="fas fa-clipboard-list text-lg"></i>
               </div>
@@ -16,12 +16,12 @@
                 <h1 class="text-lg sm:text-xl font-semibold">
                   View & Print Vehicle Classes
                 </h1>
-                <p class="text-xs sm:text-sm text-blue-100">
+                <p class="text-xs sm:text-sm text-indigo-100">
                   Export vehicle class definitions
                 </p>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-2 text-xs text-blue-100">
+            <div class="hidden sm:flex items-center gap-2 text-xs text-indigo-100">
               <i class="fas fa-info-circle"></i>
               <span>Export vehicle classes to PDF.</span>
             </div>
@@ -31,7 +31,7 @@
         <!-- Report Information -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
           <div class="flex items-center mb-4 pb-3 border-b border-gray-100">
-            <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
+            <div class="p-2.5 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
               <i class="fas fa-info-circle"></i>
             </div>
             <div>
@@ -60,7 +60,7 @@
           <div class="flex items-center gap-2 mt-4">
             <button
               @click="exportToPDF"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              class="px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-sm hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transition-all"
             >
               <i class="fas fa-file-pdf"></i>
               Export PDF
@@ -71,7 +71,7 @@
         <!-- Vehicle Classes Report Table -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="flex items-center mb-4 pb-3 border-b border-gray-100 px-6 pt-6">
-            <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
+            <div class="p-2.5 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
               <i class="fas fa-table"></i>
             </div>
             <div>
@@ -85,39 +85,39 @@
           </div>
 
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full border-collapse border border-gray-200">
+              <thead class="bg-slate-50">
                 <tr>
                   <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200"
                   >
                     No.
                   </th>
                   <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200"
                   >
                     Vehicle Class Code
                   </th>
                   <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200"
                   >
                     Description
                   </th>
                   <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200"
                   >
                     Created Date
                   </th>
                   <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200"
                   >
                     Updated Date
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-white">
                 <tr v-if="loading" class="animate-pulse">
-                  <td colspan="5" class="px-6 py-4 text-center">
+                  <td colspan="5" class="px-6 py-4 text-center border border-gray-200">
                     <div class="flex items-center justify-center">
                       <svg
                         class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600"
@@ -144,7 +144,7 @@
                   </td>
                 </tr>
                 <tr v-else-if="vehicleClasses.length === 0" class="text-center">
-                  <td colspan="5" class="px-6 py-8 text-gray-500">
+                  <td colspan="5" class="px-6 py-8 text-gray-500 border border-gray-200">
                     <div class="flex flex-col items-center">
                       <svg
                         class="w-12 h-12 text-gray-300 mb-4"
@@ -172,25 +172,25 @@
                   :key="vehicleClass.id"
                   class="hover:bg-gray-50 transition-colors"
                 >
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                     {{ index + 1 }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                     <div class="text-sm font-medium text-gray-900">
                       {{ vehicleClass.VEHICLE_CLASS_CODE }}
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                     <div class="text-sm text-gray-900">
                       {{ vehicleClass.DESCRIPTION }}
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                     <div class="text-sm text-gray-900">
                       {{ formatDate(vehicleClass.created_at) }}
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                     <div class="text-sm text-gray-900">
                       {{ formatDate(vehicleClass.updated_at) }}
                     </div>

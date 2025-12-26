@@ -4,18 +4,18 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto space-y-4">
         <!-- Header -->
-        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700">
+        <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm rounded-xl border border-indigo-700">
           <div class="flex items-center justify-between px-4 py-3 sm:px-6">
             <div class="flex items-center gap-3">
-              <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center">
+              <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
                 <i class="fas fa-truck text-lg"></i>
               </div>
               <div>
                 <h1 class="text-lg sm:text-xl font-semibold">Define Vehicle</h1>
-                <p class="text-xs sm:text-sm text-blue-100">Manage vehicle information and driver details</p>
+                <p class="text-xs sm:text-sm text-indigo-100">Manage vehicle information and driver details</p>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-2 text-xs text-blue-100">
+            <div class="hidden sm:flex items-center gap-2 text-xs text-indigo-100">
               <i class="fas fa-info-circle"></i>
               <span>Search existing vehicles or add a new one.</span>
             </div>
@@ -28,7 +28,7 @@
           <div class="lg:col-span-2">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
               <div class="flex items-center mb-4 pb-3 border-b border-gray-100">
-                <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
+                <div class="p-2.5 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
                   <i class="fas fa-edit"></i>
                 </div>
                 <div>
@@ -41,20 +41,20 @@
                 <div class="md:col-span-2">
                   <label class="block text-sm font-semibold text-gray-700 mb-1">Vehicle #</label>
                   <div class="relative flex">
-                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500">
+                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-indigo-200 bg-indigo-50 text-indigo-600">
                       <i class="fas fa-truck"></i>
                     </span>
                     <input
                       v-model="searchQuery"
                       type="text"
                       placeholder="Search or type vehicle number"
-                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 text-sm sm:text-base transition-colors"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400 text-sm sm:text-base transition-colors"
                       @input="debouncedSearch"
                     />
                     <button
                       type="button"
                       @click="showVehicleModal = true"
-                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-lg text-sm transition-colors transform active:translate-y-px"
+                      class="inline-flex items-center px-3 py-2 border border-l-0 border-indigo-500 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white rounded-r-lg text-sm transition-all transform active:translate-y-px shadow-sm"
                     >
                       <i class="fas fa-table"></i>
                     </button>
@@ -66,7 +66,7 @@
                     <button
                       type="button"
                       @click="openAddModal"
-                      class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"
+                      class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-sm hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transition-all"
                     >
                       <i class="fas fa-plus-circle"></i>
                       Add New
@@ -83,10 +83,10 @@
           <div class="space-y-4">
             <div class="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-5">
               <div class="flex items-center mb-3 pb-2 border-b border-blue-100">
-                <div class="p-2.5 bg-blue-500 rounded-lg mr-3">
-                  <i class="fas fa-info-circle text-white"></i>
+                <div class="p-2.5 rounded-lg mr-3 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm">
+                  <i class="fas fa-info-circle"></i>
                 </div>
-                <h3 class="text-sm sm:text-base font-semibold text-blue-900">Vehicle Information</h3>
+                <h3 class="text-sm sm:text-base font-semibold text-indigo-900">Vehicle Information</h3>
               </div>
               <div class="space-y-2 text-xs sm:text-sm text-gray-600">
                 <ul class="list-disc pl-5 space-y-1">
@@ -501,15 +501,31 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
-import { useToast } from '@/Composables/useToast'
+import { Head } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import VehicleTableModal from '@/Components/VehicleTableModal.vue'
 import VehicleClassTableModal from '@/Components/VehicleClassTableModal.vue'
 // Updated to Heroicons v2
 import { ArrowPathIcon as RefreshIcon } from '@heroicons/vue/24/outline'
 
-const { addToast } = useToast()
+const showSuccessAlert = (message = 'Action completed successfully') => {
+  Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: message,
+    timer: 1800,
+    showConfirmButton: false
+  })
+}
+
+const showErrorAlert = (message = 'Something went wrong') => {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: message
+  })
+}
 
 // Reactive data
 const vehicles = ref([])
@@ -631,12 +647,12 @@ const fetchVehicles = async () => {
       pagination.value = paginator
       vehicleClasses.value = data.vehicle_classes ?? vehicleClasses.value
     } else {
-      addToast('Error fetching vehicles' + (data?.message ? `: ${data.message}` : ''), 'error')
+      showErrorAlert('Error fetching vehicles' + (data?.message ? `: ${data.message}` : ''))
       vehicles.value = []
       pagination.value = { current_page: 1, last_page: 1, from: 0, to: 0, total: 0 }
     }
   } catch (error) {
-    addToast('Error fetching vehicles: ' + (error?.message || error), 'error')
+    showErrorAlert('Error fetching vehicles: ' + (error?.message || error))
     vehicles.value = []
     pagination.value = { current_page: 1, last_page: 1, from: 0, to: 0, total: 0 }
   } finally {
@@ -743,23 +759,31 @@ const saveVehicle = async () => {
     const data = await response.json()
 
     if (data.success) {
-      addToast(data.message, 'success')
+      showSuccessAlert(data.message || 'Vehicle saved successfully')
       closeModal()
       await fetchVehicles()
     } else {
-      addToast(data.message || 'Error saving vehicle', 'error')
+      showErrorAlert(data.message || 'Error saving vehicle')
     }
   } catch (error) {
-    addToast('Error saving vehicle: ' + (error?.message || error), 'error')
+    showErrorAlert('Error saving vehicle: ' + (error?.message || error))
   } finally {
     saving.value = false
   }
 }
 
 const deleteVehicle = async (vehicle, fromModal = false) => {
-  if (!confirm(`Are you sure you want to obsolete vehicle ${vehicle.VEHICLE_NO}?`)) {
-    return
-  }
+  const result = await Swal.fire({
+    title: 'Obsolete vehicle?',
+    text: `Vehicle ${vehicle.VEHICLE_NO} will be marked obsolete.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#2563eb',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, continue'
+  })
+
+  if (!result.isConfirmed) return
 
   try {
     const response = await fetch(buildApiUrl(`/vehicles/${vehicle.id}/status`), {
@@ -785,13 +809,13 @@ const deleteVehicle = async (vehicle, fromModal = false) => {
       throw new Error(data?.message || 'Unknown error from server')
     }
 
-    addToast(`Vehicle ${vehicle.VEHICLE_NO} obsoleted successfully`, 'success')
+    showSuccessAlert(`Vehicle ${vehicle.VEHICLE_NO} obsoleted successfully`)
     if (fromModal) {
       closeModal()
     }
     await fetchVehicles()
   } catch (error) {
-    addToast('Error obsoleting vehicle: ' + (error?.message || error), 'error')
+    showErrorAlert('Error obsoleting vehicle: ' + (error?.message || error))
   }
 }
 

@@ -4,18 +4,18 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto space-y-4">
         <!-- Header -->
-        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700">
+        <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm rounded-xl border border-indigo-700">
           <div class="flex items-center justify-between px-4 py-3 sm:px-6">
             <div class="flex items-center gap-3">
-              <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center">
+              <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
                 <i class="fas fa-truck text-lg"></i>
               </div>
               <div>
                 <h1 class="text-lg sm:text-xl font-semibold">View & Print Vehicle</h1>
-                <p class="text-xs sm:text-sm text-blue-100">Filter and export vehicle information</p>
+                <p class="text-xs sm:text-sm text-indigo-100">Filter and export vehicle information</p>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-2 text-xs text-blue-100">
+            <div class="hidden sm:flex items-center gap-2 text-xs text-indigo-100">
               <i class="fas fa-info-circle"></i>
               <span>Search vehicles and export to PDF.</span>
             </div>
@@ -23,9 +23,9 @@
         </div>
 
         <!-- Filter Section -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
+        <div class="bg-white rounded-xlshadow-sm border border-gray-200 p-4 sm:p-5">
           <div class="flex items-center mb-4 pb-3 border-b border-gray-100">
-            <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
+            <div class="p-2.5 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
               <i class="fas fa-filter"></i>
             </div>
             <div>
@@ -41,7 +41,7 @@
                 v-model="filters.search"
                 type="text"
                 placeholder="Search vehicles..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 @input="debouncedSearch"
               />
             </div>
@@ -52,7 +52,7 @@
               <select
                 v-model="filters.status"
                 @change="fetchVehicles"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">All Status</option>
                 <option value="A">Active</option>
@@ -66,7 +66,7 @@
               <select
                 v-model="filters.company"
                 @change="fetchVehicles"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">All Companies</option>
                 <option value="KIM">KIM</option>
@@ -83,7 +83,7 @@
               <select
                 v-model="filters.vehicleClass"
                 @change="fetchVehicles"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">All Classes</option>
                 <option
@@ -98,24 +98,24 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex items-center gap-2 mt-4">
+          <div class="flex flex-wrap items-center gap-2 mt-4">
             <button
               @click="fetchVehicles"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              class="px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-sm hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transition-all"
             >
               <i class="fas fa-search"></i>
               Search
             </button>
             <button
               @click="exportToPDF"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
             >
               <i class="fas fa-file-pdf"></i>
               Export PDF
             </button>
             <button
               @click="clearFilters"
-              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors border border-gray-300"
             >
               <i class="fas fa-times"></i>
               Clear Filters
@@ -128,7 +128,9 @@
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <i class="fas fa-truck text-blue-500 text-2xl"></i>
+                <div class="p-2 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm">
+                  <i class="fas fa-truck"></i>
+                </div>
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-500">Total Vehicles</p>
@@ -140,7 +142,9 @@
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                <div class="p-2 rounded-full bg-emerald-100 text-emerald-600">
+                  <i class="fas fa-check-circle"></i>
+                </div>
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-500">Active Vehicles</p>
@@ -152,7 +156,9 @@
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <i class="fas fa-times-circle text-red-500 text-2xl"></i>
+                <div class="p-2 rounded-full bg-rose-100 text-rose-600">
+                  <i class="fas fa-times-circle"></i>
+                </div>
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-500">Obsolete Vehicles</p>
@@ -164,7 +170,9 @@
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <i class="fas fa-users text-purple-500 text-2xl"></i>
+                <div class="p-2 rounded-full bg-purple-100 text-purple-600">
+                  <i class="fas fa-users"></i>
+                </div>
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-500">Total Drivers</p>
@@ -177,7 +185,7 @@
         <!-- Vehicle Report Table -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="flex items-center mb-4 pb-3 border-b border-gray-100 px-6 pt-6">
-            <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
+            <div class="p-2.5 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
               <i class="fas fa-table"></i>
             </div>
             <div>
@@ -187,122 +195,125 @@
           </div>
 
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-[1200px] border-collapse border border-gray-200">
+              <thead class="bg-slate-50">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     No.
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Vehicle #
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Status
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Class
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Description
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Company
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Driver Code
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Driver Name
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Driver ID
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Driver Phone
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Note
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Created Date
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider border border-gray-200">
                     Updated Date
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-if="loading" class="animate-pulse">
-                <td colspan="13" class="px-6 py-4 text-center">
-                  <div class="flex items-center justify-center">
-                    <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
-                    Loading vehicles...
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="vehicles.length === 0">
-                <td colspan="13" class="px-6 py-4 text-center text-gray-500">
-                  No vehicles found
-                </td>
-              </tr>
-              <tr
-                v-else
-                v-for="(vehicle, index) in vehicles"
-                :key="vehicle.id"
-                class="hover:bg-gray-50"
-              >
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ index + 1 }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ vehicle.VEHICLE_NO }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    :class="
-                      vehicle.VEHICLE_STATUS === 'A'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    "
-                    class="px-2 py-1 text-xs font-semibold rounded-full"
-                  >
-                    {{ vehicle.VEHICLE_STATUS === "A" ? "Active" : "Obsolete" }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.VEHICLE_CLASS }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.VEHICLE_DESCRIPTION || "-" }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.VEHICLE_COMPANY }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.DRIVER_CODE }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.DRIVER_NAME }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.DRIVER_ID }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.DRIVER_PHONE }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ vehicle.NOTE || "-" }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ new Date(vehicle.created_at).toLocaleDateString() }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ new Date(vehicle.updated_at).toLocaleDateString() }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <tbody>
+                <tr v-if="loading" class="animate-pulse">
+                  <td colspan="13" class="px-6 py-4 text-center border border-gray-200">
+                    <div class="flex items-center justify-center">
+                      <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
+                      Loading vehicles...
+                    </div>
+                  </td>
+                </tr>
+                <tr v-else-if="vehicles.length === 0">
+                  <td colspan="13" class="px-6 py-8 text-center text-gray-500 border border-gray-200">
+                    <div class="flex flex-col items-center gap-2">
+                      <i class="fas fa-clipboard-list text-2xl text-gray-300"></i>
+                      <span>No vehicles found</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr
+                  v-else
+                  v-for="(vehicle, index) in vehicles"
+                  :key="vehicle.id"
+                  class="hover:bg-gray-50 transition-colors"
+                >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ index + 1 }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border border-gray-200">
+                    {{ vehicle.VEHICLE_NO }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
+                    <span
+                      :class="
+                        vehicle.VEHICLE_STATUS === 'A'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      "
+                      class="px-2 py-1 text-xs font-semibold rounded-full"
+                    >
+                      {{ vehicle.VEHICLE_STATUS === 'A' ? 'Active' : 'Obsolete' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.VEHICLE_CLASS }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.VEHICLE_DESCRIPTION || '-' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.VEHICLE_COMPANY }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.DRIVER_CODE }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.DRIVER_NAME }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.DRIVER_ID }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.DRIVER_PHONE }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ vehicle.NOTE || '-' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ new Date(vehicle.created_at).toLocaleDateString() }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                    {{ new Date(vehicle.updated_at).toLocaleDateString() }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
         <!-- Pagination -->
         <div
