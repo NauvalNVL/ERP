@@ -221,6 +221,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import Swal from 'sweetalert2'
 
 const vehicles = ref([])
 const loading = ref(false)
@@ -372,8 +373,21 @@ const showNotification = (message, type = 'success') => {
 const toggleVehicleStatus = async vehicle => {
   if (isToggling.value) return
 
-  const confirmMessage = `Are you sure you want to change the status for vehicle "${vehicle.VEHICLE_NO}"?`
-  if (!confirm(confirmMessage)) return
+  const currentStatus = vehicle.VEHICLE_STATUS === 'A' ? 'A' : 'O'
+  const newStatus = currentStatus === 'A' ? 'O' : 'A'
+  const result = await Swal.fire({
+    title: currentStatus === 'A' ? 'Mark Vehicle as Obsolete?' : 'Activate Vehicle?',
+    html: `<strong>${vehicle.VEHICLE_NO}</strong> - ${vehicle.VEHICLE_DESCRIPTION || 'No description'}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: currentStatus === 'A' ? 'Yes, Obsolete' : 'Yes, Activate',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: currentStatus === 'A' ? '#dc2626' : '#059669',
+    cancelButtonColor: '#9ca3af',
+    reverseButtons: true
+  })
+
+  if (!result.isConfirmed) return
 
   isToggling.value = true
 
@@ -382,8 +396,6 @@ const toggleVehicleStatus = async vehicle => {
     if (!csrfToken) {
       throw new Error('CSRF token not found')
     }
-
-    const newStatus = vehicle.VEHICLE_STATUS === 'A' ? 'O' : 'A'
 
     const response = await fetch(buildApiUrl(`/vehicles/${vehicle.id}/status`), {
       method: 'PUT',
