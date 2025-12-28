@@ -67,56 +67,56 @@
                         </div>
 
                         <!-- Table Content -->
-                        <table class="min-w-[1400px] divide-y divide-gray-200">
+                        <table class="min-w-[1400px] border-collapse">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th @click="sortTable('pd_code')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('pd_code')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Design Code <i :class="getSortIcon('pd_code')"></i>
                                     </th>
-                                    <th @click="sortTable('pd_name')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('pd_name')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Design Name <i :class="getSortIcon('pd_name')"></i>
                                     </th>
-                                    <th @click="sortTable('status')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('status')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Status <i :class="getSortIcon('status')"></i>
                                     </th>
-                                    <th @click="sortTable('pd_design_type')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('pd_design_type')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Design Type <i :class="getSortIcon('pd_design_type')"></i>
                                     </th>
-                                    <th @click="sortTable('idc')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('idc')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         IDC <i :class="getSortIcon('idc')"></i>
                                     </th>
-                                    <th @click="sortTable('product')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('product')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Product <i :class="getSortIcon('product')"></i>
                                     </th>
-                                    <th @click="sortTable('joint')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('joint')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Joint <i :class="getSortIcon('joint')"></i>
                                     </th>
-                                    <th @click="sortTable('joint_to_print')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('joint_to_print')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Joint to Print <i :class="getSortIcon('joint_to_print')"></i>
                                     </th>
-                                    <th @click="sortTable('pcs_to_joint')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('pcs_to_joint')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         PCS to Joint <i :class="getSortIcon('pcs_to_joint')"></i>
                                     </th>
-                                    <th @click="sortTable('score')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('score')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Score <i :class="getSortIcon('score')"></i>
                                     </th>
-                                    <th @click="sortTable('slot')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('slot')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Slot <i :class="getSortIcon('slot')"></i>
                                     </th>
-                                    <th @click="sortTable('flute_style')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('flute_style')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Flute Style <i :class="getSortIcon('flute_style')"></i>
                                     </th>
-                                    <th @click="sortTable('print_flute')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('print_flute')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Print Flute <i :class="getSortIcon('print_flute')"></i>
                                     </th>
-                                    <th @click="sortTable('input_weight')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('input_weight')" class="px-3 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Input Weight <i :class="getSortIcon('input_weight')"></i>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white">
                                 <tr v-if="loading" class="hover:bg-gray-50">
-                                    <td colspan="14" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="14" class="px-3 py-4 text-center text-gray-500 border border-gray-200">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -124,7 +124,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredProductDesigns.length === 0" class="hover:bg-gray-50">
-                                    <td colspan="14" class="px-3 py-4 text-center text-gray-500">
+                                    <td colspan="14" class="px-3 py-4 text-center text-gray-500 border border-gray-200">
                                         No product designs found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -135,22 +135,22 @@
                                 <tr v-for="(design, index) in filteredProductDesigns" :key="design.pd_code"
                                     :class="{'bg-emerald-50': index % 2 === 0}"
                                     class="hover:bg-emerald-100">
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ design.pd_code || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.pd_name || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ getStatusValue(design) }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.pd_design_type || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.idc || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm font-medium border border-gray-200">{{ design.pd_code || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.pd_name || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ getStatusValue(design) }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.pd_design_type || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.idc || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">
                                         <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">{{ design.product || 'N/A' }}</span>
                                     </td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.joint || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.joint_to_print || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.pcs_to_joint || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.score || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.slot || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.flute_style || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.print_flute || 'N/A' }}</td>
-                                    <td class="px-3 py-4 whitespace-nowrap text-sm">{{ design.input_weight || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.joint || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.joint_to_print || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.pcs_to_joint || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.score || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.slot || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.flute_style || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.print_flute || 'N/A' }}</td>
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm border border-gray-200">{{ design.input_weight || 'N/A' }}</td>
                                 </tr>
                             </tbody>
                         </table>

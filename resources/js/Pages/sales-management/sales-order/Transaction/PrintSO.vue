@@ -226,10 +226,7 @@
                 <button class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-blue-600 shadow-sm hover:bg-blue-50" @click="downloadPdf">
                   <i class="fa-solid fa-file-pdf mr-2"></i> PDF
                 </button>
-                <button class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-blue-600 shadow-sm hover:bg-blue-50" @click="downloadExcel">
-                  <i class="fa-solid fa-file-excel mr-2"></i> Excel
-            </button>
-          </div>
+              </div>
         </div>
       </div>
           <div class="p-4 sm:p-6">

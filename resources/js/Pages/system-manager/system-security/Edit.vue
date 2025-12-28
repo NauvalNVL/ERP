@@ -467,6 +467,7 @@
                 <SalespersonModal
                     :show="showSalespersonModal"
                     :salespersons="salespersons"
+                    :loading="salespersonLoading"
                     @close="showSalespersonModal = false"
                     @select="selectSalesperson"
                 />
@@ -595,6 +596,7 @@ export default {
         return {
             showSalespersonModal: false,
             salespersons: [],
+            salespersonLoading: false,
             form: {
                 user_id: this.user.user_id,
                 username: this.user.username,
@@ -628,14 +630,21 @@ export default {
 
     methods: {
         async openSalespersonModal() {
+            this.showSalespersonModal = true;
+
+            if (this.salespersonLoading) {
+                return;
+            }
+
+            this.salespersonLoading = true;
             try {
-                // Fetch salespersons data from the server
                 const response = await axios.get('/api/salespersons');
                 this.salespersons = response.data;
-                this.showSalespersonModal = true;
             } catch (error) {
                 console.error('Error fetching salespersons:', error);
                 alert('Failed to load salespersons. Please try again.');
+            } finally {
+                this.salespersonLoading = false;
             }
         },
         selectSalesperson(salesperson) {

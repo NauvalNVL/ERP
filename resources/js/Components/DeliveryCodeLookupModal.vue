@@ -1,203 +1,184 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+  <div v-if="show" class="fixed inset-0 z-50">
     <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-    
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-slate-900/70 to-blue-900/70 backdrop-blur-sm"></div>
+
     <!-- Modal -->
     <div class="relative min-h-screen flex items-center justify-center p-4">
-      <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div class="relative bg-white/95 rounded-2xl shadow-2xl border border-blue-100 w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-800">
-              Customer Alternate Delivery Location Table
-            </h3>
-            <button 
-              @click="$emit('close')"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <i class="fas fa-times text-xl"></i>
-            </button>
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-white/20 rounded-lg">
+              <i class="fas fa-map-marked-alt text-lg"></i>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-widest text-white/80 mb-0.5">Define Customer Alternate Address</p>
+              <h3 class="text-xl font-semibold">Customer Alternate Delivery Location Table</h3>
+            </div>
           </div>
+          <button
+            @click="$emit('close')"
+            class="p-2 rounded-full hover:bg-white/20 transition-colors text-white"
+          >
+            <i class="fas fa-times text-lg"></i>
+          </button>
         </div>
 
         <!-- Content -->
-        <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+        <div class="p-6 overflow-y-auto flex-1 bg-gradient-to-b from-slate-50 via-white to-slate-50">
           <!-- Loading State -->
-          <div v-if="loading" class="flex items-center justify-center py-8">
-            <div class="flex items-center space-x-2">
-              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span class="text-gray-600">Loading delivery locations...</span>
+          <div v-if="loading" class="flex items-center justify-center py-12">
+            <div class="flex items-center space-x-3 bg-white rounded-xl px-5 py-3 shadow-md border border-blue-100">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent border-b-transparent"></div>
+              <span class="text-blue-700 font-medium">Loading delivery locations...</span>
             </div>
           </div>
 
           <!-- Error State -->
-          <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div v-else-if="errorMessage" class="bg-red-50/80 border border-red-200 rounded-xl p-4 mb-6 shadow-sm">
             <div class="flex items-center">
-              <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
-              <span class="text-red-700">{{ errorMessage }}</span>
+              <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                <i class="fas fa-exclamation-circle text-red-500"></i>
+              </div>
+              <span class="text-red-700 font-medium">{{ errorMessage }}</span>
             </div>
           </div>
 
           <!-- No Data State -->
-          <div v-else-if="deliveryLocations.length === 0" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div v-else-if="deliveryLocations.length === 0" class="bg-yellow-50/90 border border-yellow-200 rounded-xl p-4 mb-6 shadow-sm">
             <div class="flex items-center">
-              <i class="fas fa-info-circle text-yellow-500 mr-2"></i>
-              <span class="text-yellow-700">No delivery locations found for this customer. Please add alternate addresses first.</span>
+              <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                <i class="fas fa-info text-yellow-600"></i>
+              </div>
+              <span class="text-yellow-700 font-medium">No delivery locations found for this customer. Please add alternate addresses first.</span>
             </div>
           </div>
 
           <!-- Delivery Code Table -->
-          <div v-else class="mb-6">
-            <div class="border border-gray-400 rounded">
-              <!-- Table Header -->
-              <div class="bg-gray-200 border-b border-gray-400">
-                <div class="grid grid-cols-2">
-                  <div class="px-4 py-2 font-bold text-gray-800 border-r border-gray-400">Delivery Code</div>
-                  <div class="px-4 py-2 font-bold text-gray-800">Ship To</div>
-                </div>
+          <div v-else class="mb-6 bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-widest text-white/70">Saved Locations</p>
+                <p class="text-sm font-semibold">Select an alternate delivery location</p>
               </div>
-              
-              <!-- Table Body -->
-              <div class="bg-white max-h-40 overflow-y-auto">
-                <div 
-                  v-for="(location, index) in deliveryLocations" 
-                  :key="index"
-                  :class="selectedLocation?.delivery_code === location.delivery_code ? 'bg-blue-100' : 'hover:bg-gray-50'"
-                  class="grid grid-cols-2 cursor-pointer border-b border-gray-200"
-                  @click="selectLocation(location)"
-                >
-                  <div class="px-4 py-2 border-r border-gray-200">{{ location.delivery_code }}</div>
-                  <div class="px-4 py-2">{{ location.ship_to }}</div>
+              <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-xs font-semibold">
+                <i class="fas fa-layer-group mr-2 text-white"></i>{{ deliveryLocations.length }} entries
+              </span>
+            </div>
+
+            <div class="divide-y divide-blue-50 max-h-52 overflow-y-auto">
+              <div
+                v-for="(location, index) in deliveryLocations"
+                :key="index"
+                class="flex items-stretch cursor-pointer transition group"
+                :class="selectedLocation?.delivery_code === location.delivery_code ? 'bg-cyan-50/80' : 'bg-white hover:bg-blue-50/70'"
+                @click="selectLocation(location)"
+              >
+                <div class="w-1" :class="selectedLocation?.delivery_code === location.delivery_code ? 'bg-gradient-to-b from-cyan-400 to-blue-500' : 'bg-transparent group-hover:bg-blue-200 transition'"></div>
+                <div class="flex-1 grid grid-cols-2 gap-4 px-4 py-3">
+                  <div>
+                    <p class="text-xs uppercase tracking-widest text-gray-400">Delivery Code</p>
+                    <p class="text-base font-semibold text-gray-800">{{ location.delivery_code }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-widest text-gray-400">Ship To</p>
+                    <p class="text-sm font-medium text-gray-700">{{ location.ship_to }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Location Details Form -->
-          <div class="space-y-4">
-            <!-- Row 1: Country and Town -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Country:</label>
-                <input 
-                  v-model="formData.country" 
-                  type="text" 
-                  class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                  readonly
-                >
+          <div class="space-y-4 bg-white rounded-2xl border border-blue-50 shadow-sm p-5">
+            <div class="flex items-center mb-2">
+              <div class="w-10 h-10 rounded-xl bg-blue-600/10 text-blue-600 flex items-center justify-center mr-3">
+                <i class="fas fa-map-pin"></i>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Town:</label>
-                <input 
-                  v-model="formData.town" 
-                  type="text" 
-                  class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                  readonly
-                >
+                <p class="text-xs uppercase tracking-widest text-gray-400">Location Detail</p>
+                <p class="text-base font-semibold text-gray-800">Preview of the selected delivery address</p>
+              </div>
+            </div>
+
+            <!-- Row 1: Country and Town -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label>Country</label>
+                <input v-model="formData.country" type="text" readonly />
+              </div>
+              <div class="form-field">
+                <label>Town</label>
+                <input v-model="formData.town" type="text" readonly />
               </div>
             </div>
 
             <!-- Row 2: State and Section -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">State:</label>
-                <input 
-                  v-model="formData.state" 
-                  type="text" 
-                  class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                  readonly
-                >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label>State</label>
+                <input v-model="formData.state" type="text" readonly />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section:</label>
-                <input 
-                  v-model="formData.section" 
-                  type="text" 
-                  class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                  readonly
-                >
+              <div class="form-field">
+                <label>Section</label>
+                <input v-model="formData.section" type="text" readonly />
               </div>
             </div>
 
             <!-- Row 3: Address -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Address:</label>
-              <textarea 
-                v-model="formData.address" 
-                rows="2"
-                class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                readonly
-              ></textarea>
+            <div class="form-field">
+              <label>Address</label>
+              <textarea v-model="formData.address" rows="2" readonly></textarea>
             </div>
 
             <!-- Row 4: Contact -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Contact:</label>
-              <input 
-                v-model="formData.contact" 
-                type="text" 
-                class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                readonly
-              >
+            <div class="form-field">
+              <label>Contact Person</label>
+              <input v-model="formData.contact" type="text" readonly />
             </div>
 
             <!-- Row 5: Tel No and Fax No -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tel No:</label>
-                <input 
-                  v-model="formData.tel_no" 
-                  type="text" 
-                  class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                  readonly
-                >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label>Tel No</label>
+                <input v-model="formData.tel_no" type="text" readonly />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Fax No:</label>
-                <input 
-                  v-model="formData.fax_no" 
-                  type="text" 
-                  class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                  readonly
-                >
+              <div class="form-field">
+                <label>Fax No</label>
+                <input v-model="formData.fax_no" type="text" readonly />
               </div>
             </div>
 
             <!-- Row 6: Email -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
-              <input 
-                v-model="formData.email" 
-                type="text" 
-                class="w-full px-3 py-2 border border-gray-400 rounded text-sm"
-                readonly
-              >
+            <div class="form-field">
+              <label>Email</label>
+              <input v-model="formData.email" type="text" readonly />
             </div>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-center space-x-3">
-          <button 
-            @click="selectDeliveryCode"
-            :disabled="!selectedLocation || loading"
-            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
-            Select
-          </button>
-          <button 
+        <div class="px-6 py-4 bg-slate-50/80 border-t border-blue-100 flex justify-end space-x-3">
+          <button
             @click="$emit('close')"
             :disabled="loading"
-            class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            class="secondary-btn"
           >
-            Exit
+            <i class="fas fa-times mr-2"></i>Close
+          </button>
+          <button
+            @click="selectDeliveryCode"
+            :disabled="!selectedLocation || loading"
+            class="primary-btn disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
+            <i v-else class="fas fa-check mr-2"></i>
+            Use this location
           </button>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -391,16 +372,25 @@ watch(() => props.show, (val) => {
   background: #94a3b8;
 }
 
-/* Table hover effects */
-.grid:hover {
-  background-color: #f9fafb;
+.form-field label {
+  @apply block text-xs uppercase tracking-widest text-gray-500 mb-1;
 }
 
-/* Input focus styles */
-input:focus,
-textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.form-field input,
+.form-field textarea {
+  @apply w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm text-gray-700 transition;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  @apply outline-none border-blue-400 ring-2 ring-blue-100 bg-white;
+}
+
+.primary-btn {
+  @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold shadow-md transition hover:shadow-lg hover:from-blue-700 hover:to-cyan-600;
+}
+
+.secondary-btn {
+  @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 bg-white font-semibold shadow-sm transition hover:shadow-md hover:text-slate-800;
 }
 </style>

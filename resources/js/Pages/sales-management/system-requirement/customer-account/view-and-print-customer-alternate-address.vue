@@ -193,12 +193,12 @@
             class="overflow-x-auto bg-white rounded-lg max-w-full"
             id="printable-table"
           >
-            <table class="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
+            <table class="min-w-full border-collapse text-xs sm:text-sm">
               <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
                 <tr>
                   <th
                     @click="sortBy('customer_code')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Customer Code</span>
@@ -207,7 +207,7 @@
                   </th>
                   <th
                     @click="sortBy('delivery_code')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Delivery Code</span>
@@ -216,7 +216,7 @@
                   </th>
                   <th
                     @click="sortBy('country')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Country</span>
@@ -225,7 +225,7 @@
                   </th>
                   <th
                     @click="sortBy('state')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>State</span>
@@ -234,7 +234,7 @@
                   </th>
                   <th
                     @click="sortBy('town')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Town</span>
@@ -243,7 +243,7 @@
                   </th>
                   <th
                     @click="sortBy('bill_to_name')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Bill To Name</span>
@@ -252,7 +252,7 @@
                   </th>
                   <th
                     @click="sortBy('bill_to_address')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Bill To Address</span>
@@ -261,7 +261,7 @@
                   </th>
                   <th
                     @click="sortBy('ship_to_name')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Ship To Name</span>
@@ -270,7 +270,7 @@
                   </th>
                   <th
                     @click="sortBy('ship_to_address')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Ship To Address</span>
@@ -279,7 +279,7 @@
                   </th>
                   <th
                     @click="sortBy('contact_person')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Contact Person</span>
@@ -288,7 +288,7 @@
                   </th>
                   <th
                     @click="sortBy('tel_no')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Tel No</span>
@@ -297,7 +297,7 @@
                   </th>
                   <th
                     @click="sortBy('fax_no')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Fax No</span>
@@ -306,7 +306,7 @@
                   </th>
                   <th
                     @click="sortBy('email')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Email</span>
@@ -315,7 +315,7 @@
                   </th>
                   <th
                     @click="sortBy('status')"
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 text-[10px] sm:text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                   >
                     <div class="flex items-center">
                       <span>Status</span>
@@ -324,9 +324,9 @@
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-white">
                 <tr v-if="loading">
-                  <td colspan="15" class="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colspan="15" class="px-6 py-4 text-center text-sm text-gray-500 border border-gray-200">
                     <div class="flex justify-center items-center">
                       <div
                         class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"
@@ -338,7 +338,7 @@
                 <tr v-else-if="filteredAddresses.length === 0">
                   <td
                     colspan="15"
-                    class="px-3 py-3 sm:px-4 sm:py-4 md:px-6 text-center text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-3 sm:px-4 sm:py-4 md:px-6 text-center text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     <div class="flex flex-col items-center">
                       <i class="fas fa-map-marker-alt text-4xl text-gray-300 mb-2"></i>
@@ -371,72 +371,72 @@
                   class="hover:bg-blue-100 transition-colors"
                 >
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 border border-gray-200"
                   >
                     {{ address.customer_code }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.delivery_code }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.country }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.state }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.town }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.bill_to_name }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.bill_to_address }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.ship_to_name }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.ship_to_address }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.contact_person }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.tel_no }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.fax_no }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm text-gray-500 border border-gray-200"
                   >
                     {{ address.email }}
                   </td>
                   <td
-                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm"
+                    class="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 whitespace-normal md:whitespace-nowrap text-xs sm:text-sm border border-gray-200"
                   >
                     <span
                       :class="{

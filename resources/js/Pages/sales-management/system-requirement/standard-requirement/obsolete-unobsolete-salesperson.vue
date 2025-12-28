@@ -87,36 +87,14 @@
 							<table class="min-w-full table-auto divide-y divide-gray-200 text-sm">
 								<thead class="bg-gray-50">
 									<tr>
-										<th
-											scope="col"
-											class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
-										>
-											Code
-										</th>
-										<th
-											scope="col"
-											class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
-										>
-											Name
-										</th>
-										<th
-											scope="col"
-											class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
-										>
-											Email
-										</th>
-										<th
-											scope="col"
-											class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide"
-										>
-											Status
-										</th>
-										<th
-											scope="col"
-											class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide"
-										>
-											Action
-										</th>
+										<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Code</th>
+										<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+										<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Group</th>
+										<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Code Group</th>
+										<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Target Sales</th>
+										<th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</th>
+										<th scope="col" class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+										<th scope="col" class="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</th>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-gray-100 bg-white">
@@ -126,6 +104,15 @@
 										</td>
 										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-800">
 											{{ person.name }}
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+											{{ person.grup || '-' }}
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+											{{ person.code_grup || '-' }}
+										</td>
+										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+											{{ person.target_sales ? Number(person.target_sales).toFixed(2) : '0.00' }}
 										</td>
 										<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-600">
 											{{ person.email || '-' }}
@@ -166,7 +153,7 @@
 										</td>
 									</tr>
 									<tr v-if="filteredSalespersons.length === 0">
-										<td colspan="5" class="px-4 py-10 text-center text-sm text-gray-500">
+										<td colspan="8" class="px-4 py-10 text-center text-sm text-gray-500">
 											No salespersons found.
 										</td>
 									</tr>
@@ -305,10 +292,12 @@ const filteredSalespersons = computed(() => {
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(person => 
-            person.code.toLowerCase().includes(query) || 
-            person.name.toLowerCase().includes(query) ||
-            (person.email && person.email.toLowerCase().includes(query))
+        filtered = filtered.filter(person =>
+            person.code?.toLowerCase().includes(query) ||
+            person.name?.toLowerCase().includes(query) ||
+            person.grup?.toLowerCase().includes(query) ||
+            person.code_grup?.toLowerCase().includes(query) ||
+            person.email?.toLowerCase().includes(query)
         );
     }
     

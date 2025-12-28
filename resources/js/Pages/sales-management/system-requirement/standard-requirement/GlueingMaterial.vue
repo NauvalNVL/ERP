@@ -281,11 +281,23 @@ const editForm = ref({
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
+const fallbackCommonItems = [
+    'PVAC — Polyvinyl Acetate Glue',
+    'STARCH — Starch Based Glue',
+    'HOT MELT — Hot Melt Adhesive',
+    'SILICATE — Sodium Silicate Glue'
+];
+
 const commonGlueingNames = computed(() => {
-    return glueingMaterials.value
-        .map(item => item?.name)
-        .filter(name => !!name)
-        .slice(0, 4);
+    const activeNames = glueingMaterials.value
+        .map(item => item?.name || '')
+        .filter(name => !!name);
+
+    if (activeNames.length === 0) {
+        return fallbackCommonItems;
+    }
+
+    return activeNames.slice(0, 4);
 });
 
 // Fetch Glueing Materials from API

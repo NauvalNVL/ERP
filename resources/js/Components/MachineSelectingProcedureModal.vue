@@ -347,8 +347,10 @@
         v-if="showMachineModal"
         :show="showMachineModal"
         :machines="machines"
+        :loading="machineLoading"
         @close="showMachineModal = false"
         @select="onMachineSelected"
+        @refresh="fetchMachines"
       />
     </div>
   </transition>
@@ -377,6 +379,7 @@ const maxFgLevel = ref(0);
 const showMachineModal = ref(false);
 const selectedRowIndex = ref(null);
 const machines = ref([]);
+const machineLoading = ref(false);
 
 // Initialize MSP rows (Steps 10-80, matching the image)
 const createEmptyMspRow = (step) => ({
@@ -496,6 +499,7 @@ watch(
 
 // Fetch machines from API
 const fetchMachines = async () => {
+  machineLoading.value = true;
   try {
     const response = await fetch("/api/machines", {
       headers: {
@@ -524,6 +528,8 @@ const fetchMachines = async () => {
   } catch (error) {
     console.error("Error fetching machines:", error);
     machines.value = [];
+  } finally {
+    machineLoading.value = false;
   }
 };
 
@@ -531,6 +537,7 @@ const fetchMachines = async () => {
 const openMachineSelector = (index) => {
   selectedRowIndex.value = index;
   showMachineModal.value = true;
+  fetchMachines();
 };
 
 // Handle machine selection

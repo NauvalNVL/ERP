@@ -1087,6 +1087,15 @@ export default {
                     }
                 });
 
+                if (response.status === 403) {
+                    const errorData = await response.json();
+                    this.foundUser = null;
+                    this.searchMessage = errorData.message || 'Inactive or obsolete users cannot access this menu.';
+                    this.searchMessageType = 'error';
+                    this.searchMessageIcon = ExclamationCircleIcon;
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (response.ok && data.user) {
@@ -1134,6 +1143,22 @@ export default {
                             obsoletePairs.forEach(([defineKey, obsoleteKey]) => {
                                 if (this.form.permissions[defineKey] && !permissionSet.has(obsoleteKey)) {
                                     this.form.permissions[obsoleteKey] = true;
+                                }
+                            });
+
+                            const sidebarRequiredPermissions = [
+                                'dashboard',
+                                'reactive_unobsolete_user',
+                                'define_machine',
+                                'obsolete_unobsolete_machine',
+                                'view_print_machine',
+                                'input_no_faktur',
+                                'export_to_coretax'
+                            ];
+
+                            sidebarRequiredPermissions.forEach((key) => {
+                                if (!permissionSet.has(key)) {
+                                    this.form.permissions[key] = true;
                                 }
                             });
                         } finally {

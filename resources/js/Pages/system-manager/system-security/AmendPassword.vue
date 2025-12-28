@@ -324,11 +324,19 @@ export default {
             axios.get(`/api/users?search=${this.search_user_id}`)
                 .then(response => {
                     if (response.data && response.data.length > 0) {
-                        this.foundUser = response.data[0];
-                        this.form.user_id = this.foundUser.user_id;
-                        this.setMessage(`User '${this.foundUser.official_name}' found.`, 'success');
+                        const user = response.data[0];
+                        if (user.status !== 'A') {
+                            this.foundUser = null;
+                            this.form.user_id = '';
+                            this.setMessage(`User "${user.user_id}" is inactive or obsolete and cannot be updated here.`, 'error');
+                            return;
+                        }
+                        this.foundUser = user;
+                        this.form.user_id = user.user_id;
+                        this.setMessage(`User '${user.official_name}' found.`, 'success');
                     } else {
                         this.foundUser = null;
+                        this.form.user_id = '';
                         this.setMessage(`User with ID "${this.search_user_id}" not found.`, 'warning');
                     }
                 })

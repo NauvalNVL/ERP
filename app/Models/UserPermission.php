@@ -83,6 +83,13 @@ class UserPermission extends Model
                 'parent' => 'system_manager'
             ],
             [
+                'key' => 'reactive_unobsolete_user',
+                'name' => 'Reactive/Unobsolete User',
+                'route' => '/system-security/reactive-unobsolete-user',
+                'category' => 'system_manager',
+                'parent' => 'system_manager'
+            ],
+            [
                 'key' => 'view_print_user',
                 'name' => 'View & Print User',
                 'route' => '/system-security/view-print-user',
@@ -1091,6 +1098,13 @@ class UserPermission extends Model
             ],
             
             // Tax DJP
+            [
+                'key' => 'input_no_faktur',
+                'name' => 'Input No Faktur',
+                'route' => '/warehouse-management/invoice/tax-djp/input-no-faktur',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
             [
                 'key' => 'export_to_coretax',
                 'name' => 'Export to Coretax',

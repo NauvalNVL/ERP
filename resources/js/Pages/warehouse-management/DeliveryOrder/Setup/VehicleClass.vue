@@ -4,18 +4,18 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto space-y-4">
         <!-- Header Section -->
-        <div class="bg-blue-600 text-white shadow-sm rounded-xl border border-blue-700">
+        <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm rounded-xl border border-indigo-700">
           <div class="flex items-center justify-between px-4 py-3 sm:px-6">
             <div class="flex items-center gap-3">
-              <div class="h-10 w-10 rounded-full bg-blue-500/80 flex items-center justify-center">
+              <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
                 <i class="fas fa-layer-group text-lg"></i>
               </div>
               <div>
                 <h1 class="text-lg sm:text-xl font-semibold">Define Vehicle Class</h1>
-                <p class="text-xs sm:text-sm text-blue-100">Manage vehicle class definitions and specifications</p>
+                <p class="text-xs sm:text-sm text-indigo-100">Manage vehicle class definitions and specifications</p>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-2 text-xs text-blue-100">
+            <div class="hidden sm:flex items-center gap-2 text-xs text-indigo-100">
               <i class="fas fa-info-circle"></i>
               <span>Search existing classes or add a new one.</span>
             </div>
@@ -28,7 +28,7 @@
           <div class="lg:col-span-2">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
               <div class="flex items-center mb-4 pb-3 border-b border-gray-100">
-                <div class="p-2.5 bg-blue-50 rounded-lg mr-3 text-blue-600">
+                <div class="p-2.5 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
                   <i class="fas fa-layer-group"></i>
                 </div>
                 <div>
@@ -41,20 +41,20 @@
                 <div class="md:col-span-2">
                   <label class="block text-sm font-semibold text-gray-700 mb-1">Vehicle Class Code</label>
                   <div class="relative flex">
-                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500">
+                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-indigo-200 bg-indigo-50 text-indigo-600">
                       <i class="fas fa-layer-group"></i>
                     </span>
                     <input
                       v-model="searchQuery"
                       type="text"
                       placeholder="Search by code or description..."
-                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 text-sm sm:text-base transition-colors"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400 text-sm sm:text-base transition-colors"
                       @input="searchVehicleClasses"
                     />
                     <button
                       type="button"
                       @click="showVehicleClassModal = true"
-                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-lg text-sm transition-colors transform active:translate-y-px"
+                      class="inline-flex items-center px-3 py-2 border border-l-0 border-indigo-500 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white rounded-r-lg text-sm transition-all transform active:translate-y-px shadow-sm"
                     >
                       <i class="fas fa-table"></i>
                     </button>
@@ -66,7 +66,7 @@
                     <button
                       type="button"
                       @click="openModal('add')"
-                      class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"
+                      class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-sm hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transition-all"
                     >
                       <i class="fas fa-plus-circle"></i>
                       Add New
@@ -81,10 +81,10 @@
           <div class="space-y-4">
             <div class="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-5">
               <div class="flex items-center mb-3 pb-2 border-b border-blue-100">
-                <div class="p-2.5 bg-blue-500 rounded-lg mr-3">
-                  <i class="fas fa-info-circle text-white"></i>
+                <div class="p-2.5 rounded-lg mr-3 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm">
+                  <i class="fas fa-info-circle"></i>
                 </div>
-                <h3 class="text-sm sm:text-base font-semibold text-blue-900">Vehicle Class Information</h3>
+                <h3 class="text-sm sm:text-base font-semibold text-indigo-900">Vehicle Class Information</h3>
               </div>
               <div class="space-y-2 text-xs sm:text-sm text-gray-600">
                 <ul class="list-disc pl-5 space-y-1">
@@ -223,21 +223,15 @@
       @close="showVehicleClassModal = false"
       @select="onVehicleClassSelected"
     />
-
-    <!-- Toast Container -->
-    <ToastContainer />
   </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
-import { useToast } from '@/Composables/useToast'
+import { Head } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import ToastContainer from '@/Components/ToastContainer.vue'
 import VehicleClassTableModal from '@/Components/VehicleClassTableModal.vue'
-
-const { addToast } = useToast()
 
 // Reactive data
 const vehicleClasses = ref([])
@@ -300,6 +294,24 @@ const visiblePages = computed(() => {
 })
 
 // Methods
+const showSuccessAlert = (message = 'Action completed successfully') => {
+  Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: message,
+    timer: 1800,
+    showConfirmButton: false
+  })
+}
+
+const showErrorAlert = (message = 'Something went wrong') => {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: message
+  })
+}
+
 const fetchVehicleClasses = async () => {
   loading.value = true
   try {
@@ -309,10 +321,10 @@ const fetchVehicleClasses = async () => {
     if (data.success) {
       vehicleClasses.value = data.data
     } else {
-      addToast('Error fetching vehicle classes', 'error')
+      showErrorAlert('Failed to fetch vehicle classes')
     }
   } catch (error) {
-    addToast('Error fetching vehicle classes', 'error')
+    showErrorAlert('Failed to fetch vehicle classes')
   } finally {
     loading.value = false
   }
@@ -389,24 +401,34 @@ const saveVehicleClass = async () => {
     const data = await response.json()
 
     if (data.success) {
-      addToast(data.message, 'success')
+      showSuccessAlert(data.message || 'Vehicle class saved successfully')
       closeModal()
       await fetchVehicleClasses()
     } else {
       if (data.errors) {
         errors.value = data.errors
       }
-      addToast(data.message || 'Error saving vehicle class', 'error')
+      showErrorAlert(data.message || 'Error saving vehicle class')
     }
   } catch (error) {
-    addToast('Error saving vehicle class', 'error')
+    showErrorAlert('Error saving vehicle class')
   } finally {
     saving.value = false
   }
 }
 
 const deleteVehicleClass = async (vehicleClass) => {
-  if (!confirm(`Are you sure you want to obsolete vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}"?`)) {
+  const result = await Swal.fire({
+    title: 'Obsolete vehicle class?',
+    text: `Vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}" will be marked obsolete.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#2563eb',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, obsolete it'
+  })
+
+  if (!result.isConfirmed) {
     return
   }
 
@@ -433,11 +455,11 @@ const deleteVehicleClass = async (vehicleClass) => {
       throw new Error(data?.message || 'Unknown error from server')
     }
 
-    addToast(`Vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}" obsoleted successfully`, 'success')
+    showSuccessAlert(`Vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}" obsoleted successfully`)
     closeModal()
     await fetchVehicleClasses()
   } catch (error) {
-    addToast('Error obsoleting vehicle class: ' + (error?.message || error), 'error')
+    showErrorAlert('Error obsoleting vehicle class: ' + (error?.message || error))
   }
 }
 

@@ -570,6 +570,7 @@
       v-if="showSalespersonModal"
       :show="showSalespersonModal"
       :salespersons="salespersons"
+      :loading="salespersonLoading"
       @close="closeSalespersonModal"
       @select="selectSalesperson"
       class="modal-lookup"
@@ -580,6 +581,7 @@
       v-if="showIndustryModal"
       :show="showIndustryModal"
       :industries="industries"
+      :loading="industryLoading"
       @close="closeIndustryModal"
       @select="selectIndustry"
       class="modal-lookup"
@@ -590,6 +592,7 @@
       v-if="showGeoModal"
       :show="showGeoModal"
       :geos="geos"
+      :loading="geoLoading"
       @close="closeGeoModal"
       @select="selectGeo"
       class="modal-lookup"
@@ -1066,8 +1069,11 @@ const isSaving = ref(false);
 
 // Data from API
 const industries = ref([]);
+const industryLoading = ref(false);
 const geos = ref([]);
+const geoLoading = ref(false);
 const salespersons = ref([]);
+const salespersonLoading = ref(false);
 const customerGroups = ref([]);
 
 // Form state
@@ -1162,33 +1168,66 @@ const clearSearch = () => {
 };
 
 // Data loading functions
-const loadIndustries = async () => {
+const loadIndustries = async (showSpinner = false) => {
+  if (showSpinner) {
+    if (industryLoading.value) {
+      return;
+    }
+    industryLoading.value = true;
+  }
+
   try {
     const response = await axios.get("/api/industry");
     industries.value = response.data;
   } catch (error) {
     console.error("Error loading industries:", error);
     showNotification("Failed to load industry data", "error");
+  } finally {
+    if (showSpinner) {
+      industryLoading.value = false;
+    }
   }
 };
 
-const loadGeos = async () => {
+const loadGeos = async (showSpinner = false) => {
+  if (showSpinner) {
+    if (geoLoading.value) {
+      return;
+    }
+    geoLoading.value = true;
+  }
+
   try {
     const response = await axios.get("/api/geos");
     geos.value = response.data;
   } catch (error) {
     console.error("Error loading geo data:", error);
     showNotification("Failed to load geographical data", "error");
+  } finally {
+    if (showSpinner) {
+      geoLoading.value = false;
+    }
   }
 };
 
-const loadSalespersons = async () => {
+const loadSalespersons = async (showSpinner = false) => {
+  if (showSpinner) {
+    if (salespersonLoading.value) {
+      return;
+    }
+    salespersonLoading.value = true;
+  }
+
   try {
     const response = await axios.get("/api/salespersons");
     salespersons.value = response.data;
   } catch (error) {
     console.error("Error loading salespersons:", error);
     showNotification("Failed to load salesperson data", "error");
+  } finally {
+    if (showSpinner) {
+      salespersonLoading.value = false;
+    }
   }
 };
 
@@ -1316,12 +1355,18 @@ const selectCustomerAccount = (account) => {
 };
 
 // Salesperson modal functions
-const openSalespersonModal = (event) => {
+const openSalespersonModal = async (event) => {
   // Prevent event propagation to avoid closing the edit modal
   if (event) {
     event.stopPropagation();
   }
   showSalespersonModal.value = true;
+
+  if (!salespersons.value.length) {
+    await loadSalespersons(true);
+  } else {
+    loadSalespersons(true);
+  }
 };
 
 const closeSalespersonModal = () => {
@@ -1339,12 +1384,18 @@ const selectSalesperson = (salesperson) => {
 };
 
 // Industry modal functions
-const openIndustryModal = (event) => {
+const openIndustryModal = async (event) => {
   // Prevent event propagation to avoid closing the edit modal
   if (event) {
     event.stopPropagation();
   }
   showIndustryModal.value = true;
+
+  if (!industries.value.length) {
+    await loadIndustries(true);
+  } else {
+    loadIndustries(true);
+  }
 };
 
 const closeIndustryModal = () => {
@@ -1362,12 +1413,18 @@ const selectIndustry = (industry) => {
 };
 
 // Geo modal functions
-const openGeoModal = (event) => {
+const openGeoModal = async (event) => {
   // Prevent event propagation to avoid closing the edit modal
   if (event) {
     event.stopPropagation();
   }
   showGeoModal.value = true;
+
+  if (!geos.value.length) {
+    await loadGeos(true);
+  } else {
+    loadGeos(true);
+  }
 };
 
 const closeGeoModal = () => {

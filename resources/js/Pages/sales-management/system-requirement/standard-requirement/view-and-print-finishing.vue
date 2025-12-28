@@ -58,26 +58,26 @@
                         </div>
 
                         <!-- Table Content -->
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full border-collapse">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th @click="sortTable('id')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('id')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         No <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Code <i class="fas fa-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
-                                        Description <i class="fas fa-sort ml-1"></i>
+                                    <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
+                                        Description <i class="fas a-sort ml-1"></i>
                                     </th>
-                                    <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer">
+                                    <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer border border-gray-200">
                                         Status <i class="fas fa-sort ml-1"></i>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white">
                                 <tr v-if="loading" class="hover:bg-gray-50">
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                                         <div class="flex justify-center">
                                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                         </div>
@@ -85,7 +85,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else-if="filteredFinishings.length === 0" class="hover:bg-gray-50">
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                                         No finishings found.
                                         <template v-if="searchQuery">
                                             <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -96,16 +96,16 @@
                                 <tr v-for="(finishing, index) in filteredFinishings" :key="finishing.id" 
                                     :class="{'bg-emerald-50': index % 2 === 0}" 
                                     class="hover:bg-emerald-100">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                                         <div class="text-sm font-medium text-gray-900">{{ finishing.id }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ finishing.code || 'N/A' }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ finishing.description || 'N/A' }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap border border-gray-200">
                                         <div class="text-sm text-gray-900">{{ finishing.status || '' }}</div>
                                     </td>
                                 </tr>

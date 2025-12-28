@@ -73,21 +73,20 @@
                         <table class="min-w-full table-auto divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grammage (g/m²)</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paper Quality</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Record Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paper Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight (g/m²)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commercial Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CORR Wet-End Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CORR DECC Code</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="quality in filteredPaperQualities" :key="quality.id" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ quality.paper_quality }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.paper_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.weight_kg_m }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.type || 'N/A' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span v-if="quality.status === 'Act'" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Active
                             </span>
@@ -95,6 +94,11 @@
                                 <i class="fas fa-times-circle mr-1"></i> Obsolete
                             </span>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.paper_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.weight_kg_m }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.commercial_code || '-' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.wet_end_code || '-' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ quality.decc_code || '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex justify-center">
                                 <button @click="togglePaperQualityStatus(quality)" :disabled="isToggling"
@@ -112,7 +116,7 @@
                         </td>
                     </tr>
                     <tr v-if="filteredPaperQualities.length === 0">
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No paper qualities found.</td>
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">No paper qualities found.</td>
                     </tr>
                 </tbody>
                         </table>
@@ -222,10 +226,12 @@ const filteredPaperQualities = computed(() => {
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(quality => 
-            (quality.paper_quality && quality.paper_quality.toLowerCase().includes(query)) || 
-            (quality.paper_name && quality.paper_name.toLowerCase().includes(query)) || 
-            (quality.type && quality.type.toLowerCase().includes(query))
+        filtered = filtered.filter(quality =>
+            (quality.paper_quality && quality.paper_quality.toLowerCase().includes(query)) ||
+            (quality.paper_name && quality.paper_name.toLowerCase().includes(query)) ||
+            (quality.commercial_code && quality.commercial_code.toLowerCase().includes(query)) ||
+            (quality.wet_end_code && quality.wet_end_code.toLowerCase().includes(query)) ||
+            (quality.decc_code && quality.decc_code.toLowerCase().includes(query))
         );
     }
     

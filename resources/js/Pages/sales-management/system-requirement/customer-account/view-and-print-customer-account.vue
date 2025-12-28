@@ -198,12 +198,12 @@
           <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white">
               <!-- Table Content -->
-              <table class="min-w-full divide-y divide-gray-200">
+              <table class="min-w-full border-collapse">
                 <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
                   <tr>
                     <th
                       @click="sortTable('customer_code')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Code</span>
@@ -212,7 +212,7 @@
                     </th>
                     <th
                       @click="sortTable('customer_name')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Name</span>
@@ -221,7 +221,7 @@
                     </th>
                     <th
                       @click="sortTable('short_name')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Short Name</span>
@@ -230,7 +230,7 @@
                     </th>
                     <th
                       @click="sortTable('address')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Address</span>
@@ -239,7 +239,7 @@
                     </th>
                     <th
                       @click="sortTable('contact_person')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Contact</span>
@@ -248,7 +248,7 @@
                     </th>
                     <th
                       @click="sortTable('telephone_no')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Phone</span>
@@ -257,7 +257,7 @@
                     </th>
                     <th
                       @click="sortTable('fax_no')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Fax</span>
@@ -266,7 +266,7 @@
                     </th>
                     <th
                       @click="sortTable('co_email')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Email</span>
@@ -275,7 +275,7 @@
                     </th>
                     <th
                       @click="sortTable('credit_limit')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Credit Limit</span>
@@ -284,7 +284,7 @@
                     </th>
                     <th
                       @click="sortTable('credit_terms')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Terms (Days)</span>
@@ -293,7 +293,7 @@
                     </th>
                     <th
                       @click="sortTable('ac_type')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Account Type</span>
@@ -302,7 +302,7 @@
                     </th>
                     <th
                       @click="sortTable('currency_code')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Currency</span>
@@ -311,7 +311,7 @@
                     </th>
                     <th
                       @click="sortTable('npwp')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>NPWP</span>
@@ -320,7 +320,7 @@
                     </th>
                     <th
                       @click="sortTable('sales_type')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Customer Type</span>
@@ -329,7 +329,7 @@
                     </th>
                     <th
                       @click="sortTable('salesperson_code')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Salesperson</span>
@@ -338,7 +338,7 @@
                     </th>
                     <th
                       @click="sortTable('industrial_code')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Industry</span>
@@ -347,7 +347,7 @@
                     </th>
                     <th
                       @click="sortTable('geographical')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Geographical</span>
@@ -356,7 +356,7 @@
                     </th>
                     <th
                       @click="sortTable('grouping_code')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Group</span>
@@ -365,7 +365,7 @@
                     </th>
                     <th
                       @click="sortTable('status')"
-                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors"
+                      class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors border border-gray-200"
                     >
                       <div class="flex items-center">
                         <span>Status</span>
@@ -374,9 +374,9 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white">
                   <tr v-if="loading" class="hover:bg-gray-50">
-                    <td colspan="19" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="19" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                       <div class="flex justify-center">
                         <div
                           class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"
@@ -389,7 +389,7 @@
                     v-else-if="filteredCustomerAccounts.length === 0"
                     class="hover:bg-gray-50"
                   >
-                    <td colspan="19" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="19" class="px-6 py-4 text-center text-gray-500 border border-gray-200">
                       <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-300 mb-2"></i>
                         <p class="text-lg font-medium">No customer accounts found</p>
@@ -418,97 +418,97 @@
                     }"
                     class="hover:bg-blue-100 transition-colors"
                   >
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm font-medium text-gray-900">
                         {{ account.customer_code }}
                       </div>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.customer_name }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.short_name || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ formatAddress(account) }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.contact_person || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.telephone_no || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.fax_no || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.co_email || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right">
+                    <td class="px-4 py-3 whitespace-nowrap text-right border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ formatCurrency(account.credit_limit) }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
+                    <td class="px-4 py-3 whitespace-nowrap text-center border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.credit_terms || 0 }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.ac_type || account.account_type || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.currency_code || "IDR" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.npwp || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.sales_type || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.salesperson_code || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.industrial_code || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.geographical || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <div class="text-sm text-gray-900">
                         {{ account.grouping_code || "-" }}
                       </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap border border-gray-200">
                       <span
                         class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
                         :class="{
@@ -525,29 +525,35 @@
                     </td>
                   </tr>
                 </tbody>
-              </table>
-
-              <!-- Table Footer -->
-              <div
-                class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-blue-500"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                    <span
-                      >Total Customer Accounts:
-                      <span class="font-semibold text-blue-700">{{
-                        filteredCustomerAccounts.length
-                      }}</span></span
+                <tfoot>
+                  <tr>
+                    <td
+                      colspan="19"
+                      class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-blue-500"
                     >
-                  </div>
-                  <div v-if="searchQuery || statusFilter !== 'all'" class="text-blue-600">
-                    Filtered from
-                    {{ customerAccounts.length }} total records
-                  </div>
-                  <div class="text-xs text-white">Generated: {{ currentDate }}</div>
-                </div>
-              </div>
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                          <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                          <span
+                            >Total Customer Accounts:
+                            <span class="font-semibold text-blue-700">{{
+                              filteredCustomerAccounts.length
+                            }}</span></span
+                          >
+                        </div>
+                        <div
+                          v-if="searchQuery || statusFilter !== 'all'"
+                          class="text-blue-600"
+                        >
+                          Filtered from
+                          {{ customerAccounts.length }} total records
+                        </div>
+                        <div class="text-xs text-white">Generated: {{ currentDate }}</div>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
         </div>

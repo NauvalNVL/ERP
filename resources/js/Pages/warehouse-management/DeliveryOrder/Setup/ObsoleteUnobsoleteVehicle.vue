@@ -5,22 +5,22 @@
     <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
         <!-- Header Section -->
-        <div class="bg-emerald-600 text-white shadow-sm rounded-xl border border-emerald-700 mb-4">
+        <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm rounded-xl border border-indigo-700 mb-4">
           <div class="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="flex items-center gap-3">
-              <div class="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center">
+              <div class="h-9 w-9 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
                 <i class="fas fa-sync-alt text-white text-sm"></i>
               </div>
               <div>
                 <h2 class="text-lg sm:text-xl font-semibold leading-tight">
                   Manage Vehicle Status (Obsolete/Unobsolete)
                 </h2>
-                <p class="text-xs sm:text-sm text-emerald-100">
+                <p class="text-xs sm:text-sm text-indigo-100">
                   Toggle the active status of vehicles.
                 </p>
               </div>
             </div>
-            <div class="text-xs sm:text-sm text-emerald-100 flex items-center gap-2">
+            <div class="text-xs sm:text-sm text-indigo-100 flex items-center gap-2">
               <i class="fas fa-info-circle text-sm"></i>
               <span>Use search, status, and company filters to quickly find vehicles.</span>
             </div>
@@ -30,11 +30,11 @@
         <!-- Main Content Card -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
           <div class="px-4 py-3 sm:px-6 border-b border-gray-100 flex items-center">
-            <div class="p-2 bg-emerald-500 rounded-lg mr-3 text-white">
+            <div class="p-2 rounded-lg mr-3 text-white bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-sm">
               <i class="fas fa-truck"></i>
             </div>
             <div>
-              <h3 class="text-sm sm:text-base font-semibold text-slate-800">
+              <h3 class="text-sm sm:text-base font-semibold text-slate-900">
                 Vehicle List
               </h3>
               <p class="text-xs text-slate-500">
@@ -44,18 +44,6 @@
           </div>
 
           <div class="p-4 sm:p-6 space-y-4">
-            <!-- Notification -->
-            <div
-              v-if="notification.show"
-              :class="{
-                'bg-green-100 border border-green-400 text-green-700': notification.type === 'success',
-                'bg-red-100 border border-red-400 text-red-700': notification.type === 'error',
-                'px-4 py-3 rounded relative': true
-              }"
-            >
-              <span class="block sm:inline">{{ notification.message }}</span>
-            </div>
-
             <!-- Search and Filters -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div class="md:col-span-2">
@@ -67,14 +55,14 @@
                     v-model="searchQuery"
                     type="text"
                     placeholder="Search vehicles..."
-                    class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50"
+                    class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50"
                   >
                 </div>
               </div>
               <div class="flex flex-col sm:flex-row gap-3 md:justify-end">
                 <select
                   v-model="statusFilter"
-                  class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                  class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                 >
                   <option value="all">All Statuses</option>
                   <option value="active">Active Only</option>
@@ -82,7 +70,7 @@
                 </select>
                 <select
                   v-model="companyFilter"
-                  class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                  class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                 >
                   <option value="all">All Companies</option>
                   <option v-for="company in allCompanies" :key="company" :value="company">
@@ -94,22 +82,22 @@
 
             <!-- Loading Indicator -->
             <div v-if="loading" class="my-8 flex justify-center">
-              <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+              <div class="w-12 h-12 border-4 border-solid border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
 
             <!-- Vehicle Table -->
             <div v-else class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
               <table class="min-w-full divide-y divide-gray-200 bg-white">
-                <thead class="bg-gray-100">
+                <thead class="bg-slate-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle #</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Vehicle #</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Class</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Company</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Driver</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Phone</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-indigo-700 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-indigo-700 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -220,6 +208,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Swal from 'sweetalert2'
 
@@ -230,11 +219,24 @@ const searchQuery = ref('')
 const statusFilter = ref('all')
 const companyFilter = ref('all')
 const allCompanies = ref([])
-const notification = ref({
-  show: false,
-  message: '',
-  type: 'success'
-})
+
+const showSuccessAlert = (message = 'Action completed successfully') => {
+  Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: message,
+    timer: 1800,
+    showConfirmButton: false
+  })
+}
+
+const showErrorAlert = (message = 'Something went wrong') => {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: message
+  })
+}
 
 const pagination = ref({
   currentPage: 1,
@@ -293,7 +295,7 @@ const fetchVehicles = async () => {
       ).sort()
       allCompanies.value = companies
     } else {
-      showNotification('Error loading vehicles' + (data?.message ? `: ${data.message}` : ''), 'error')
+      showErrorAlert('Error loading vehicles' + (data?.message ? `: ${data.message}` : ''))
       vehicles.value = []
       pagination.value = {
         currentPage: 1,
@@ -303,7 +305,7 @@ const fetchVehicles = async () => {
     }
   } catch (error) {
     console.error('Error fetching vehicles:', error)
-    showNotification('Error loading vehicles: ' + (error?.message || error), 'error')
+    showErrorAlert('Error loading vehicles: ' + (error?.message || error))
     vehicles.value = []
     pagination.value = {
       currentPage: 1,
@@ -358,33 +360,17 @@ const changePage = page => {
   pagination.value.currentPage = page
 }
 
-const showNotification = (message, type = 'success') => {
-  notification.value = {
-    show: true,
-    message,
-    type
-  }
-
-  setTimeout(() => {
-    notification.value.show = false
-  }, 3000)
-}
-
 const toggleVehicleStatus = async vehicle => {
   if (isToggling.value) return
 
-  const currentStatus = vehicle.VEHICLE_STATUS === 'A' ? 'A' : 'O'
-  const newStatus = currentStatus === 'A' ? 'O' : 'A'
   const result = await Swal.fire({
-    title: currentStatus === 'A' ? 'Mark Vehicle as Obsolete?' : 'Activate Vehicle?',
-    html: `<strong>${vehicle.VEHICLE_NO}</strong> - ${vehicle.VEHICLE_DESCRIPTION || 'No description'}`,
+    title: 'Change vehicle status?',
+    text: `Vehicle "${vehicle.VEHICLE_NO}" will be ${vehicle.VEHICLE_STATUS === 'A' ? 'marked obsolete' : 'activated'}.`,
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: currentStatus === 'A' ? 'Yes, Obsolete' : 'Yes, Activate',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: currentStatus === 'A' ? '#dc2626' : '#059669',
-    cancelButtonColor: '#9ca3af',
-    reverseButtons: true
+    confirmButtonColor: '#2563eb',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, proceed'
   })
 
   if (!result.isConfirmed) return
@@ -422,10 +408,10 @@ const toggleVehicleStatus = async vehicle => {
     vehicle.STATUS = newStatus
 
     const statusText = newStatus === 'A' ? 'activated' : 'marked obsolete'
-    showNotification(`Vehicle "${vehicle.VEHICLE_NO}" successfully ${statusText}`, 'success')
+    showSuccessAlert(`Vehicle "${vehicle.VEHICLE_NO}" successfully ${statusText}`)
   } catch (error) {
     console.error('Error toggling vehicle status:', error)
-    showNotification('Error updating status: ' + (error?.message || error), 'error')
+    showErrorAlert('Error updating status: ' + (error?.message || error))
   } finally {
     isToggling.value = false
   }
