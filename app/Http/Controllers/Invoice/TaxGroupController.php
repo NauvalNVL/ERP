@@ -17,13 +17,23 @@ class TaxGroupController extends Controller
     /**
      * Display a listing of tax groups.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            // Only return active tax groups by default
-            $taxGroups = TaxGroup::where('status', 'A')
-                ->orderBy('code')
-                ->get();
+            $statusFilter = strtoupper($request->query('status', 'A'));
+
+            $query = TaxGroup::orderBy('code');
+
+            if ($statusFilter === 'ALL') {
+                // No additional filtering
+            } elseif ($statusFilter === 'O') {
+                $query->where('status', 'O');
+            } else {
+                // Default to active tax groups
+                $query->where('status', 'A');
+            }
+
+            $taxGroups = $query->get();
 
             return response()->json([
                 'success' => true,
@@ -111,13 +121,18 @@ class TaxGroupController extends Controller
                 ], 422);
             }
 
-            $taxGroup->status = $status;
-            $taxGroup->save();
+            DB::transaction(function () use ($taxGroup, $status) {
+                $taxGroup->status = $status;
+                $taxGroup->save();
+
+                TaxGroupItem::where('tax_group_code', $taxGroup->code)
+                    ->update(['status' => $status]);
+            });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Tax group status updated successfully',
-                'data' => $taxGroup,
+                'data' => $taxGroup->fresh(),
             ]);
         } catch (\Exception $e) {
             return response()->json([

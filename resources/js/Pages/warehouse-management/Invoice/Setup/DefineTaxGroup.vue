@@ -319,30 +319,6 @@
             <div class="w-12 h-12 border-4 border-solid border-purple-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
-        <!-- Notification Toast -->
-        <div v-if="notification.show" class="fixed bottom-5 right-5 z-50 shadow-xl rounded-lg transition-all duration-300 transform"
-             :class="{
-                 'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
-                 'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
-                 'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning',
-                 'translate-x-0 opacity-100': notification.show,
-                 'translate-x-full opacity-0': !notification.show
-             }">
-            <div class="p-4 flex items-center">
-                <div class="mr-3">
-                    <i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
-                    <i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
-                    <i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
-                </div>
-                <div>
-                    <p class="font-medium" :class="{
-                        'text-green-800': notification.type === 'success',
-                        'text-red-800': notification.type === 'error',
-                        'text-yellow-800': notification.type === 'warning'
-                    }">{{ notification.message }}</p>
-                </div>
-            </div>
-        </div>
     </AppLayout>
 </template>
 
@@ -353,6 +329,51 @@ import TaxGroupModal from '@/Components/TaxGroupModal.vue';
 import TaxItemScreenModal from '@/Components/TaxItemScreenModal.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+
+const showSuccessAlert = (message) =>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: message,
+        confirmButtonColor: '#4f46e5',
+    });
+
+const showErrorAlert = (message) =>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: message,
+        confirmButtonColor: '#ef4444',
+    });
+
+const showWarningAlert = (message) =>
+    Swal.fire({
+        icon: 'warning',
+        title: 'Perhatian',
+        text: message,
+        confirmButtonColor: '#f97316',
+    });
+
+const showConfirmDialog = async ({
+    title,
+    text,
+    confirmButtonText = 'Ya, simpan',
+    confirmButtonColor = '#2563eb',
+}) => {
+    const result = await Swal.fire({
+        title,
+        text,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText,
+        cancelButtonText: 'Batal',
+        confirmButtonColor,
+        cancelButtonColor: '#6b7280',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    });
+    return result.isConfirmed;
+};
 
 // UI State
 const showTableModal = ref(false);
@@ -381,23 +402,7 @@ const form = ref({
 });
 const originalCode = ref(''); // Track original code for updates
 
-// Notification
-const notification = ref({
-    show: false,
-    message: '',
-    type: 'success'
-});
-
-const showNotification = (message, type = 'success') => {
-    notification.value = {
-        show: true,
-        message,
-        type
-    };
-    setTimeout(() => {
-        notification.value.show = false;
-    }, 3000);
-};
+const normalizeCode = (value) => (value || '').toString().trim().toUpperCase();
 
 // Methods
 const fetchTaxGroups = async () => {
@@ -410,7 +415,7 @@ const fetchTaxGroups = async () => {
     } catch (e) {
         console.error('Error fetching tax groups:', e);
         taxGroups.value = [];
-        showNotification('Failed to load tax groups.', 'error');
+        showErrorAlert('Failed to load tax groups.');
     } finally {
         loading.value = false;
     }
@@ -435,15 +440,14 @@ const handleNew = () => {
 };
 
 const handleObsoleteSelection = (code, message) => {
-    showNotification(
+    showErrorAlert(
         message || `Tax group ${code || ''} is obsolete and cannot be used.`,
-        'error'
     );
     handleCancel();
 };
 
 const handleEnterKey = async () => {
-    const code = form.value.code?.trim().toUpperCase();
+    const code = normalizeCode(form.value.code);
     if (!code) return;
 
     // Try to find existing tax group
@@ -467,10 +471,10 @@ const handleEnterKey = async () => {
             form.value.status = 'A';
             originalCode.value = '';
             recordMode.value = 'add';
-            showNotification('Creating new tax group: ' + code, 'success');
+            showSuccessAlert('Creating new tax group: ' + code);
         } else {
             console.error('Error checking tax group:', e);
-            showNotification('Error checking tax group', 'error');
+            showErrorAlert('Error checking tax group');
         }
     }
 };
@@ -493,7 +497,7 @@ const onTaxGroupSelected = (group) => {
     editForm.value = { ...form.value };
     showEditModal.value = true;
 
-    showNotification('Tax group loaded: ' + group.code, 'success');
+    showSuccessAlert('Tax group loaded: ' + group.code);
 };
 
 const handleCancel = () => {
@@ -508,23 +512,22 @@ const handleCancel = () => {
 };
 
 const handleSave = async () => {
-    if (!form.value.code || !form.value.name) {
-        showNotification('Tax Group Code and Name are required.', 'error');
+    const cleanCode = normalizeCode(form.value.code);
+    const cleanName = (form.value.name || '').trim();
+    if (!cleanCode || !cleanName) {
+        showErrorAlert('Tax Group Code and Name are required.');
         return false;
     }
+    form.value.code = cleanCode;
+    form.value.name = cleanName;
 
-    const confirmRes = await Swal.fire({
-        title: 'Confirm Saving / Updating?',
-        text: 'Confirm Saving / Updating ?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        reverseButtons: true,
-        allowOutsideClick: false,
+    const confirmed = await showConfirmDialog({
+        title: 'Simpan / Update Tax Group?',
+        text: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
+        confirmButtonText: 'Ya, simpan',
     });
 
-    if (!confirmRes.isConfirmed) {
+    if (!confirmed) {
         return false;
     }
 
@@ -548,9 +551,8 @@ const handleSave = async () => {
 
         const result = response.data;
         if (result.success) {
-            showNotification(
-                recordMode.value === 'add' ? 'Tax group created successfully!' : 'Tax group updated successfully!',
-                'success'
+            showSuccessAlert(
+                recordMode.value === 'add' ? 'Tax group created successfully!' : 'Tax group updated successfully!'
             );
             await fetchTaxGroups();
 
@@ -559,12 +561,21 @@ const handleSave = async () => {
             recordMode.value = 'review';
             success = true;
         } else {
-            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
+            showErrorAlert('Error: ' + (result.message || 'Unknown error'));
         }
     } catch (e) {
-        const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
-        console.error('Error saving tax group:', e);
-        showNotification(`Error saving tax group: ${errorMessage}`, 'error');
+        const status = e.response?.status;
+        if (status === 422) {
+            const errors = e.response?.data?.errors;
+            const errorMessages = errors
+                ? Object.values(errors).flat().join('\n')
+                : e.response?.data?.message || 'Validation failed';
+            showErrorAlert(`Validasi gagal: ${errorMessages}`);
+        } else {
+            const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
+            console.error('Error saving tax group:', e);
+            showErrorAlert(`Error saving tax group: ${errorMessage}`);
+        }
     } finally {
         saving.value = false;
     }
@@ -577,18 +588,14 @@ const handleDelete = async () => {
         return;
     }
 
-    const confirmRes = await Swal.fire({
+    const confirmed = await showConfirmDialog({
         title: 'Delete Tax Group?',
         text: `Are you sure you want to delete tax group "${form.value.code}"? This action cannot be undone.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel',
-        reverseButtons: true,
-        allowOutsideClick: false,
+        confirmButtonText: 'Ya, hapus',
+        confirmButtonColor: '#dc2626',
     });
 
-    if (!confirmRes.isConfirmed) {
+    if (!confirmed) {
         return;
     }
 
@@ -597,16 +604,16 @@ const handleDelete = async () => {
         const response = await axios.delete(`/api/invoices/tax-groups/${form.value.code}`);
         const result = response.data;
         if (result.success) {
-            showNotification('Tax group deleted successfully.', 'success');
+            showSuccessAlert('Tax group deleted successfully.');
             await fetchTaxGroups();
             handleCancel(); // Reset form
         } else {
-            showNotification('Error deleting tax group: ' + (result.message || 'Unknown error'), 'error');
+            showErrorAlert('Error deleting tax group: ' + (result.message || 'Unknown error'));
         }
     } catch (e) {
         const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
         console.error('Error deleting tax group:', e);
-        showNotification(`Error deleting tax group: ${errorMessage}`, 'error');
+        showErrorAlert(`Error deleting tax group: ${errorMessage}`);
     } finally {
         saving.value = false;
     }
@@ -625,14 +632,14 @@ const closeEditModal = () => {
 
 const saveTaxGroupChanges = async () => {
     if (!editForm.value.code || !editForm.value.name) {
-        showNotification('Tax Group Code and Name are required.', 'error');
+        showErrorAlert('Tax Group Code and Name are required.');
         return;
     }
 
     // Sinkronkan data modal ke form utama
     form.value = {
-        code: editForm.value.code.toUpperCase(),
-        name: editForm.value.name,
+        code: normalizeCode(editForm.value.code),
+        name: (editForm.value.name || '').trim(),
         sales_tax_applied: editForm.value.sales_tax_applied || 'Y',
         status: editForm.value.status || 'A'
     };
@@ -658,7 +665,7 @@ const saveTaxGroupChanges = async () => {
 
 const handleDeleteFromModal = async () => {
     if (!editForm.value.code) {
-        showNotification('Please select a tax group first.', 'warning');
+        showWarningAlert('Please select a tax group first.');
         return;
     }
     form.value.code = editForm.value.code;
@@ -668,7 +675,7 @@ const handleDeleteFromModal = async () => {
 
 const openTaxItemScreen = () => {
     if (!form.value.code) {
-        showNotification('Please select a tax group first.', 'warning');
+        showWarningAlert('Please select a tax group first.');
         return;
     }
     showTaxItemScreen.value = true;

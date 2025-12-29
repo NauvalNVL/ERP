@@ -290,77 +290,53 @@
             </div>
         </div>
 
-        <!-- Confirmation Dialog (CPS-style) -->
-        <div v-if="showConfirmation" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-2xl w-96">
-                <div class="bg-blue-600 text-white px-4 py-3 rounded-t-lg">
-                    <h3 class="text-sm font-semibold">Confirmation</h3>
-                </div>
-                <div class="p-6 flex items-center gap-4">
-                    <div class="flex-shrink-0">
-                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-question text-blue-600 text-2xl"></i>
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-gray-800 font-medium">{{ confirmationMessage }}</p>
-                    </div>
-                </div>
-                <div class="px-6 pb-4 flex justify-center gap-3">
-                    <button @click="confirmAction" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
-                        OK
-                    </button>
-                    <button @click="cancelAction" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded text-sm">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Loading Overlay -->
         <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
             <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-
-        <!-- Notification Toast -->
-        <div v-if="notification.show" class="fixed bottom-5 right-5 z-50 shadow-xl rounded-lg transition-all duration-300 transform"
-             :class="{
-                 'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
-                 'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
-                 'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning',
-                 'translate-x-0 opacity-100': notification.show,
-                 'translate-x-full opacity-0': !notification.show
-             }">
-            <div class="p-4 flex items-center">
-                <div class="mr-3">
-                    <i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
-                    <i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
-                    <i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
-                </div>
-                <div>
-                    <p class="font-medium" :class="{
-                        'text-green-800': notification.type === 'success',
-                        'text-red-800': notification.type === 'error',
-                        'text-yellow-800': notification.type === 'warning'
-                    }">{{ notification.message }}</p>
-                </div>
-            </div>
         </div>
     </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+
+const showSuccessAlert = (message) =>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: message,
+        confirmButtonColor: '#4f46e5',
+    });
+
+const showErrorAlert = (message) =>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: message,
+        confirmButtonColor: '#ef4444',
+    });
+
+const showConfirmDialog = async ({ title, text, confirmButtonText = 'Ya, simpan' }) => {
+    const result = await Swal.fire({
+        title,
+        text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText,
+        cancelButtonText: 'Batal',
+    });
+    return result.isConfirmed;
+};
 
 // UI State
 const recordMode = ref('select'); // 'select' | 'review'
 const showTable = ref(false);
 const showForm = ref(false);
-const showConfirmation = ref(false);
-const confirmationMessage = ref('');
-const confirmationAction = ref(null);
 const selectedRow = ref(null);
 
 // Data
@@ -392,24 +368,11 @@ const customTypeOptions = [
 
 const taxTypes = ref([]);
 const originalData = ref(null);
-const notification = ref({ show: false, message: '', type: 'success' });
 const saving = ref(false);
 
-const showNotification = (message, type = 'success') => {
-    notification.value = {
-        show: true,
-        message,
-        type
-    };
-    setTimeout(() => {
-        notification.value.show = false;
-    }, 3000);
-};
-
 const handleObsoleteSelection = (code, message) => {
-    showNotification(
-        message || `Tax type ${code || ''} is obsolete and cannot be used.`,
-        'error'
+    showErrorAlert(
+        message || `Tax type ${code || ''} is obsolete and cannot be used.`
     );
     resetForm();
 };
@@ -494,7 +457,7 @@ const handleCodeInput = async () => {
             return;
         }
         console.error('Error fetching tax type:', e);
-        showNotification('Failed to fetch tax type data.', 'error');
+        showErrorAlert('Failed to fetch tax type data.');
     }
 };
 
@@ -528,42 +491,37 @@ const closeForm = () => {
     showForm.value = false;
 };
 
-const handleSave = () => {
+const handleSave = async () => {
     if (!form.value.code || !form.value.name) {
-        alert('Please fill Tax Code and Tax Name');
+        showErrorAlert('Please fill Tax Code and Tax Name');
         return;
     }
-    confirmationMessage.value = 'Confirm Saving / Updating ?';
-    confirmationAction.value = 'save';
-    showConfirmation.value = true;
+    const confirmed = await showConfirmDialog({
+        title: 'Simpan Tax Type?',
+        text: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
+        confirmButtonText: 'Ya, simpan',
+    });
+    if (!confirmed) return;
+    await saveTaxType();
 };
 
-const handleDelete = () => {
+const handleDelete = async () => {
     if (!form.value.code) {
-        alert('Please select a tax type to obsolete');
+        showErrorAlert('Please select a tax type to obsolete');
         return;
     }
-    confirmationMessage.value = 'Confirm Obsoleting ?';
-    confirmationAction.value = 'delete';
-    showConfirmation.value = true;
+    const confirmed = await showConfirmDialog({
+        title: 'Obsolete Tax Type?',
+        text: `Tax type ${form.value.code} akan diubah menjadi Obsolete. Lanjutkan?`,
+        confirmButtonText: 'Ya, obsolete',
+    });
+    if (!confirmed) return;
+    await deleteTaxType();
 };
 
 const handleRefresh = async () => {
     await loadTaxTypes();
     resetForm();
-};
-
-const confirmAction = async () => {
-    if (confirmationAction.value === 'save') {
-        await saveTaxType();
-    } else if (confirmationAction.value === 'delete') {
-        await deleteTaxType();
-    }
-    showConfirmation.value = false;
-};
-
-const cancelAction = () => {
-    showConfirmation.value = false;
 };
 
 const saveTaxType = async () => {
@@ -588,13 +546,13 @@ const saveTaxType = async () => {
         }
 
         if (res.data && res.data.success) {
-            showNotification(res.data.message || 'Tax type saved successfully!', 'success');
+            showSuccessAlert(res.data.message || 'Tax type saved successfully!');
             await loadTaxTypes();
             resetForm();
             showForm.value = false;
         }
     } catch (e) {
-        showNotification(e.response?.data?.message || 'Error saving tax type', 'error');
+        showErrorAlert(e.response?.data?.message || 'Error saving tax type');
     } finally {
         saving.value = false;
     }
@@ -607,13 +565,13 @@ const deleteTaxType = async () => {
             status: 'O',
         });
         if (res.data && res.data.success) {
-            showNotification(res.data.message || 'Tax type marked obsolete successfully', 'success');
+            showSuccessAlert(res.data.message || 'Tax type marked obsolete successfully');
             await loadTaxTypes();
             resetForm();
             showForm.value = false;
         }
     } catch (e) {
-        showNotification(e.response?.data?.message || 'Error obsoleting tax type', 'error');
+        showErrorAlert(e.response?.data?.message || 'Error obsoleting tax type');
     } finally {
         saving.value = false;
     }

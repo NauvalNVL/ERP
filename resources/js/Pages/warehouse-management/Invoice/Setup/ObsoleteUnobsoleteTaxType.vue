@@ -218,13 +218,21 @@ const searchQuery = ref("");
 const statusFilter = ref("all");
 const isToggling = ref(false);
 
-const toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timer: 2500,
-  timerProgressBar: true,
-});
+const showSuccessAlert = (message) =>
+  Swal.fire({
+    icon: "success",
+    title: "Berhasil",
+    text: message,
+    confirmButtonColor: "#4f46e5",
+  });
+
+const showErrorAlert = (message) =>
+  Swal.fire({
+    icon: "error",
+    title: "Gagal",
+    text: message,
+    confirmButtonColor: "#ef4444",
+  });
 
 const getStatus = (item) => {
   if (item.status) {
@@ -312,17 +320,10 @@ const toggleTaxTypeStatus = async (item) => {
     item.status = newStatus;
 
     const statusText = newStatus === "A" ? "activated" : "marked obsolete";
-    toast.fire({
-      icon: "success",
-      title: `Tax type "${item.code}" ${statusText}`,
-    });
+    showSuccessAlert(`Tax type "${item.code}" ${statusText}`);
   } catch (error) {
     console.error("Error toggling tax type status:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Status update failed",
-      text: error.message || "Error updating tax type status.",
-    });
+    showErrorAlert(error.message || "Error updating tax type status.");
   } finally {
     isToggling.value = false;
   }
