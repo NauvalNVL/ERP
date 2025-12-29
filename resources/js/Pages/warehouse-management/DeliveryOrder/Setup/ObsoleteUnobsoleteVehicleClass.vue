@@ -193,7 +193,6 @@ import { ref, computed, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import Swal from 'sweetalert2'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Swal from 'sweetalert2'
 
 const classes = ref([])
 const loading = ref(false)
@@ -320,6 +319,8 @@ const changePage = page => {
 
 const toggleClassStatus = async cls => {
   if (isToggling.value) return
+
+  const newStatus = cls.STATUS === 'A' ? 'O' : 'A'
 
   const result = await Swal.fire({
     title: 'Change vehicle class status?',
