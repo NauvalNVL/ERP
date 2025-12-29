@@ -210,13 +210,41 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import DeliveryOrderLookupModal from '@/Components/DeliveryOrderLookupModal.vue'
-import { useToast } from '@/Composables/useToast'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 
-const { success, error, info } = useToast()
+const showSuccessAlert = (message) =>
+  Swal.fire({
+    icon: 'success',
+    title: 'Berhasil',
+    text: message,
+    confirmButtonColor: '#4f46e5'
+  })
+
+const showErrorAlert = (message) =>
+  Swal.fire({
+    icon: 'error',
+    title: 'Gagal',
+    text: message,
+    confirmButtonColor: '#ef4444'
+  })
+
+const showConfirmDialog = async ({ title, text, confirmButtonText = 'Ya, lanjutkan' }) => {
+  const result = await Swal.fire({
+    title,
+    text,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText,
+    cancelButtonText: 'Batal'
+  })
+  return result.isConfirmed
+}
 
 // Period Information
 const currentPeriod = reactive({
@@ -278,7 +306,7 @@ const selectDeliveryOrder = async (deliveryOrderData) => {
   parseDeliveryOrderNumber(deliveryOrderData.DO_Num)
   
   // Modal will auto-close via emit('close') from the modal component
-  success(`Delivery Order ${deliveryOrderData.DO_Num} selected successfully`)
+  showSuccessAlert(`Delivery Order ${deliveryOrderData.DO_Num} selected successfully`)
 }
 
 const parseDeliveryOrderNumber = (doNumber) => {
@@ -294,22 +322,26 @@ const parseDeliveryOrderNumber = (doNumber) => {
 
 const cancelDeliveryOrder = async () => {
   if (!selectedDeliveryOrder.doNumber) {
-    error('Please select a delivery order first')
+    showErrorAlert('Please select a delivery order first')
     return
   }
   
   if (!canCancel.value) {
     showValidation.value = true
     if (!cancellationReason.value.trim()) {
-      error('Please provide a cancellation reason')
+      showErrorAlert('Please provide a cancellation reason')
     } else {
-      error('This delivery order cannot be cancelled')
+      showErrorAlert('This delivery order cannot be cancelled')
     }
     return
   }
-  
-  // Confirm cancellation
-  if (!confirm(`Are you sure you want to cancel delivery order ${selectedDeliveryOrder.doNumber}?\n\nThis action cannot be undone.`)) {
+
+  const confirmed = await showConfirmDialog({
+    title: 'Batalkan Delivery Order?',
+    text: `Apakah Anda yakin ingin membatalkan DO ${selectedDeliveryOrder.doNumber}? Aksi ini tidak dapat dibatalkan.`,
+    confirmButtonText: 'Ya, batalkan'
+  })
+  if (!confirmed) {
     return
   }
   
@@ -329,7 +361,7 @@ const cancelDeliveryOrder = async () => {
         ? `Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully. ${affectedRows} records updated.`
         : `Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully.`
       
-      success(message)
+      showSuccessAlert(message)
       
       // Update the status
       selectedDeliveryOrder.status = 'Cancelled'
@@ -337,14 +369,14 @@ const cancelDeliveryOrder = async () => {
       // Clear the form
       refreshPage()
     } else {
-      error(response.data.message || 'Failed to cancel delivery order')
+      showErrorAlert(response.data.message || 'Failed to cancel delivery order')
     }
   } catch (err) {
     console.error('Error cancelling delivery order:', err)
     if (err.response?.data?.message) {
-      error(err.response.data.message)
+      showErrorAlert(err.response.data.message)
     } else {
-      error('Error cancelling delivery order')
+      showErrorAlert('Error cancelling delivery order')
     }
   }
 }
@@ -370,12 +402,17 @@ const refreshPage = () => {
   cancellationReason.value = ''
   showValidation.value = false
   
-  success('Form reset successfully')
+  showSuccessAlert('Form reset successfully')
 }
 
-const exitPage = () => {
+const exitPage = async () => {
   if (selectedDeliveryOrder.doNumber || cancellationReason.value) {
-    if (confirm('You have unsaved changes. Are you sure you want to exit?')) {
+    const confirmed = await showConfirmDialog({
+      title: 'Keluar dari halaman?',
+      text: 'Perubahan belum disimpan. Apakah Anda yakin ingin keluar?',
+      confirmButtonText: 'Ya, keluar'
+    })
+    if (confirmed) {
       window.history.back()
     }
   } else {
@@ -416,8 +453,6 @@ onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
 })
 
-// Cleanup
-import { onUnmounted } from 'vue'
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
 })
