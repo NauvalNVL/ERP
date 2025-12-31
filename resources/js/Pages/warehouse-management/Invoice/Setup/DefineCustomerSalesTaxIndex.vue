@@ -495,11 +495,11 @@ const handleSave = async () => {
 const handleDelete = async () => {
   const confirmResult = await Swal.fire({
     icon: "warning",
-    title: "Confirm Delete",
-    text: "Are you sure you want to delete this tax index?",
+    title: "Confirm Obsolete",
+    text: "Are you sure you want to obsolete this tax index?",
     showCancelButton: true,
     confirmButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it",
+    confirmButtonText: "Yes, obsolete",
     cancelButtonText: "Cancel",
   });
 
@@ -508,14 +508,21 @@ const handleDelete = async () => {
   }
 
   try {
-    const response = await axios.delete(
-      `/api/invoices/customer-tax-indices/${form.value.customer_code}/${form.value.index_number}`
+    const tokenTag = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = tokenTag ? tokenTag.getAttribute("content") : null;
+
+    const response = await axios.put(
+      `/api/invoices/customer-tax-indices/${encodeURIComponent(
+        form.value.customer_code
+      )}/${encodeURIComponent(form.value.index_number)}/status`,
+      { status: "O" },
+      csrfToken ? { headers: { "X-CSRF-TOKEN": csrfToken } } : undefined
     );
 
     if (response.data.success) {
       await Swal.fire({
         icon: "success",
-        title: "Deleted",
+        title: "Obsoleted",
       });
       handleCancel();
     }
@@ -523,8 +530,8 @@ const handleDelete = async () => {
     console.error("Error deleting:", error);
     await Swal.fire({
       icon: "error",
-      title: "Delete Failed",
-      text: "Failed to delete: " + (error.response?.data?.message || error.message),
+      title: "Obsolete Failed",
+      text: "Failed to obsolete: " + (error.response?.data?.message || error.message),
     });
   }
 };
