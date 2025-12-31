@@ -194,7 +194,7 @@
                                 v-model="form.custom_type"
                                 class="modal-input"
                             >
-                                <option v-for="opt in customTypeOptions" :key="opt" :value="opt">{{ opt }}</option>
+                                <option v-for="opt in customTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                             </select>
                         </div>
                     </form>
@@ -266,7 +266,7 @@
                                 <td class="px-4 py-2">{{ tx.name }}</td>
                                 <td class="px-4 py-2">{{ tx.apply }}</td>
                                 <td class="px-4 py-2">{{ Number(tx.rate).toFixed(2) }}</td>
-                                <td class="px-4 py-2">{{ tx.custom_type }}</td>
+                                <td class="px-4 py-2">{{ getCustomTypeLabel(tx.custom_type) }}</td>
                                 <td class="px-4 py-2">
                                     {{ tx.status === 'O' ? 'Obsolete' : 'Active' }}
                                 </td>
@@ -306,7 +306,7 @@ import Swal from 'sweetalert2';
 const showSuccessAlert = (message) =>
     Swal.fire({
         icon: 'success',
-        title: 'Berhasil',
+        title: 'Success',
         text: message,
         confirmButtonColor: '#4f46e5',
     });
@@ -314,12 +314,12 @@ const showSuccessAlert = (message) =>
 const showErrorAlert = (message) =>
     Swal.fire({
         icon: 'error',
-        title: 'Gagal',
+        title: 'Failed',
         text: message,
         confirmButtonColor: '#ef4444',
     });
 
-const showConfirmDialog = async ({ title, text, confirmButtonText = 'Ya, simpan' }) => {
+const showConfirmDialog = async ({ title, text, confirmButtonText = 'Yes, save' }) => {
     const result = await Swal.fire({
         title,
         text,
@@ -328,7 +328,7 @@ const showConfirmDialog = async ({ title, text, confirmButtonText = 'Ya, simpan'
         confirmButtonColor: '#2563eb',
         cancelButtonColor: '#6b7280',
         confirmButtonText,
-        cancelButtonText: 'Batal',
+        cancelButtonText: 'Cancel',
     });
     return result.isConfirmed;
 };
@@ -350,21 +350,30 @@ const form = ref({
 });
 
 const customTypeOptions = [
-    'N-NIL',
-    '01-FTZ CUSTOM FORM 2',
-    '02-LMW LAMPIRAN H',
-    '03-LMW CUSTOM FORM 9',
-    '04-LMW LAMPIRAN GPB-1',
-    '05-LMW LAMPIRAN GPB-2',
-    '06-LMW LAMPIRAN J',
-    '07-CJP(2)',
-    '08-LMW LAMPIRAN I',
-    'S1-SST, FTZ',
-    'S2-SST, LMW',
-    'SA-SST, SCHEDULE A',
-    'SB-SST, SCHEDULE B',
-    'SC-SST, SCHEDULE C',
+    { value: 'N-NIL', label: 'N-NIL' },
+    { value: '01-FTZ CUSTOM FORM 2', label: '01-FTZ CUSTOM FORM 2' },
+    { value: '02-LMW LAMPIRAN H', label: '02-LMW APPENDIX H' },
+    { value: '03-LMW CUSTOM FORM 9', label: '03-LMW CUSTOM FORM 9' },
+    { value: '04-LMW LAMPIRAN GPB-1', label: '04-LMW APPENDIX GPB-1' },
+    { value: '05-LMW LAMPIRAN GPB-2', label: '05-LMW APPENDIX GPB-2' },
+    { value: '06-LMW LAMPIRAN J', label: '06-LMW APPENDIX J' },
+    { value: '07-CJP(2)', label: '07-CJP(2)' },
+    { value: '08-LMW LAMPIRAN I', label: '08-LMW APPENDIX I' },
+    { value: 'S1-SST, FTZ', label: 'S1-SST, FTZ' },
+    { value: 'S2-SST, LMW', label: 'S2-SST, LMW' },
+    { value: 'SA-SST, SCHEDULE A', label: 'SA-SST, SCHEDULE A' },
+    { value: 'SB-SST, SCHEDULE B', label: 'SB-SST, SCHEDULE B' },
+    { value: 'SC-SST, SCHEDULE C', label: 'SC-SST, SCHEDULE C' },
 ];
+
+const customTypeLabelByValue = Object.fromEntries(
+    customTypeOptions.map((opt) => [opt.value, opt.label])
+);
+
+const getCustomTypeLabel = (value) => {
+    const key = (value || '').toString();
+    return customTypeLabelByValue[key] || key || 'N-NIL';
+};
 
 const taxTypes = ref([]);
 const originalData = ref(null);
@@ -497,9 +506,9 @@ const handleSave = async () => {
         return;
     }
     const confirmed = await showConfirmDialog({
-        title: 'Simpan Tax Type?',
-        text: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
-        confirmButtonText: 'Ya, simpan',
+        title: 'Save Tax Type?',
+        text: 'Are you sure you want to save these changes?',
+        confirmButtonText: 'Yes, save',
     });
     if (!confirmed) return;
     await saveTaxType();
@@ -512,8 +521,8 @@ const handleDelete = async () => {
     }
     const confirmed = await showConfirmDialog({
         title: 'Obsolete Tax Type?',
-        text: `Tax type ${form.value.code} akan diubah menjadi Obsolete. Lanjutkan?`,
-        confirmButtonText: 'Ya, obsolete',
+        text: `Tax type ${form.value.code} will be marked as Obsolete. Continue?`,
+        confirmButtonText: 'Yes, obsolete',
     });
     if (!confirmed) return;
     await deleteTaxType();

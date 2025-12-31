@@ -26,17 +26,17 @@
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Current Period:</label>
             <div class="flex items-center space-x-2">
-              <input 
-                v-model="currentPeriod.month" 
-                type="number" 
-                min="1" 
+              <input
+                v-model="currentPeriod.month"
+                type="number"
+                min="1"
                 max="12"
                 class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                 readonly
                 disabled
               >
-              <input 
-                v-model="currentPeriod.year" 
+              <input
+                v-model="currentPeriod.year"
                 type="number"
                 class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                 readonly
@@ -50,30 +50,30 @@
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">D/Order#:</label>
             <div class="flex items-center space-x-2">
-              <input 
-                v-model="deliveryOrderParts.year" 
+              <input
+                v-model="deliveryOrderParts.year"
                 type="number"
                 class="w-16 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 placeholder="YYYY"
                 readonly
               >
               <span class="text-gray-500">-</span>
-              <input 
-                v-model="deliveryOrderParts.month" 
+              <input
+                v-model="deliveryOrderParts.month"
                 type="number"
                 class="w-12 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 placeholder="MM"
                 readonly
               >
               <span class="text-gray-500">-</span>
-              <input 
-                v-model="deliveryOrderParts.number" 
+              <input
+                v-model="deliveryOrderParts.number"
                 type="number"
                 class="w-20 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 placeholder="Number"
                 readonly
               >
-              <button 
+              <button
                 @click="openDeliveryOrderLookup"
                 class="p-2 text-red-600 hover:bg-red-100 rounded transition-colors"
                 title="DO Lookup"
@@ -129,7 +129,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Reason: <span class="text-red-500">*</span>
               </label>
-              <textarea 
+              <textarea
                 v-model="cancellationReason"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
@@ -158,15 +158,15 @@
 
         <!-- Action Buttons -->
         <div v-if="selectedDeliveryOrder.doNumber" class="mt-6 flex items-center justify-end space-x-4">
-          <button 
-            @click="refreshPage" 
+          <button
+            @click="refreshPage"
             class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center"
           >
             <i class="fas fa-sync-alt mr-2"></i>
             Refresh
           </button>
-          <button 
-            @click="cancelDeliveryOrder" 
+          <button
+            @click="cancelDeliveryOrder"
             class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
             :disabled="!canCancel"
           >
@@ -200,10 +200,10 @@
 </div>
 
     <!-- Delivery Order Lookup Modal -->
-    <DeliveryOrderLookupModal 
-      :show="showDeliveryOrderModal" 
+    <DeliveryOrderLookupModal
+      :show="showDeliveryOrderModal"
       context="cancel"
-      @close="showDeliveryOrderModal = false" 
+      @close="showDeliveryOrderModal = false"
       @select="selectDeliveryOrder"
     />
   </AppLayout>
@@ -219,7 +219,7 @@ import Swal from 'sweetalert2'
 const showSuccessAlert = (message) =>
   Swal.fire({
     icon: 'success',
-    title: 'Berhasil',
+    title: 'Success',
     text: message,
     confirmButtonColor: '#4f46e5'
   })
@@ -227,12 +227,12 @@ const showSuccessAlert = (message) =>
 const showErrorAlert = (message) =>
   Swal.fire({
     icon: 'error',
-    title: 'Gagal',
+    title: 'Failed',
     text: message,
     confirmButtonColor: '#ef4444'
   })
 
-const showConfirmDialog = async ({ title, text, confirmButtonText = 'Ya, lanjutkan' }) => {
+const showConfirmDialog = async ({ title, text, confirmButtonText = 'Yes, continue' }) => {
   const result = await Swal.fire({
     title,
     text,
@@ -241,7 +241,7 @@ const showConfirmDialog = async ({ title, text, confirmButtonText = 'Ya, lanjutk
     confirmButtonColor: '#dc2626',
     cancelButtonColor: '#6b7280',
     confirmButtonText,
-    cancelButtonText: 'Batal'
+    cancelButtonText: 'Cancel'
   })
   return result.isConfirmed
 }
@@ -282,8 +282,8 @@ const orderMode = ref('0-Order by Customer + Deliver & Invoice to Customer')
 
 // Computed properties
 const canCancel = computed(() => {
-  return selectedDeliveryOrder.doNumber && 
-         selectedDeliveryOrder.status && 
+  return selectedDeliveryOrder.doNumber &&
+         selectedDeliveryOrder.status &&
          ['Draft', 'Saved'].includes(selectedDeliveryOrder.status) &&
          cancellationReason.value.trim().length > 0
 })
@@ -301,10 +301,10 @@ const selectDeliveryOrder = async (deliveryOrderData) => {
   selectedDeliveryOrder.orderDate = deliveryOrderData.DO_DMY
   selectedDeliveryOrder.vehicleNumber = deliveryOrderData.DO_VHC_Num
   selectedDeliveryOrder.originalData = deliveryOrderData
-  
+
   // Parse DO number parts
   parseDeliveryOrderNumber(deliveryOrderData.DO_Num)
-  
+
   // Modal will auto-close via emit('close') from the modal component
   showSuccessAlert(`Delivery Order ${deliveryOrderData.DO_Num} selected successfully`)
 }
@@ -325,7 +325,7 @@ const cancelDeliveryOrder = async () => {
     showErrorAlert('Please select a delivery order first')
     return
   }
-  
+
   if (!canCancel.value) {
     showValidation.value = true
     if (!cancellationReason.value.trim()) {
@@ -337,35 +337,35 @@ const cancelDeliveryOrder = async () => {
   }
 
   const confirmed = await showConfirmDialog({
-    title: 'Batalkan Delivery Order?',
-    text: `Apakah Anda yakin ingin membatalkan DO ${selectedDeliveryOrder.doNumber}? Aksi ini tidak dapat dibatalkan.`,
-    confirmButtonText: 'Ya, batalkan'
+    title: 'Cancel Delivery Order?',
+    text: `Are you sure you want to cancel DO ${selectedDeliveryOrder.doNumber}? This action cannot be undone.`,
+    confirmButtonText: 'Yes, cancel'
   })
   if (!confirmed) {
     return
   }
-  
+
   try {
     const cancelData = {
       do_number: selectedDeliveryOrder.doNumber,
       cancellation_reason: cancellationReason.value.trim()
     }
-    
+
     console.log('Cancelling delivery order:', cancelData)
-    
+
     const response = await axios.post(`/api/delivery-orders/${selectedDeliveryOrder.doNumber}/cancel`, cancelData)
-    
+
     if (response.data.success) {
       const affectedRows = response.data.data?.affected_rows || 1
-      const message = affectedRows > 1 
+      const message = affectedRows > 1
         ? `Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully. ${affectedRows} records updated.`
         : `Delivery order ${selectedDeliveryOrder.doNumber} cancelled successfully.`
-      
+
       showSuccessAlert(message)
-      
+
       // Update the status
       selectedDeliveryOrder.status = 'Cancelled'
-      
+
       // Clear the form
       refreshPage()
     } else {
@@ -390,27 +390,27 @@ const refreshPage = () => {
   selectedDeliveryOrder.orderDate = ''
   selectedDeliveryOrder.vehicleNumber = ''
   selectedDeliveryOrder.originalData = null
-  
+
   // Reset delivery order parts
   Object.assign(deliveryOrderParts, {
     year: '',
     month: '',
     number: ''
   })
-  
+
   // Reset cancellation reason
   cancellationReason.value = ''
   showValidation.value = false
-  
+
   showSuccessAlert('Form reset successfully')
 }
 
 const exitPage = async () => {
   if (selectedDeliveryOrder.doNumber || cancellationReason.value) {
     const confirmed = await showConfirmDialog({
-      title: 'Keluar dari halaman?',
-      text: 'Perubahan belum disimpan. Apakah Anda yakin ingin keluar?',
-      confirmButtonText: 'Ya, keluar'
+      title: 'Leave this page?',
+      text: 'Changes have not been saved. Are you sure you want to leave?',
+      confirmButtonText: 'Yes, leave'
     })
     if (confirmed) {
       window.history.back()

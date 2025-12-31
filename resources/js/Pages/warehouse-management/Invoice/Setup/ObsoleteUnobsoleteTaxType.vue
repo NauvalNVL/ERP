@@ -221,7 +221,7 @@ const isToggling = ref(false);
 const showSuccessAlert = (message) =>
   Swal.fire({
     icon: "success",
-    title: "Berhasil",
+    title: "Success",
     text: message,
     confirmButtonColor: "#4f46e5",
   });
@@ -229,7 +229,7 @@ const showSuccessAlert = (message) =>
 const showErrorAlert = (message) =>
   Swal.fire({
     icon: "error",
-    title: "Gagal",
+    title: "Failed",
     text: message,
     confirmButtonColor: "#ef4444",
   });
