@@ -514,7 +514,18 @@ const fetchMachines = async () => {
     }
 
     const data = await response.json();
-    machines.value = data.machines || [];
+    const list = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.machines)
+      ? data.machines
+      : [];
+
+    machines.value = (list || []).filter((machine) => {
+      const status = (machine?.status ?? machine?.STATUS ?? "").toString().trim();
+      if (status) return status !== "Obs";
+      if (typeof machine?.is_active === "boolean") return machine.is_active;
+      return true;
+    });
 
     // After loading machines, populate machine names for existing mchCodes
     mspRows.value.forEach((row) => {

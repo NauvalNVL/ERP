@@ -47,9 +47,19 @@ class ChemicalCoatController extends Controller
     /**
      * Get all chemical coats (API)
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
-        $chemicalCoats = ChemicalCoat::orderBy('code')->get();
+        $query = ChemicalCoat::query()->orderBy('code');
+
+        $allStatus = $request->boolean('all_status') || $request->boolean('include_obsolete');
+        if (!$allStatus) {
+            $query->where(function ($q) {
+                $q->where('status', 'Act')
+                    ->orWhere('is_active', true);
+            });
+        }
+
+        $chemicalCoats = $query->get();
         return response()->json($chemicalCoats);
     }
 

@@ -20,7 +20,17 @@ class ReinforcementTapeController extends Controller
     public function apiIndex(Request $request)
     {
         try {
-            $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            $query = ReinforcementTape::query()->orderBy('code', 'asc');
+
+            $allStatus = $request->boolean('all_status') || $request->boolean('include_obsolete');
+            if (!$allStatus) {
+                $query->where(function ($q) {
+                    $q->where('status', 'Act')
+                        ->orWhere('is_active', true);
+                });
+            }
+
+            $reinforcementTapes = $query->get();
 
             return response()->json($reinforcementTapes);
         } catch (\Exception $e) {

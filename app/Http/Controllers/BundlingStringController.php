@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BundlingString;
+use Database\Seeders\BundlingStringSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,17 @@ class BundlingStringController extends Controller
     public function apiIndex(Request $request)
     {
         try {
-            $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            $query = BundlingString::query()->orderBy('code', 'asc');
+
+            $allStatus = $request->boolean('all_status') || $request->boolean('include_obsolete');
+            if (!$allStatus) {
+                $query->where(function ($q) {
+                    $q->where('status', 'Act')
+                        ->orWhere('is_active', true);
+                });
+            }
+
+            $bundlingStrings = $query->get();
             return response()->json($bundlingStrings);
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@apiIndex: ' . $e->getMessage());
@@ -337,6 +348,21 @@ class BundlingStringController extends Controller
                 'success' => false,
                 'message' => 'Error updating bundling string status: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            DB::beginTransaction();
+
+            $seeder = new BundlingStringSeeder();
+            $seeder->run();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error seeding bundling strings: ' . $e->getMessage());
         }
     }
 }

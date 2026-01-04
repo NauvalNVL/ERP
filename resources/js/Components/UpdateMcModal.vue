@@ -3028,11 +3028,18 @@ const fetchChemicalCoats = async () => {
     });
     if (response.ok) {
       const data = await response.json();
-      chemicalCoatRows.value = Array.isArray(data)
+      const list = Array.isArray(data)
         ? data
         : Array.isArray(data?.data)
         ? data.data
         : [];
+
+      chemicalCoatRows.value = (list || []).filter((coat) => {
+        const status = (coat?.status ?? coat?.STATUS ?? "").toString().trim();
+        if (status) return status !== "Obs";
+        if (typeof coat?.is_active === "boolean") return coat.is_active;
+        return true;
+      });
     } else {
       chemicalCoatRows.value = [];
     }
@@ -3067,11 +3074,18 @@ const fetchReinforcementTapes = async () => {
     });
     if (response.ok) {
       const data = await response.json();
-      reinforcementTapeRows.value = Array.isArray(data)
+      const list = Array.isArray(data)
         ? data
         : Array.isArray(data?.data)
         ? data.data
         : [];
+
+      reinforcementTapeRows.value = (list || []).filter((tape) => {
+        const status = (tape?.status ?? tape?.STATUS ?? "").toString().trim();
+        if (status) return status !== "Obs";
+        if (typeof tape?.is_active === "boolean") return tape.is_active;
+        return true;
+      });
     } else {
       reinforcementTapeRows.value = [];
     }
@@ -3375,11 +3389,18 @@ const fetchBundlingStrings = async () => {
     });
     if (response.ok) {
       const data = await response.json();
-      bundlingStringItems.value = Array.isArray(data)
+      const list = Array.isArray(data)
         ? data
         : Array.isArray(data?.data)
         ? data.data
         : [];
+
+      bundlingStringItems.value = (list || []).filter((item) => {
+        const status = (item?.status ?? item?.STATUS ?? "").toString().trim();
+        if (status) return status !== "Obs";
+        if (typeof item?.is_active === "boolean") return item.is_active;
+        return true;
+      });
     } else {
       bundlingStringItems.value = [];
     }
@@ -3457,11 +3478,18 @@ const fetchGlueingMaterials = async () => {
     });
     if (response.ok) {
       const data = await response.json();
-      glueingItems.value = Array.isArray(data)
+      const list = Array.isArray(data)
         ? data
         : Array.isArray(data?.data)
         ? data.data
         : [];
+
+      glueingItems.value = (list || []).filter((item) => {
+        const status = (item?.status ?? item?.STATUS ?? "").toString().trim();
+        if (status) return status !== "Obs";
+        if (typeof item?.is_active === "boolean") return item.is_active;
+        return true;
+      });
     } else {
       glueingItems.value = [];
     }

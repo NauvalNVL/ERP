@@ -21,7 +21,17 @@ class MachineController extends Controller
     public function index(Request $request)
     {
         try {
-            $machines = Machine::orderBy('machine_code', 'asc')->get();
+            $query = Machine::query()->orderBy('machine_code', 'asc');
+
+            $allStatus = $request->boolean('all_status') || $request->boolean('include_obsolete');
+            if (!$allStatus) {
+                $query->where(function ($q) {
+                    $q->where('status', 'Act')
+                        ->orWhereNull('status');
+                });
+            }
+
+            $machines = $query->get();
 
             // Transform data to match Vue component expected format
             $machinesTransformed = $machines->map(function($machine) {

@@ -13,7 +13,17 @@ class GlueingMaterialController extends Controller
     public function apiIndex(Request $request)
     {
         try {
-            $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
+            $query = GlueingMaterial::query()->orderBy('code', 'asc');
+
+            $allStatus = $request->boolean('all_status') || $request->boolean('include_obsolete');
+            if (!$allStatus) {
+                $query->where(function ($q) {
+                    $q->where('status', 'Act')
+                        ->orWhere('is_active', true);
+                });
+            }
+
+            $glueingMaterials = $query->get();
 
             return response()->json($glueingMaterials);
         } catch (\Exception $e) {
