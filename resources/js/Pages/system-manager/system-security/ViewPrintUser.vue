@@ -556,8 +556,7 @@ export default {
                 bodyStyles: { fontSize: 8 },
                 alternateRowStyles: { fillColor: [245, 247, 250] }
             });
-            doc.autoPrint();
-            window.open(doc.output('bloburl'), '_blank');
+            doc.save(`user-directory-${new Date().toISOString().slice(0, 10)}.pdf`);
         },
         exportUsers() {
             if (this.users.length === 0) { alert('No users to export'); return; }
