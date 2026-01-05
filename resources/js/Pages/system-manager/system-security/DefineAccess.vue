@@ -1594,7 +1594,7 @@
                   class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
                   <XIcon class="h-5 w-5 mr-2" />
-                  Kembali
+                  Back
                 </Link>
                 <button
                   type="submit"
@@ -1602,7 +1602,7 @@
                   class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
                   <SaveIcon class="h-5 w-5 mr-2" />
-                  {{ isSaving ? "Menyimpan..." : "Simpan Permissions" }}
+                  {{ isSaving ? "Saving..." : "Save Permissions" }}
                 </button>
               </div>
             </form>
