@@ -6,11 +6,11 @@
         <div class="w-10 h-10 rounded-full mr-3 overflow-hidden pulse flex items-center justify-center">
           <img
             :src="logoSrc"
-            alt="ERP Logo"
+            alt="Multibox Contingency System Logo"
             class="w-full h-full object-contain"
           />
         </div>
-        <h1 class="text-xl font-bold slide-in-right">ERP System</h1>
+        <h1 class="text-xl font-bold slide-in-right">Multibox Contingency System</h1>
       </div>
     </div>
 

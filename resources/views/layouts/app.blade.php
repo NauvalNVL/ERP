@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>ERP System</title>
+    <title>Multibox Contingency System</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')

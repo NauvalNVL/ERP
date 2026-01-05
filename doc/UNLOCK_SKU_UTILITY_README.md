@@ -1,8 +1,8 @@
-# Unlock SKU Utility - ERP System
+# Unlock SKU Utility - Multibox Contingency System
 
 ## Overview
 
-The Unlock SKU Utility is a web-based tool designed to manage and unlock SKUs (Stock Keeping Units) that have been locked due to various reasons in the ERP system. This utility provides administrators and authorized users with the ability to safely unlock SKUs that are preventing normal business operations.
+The Unlock SKU Utility is a web-based tool designed to manage and unlock SKUs (Stock Keeping Units) that have been locked due to various reasons in the Multibox Contingency System. This utility provides administrators and authorized users with the ability to safely unlock SKUs that are preventing normal business operations.
 
 ## Features
 

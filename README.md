@@ -1,4 +1,4 @@
-# ERP System
+# Multibox Contingency System
 
 Sistem Enterprise Resource Planning (ERP) yang modern dan scalable, dibangun dengan teknologi terkini untuk mengintegrasikan semua proses bisnis perusahaan.
 
@@ -19,7 +19,7 @@ Sistem Enterprise Resource Planning (ERP) yang modern dan scalable, dibangun den
 
 ## 🎯 Tentang Proyek
 
-ERP System adalah solusi manajemen enterprise yang dirancang untuk membantu organisasi mengintegrasikan dan mengelola proses bisnis bisnis mereka secara efisien. Sistem ini menyediakan modul-modul yang komprehensif untuk mengelola operasi harian perusahaan dari berbagai departemen.
+Multibox Contingency System adalah solusi manajemen enterprise yang dirancang untuk membantu organisasi mengintegrasikan dan mengelola proses bisnis bisnis mereka secara efisien. Sistem ini menyediakan modul-modul yang komprehensif untuk mengelola operasi harian perusahaan dari berbagai departemen.
 
 ## ✨ Fitur Utama
 

@@ -1,17 +1,17 @@
 <template>
-    <Head title="Login - ERP System" />
+    <Head title="Login - Multibox Contingency System" />
     <div class="min-h-screen flex items-center justify-center bg-gray-100 animate-fadeIn">
         <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg animate-slideUp">
             <div class="flex flex-col items-center">
                 <div class="w-20 h-20 mb-4 animate-bounce-soft">
                     <img
                         :src="logoSrc"
-                        alt="ERP Logo"
+                        alt="Multibox Contingency System Logo"
                         class="w-full h-full object-contain drop-shadow-md"
                     />
                 </div>
                 <h2 class="text-center text-3xl font-extrabold text-gray-900 animate-fadeIn animation-delay-300">
-                    Login to ERP System
+                    Login to Multibox Contingency System
                 </h2>
                 <p class="mt-2 text-center text-sm text-gray-600 animate-fadeIn animation-delay-500">
                     Enter your credentials to access the system
