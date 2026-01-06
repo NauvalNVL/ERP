@@ -1900,6 +1900,17 @@ export default {
         }
       });
     },
+    "form.permissions.system_manager"(newValue) {
+      if (this.isLoadingPermissions) return;
+      // When System Manager main access is toggled, toggle all related permissions
+      const systemManagerPermissions = this.getCategoryPermissions("system_manager");
+      systemManagerPermissions.forEach((key) => {
+        if (key !== "system_manager") {
+          // Don't toggle the main checkbox itself
+          this.form.permissions[key] = newValue;
+        }
+      });
+    },
     "form.permissions.warehouse_management"(newValue) {
       if (this.isLoadingPermissions) return;
       // When Warehouse Management main access is toggled, toggle all related permissions
@@ -1938,6 +1949,28 @@ export default {
         // Auto-uncheck main access if no submenus are checked
         if (!someSubMenusChecked && newPermissions.sales_management) {
           this.form.permissions.sales_management = false;
+        }
+
+        // System Manager main access sync
+        const systemManagerPermissions = this.getCategoryPermissions("system_manager");
+        const systemManagerSubMenuPermissions = systemManagerPermissions.filter(
+          (key) => key !== "system_manager"
+        );
+
+        const allSystemManagerSubMenusChecked =
+          systemManagerSubMenuPermissions.length > 0 &&
+          systemManagerSubMenuPermissions.every((key) => newPermissions[key] === true);
+
+        const someSystemManagerSubMenusChecked = systemManagerSubMenuPermissions.some(
+          (key) => newPermissions[key] === true
+        );
+
+        if (allSystemManagerSubMenusChecked && !newPermissions.system_manager) {
+          this.form.permissions.system_manager = true;
+        }
+
+        if (!someSystemManagerSubMenusChecked && newPermissions.system_manager) {
+          this.form.permissions.system_manager = false;
         }
 
         // Warehouse Management main access sync
@@ -2103,6 +2136,7 @@ export default {
           "amend_user_password",
           "define_user_access_permission",
           "copy_paste_user_access_permission",
+          "reactive_unobsolete_user",
           "view_print_user",
         ],
         sales_management: Object.keys(this.form.permissions).filter(
