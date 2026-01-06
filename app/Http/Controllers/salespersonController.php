@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Salesperson;
-use App\Models\SalesTeam;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\SalespersonSeeder;
-use Database\Seeders\SalesTeamSeeder;
 use Inertia\Inertia;
 
 class SalespersonController extends Controller
@@ -327,7 +325,9 @@ class SalespersonController extends Controller
             return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-salesperson');
         } catch (\Exception $e) {
             Log::error('Error in SalespersonController@vueViewAndPrint: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load salesperson data for printing'], 500);
+            return Inertia::render('errors/generic-error', [
+                'error' => 'Failed to load salesperson data for printing'
+            ]);
         }
     }
 
@@ -385,10 +385,6 @@ class SalespersonController extends Controller
         try {
             DB::beginTransaction();
 
-            // Ensure Sales Teams exist first (FK dependency)
-            $teamSeeder = new SalesTeamSeeder();
-            $teamSeeder->run();
-
             // Run the salesperson seeder
             $seeder = new SalespersonSeeder();
             $seeder->run();
@@ -427,7 +423,9 @@ class SalespersonController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in SalespersonController@vueIndex: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load salesperson data'], 500);
+            return Inertia::render('errors/generic-error', [
+                'error' => 'Failed to load salesperson data'
+            ]);
         }
     }
 

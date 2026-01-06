@@ -178,7 +178,7 @@
                   <div>
                     <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
                     <p class="text-sm text-gray-600">
-                      Pilih semua atau hapus semua permission
+                      Select or clear every permission with a single toggle
                     </p>
                   </div>
                   <div class="flex items-center space-x-4">
@@ -2039,7 +2039,7 @@ export default {
             try {
               const permissionSet = new Set(data.permissions);
 
-              // Set all known permissions berdasarkan data dari backend
+              // Apply all known permissions based on the backend response
               Object.keys(this.form.permissions).forEach((key) => {
                 this.form.permissions[key] = permissionSet.has(key);
               });
@@ -2088,19 +2088,19 @@ export default {
         });
 
         if (response.ok) {
-          this.searchMessage = "Permissions berhasil diperbarui!";
+          this.searchMessage = "Permissions updated successfully!";
           this.searchMessageClass = "bg-green-100 text-green-700 border border-green-200";
           this.searchMessageIcon = CheckCircleIcon;
         } else {
           const errorData = await response.json();
           this.searchMessage =
-            errorData.message || "Terjadi kesalahan saat menyimpan permissions.";
+            errorData.message || "An error occurred while saving permissions.";
           this.searchMessageClass = "bg-red-100 text-red-700 border border-red-200";
           this.searchMessageIcon = ExclamationCircleIcon;
         }
       } catch (error) {
         console.error("Save error:", error);
-        this.searchMessage = "Terjadi kesalahan saat menyimpan permissions.";
+        this.searchMessage = "An error occurred while saving permissions.";
         this.searchMessageClass = "bg-red-100 text-red-700 border border-red-200";
         this.searchMessageIcon = ExclamationCircleIcon;
       } finally {
