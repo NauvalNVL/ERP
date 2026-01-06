@@ -198,14 +198,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-tag"></i>
                                 </span>
-                                <select
-                                    v-model="editForm.cg_type"
-                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm"
-                                >
-                                    <option value="X-Flexo">X-Flexo</option>
-                                    <option value="C-Coating">C-Coating</option>
-                                    <option value="S-Offset">S-Offset</option>
-                                </select>
+                                <input v-model="editForm.cg_type" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-gray-100" readonly>
                             </div>
                         </div>
                     </div>
@@ -389,7 +382,7 @@ const editForm = ref({
     color_id: '',
     color_name: '',
     color_group_id: '',
-    cg_type: 'X-Flexo'
+    cg_type: ''
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -489,6 +482,8 @@ const fetchColorGroups = async () => {
             cg_name: group.cg_name,
             cg_type: group.cg_type
         }));
+
+        syncCgTypeFromColorGroup();
     } catch (e) {
         console.error('Error fetching color groups:', e);
         colorGroups.value = [];
@@ -573,7 +568,7 @@ const createNewColor = () => {
         color_id: '',
         color_name: '',
         color_group_id: '',
-        cg_type: 'X-Flexo'
+        cg_type: ''
     };
     showEditModal.value = true;
 };
@@ -584,9 +579,24 @@ const closeEditModal = () => {
         color_id: '',
         color_name: '',
         color_group_id: '',
-        cg_type: 'X-Flexo'
+        cg_type: ''
     };
     isCreating.value = false;
+};
+
+const syncCgTypeFromColorGroup = () => {
+    const cgId = (editForm.value.color_group_id || '').toString().trim();
+    if (!cgId) {
+        editForm.value.cg_type = '';
+        return;
+    }
+
+    const matched = colorGroups.value.find((g) => (g.cg || '').toString().trim() === cgId);
+    if (matched && matched.cg_type) {
+        editForm.value.cg_type = matched.cg_type;
+    } else {
+        editForm.value.cg_type = '';
+    }
 };
 
 const openColorGroupSelector = () => {
@@ -613,6 +623,13 @@ const selectColorGroup = (group) => {
     showColorGroupModal.value = false;
 };
 
+watch(
+    () => editForm.value.color_group_id,
+    () => {
+        syncCgTypeFromColorGroup();
+    }
+);
+
 const saveColorChanges = async () => {
     // Validate form
     if (!editForm.value.color_id) {
@@ -627,6 +644,11 @@ const saveColorChanges = async () => {
 
     if (!editForm.value.color_group_id) {
         showNotification('Color group is required', 'error');
+        return;
+    }
+
+    if (!editForm.value.cg_type) {
+        showNotification('CG type is required', 'error');
         return;
     }
 
