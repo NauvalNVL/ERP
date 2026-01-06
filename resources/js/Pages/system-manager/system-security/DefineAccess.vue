@@ -1837,6 +1837,8 @@ export default {
           amend_invoice: false,
           cancel_active_invoice: false,
           view_print_invoice_log: false,
+          input_no_faktur: false,
+          export_to_coretax: false,
         },
       },
     };
@@ -2064,7 +2066,9 @@ export default {
             key.includes("analysis") ||
             key.includes("vehicle") ||
             key.includes("transport") ||
-            key.includes("tax")
+            key.includes("tax") ||
+            key.includes("faktur") ||
+            key.includes("coretax")
         ),
       };
       return categoryMaps[category] || [];
