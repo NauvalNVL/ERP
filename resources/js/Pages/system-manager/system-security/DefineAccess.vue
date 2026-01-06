@@ -1900,6 +1900,17 @@ export default {
         }
       });
     },
+    "form.permissions.warehouse_management"(newValue) {
+      if (this.isLoadingPermissions) return;
+      // When Warehouse Management main access is toggled, toggle all related permissions
+      const warehousePermissions = this.getCategoryPermissions("warehouse_management");
+      warehousePermissions.forEach((key) => {
+        if (key !== "warehouse_management") {
+          // Don't toggle the main checkbox itself
+          this.form.permissions[key] = newValue;
+        }
+      });
+    },
     "form.permissions": {
       handler(newPermissions) {
         if (this.isLoadingPermissions) return;
@@ -1927,6 +1938,28 @@ export default {
         // Auto-uncheck main access if no submenus are checked
         if (!someSubMenusChecked && newPermissions.sales_management) {
           this.form.permissions.sales_management = false;
+        }
+
+        // Warehouse Management main access sync
+        const warehousePermissions = this.getCategoryPermissions("warehouse_management");
+        const warehouseSubMenuPermissions = warehousePermissions.filter(
+          (key) => key !== "warehouse_management"
+        );
+
+        const allWarehouseSubMenusChecked =
+          warehouseSubMenuPermissions.length > 0 &&
+          warehouseSubMenuPermissions.every((key) => newPermissions[key] === true);
+
+        const someWarehouseSubMenusChecked = warehouseSubMenuPermissions.some(
+          (key) => newPermissions[key] === true
+        );
+
+        if (allWarehouseSubMenusChecked && !newPermissions.warehouse_management) {
+          this.form.permissions.warehouse_management = true;
+        }
+
+        if (!someWarehouseSubMenusChecked && newPermissions.warehouse_management) {
+          this.form.permissions.warehouse_management = false;
         }
       },
       deep: true,
