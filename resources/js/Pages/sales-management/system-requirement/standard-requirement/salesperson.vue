@@ -133,6 +133,13 @@
         @select="onSalespersonSelected"
     />
 
+    <UserModal
+        :show="showUserModal"
+        :users="users"
+        @close="showUserModal = false"
+        @select="onUserSelected"
+    />
+
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
@@ -200,7 +207,12 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Internal:</label>
-                            <input v-model="editForm.internal" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                            <div class="relative flex">
+                                <input v-model="editForm.internal" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                                <button type="button" @click="openUserModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                    <i class="fas fa-table"></i>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
@@ -264,6 +276,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalespersonModal from '@/Components/salesperson-modal.vue';
+import UserModal from '@/Components/user-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from 'sweetalert2';
 
@@ -286,8 +299,10 @@ const modalLoading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
+const showUserModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
+const users = ref([]);
 const editForm = ref({
     id: '',
     code: '',
@@ -378,6 +393,40 @@ const fetchSalesTeams = async () => {
     ];
 };
 
+const fetchUsers = async () => {
+    if (users.value.length > 0) return;
+    try {
+        const res = await fetch('/api/users', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await res.json();
+
+        const rawUsers = Array.isArray(data)
+            ? data
+            : (data && data.users && Array.isArray(data.users) ? data.users : []);
+
+        users.value = rawUsers
+            .map((u) => {
+                const code = (u.code || u.user_id || u.userID || u.userId || '').toString().trim();
+                const name = (u.name || u.OFFICIAL_NAME || u.official_name || u.userName || u.username || '').toString().trim();
+                return { code, name };
+            })
+            .filter((u) => u.code !== '');
+    } catch (e) {
+        console.error('Error fetching users:', e);
+        users.value = [];
+    }
+};
+
 const onSalesTeamChange = () => {
     const selectedTeam = salesTeams.value.find(team => team.name === editForm.value.grup);
     if (selectedTeam) {
@@ -401,6 +450,11 @@ const selectGroupOption = (team) => {
 const openSalespersonModal = async () => {
     showModal.value = true;
     await fetchSalespersons({ showGlobal: false });
+};
+
+const openUserModal = async () => {
+    await fetchUsers();
+    showUserModal.value = true;
 };
 
 onMounted(async () => {
@@ -435,6 +489,13 @@ const onSalespersonSelected = (person) => {
     };
     console.log('Selected person for editing:', editForm.value);
     showEditModal.value = true;
+};
+
+const onUserSelected = (user) => {
+    if (user && user.code) {
+        editForm.value.internal = user.code;
+    }
+    showUserModal.value = false;
 };
 
 const editSelectedRow = () => {
