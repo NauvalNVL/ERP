@@ -1939,53 +1939,6 @@ export default {
               Object.keys(this.form.permissions).forEach((key) => {
                 this.form.permissions[key] = permissionSet.has(key);
               });
-
-              // Untuk permission obsolete/unobsolete baru, aktifkan otomatis
-              // jika pasangan define_* sudah aktif tetapi obsolete_* belum ada
-              const obsoletePairs = [
-                ["define_salesperson", "obsolete_unobsolete_salesperson"],
-                ["define_industry", "obsolete_unobsolete_industry"],
-                ["define_geo", "obsolete_unobsolete_geo"],
-                ["define_product_group", "obsolete_unobsolete_product_group"],
-                ["define_product", "obsolete_unobsolete_product"],
-                ["define_product_design", "obsolete_unobsolete_product_design"],
-                ["define_scoring_tool", "obsolete_unobsolete_scoring_tool"],
-                ["define_paper_quality", "obsolete_unobsolete_paper_quality"],
-                ["define_paper_flute", "obsolete_unobsolete_paper_flute"],
-                ["define_paper_size", "obsolete_unobsolete_paper_size"],
-                ["define_color_group", "obsolete_unobsolete_color_group"],
-                ["define_color", "obsolete_unobsolete_color"],
-                ["define_finishing", "obsolete_unobsolete_finishing"],
-                ["define_stitch_wire", "obsolete_unobsolete_stitch_wire"],
-                ["define_chemical_coat", "obsolete_unobsolete_chemical_coat"],
-                ["define_reinforcement_tape", "obsolete_unobsolete_reinforcement_tape"],
-                ["define_bundling_string", "obsolete_unobsolete_bundling_string"],
-                ["define_wrapping_material", "obsolete_unobsolete_wrapping_material"],
-                ["define_glueing_material", "obsolete_unobsolete_glueing_material"],
-                ["define_machine", "obsolete_unobsolete_machine"],
-              ];
-
-              obsoletePairs.forEach(([defineKey, obsoleteKey]) => {
-                if (this.form.permissions[defineKey] && !permissionSet.has(obsoleteKey)) {
-                  this.form.permissions[obsoleteKey] = true;
-                }
-              });
-
-              const sidebarRequiredPermissions = [
-                "dashboard",
-                "reactive_unobsolete_user",
-                "define_machine",
-                "obsolete_unobsolete_machine",
-                "view_print_machine",
-                "input_no_faktur",
-                "export_to_coretax",
-              ];
-
-              sidebarRequiredPermissions.forEach((key) => {
-                if (!permissionSet.has(key)) {
-                  this.form.permissions[key] = true;
-                }
-              });
             } finally {
               // Use nextTick to ensure watchers don't fire on the immediate updates
               this.$nextTick(() => {
