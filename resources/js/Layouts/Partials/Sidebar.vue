@@ -223,10 +223,7 @@ const hasPermission = (menuKey) => {
   if (
     menuKey === 'obsolete_unobsolete_vehicle' ||
     menuKey === 'obsolete_unobsolete_vehicle_class' ||
-    menuKey === 'obsolete_unobsolete_analysis_code' ||
-    menuKey === 'obsolete_unobsolete_tax_type' ||
-    menuKey === 'obsolete_unobsolete_tax_group' ||
-    menuKey === 'obsolete_unobsolete_customer_sales_tax_index'
+    menuKey === 'obsolete_unobsolete_analysis_code'
   ) {
     return true;
   }

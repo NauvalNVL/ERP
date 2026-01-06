@@ -1173,9 +1173,30 @@ class UserPermission extends Model
                 'parent' => 'warehouse_management'
             ],
             [
+                'key' => 'obsolete_unobsolete_tax_type',
+                'name' => 'Obsolete/Unobsolete Tax Type',
+                'route' => '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-type',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
                 'key' => 'define_tax_group',
                 'name' => 'Define Tax Group',
                 'route' => '/warehouse-management/invoice/setup/define-tax-group',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_tax_group',
+                'name' => 'Obsolete/Unobsolete Tax Group',
+                'route' => '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-group',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_customer_sales_tax_index',
+                'name' => 'Obsolete/Unobsolete Customer Sales Tax Index',
+                'route' => '/warehouse-management/invoice/setup/obsolete-unobsolete-customer-sales-tax-index',
                 'category' => 'warehouse_management',
                 'parent' => 'warehouse_management'
             ],

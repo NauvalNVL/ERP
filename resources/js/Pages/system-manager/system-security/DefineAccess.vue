@@ -1403,11 +1403,31 @@
                               <label class="flex items-center">
                                 <input
                                   type="checkbox"
+                                  v-model="form.permissions.obsolete_unobsolete_tax_type"
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Tax Type</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
                                   v-model="form.permissions.define_tax_group"
                                   class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
                                 />
                                 <span class="ml-3 text-xs text-gray-700"
                                   >Define Tax Group</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  v-model="form.permissions.obsolete_unobsolete_tax_group"
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Tax Group</span
                                 >
                               </label>
                               <label class="flex items-center">
@@ -1420,6 +1440,19 @@
                                 />
                                 <span class="ml-3 text-xs text-gray-700"
                                   >Define Customer Sales Tax Index</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  v-model="
+                                    form.permissions
+                                      .obsolete_unobsolete_customer_sales_tax_index
+                                  "
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Customer Sales Tax Index</span
                                 >
                               </label>
                               <label class="flex items-center">
@@ -1825,7 +1858,10 @@ export default {
           view_print_do_unapplied_fg: false,
           // Invoice Setup
           define_tax_type: false,
+          obsolete_unobsolete_tax_type: false,
           define_tax_group: false,
+          obsolete_unobsolete_tax_group: false,
+          obsolete_unobsolete_customer_sales_tax_index: false,
           define_customer_sales_tax_index: false,
           view_print_tax_type: false,
           view_print_tax_group: false,
