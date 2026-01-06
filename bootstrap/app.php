@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\EnsureMenuAccess;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware
+            ->alias([
+                'ensure.menu.access' => EnsureMenuAccess::class,
+            ])
             // CSRF hanya dilewati untuk login/logout, route lain tetap terlindungi
             ->validateCsrfTokens(except: [
                 '/login',

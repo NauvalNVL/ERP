@@ -94,7 +94,7 @@
                                                 item, idx
                                             ) in filteredMenuRoutes"
                                             :key="item.uri"
-                                            @mousedown.prevent="go(item.uri)"
+                                            @mousedown.prevent="go(item)"
                                             :class="
                                                 idx === highlightedIndex
                                                     ? 'bg-blue-50 text-blue-700'
@@ -160,7 +160,7 @@ import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import Sidebar from "./Partials/Sidebar.vue";
 import sidebarStore from "./Partials/sidebarStore";
 import ToastContainer from "@/Components/ToastContainer.vue";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 
 defineProps({
     header: {
@@ -175,6 +175,9 @@ let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
 let ticking = false;
 const scrollArea = ref(null);
 const searchContainer = ref(null);
+
+const page = usePage();
+const userPermissions = computed(() => page.props.auth?.permissions || []);
 
 const toggleSidebar = () => {
     sidebarStore.toggleMobile();
@@ -298,7 +301,10 @@ const ensureMenuRoutes = async () => {
 
 const filteredMenuRoutes = computed(() => {
     const q = menuQuery.value.trim().toLowerCase();
-    const list = menuRoutes.value;
+    const list = menuRoutes.value.filter((r) => {
+        if (!r || !r.permission_key) return false;
+        return userPermissions.value.includes(r.permission_key);
+    });
     if (!q) return list.slice(0, 10);
     return list
         .filter(
@@ -310,11 +316,19 @@ const filteredMenuRoutes = computed(() => {
         .slice(0, 15);
 });
 
-const go = (uri) => {
+const go = (item) => {
+    if (!item || !item.uri) return;
+    if (!item.permission_key || !userPermissions.value.includes(item.permission_key)) {
+        openSearch.value = false;
+        menuQuery.value = "";
+        highlightedIndex.value = -1;
+        return;
+    }
+
     openSearch.value = false;
     menuQuery.value = "";
     highlightedIndex.value = -1;
-    router.visit(uri);
+    router.visit(item.uri);
 };
 
 const highlightNext = () => {
@@ -330,7 +344,7 @@ const highlightPrev = () => {
 };
 const navigateHighlighted = () => {
     const item = filteredMenuRoutes.value[highlightedIndex.value];
-    if (item) go(item.uri);
+    if (item) go(item);
 };
 </script>
 

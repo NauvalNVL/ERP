@@ -51,15 +51,44 @@ use App\Http\Controllers\PaperSizeController;
 // This endpoint is used by the Vue AppLayout to provide a searchable menu.
 // It scans all registered routes, filters for GET web routes whose names
 // start with 'vue.', and returns a simplified list of { title, uri, name }.
-Route::get('/menu-routes', function (Request $request) {
+Route::middleware(['web'])->get('/menu-routes', function (Request $request) {
+    if (!$request->user()) {
+        return response()->json([]);
+    }
+
     $sidebarMap = [];
     $sidebarPath = resource_path('js/Layouts/Partials/Sidebar.vue');
 
     $normalizeUri = function (string $uri): string {
         $uri = trim($uri);
         $uri = preg_replace('/[?#].*$/', '', $uri);
-        return '/' . ltrim((string) $uri, '/');
+        $uri = '/' . ltrim((string) $uri, '/');
+        $uri = preg_replace('#/+$#', '', $uri);
+        return $uri === '' ? '/' : $uri;
     };
+
+    $titleToPermissionKeyFallback = function (string $title): string {
+        $key = strtolower(trim($title));
+        // Normalize separators into underscores
+        $key = preg_replace('/[\s\/&\\-]+/', '_', $key);
+        // Remove any remaining non-alphanumeric/underscore
+        $key = preg_replace('/[^a-z0-9_]+/', '', $key);
+        // Collapse repeated underscores
+        $key = preg_replace('/_+/', '_', $key);
+        return trim($key, '_');
+    };
+
+    $menuNameToKey = [];
+    try {
+        $menuItems = \App\Models\UserPermission::getAllMenuItems();
+        foreach ($menuItems as $item) {
+            if (!empty($item['name']) && !empty($item['key']) && !isset($menuNameToKey[$item['name']])) {
+                $menuNameToKey[$item['name']] = $item['key'];
+            }
+        }
+    } catch (\Throwable $e) {
+        $menuNameToKey = [];
+    }
 
     if (is_readable($sidebarPath)) {
         $sidebar = file_get_contents($sidebarPath);
@@ -102,13 +131,26 @@ Route::get('/menu-routes', function (Request $request) {
         }
     }
 
+    $allowedKeys = $request->user() ? $request->user()->getPermissionsArray() : [];
+
     $routes = collect($sidebarMap)
-        ->map(function ($title, $uri) use ($routeNameByUri) {
+        ->map(function ($title, $uri) use ($routeNameByUri, $menuNameToKey, $titleToPermissionKeyFallback) {
+            $permissionKey = $menuNameToKey[$title] ?? $titleToPermissionKeyFallback($title);
+
+            // Dashboard should map to the canonical key
+            if ($uri === '/dashboard') {
+                $permissionKey = 'dashboard';
+            }
+
             return [
                 'title' => $title,
                 'uri'   => $uri,
                 'name'  => $routeNameByUri[$uri] ?? null,
+                'permission_key' => $permissionKey,
             ];
+        })
+        ->filter(function ($row) use ($allowedKeys) {
+            return !empty($row['permission_key']) && in_array($row['permission_key'], $allowedKeys, true);
         })
         ->values()
         ->sortBy('title')

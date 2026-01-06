@@ -136,7 +136,7 @@ Route::post('/login', [LoginController::class, 'login'])
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Authenticated Routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'ensure.menu.access'])->group(function () {
 // Vue Routes
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
