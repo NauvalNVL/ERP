@@ -1403,11 +1403,31 @@
                               <label class="flex items-center">
                                 <input
                                   type="checkbox"
+                                  v-model="form.permissions.obsolete_unobsolete_tax_type"
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Tax Type</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
                                   v-model="form.permissions.define_tax_group"
                                   class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
                                 />
                                 <span class="ml-3 text-xs text-gray-700"
                                   >Define Tax Group</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  v-model="form.permissions.obsolete_unobsolete_tax_group"
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Tax Group</span
                                 >
                               </label>
                               <label class="flex items-center">
@@ -1420,6 +1440,19 @@
                                 />
                                 <span class="ml-3 text-xs text-gray-700"
                                   >Define Customer Sales Tax Index</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  v-model="
+                                    form.permissions
+                                      .obsolete_unobsolete_customer_sales_tax_index
+                                  "
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Customer Sales Tax Index</span
                                 >
                               </label>
                               <label class="flex items-center">
@@ -1825,7 +1858,10 @@ export default {
           view_print_do_unapplied_fg: false,
           // Invoice Setup
           define_tax_type: false,
+          obsolete_unobsolete_tax_type: false,
           define_tax_group: false,
+          obsolete_unobsolete_tax_group: false,
+          obsolete_unobsolete_customer_sales_tax_index: false,
           define_customer_sales_tax_index: false,
           view_print_tax_type: false,
           view_print_tax_group: false,
@@ -1837,6 +1873,8 @@ export default {
           amend_invoice: false,
           cancel_active_invoice: false,
           view_print_invoice_log: false,
+          input_no_faktur: false,
+          export_to_coretax: false,
         },
       },
     };
@@ -1857,6 +1895,17 @@ export default {
       const salesPermissions = this.getCategoryPermissions("sales_management");
       salesPermissions.forEach((key) => {
         if (key !== "sales_management") {
+          // Don't toggle the main checkbox itself
+          this.form.permissions[key] = newValue;
+        }
+      });
+    },
+    "form.permissions.warehouse_management"(newValue) {
+      if (this.isLoadingPermissions) return;
+      // When Warehouse Management main access is toggled, toggle all related permissions
+      const warehousePermissions = this.getCategoryPermissions("warehouse_management");
+      warehousePermissions.forEach((key) => {
+        if (key !== "warehouse_management") {
           // Don't toggle the main checkbox itself
           this.form.permissions[key] = newValue;
         }
@@ -1889,6 +1938,28 @@ export default {
         // Auto-uncheck main access if no submenus are checked
         if (!someSubMenusChecked && newPermissions.sales_management) {
           this.form.permissions.sales_management = false;
+        }
+
+        // Warehouse Management main access sync
+        const warehousePermissions = this.getCategoryPermissions("warehouse_management");
+        const warehouseSubMenuPermissions = warehousePermissions.filter(
+          (key) => key !== "warehouse_management"
+        );
+
+        const allWarehouseSubMenusChecked =
+          warehouseSubMenuPermissions.length > 0 &&
+          warehouseSubMenuPermissions.every((key) => newPermissions[key] === true);
+
+        const someWarehouseSubMenusChecked = warehouseSubMenuPermissions.some(
+          (key) => newPermissions[key] === true
+        );
+
+        if (allWarehouseSubMenusChecked && !newPermissions.warehouse_management) {
+          this.form.permissions.warehouse_management = true;
+        }
+
+        if (!someWarehouseSubMenusChecked && newPermissions.warehouse_management) {
+          this.form.permissions.warehouse_management = false;
         }
       },
       deep: true,
@@ -1938,53 +2009,6 @@ export default {
               // Set all known permissions berdasarkan data dari backend
               Object.keys(this.form.permissions).forEach((key) => {
                 this.form.permissions[key] = permissionSet.has(key);
-              });
-
-              // Untuk permission obsolete/unobsolete baru, aktifkan otomatis
-              // jika pasangan define_* sudah aktif tetapi obsolete_* belum ada
-              const obsoletePairs = [
-                ["define_salesperson", "obsolete_unobsolete_salesperson"],
-                ["define_industry", "obsolete_unobsolete_industry"],
-                ["define_geo", "obsolete_unobsolete_geo"],
-                ["define_product_group", "obsolete_unobsolete_product_group"],
-                ["define_product", "obsolete_unobsolete_product"],
-                ["define_product_design", "obsolete_unobsolete_product_design"],
-                ["define_scoring_tool", "obsolete_unobsolete_scoring_tool"],
-                ["define_paper_quality", "obsolete_unobsolete_paper_quality"],
-                ["define_paper_flute", "obsolete_unobsolete_paper_flute"],
-                ["define_paper_size", "obsolete_unobsolete_paper_size"],
-                ["define_color_group", "obsolete_unobsolete_color_group"],
-                ["define_color", "obsolete_unobsolete_color"],
-                ["define_finishing", "obsolete_unobsolete_finishing"],
-                ["define_stitch_wire", "obsolete_unobsolete_stitch_wire"],
-                ["define_chemical_coat", "obsolete_unobsolete_chemical_coat"],
-                ["define_reinforcement_tape", "obsolete_unobsolete_reinforcement_tape"],
-                ["define_bundling_string", "obsolete_unobsolete_bundling_string"],
-                ["define_wrapping_material", "obsolete_unobsolete_wrapping_material"],
-                ["define_glueing_material", "obsolete_unobsolete_glueing_material"],
-                ["define_machine", "obsolete_unobsolete_machine"],
-              ];
-
-              obsoletePairs.forEach(([defineKey, obsoleteKey]) => {
-                if (this.form.permissions[defineKey] && !permissionSet.has(obsoleteKey)) {
-                  this.form.permissions[obsoleteKey] = true;
-                }
-              });
-
-              const sidebarRequiredPermissions = [
-                "dashboard",
-                "reactive_unobsolete_user",
-                "define_machine",
-                "obsolete_unobsolete_machine",
-                "view_print_machine",
-                "input_no_faktur",
-                "export_to_coretax",
-              ];
-
-              sidebarRequiredPermissions.forEach((key) => {
-                if (!permissionSet.has(key)) {
-                  this.form.permissions[key] = true;
-                }
               });
             } finally {
               // Use nextTick to ensure watchers don't fire on the immediate updates
@@ -2111,7 +2135,9 @@ export default {
             key.includes("analysis") ||
             key.includes("vehicle") ||
             key.includes("transport") ||
-            key.includes("tax")
+            key.includes("tax") ||
+            key.includes("faktur") ||
+            key.includes("coretax")
         ),
       };
       return categoryMaps[category] || [];

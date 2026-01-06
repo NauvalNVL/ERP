@@ -263,6 +263,161 @@ class UserPermission extends Model
                 'category' => 'sales_management',
                 'parent' => 'sales_management'
             ],
+
+            [
+                'key' => 'obsolete_unobsolete_salesperson',
+                'name' => 'Obsolete/Unobsolete Salesperson',
+                'route' => '/sales-person/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_industry',
+                'name' => 'Obsolete/Unobsolete Industry',
+                'route' => '/industry/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_geo',
+                'name' => 'Obsolete/Unobsolete Geo',
+                'route' => '/geo/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_product_group',
+                'name' => 'Obsolete/Unobsolete Product Group',
+                'route' => '/product-group/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_product',
+                'name' => 'Obsolete/Unobsolete Product',
+                'route' => '/product/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_product_design',
+                'name' => 'Obsolete/Unobsolete Product Design',
+                'route' => '/product-design/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_scoring_tool',
+                'name' => 'Obsolete/Unobsolete Scoring Tool',
+                'route' => '/scoring-tool/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_paper_quality',
+                'name' => 'Obsolete/Unobsolete Paper Quality',
+                'route' => '/paper-quality/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_paper_flute',
+                'name' => 'Obsolete/Unobsolete Paper Flute',
+                'route' => '/paper-flute/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_paper_size',
+                'name' => 'Obsolete/Unobsolete Paper Size',
+                'route' => '/paper-size/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_color_group',
+                'name' => 'Obsolete/Unobsolete Color Group',
+                'route' => '/color-group/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_color',
+                'name' => 'Obsolete/Unobsolete Color',
+                'route' => '/color/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_finishing',
+                'name' => 'Obsolete/Unobsolete Finishing',
+                'route' => '/finishing/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_stitch_wire',
+                'name' => 'Obsolete/Unobsolete Stitch Wire',
+                'route' => '/stitch-wire/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_chemical_coat',
+                'name' => 'Obsolete/Unobsolete Chemical Coat',
+                'route' => '/chemical-coat/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_reinforcement_tape',
+                'name' => 'Obsolete/Unobsolete Reinforcement Tape',
+                'route' => '/reinforcement-tape/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_bundling_string',
+                'name' => 'Obsolete/Unobsolete Bundling String',
+                'route' => '/bundling-string/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_wrapping_material',
+                'name' => 'Obsolete/Unobsolete Wrapping Material',
+                'route' => '/wrapping-material/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_glueing_material',
+                'name' => 'Obsolete/Unobsolete Glueing Material',
+                'route' => '/glueing-material/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'define_machine',
+                'name' => 'Define Machine',
+                'route' => '/machine',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_machine',
+                'name' => 'Obsolete/Unobsolete Machine',
+                'route' => '/machine/status',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_machine',
+                'name' => 'View & Print Machine',
+                'route' => '/machine/view-print',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
             
             // Sales Management - Standard Requirement
             [
@@ -1018,9 +1173,30 @@ class UserPermission extends Model
                 'parent' => 'warehouse_management'
             ],
             [
+                'key' => 'obsolete_unobsolete_tax_type',
+                'name' => 'Obsolete/Unobsolete Tax Type',
+                'route' => '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-type',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
                 'key' => 'define_tax_group',
                 'name' => 'Define Tax Group',
                 'route' => '/warehouse-management/invoice/setup/define-tax-group',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_tax_group',
+                'name' => 'Obsolete/Unobsolete Tax Group',
+                'route' => '/warehouse-management/invoice/setup/obsolete-unobsolete-tax-group',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_customer_sales_tax_index',
+                'name' => 'Obsolete/Unobsolete Customer Sales Tax Index',
+                'route' => '/warehouse-management/invoice/setup/obsolete-unobsolete-customer-sales-tax-index',
                 'category' => 'warehouse_management',
                 'parent' => 'warehouse_management'
             ],

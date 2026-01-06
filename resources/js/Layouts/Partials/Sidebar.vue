@@ -249,40 +249,9 @@ const hasPermission = (menuKey) => {
 
   // Temporary: Allow some menus without checking backend permissions (for development/testing)
   if (false && (
-    menuKey === "define_machine" ||
-    menuKey === "view_print_machine" ||
-    menuKey === "obsolete_unobsolete_machine" ||
-    menuKey === "obsolete_unobsolete_paper_quality" ||
-    menuKey === "reactive_unobsolete_user" ||
-    menuKey === "obsolete_unobsolete_sales_team" ||
-    menuKey === "obsolete_unobsolete_salesperson" ||
-    menuKey === "obsolete_unobsolete_salesperson_team" ||
-    menuKey === "obsolete_unobsolete_industry" ||
-    menuKey === "obsolete_unobsolete_geo" ||
-    menuKey === "obsolete_unobsolete_product_group" ||
-    menuKey === "obsolete_unobsolete_product" ||
-    menuKey === "obsolete_unobsolete_product_design" ||
-    menuKey === "obsolete_unobsolete_scoring_tool" ||
-    menuKey === "obsolete_unobsolete_paper_flute" ||
-    menuKey === "obsolete_unobsolete_paper_size" ||
-    menuKey === "obsolete_unobsolete_color_group" ||
-    menuKey === "obsolete_unobsolete_color" ||
-    menuKey === "obsolete_unobsolete_finishing" ||
     menuKey === "obsolete_unobsolete_vehicle" ||
     menuKey === "obsolete_unobsolete_vehicle_class" ||
-    menuKey === "obsolete_unobsolete_analysis_code" ||
-    menuKey === "obsolete_unobsolete_stitch_wire" ||
-    menuKey === "obsolete_unobsolete_chemical_coat" ||
-    menuKey === "obsolete_unobsolete_reinforcement_tape" ||
-    menuKey === "obsolete_unobsolete_bundling_string" ||
-    menuKey === "obsolete_unobsolete_wrapping_material" ||
-    menuKey === "obsolete_unobsolete_glueing_material" ||
-    menuKey === "obsolete_reactive_customer_group" ||
-    menuKey === "obsolete_unobsolete_tax_type" ||
-    menuKey === "obsolete_unobsolete_tax_group" ||
-    menuKey === "obsolete_unobsolete_customer_sales_tax_index" ||
-    menuKey === "input_no_faktur" ||
-    menuKey === "export_to_coretax"
+    menuKey === "obsolete_unobsolete_analysis_code"
   )) {
     return true;
   }
