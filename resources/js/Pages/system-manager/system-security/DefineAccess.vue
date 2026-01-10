@@ -2145,7 +2145,8 @@ export default {
             key.includes("customer") ||
             key.includes("product") ||
             key.includes("mc") ||
-            key.includes("so") ||
+            key.includes("so_") ||
+            key.includes("_so") ||
             key.includes("industry") ||
             key.includes("geo") ||
             key.includes("color") ||
@@ -2159,6 +2160,11 @@ export default {
             key.includes("wrapping") ||
             key.includes("glueing") ||
             key.includes("machine")
+        ).filter(
+          (key) =>
+            !key.includes("tax") &&
+            !key.includes("faktur") &&
+            !key.includes("coretax")
         ),
         warehouse_management: Object.keys(this.form.permissions).filter(
           (key) =>
