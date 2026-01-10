@@ -297,7 +297,7 @@ Route::prefix('invoices')->group(function () {
 
     // Tax export endpoint for Coretax XML generation
     Route::get('/tax-export', [InvoiceController::class, 'getInvoicesForTaxExport']);
-    
+
     // Export to Coretax endpoints - Automatic XML generation from invoices
     Route::get('/coretax/invoices', [ExportToCoretaxController::class, 'getInvoicesForExport']);
     Route::post('/coretax/generate-xml', [ExportToCoretaxController::class, 'generateXml']);

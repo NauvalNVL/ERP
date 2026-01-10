@@ -1,10 +1,10 @@
 <template>
-  <AppLayout header="Define User Access Permission">
+  <AppLayout header="Define User Access Permission" :show-header="false">
     <Head title="Define User Access Permission" />
     <div
       class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden"
     >
-      <div class="max-w-6xl w-full mx-auto relative z-0">
+      <div class="max-w-6xl w-full mx-auto relative z-100">
         <!-- Header Card -->
         <div
           class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg rounded-2xl border border-indigo-700 mb-6"
@@ -78,6 +78,14 @@
                     <SearchIcon class="h-4 w-4 mr-2" />
                     <span>{{ isSearching ? "Searching..." : "Search User" }}</span>
                   </button>
+                  <button
+                    type="button"
+                    @click="openUserModal"
+                    :disabled="isLoadingUsers"
+                    class="inline-flex items-center justify-center rounded-lg border border-indigo-300 bg-white px-4 py-2 text-sm font-medium text-indigo-700 shadow-sm hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span>{{ isLoadingUsers ? "Loading..." : "Browse" }}</span>
+                  </button>
                 </div>
                 <p class="mt-1 text-xs text-gray-500">
                   The user's current permissions will load automatically after a
@@ -118,6 +126,18 @@
             </div>
           </div>
         </div>
+
+        <UserModal
+          :show="showUserModal"
+          :users="users"
+          id-key="user_id"
+          name-key="official_name"
+          job-key="official_title"
+          :enable-job-filter="true"
+          :show-job-column="true"
+          @close="showUserModal = false"
+          @select="onUserSelected"
+        />
 
         <!-- User Permission Form -->
         <div
@@ -1664,6 +1684,7 @@
 <script>
 import { Head, Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import UserModal from "@/Components/user-modal.vue";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
   UserIcon,
@@ -1681,6 +1702,7 @@ export default {
     AppLayout,
     Head,
     Link,
+    UserModal,
     Switch,
     SwitchGroup,
     SwitchLabel,
@@ -1711,6 +1733,9 @@ export default {
         sales_management: false,
         warehouse_management: false,
       },
+      showUserModal: false,
+      isLoadingUsers: false,
+      users: [],
       showAllStandardRequirement: false,
       isLoadingPermissions: false,
       form: {
@@ -1999,6 +2024,51 @@ export default {
     },
   },
   methods: {
+    async openUserModal() {
+      this.isLoadingUsers = true;
+      try {
+        const response = await fetch(`/api/users`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          if (Array.isArray(data)) {
+            this.users = data;
+          } else if (data && Array.isArray(data.data)) {
+            this.users = data.data;
+          } else {
+            this.users = [];
+          }
+          this.showUserModal = true;
+        } else {
+          this.users = [];
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        this.users = [];
+      } finally {
+        this.isLoadingUsers = false;
+      }
+    },
+
+    onUserSelected(user) {
+      const selectedId = user?.user_id || user?.userID || "";
+      if (!selectedId) {
+        this.showUserModal = false;
+        return;
+      }
+
+      this.searchForm.user_id = selectedId;
+      this.showUserModal = false;
+      this.searchUser();
+    },
+
     async searchUser() {
       this.isSearching = true;
       this.searchMessage = null;
