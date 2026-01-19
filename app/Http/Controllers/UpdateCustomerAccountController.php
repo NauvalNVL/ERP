@@ -14,6 +14,28 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateCustomerAccountController extends Controller
 {
+    private function normalizeNpwpValue($raw)
+    {
+        if ($raw === null) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', (string) $raw);
+        if ($digits === '') {
+            return null;
+        }
+
+        if (strlen($digits) === 15) {
+            return '0' . $digits;
+        }
+
+        if (strlen($digits) === 16) {
+            return $digits;
+        }
+
+        return false;
+    }
+
     public function index()
     {
         $customers = Customer::all();
@@ -30,6 +52,18 @@ class UpdateCustomerAccountController extends Controller
 
     public function store(Request $request)
     {
+        $normalizedNpwp = $this->normalizeNpwpValue($request->input('npwp'));
+        if ($normalizedNpwp === false) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => [
+                    'npwp' => ['NPWP harus 16 digit'],
+                ],
+            ], 422);
+        }
+
+        $request->merge(['npwp' => $normalizedNpwp]);
+
         $validated = $request->validate([
             'customer_code' => 'required|string|max:50',
             'customer_name' => 'required|string|max:250',
@@ -45,6 +79,7 @@ class UpdateCustomerAccountController extends Controller
             'credit_terms' => 'nullable|numeric',
             'ac_type' => 'required|string|in:Y-Foreign,N-Local',
             'currency_code' => 'nullable|string|max:50',
+            'npwp' => 'nullable|digits:16',
             'sales_type' => 'nullable|string|max:50',
             'salesperson_code' => 'nullable|string|max:50|exists:salesperson,Code',
             'industrial_code' => 'nullable|string|max:50|exists:industry,code',
@@ -52,6 +87,7 @@ class UpdateCustomerAccountController extends Controller
             'grouping_code' => 'nullable|string|max:50|exists:CUST_GROUP,Group_ID',
             'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
         ], [
+            'npwp.digits' => 'NPWP harus 16 digit',
             'salesperson_code.exists' => 'Invalid salesperson code. Please select an existing salesperson.',
             'industrial_code.exists' => 'Invalid industrial code. Please select an existing industry.',
             'geographical.exists' => 'Invalid geographical code. Please select an existing geographical area.',
@@ -78,7 +114,7 @@ class UpdateCustomerAccountController extends Controller
             'AREA' => !empty($validated['geographical']) ? $validated['geographical'] : null,
             'IND' => !empty($validated['industrial_code']) ? $validated['industrial_code'] : null,
             'GROUP_' => !empty($validated['grouping_code']) ? $validated['grouping_code'] : null,
-            'NPWP' => '',
+            'NPWP' => $validated['npwp'] ?? '',
             'CUST_TYPE' => $validated['sales_type'] ?? ''
         ];
 
@@ -255,6 +291,18 @@ class UpdateCustomerAccountController extends Controller
         try {
             Log::info('API Store Customer Request:', ['data' => $request->all()]);
 
+            $normalizedNpwp = $this->normalizeNpwpValue($request->input('npwp'));
+            if ($normalizedNpwp === false) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => [
+                        'npwp' => ['NPWP harus 16 digit'],
+                    ],
+                ], 422);
+            }
+
+            $request->merge(['npwp' => $normalizedNpwp]);
+
             $validated = $request->validate([
                 'customer_code' => 'required|string|max:50',
                 'customer_name' => 'required|string|max:250',
@@ -270,7 +318,7 @@ class UpdateCustomerAccountController extends Controller
                 'credit_terms' => 'nullable|numeric',
                 'ac_type' => 'required|string|in:Y-Foreign,N-Local',
                 'currency_code' => 'nullable|string|max:50',
-                'npwp' => 'nullable|string|max:50',
+                'npwp' => 'nullable|digits:16',
                 'sales_type' => 'nullable|string|max:50',
                 'salesperson_code' => 'nullable|string|max:50|exists:salesperson,Code',
                 'industrial_code' => 'nullable|string|max:50|exists:industry,code',
@@ -278,6 +326,7 @@ class UpdateCustomerAccountController extends Controller
                 'grouping_code' => 'nullable|string|max:50|exists:CUST_GROUP,Group_ID',
                 'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
             ], [
+                'npwp.digits' => 'NPWP harus 16 digit',
                 'salesperson_code.exists' => 'Invalid salesperson code. Please select an existing salesperson.',
                 'industrial_code.exists' => 'Invalid industrial code. Please select an existing industry.',
                 'geographical.exists' => 'Invalid geographical code. Please select an existing geographical area.',
@@ -399,6 +448,18 @@ class UpdateCustomerAccountController extends Controller
         try {
             $customer = Customer::where('CODE', $id)->firstOrFail();
 
+            $normalizedNpwp = $this->normalizeNpwpValue($request->input('npwp'));
+            if ($normalizedNpwp === false) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => [
+                        'npwp' => ['NPWP harus 16 digit'],
+                    ],
+                ], 422);
+            }
+
+            $request->merge(['npwp' => $normalizedNpwp]);
+
             $validated = $request->validate([
                 'customer_code' => 'required|string|max:50',
                 'customer_name' => 'required|string|max:250',
@@ -414,7 +475,7 @@ class UpdateCustomerAccountController extends Controller
                 'credit_terms' => 'nullable|numeric',
                 'ac_type' => 'required|string|in:Y-Foreign,N-Local',
                 'currency_code' => 'nullable|string|max:50',
-                'npwp' => 'nullable|string|max:50',
+                'npwp' => 'nullable|digits:16',
                 'sales_type' => 'nullable|string|max:50',
                 'salesperson_code' => 'nullable|string|max:50|exists:salesperson,Code',
                 'industrial_code' => 'nullable|string|max:50|exists:industry,code',
@@ -422,6 +483,7 @@ class UpdateCustomerAccountController extends Controller
                 'grouping_code' => 'nullable|string|max:50|exists:CUST_GROUP,Group_ID',
                 'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
             ], [
+                'npwp.digits' => 'NPWP harus 16 digit',
                 'salesperson_code.exists' => 'Invalid salesperson code. Please select an existing salesperson.',
                 'industrial_code.exists' => 'Invalid industrial code. Please select an existing industry.',
                 'geographical.exists' => 'Invalid geographical code. Please select an existing geographical area.',

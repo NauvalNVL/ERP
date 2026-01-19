@@ -382,7 +382,12 @@
                       type="text"
                       v-model="newCustomerForm.npwp"
                       class="form-input"
+                      inputmode="numeric"
+                      pattern="[0-9]*"
+                      maxlength="16"
                       placeholder="Enter NPWP number"
+                      @input="onNewNpwpInput"
+                      @blur="onNewNpwpBlur"
                     />
                   </div>
 
@@ -831,7 +836,12 @@
                       type="text"
                       v-model="form.npwp"
                       class="form-input"
+                      inputmode="numeric"
+                      pattern="[0-9]*"
+                      maxlength="16"
                       placeholder="Enter NPWP number"
+                      @input="onEditNpwpInput"
+                      @blur="onEditNpwpBlur"
                     />
                   </div>
 
@@ -1131,6 +1141,34 @@ const deriveShortName = (name) => {
   return (name || "").substring(0, 12);
 };
 
+const normalizeNpwp = (rawValue, padOn15 = false) => {
+  const raw = (rawValue ?? "").toString();
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length > 16) {
+    digits = digits.slice(0, 16);
+  }
+  if (padOn15 && digits.length === 15) {
+    digits = `0${digits}`;
+  }
+  return digits;
+};
+
+const onEditNpwpInput = () => {
+  form.npwp = normalizeNpwp(form.npwp, false);
+};
+
+const onEditNpwpBlur = () => {
+  form.npwp = normalizeNpwp(form.npwp, true);
+};
+
+const onNewNpwpInput = () => {
+  newCustomerForm.npwp = normalizeNpwp(newCustomerForm.npwp, false);
+};
+
+const onNewNpwpBlur = () => {
+  newCustomerForm.npwp = normalizeNpwp(newCustomerForm.npwp, true);
+};
+
 // Auto-generate short_name from customer_name on create (new customer)
 watch(
   () => newCustomerForm.customer_name,
@@ -1337,7 +1375,7 @@ const selectCustomerAccount = (account) => {
     form.ac_type = "N-Local";
   }
 
-  form.npwp = accountData.npwp || "";
+  form.npwp = normalizeNpwp(accountData.npwp || "", true);
   form.salesperson_code = accountData.salesperson_code || "";
   form.industrial_code = accountData.industrial_code || "";
   form.geographical = accountData.geographical || "";
@@ -1495,6 +1533,12 @@ const saveCustomerAccount = async () => {
     form.print_ar_aging = "N-No"; // Default to N-No if not set or invalid
   }
 
+  form.npwp = normalizeNpwp(form.npwp, true);
+  if (form.npwp && form.npwp.length !== 16) {
+    showNotification("NPWP harus 16 digit", "warning");
+    return;
+  }
+
   isSaving.value = true;
 
   try {
@@ -1547,6 +1591,7 @@ const saveCustomerAccount = async () => {
       if (error.response.status === 422) {
         const errors = error.response.data?.errors;
         const prioritizedFields = [
+          "npwp",
           "salesperson_code",
           "industrial_code",
           "geographical",
@@ -1607,6 +1652,12 @@ const saveNewCustomerAccount = async () => {
       showNotification("Please enter a valid email address", "warning");
       return;
     }
+  }
+
+  newCustomerForm.npwp = normalizeNpwp(newCustomerForm.npwp, true);
+  if (newCustomerForm.npwp && newCustomerForm.npwp.length !== 16) {
+    showNotification("NPWP harus 16 digit", "warning");
+    return;
   }
 
   const existingCustomer = customers.value.find(
@@ -1675,6 +1726,7 @@ const saveNewCustomerAccount = async () => {
       if (error.response.status === 422) {
         const errors = error.response.data?.errors;
         const prioritizedFields = [
+          "npwp",
           "salesperson_code",
           "industrial_code",
           "geographical",

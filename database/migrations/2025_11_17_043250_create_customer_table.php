@@ -34,7 +34,7 @@ return new class extends Migration
                 $table->string('AREA', 10)->nullable()->collation($collation);
                 $table->string('IND', 5)->nullable()->collation($collation);
                 $table->string('GROUP_', 12)->nullable()->collation($collation);
-                $table->string('NPWP', 50)->nullable()->collation($collation);
+                $table->string('NPWP', 16)->nullable()->collation($collation);
                 $table->string('CUST_TYPE', 50)->nullable()->collation($collation);
 
                 // Set primary key
