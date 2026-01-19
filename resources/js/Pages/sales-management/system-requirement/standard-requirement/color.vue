@@ -396,11 +396,12 @@ const fetchColors = async (options = {}) => {
         modalLoading.value = true;
     }
     try {
-        const response = await fetch('/api/colors', {
+        const response = await fetch(`/api/colors?_=${Date.now()}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
+            cache: 'no-store',
             credentials: 'same-origin' // Include cookies in the request
         });
 
@@ -445,11 +446,12 @@ const refreshColors = async () => {
 // Fetch color groups from API
 const fetchColorGroups = async () => {
     try {
-        const response = await fetch('/api/color-groups', {
+        const response = await fetch(`/api/color-groups?_=${Date.now()}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
+            cache: 'no-store',
             credentials: 'same-origin'
         });
 

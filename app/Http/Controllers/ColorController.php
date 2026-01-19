@@ -166,6 +166,7 @@ class ColorController extends Controller
                 'color_name' => $color->Color_Name,
                 'color_group_id' => $color->GroupCode,
                 'cg_type' => $color->Group,
+                'status' => $color->status,
             ];
 
             if ($request->wantsJson() || $request->ajax()) {
@@ -479,7 +480,11 @@ class ColorController extends Controller
                 ];
             });
 
-            return response()->json($colorsTransformed);
+            return response()
+                ->json($colorsTransformed)
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         } catch (\Exception $e) {
             Log::error('Error in ColorController@apiIndex: ' . $e->getMessage());
             return response()->json([

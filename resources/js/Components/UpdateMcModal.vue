@@ -4184,7 +4184,9 @@ const hydratePdFromObject = (pd, loaded) => {
   itemRemark.value = pd.itemRemark || loaded.ITEM_REMARK || "";
   handHole.value = toBool(pd.handHole ?? pd.hand_hole ?? loaded.HAND_HOLE);
   rotaryDCut.value = toBool(pd.rotaryDCut ?? pd.rotary_dc ?? loaded.ROTARY_DC);
-  fullBlockPrint.value = toBool(pd.fullBlockPrint ?? pd.fb_printing ?? loaded.FB_PRINTING);
+  fullBlockPrint.value = toBool(
+    pd.fullBlockPrint ?? pd.fb_printing ?? loaded.FB_PRINTING
+  );
   selectedFinishingCode.value = pd.selectedFinishingCode || "";
   selectedStitchWireCode.value = pd.selectedStitchWireCode || loaded.SWIRE || "";
   // Re-apply formatting so pcs stay trimmed
@@ -4737,7 +4739,8 @@ watch(
           // Other flags / remarks
           cf.itemRemark = compSrc.itemRemark ?? cf.itemRemark;
           cf.peelOffPercent = compSrc.peelOffPercent ?? cf.peelOffPercent;
-          cf.handHole = compSrc.handHole !== undefined ? toBool(compSrc.handHole) : cf.handHole;
+          cf.handHole =
+            compSrc.handHole !== undefined ? toBool(compSrc.handHole) : cf.handHole;
           cf.rotaryDCut =
             compSrc.rotaryDCut !== undefined ? toBool(compSrc.rotaryDCut) : cf.rotaryDCut;
           cf.fullBlockPrint =
@@ -5055,7 +5058,9 @@ const fetchMcComponentsFromDb = async () => {
           cf.itemRemark = fetchedComp.itemRemark ?? cf.itemRemark;
           cf.peelOffPercent = fetchedComp.peelOffPercent ?? cf.peelOffPercent;
           cf.handHole =
-            fetchedComp.handHole !== undefined ? toBool(fetchedComp.handHole) : cf.handHole;
+            fetchedComp.handHole !== undefined
+              ? toBool(fetchedComp.handHole)
+              : cf.handHole;
           cf.rotaryDCut =
             fetchedComp.rotaryDCut !== undefined
               ? toBool(fetchedComp.rotaryDCut)
