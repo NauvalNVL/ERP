@@ -1686,6 +1686,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import UserModal from "@/Components/user-modal.vue";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import Swal from "sweetalert2";
 import {
   UserIcon,
   ShieldCheckIcon,
@@ -2158,11 +2159,47 @@ export default {
         });
 
         if (response.ok) {
+          // Show SweetAlert success notification
+          await Swal.fire({
+            icon: 'success',
+            title: 'Permissions Updated!',
+            text: `Permissions for ${this.foundUser.official_name} have been successfully updated.`,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#10b981',
+            background: '#ffffff',
+            color: '#0f172a',
+            backdrop: 'rgba(16, 185, 129, 0.2)',
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-100',
+              title: 'text-xl font-semibold',
+              confirmButton: 'px-6 py-2 rounded-lg'
+            },
+          });
+          
+          // Also set the success message for consistency
           this.searchMessage = "Permissions updated successfully!";
           this.searchMessageClass = "bg-green-100 text-green-700 border border-green-200";
           this.searchMessageIcon = CheckCircleIcon;
         } else {
           const errorData = await response.json();
+          
+          // Show SweetAlert error notification
+          await Swal.fire({
+            icon: 'error',
+            title: 'Update Failed!',
+            text: errorData.message || "An error occurred while saving permissions.",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#ef4444',
+            background: '#ffffff',
+            color: '#0f172a',
+            backdrop: 'rgba(239, 68, 68, 0.2)',
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-100',
+              title: 'text-xl font-semibold',
+              confirmButton: 'px-6 py-2 rounded-lg'
+            },
+          });
+          
           this.searchMessage =
             errorData.message || "An error occurred while saving permissions.";
           this.searchMessageClass = "bg-red-100 text-red-700 border border-red-200";
@@ -2170,6 +2207,24 @@ export default {
         }
       } catch (error) {
         console.error("Save error:", error);
+        
+        // Show SweetAlert error notification for unexpected errors
+        await Swal.fire({
+          icon: 'error',
+          title: 'Unexpected Error!',
+          text: "An unexpected error occurred while saving permissions. Please try again.",
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#ef4444',
+          background: '#ffffff',
+          color: '#0f172a',
+          backdrop: 'rgba(239, 68, 68, 0.2)',
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-red-100',
+            title: 'text-xl font-semibold',
+            confirmButton: 'px-6 py-2 rounded-lg'
+          },
+        });
+        
         this.searchMessage = "An error occurred while saving permissions.";
         this.searchMessageClass = "bg-red-100 text-red-700 border border-red-200";
         this.searchMessageIcon = ExclamationCircleIcon;
