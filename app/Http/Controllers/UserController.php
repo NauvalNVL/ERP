@@ -60,13 +60,13 @@ class UserController extends Controller
 
             $user = UserCps::createUser($validated);
 
-            // User created without any permissions
-            // Permissions will be set separately via Define User Access Permission menu
+            // Automatically give dashboard access to new user
+            $this->createDefaultUserPermissions($user->userID);
 
             DB::commit();
 
             return redirect()->route('vue.system-security.index')
-                ->with('success', 'User '.$user->userID.' created successfully.');
+                ->with('success', 'User '.$user->userID.' created successfully with dashboard access.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -198,8 +198,11 @@ class UserController extends Controller
             // Update password menggunakan method dari model
             $user->updatePassword($request->new_password, 90);
 
+            // Ensure user has dashboard access
+            $this->ensureDashboardAccess($user->userID);
+
             return redirect()->route('vue.system-security.amend-password')
-                ->with('success', 'Password successfully updated for user: '.$user->userID);
+                ->with('success', 'Password successfully updated for user: '.$user->userID.' (dashboard access ensured)');
         } catch (\Exception $e) {
             Log::error('Password update error: '.$e->getMessage());
             return back()
@@ -571,6 +574,61 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Error updating user status: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Create default permissions for a new user (dashboard access only)
+     */
+    private function createDefaultUserPermissions($userId)
+    {
+        try {
+            // Get dashboard menu item from the menu items list
+            $menuItems = UserPermission::getAllMenuItems();
+            
+            // Find the dashboard menu item
+            $dashboardItem = collect($menuItems)->firstWhere('key', 'dashboard');
+            
+            if ($dashboardItem) {
+                UserPermission::create([
+                    'user_id' => $userId,
+                    'menu_key' => $dashboardItem['key'],
+                    'menu_name' => $dashboardItem['name'],
+                    'menu_route' => $dashboardItem['route'],
+                    'menu_category' => $dashboardItem['category'],
+                    'menu_parent' => $dashboardItem['parent'],
+                    'can_access' => true // Give access to dashboard
+                ]);
+            }
+            
+            Log::info("Default dashboard access created for user: {$userId}");
+            
+        } catch (\Exception $e) {
+            Log::error("Error creating default permissions for user {$userId}: " . $e->getMessage());
+            // Don't throw exception here, as user creation should still succeed
+        }
+    }
+
+    /**
+     * Ensure user has dashboard access (for password updates)
+     */
+    private function ensureDashboardAccess($userId)
+    {
+        try {
+            // Check if user already has dashboard access
+            $existingPermission = UserPermission::where('user_id', $userId)
+                ->where('menu_key', 'dashboard')
+                ->first();
+
+            if (!$existingPermission) {
+                // Create dashboard access if it doesn't exist
+                $this->createDefaultUserPermissions($userId);
+                Log::info("Dashboard access ensured for user: {$userId}");
+            }
+            
+        } catch (\Exception $e) {
+            Log::error("Error ensuring dashboard access for user {$userId}: " . $e->getMessage());
+            // Don't throw exception here, as password update should still succeed
         }
     }
 }
