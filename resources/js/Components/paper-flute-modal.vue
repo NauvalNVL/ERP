@@ -24,7 +24,7 @@
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
           </div>
         </div>
-        <div class="flex-1 min-h-0">
+        <div class="flex-1 min-h-0 flex flex-col">
           <div v-if="loading" class="flex flex-col items-center justify-center flex-1 border border-dashed border-emerald-300 rounded-lg py-10">
             <div class="flex items-center space-x-3 text-emerald-600">
               <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
@@ -32,98 +32,101 @@
             </div>
             <p class="text-xs text-emerald-500 mt-2">Please wait, fetching the latest records.</p>
           </div>
-          <div v-else class="overflow-x-auto rounded-lg border border-gray-200 max-h-[60vh]">
-            <table class="w-full min-w-[960px] divide-y divide-gray-200">
-              <thead class="bg-gray-50 sticky top-0 z-10">
-                <tr>
-                  <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Flute')">
-                    <div class="flex items-center gap-1">
-                      Paper Flute
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Descr')">
-                    <div class="flex items-center gap-1">
-                      Description
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('DB')">
-                    <div class="flex items-center gap-1 justify-end">
-                      DB
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('B')">
-                    <div class="flex items-center gap-1 justify-end">
-                      B
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('_1L')">
-                    <div class="flex items-center gap-1 justify-end">
-                      1L
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('A_C_E')">
-                    <div class="flex items-center gap-1 justify-end">
-                      A/C/E
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('_2L')">
-                    <div class="flex items-center gap-1 justify-end">
-                      2L
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Height')">
-                    <div class="flex items-center gap-1 justify-end">
-                      Height
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Starch')">
-                    <div class="flex items-center gap-1 justify-end">
-                      Starch
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                  <th class="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('status')">
-                    <div class="flex items-center gap-1">
-                      Status
-                      <i class="fas fa-sort text-gray-400"></i>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                <tr v-for="flute in filteredFlutes" :key="flute.Flute"
-                  :class="['hover:bg-emerald-50 cursor-pointer transition-colors', selectedFlute && selectedFlute.Flute === flute.Flute ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
-                  @click="selectRow(flute)"
-                  @dblclick="selectAndClose(flute)">
-                  <td class="px-3 md:px-6 py-2 md:py-3 whitespace-nowrap font-medium text-gray-900">{{ flute.Flute }}</td>
-                  <td class="px-3 md:px-6 py-2 md:py-3 text-gray-700">{{ flute.Descr }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.DB) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.B) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute._1L) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.A_C_E) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute._2L) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.Height) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.Starch) }}</td>
-                  <td class="px-3 md:px-4 py-2 md:py-3 text-gray-700">{{ getStatusValue(flute) }}</td>
-                </tr>
-                <tr v-if="filteredFlutes.length === 0">
-                  <td colspan="10" class="px-3 md:px-6 py-4 text-center text-gray-500">No paper flute data available.</td>
-                </tr>
-              </tbody>
-            </table>
+          <div v-else class="flex-1 flex flex-col min-h-0">
+            <div class="overflow-x-auto rounded-lg border border-gray-200 flex-1" style="max-height: calc(60vh - 40px);">
+              <table class="w-full min-w-[960px] divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Flute')">
+                      <div class="flex items-center gap-1">
+                        Paper Flute
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Descr')">
+                      <div class="flex items-center gap-1">
+                        Description
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('DB')">
+                      <div class="flex items-center gap-1 justify-end">
+                        DB
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('B')">
+                      <div class="flex items-center gap-1 justify-end">
+                        B
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('_1L')">
+                      <div class="flex items-center gap-1 justify-end">
+                        1L
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('A_C_E')">
+                      <div class="flex items-center gap-1 justify-end">
+                        A/C/E
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('_2L')">
+                      <div class="flex items-center gap-1 justify-end">
+                        2L
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Height')">
+                      <div class="flex items-center gap-1 justify-end">
+                        Height
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('Starch')">
+                      <div class="flex items-center gap-1 justify-end">
+                        Starch
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                    <th class="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" @click="sortTable('status')">
+                      <div class="flex items-center gap-1">
+                        Status
+                        <i class="fas fa-sort text-gray-400"></i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                  <tr v-for="flute in filteredFlutes" :key="flute.Flute"
+                    :class="['hover:bg-emerald-50 cursor-pointer transition-colors', selectedFlute && selectedFlute.Flute === flute.Flute ? 'bg-emerald-100 border-l-4 border-emerald-500' : '']"
+                    @click="selectRow(flute)"
+                    @dblclick="selectAndClose(flute)">
+                    <td class="px-3 md:px-6 py-2 md:py-3 whitespace-nowrap font-medium text-gray-900">{{ flute.Flute }}</td>
+                    <td class="px-3 md:px-6 py-2 md:py-3 text-gray-700">{{ flute.Descr }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.DB) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.B) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute._1L) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.A_C_E) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute._2L) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.Height) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-right text-gray-700">{{ formatNumber(flute.Starch) }}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-gray-700">{{ getStatusValue(flute) }}</td>
+                  </tr>
+                  <tr v-if="filteredFlutes.length === 0">
+                    <td colspan="10" class="px-3 md:px-6 py-4 text-center text-gray-500">No paper flute data available.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Instructions placed outside the scrollable area -->
+            <div class="mt-2 text-xs text-gray-500 italic pb-2">
+              <p class="hidden md:block">Click on a row to select and edit its details. Double-click to select quickly.</p>
+              <p class="md:hidden">Tap to select, double-tap to edit.</p>
+            </div>
           </div>
-        </div>
-        <div class="mt-2 text-xs text-gray-500 italic">
-          <p class="hidden md:block">Click on a row to select and edit its details. Double-click to select quickly.</p>
-          <p class="md:hidden">Tap to select, double-tap to edit.</p>
         </div>
         <div class="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
           <button type="button" @click="selectAndClose(selectedFlute)" :disabled="!selectedFlute" class="w-full sm:w-auto py-2 px-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-all">
