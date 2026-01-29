@@ -52,30 +52,30 @@
 
       <!-- System Manager -->
       <SidebarDropdown
-        v-if="hasSystemManagerAccess()"
+        v-if="filteredSystemManagerItems.length > 0"
         title="System Manager"
         icon="fas fa-cogs"
-        :items="filterItemsByPermission(systemManagerItems)"
+        :items="filteredSystemManagerItems"
         :current-path="currentPath"
         :has-permission="hasPermission"
       />
 
       <!-- Sales Management -->
       <SidebarDropdown
-        v-if="hasSalesManagementAccess()"
+        v-if="filteredSalesManagementItems.length > 0"
         title="Sales Management"
         icon="fas fa-chart-line"
-        :items="filterItemsByPermission(salesManagementItems)"
+        :items="filteredSalesManagementItems"
         :current-path="currentPath"
         :has-permission="hasPermission"
       />
 
       <!-- Warehouse Management -->
       <SidebarDropdown
-        v-if="hasWarehouseManagementAccess()"
+        v-if="filteredWarehouseManagementItems.length > 0"
         title="Warehouse Management"
         icon="fas fa-warehouse"
-        :items="filterItemsByPermission(warehouseManagementItems)"
+        :items="filteredWarehouseManagementItems"
         :current-path="currentPath"
         :has-permission="hasPermission"
       />
@@ -259,159 +259,29 @@ const hasPermission = (menuKey) => {
   return userPermissions.value.includes(menuKey);
 };
 
-// Check if user has access to System Manager (main access OR any submenu)
-const hasSystemManagerAccess = () => {
-  if (!user.value) return false;
-  
-  // Check main access first
-  if (hasPermission('system_manager')) return true;
-  
-  // Check any System Manager submenu permissions
-  const systemManagerPermissions = [
-    'define_user', 'amend_user_password', 'define_user_access_permission',
-    'copy_paste_user_access_permission', 'reactive_unobsolete_user', 'view_print_user'
-  ];
-  
-  return systemManagerPermissions.some(permission => hasPermission(permission));
-};
-
-// Check if user has access to Sales Management (main access OR any submenu)
-const hasSalesManagementAccess = () => {
-  if (!user.value) return false;
-  
-  // Check main access first
-  if (hasPermission('sales_management')) return true;
-  
-  // Check any Sales Management submenu permissions
-  const salesManagementPermissions = [
-    // Standard Requirement
-    'define_salesperson', 'obsolete_unobsolete_salesperson', 'define_salesperson_team',
-    'define_industry', 'obsolete_unobsolete_industry', 'define_geo', 'obsolete_unobsolete_geo',
-    'define_product_group', 'obsolete_unobsolete_product_group', 'define_product', 'obsolete_unobsolete_product',
-    'define_product_design', 'obsolete_unobsolete_product_design', 'define_scoring_tool', 'obsolete_unobsolete_scoring_tool',
-    'define_paper_quality', 'obsolete_unobsolete_paper_quality', 'define_paper_flute', 'obsolete_unobsolete_paper_flute',
-    'define_paper_size', 'obsolete_unobsolete_paper_size', 'define_color_group', 'obsolete_unobsolete_color_group',
-    'define_color', 'obsolete_unobsolete_color', 'define_finishing', 'obsolete_unobsolete_finishing',
-    'define_stitch_wire', 'obsolete_unobsolete_stitch_wire', 'define_chemical_coat', 'obsolete_unobsolete_chemical_coat',
-    'obsolete_unobsolete_reinforcement_tape', 'define_reinforcement_tape', 'obsolete_unobsolete_bundling_string',
-    'define_bundling_string', 'obsolete_unobsolete_wrapping_material', 'define_wrapping_material',
-    'obsolete_unobsolete_glueing_material', 'define_glueing_material', 'define_machine', 'obsolete_unobsolete_machine',
-    
-    // Customer Account
-    'define_customer_group', 'obsolete_reactive_customer_group', 'update_customer_account',
-    'define_customer_alternate_address', 'define_customer_sales_type', 'obsolete_reactive_customer_ac',
-    'view_print_customer_group', 'view_print_customer_account', 'view_print_customer_alternate_address',
-    'view_print_customer_sales_type', 'view_print_non_active_customer',
-    
-    // Master Card
-    'update_mc', 'approve_mc', 'release_approved_mc', 'obsolete_reactive_mc',
-    'view_print_mc', 'view_print_mc_maintenance_log', 'view_print_mc_approval_log',
-    'view_print_non_active_mc', 'initialized_mc_maintenance_log',
-    'view_print_mc_print_dc_block_listing', 'view_print_mc_dc_block_matching',
-    'view_print_mc_by_color', 'view_print_analysis_code', 'view_print_mc_by_psize_pquality',
-    'view_print_mc_by_machine',
-    
-    // Sales Order
-    'prepare_mc_so', 'prepare_sb_so', 'prepare_jit_so', 'print_so', 'cancel_so',
-    'amend_so', 'amend_approved_so', 'amend_so_price', 'amend_approved_so_price',
-    'close_so', 'close_so_by_period', 'unclose_so', 'resubmit_rejected_so',
-    'release_wo_by_so', 'print_so_log', 'print_so_jit_tracking',
-    
-    // And other sales management permissions...
-    'view_print_salesperson', 'view_print_industry', 'view_print_geo', 'view_print_product_group',
-    'view_print_product', 'view_print_product_design', 'view_print_paper_quality',
-    'view_print_paper_flute', 'view_print_paper_size', 'view_print_scoring_tool',
-    'view_print_color_group', 'view_print_color', 'view_print_finishing',
-    'view_print_stitch_wire', 'view_print_chemical_coat', 'view_print_reinforcement_tape',
-    'view_print_bundling_string', 'view_print_wrapping_material', 'view_print_glueing_material',
-    'view_print_machine'
-  ];
-  
-  return salesManagementPermissions.some(permission => hasPermission(permission));
-};
-
-// Check if user has access to Warehouse Management (main access OR any submenu)
-const hasWarehouseManagementAccess = () => {
-  if (!user.value) return false;
-  
-  // Check main access first
-  if (hasPermission('warehouse_management')) return true;
-  
-  // Check any Warehouse Management submenu permissions
-  const warehouseManagementPermissions = [
-    // Delivery Order Setup
-    'define_analysis_code', 'define_transport_contractor', 'define_vehicle_class', 'define_vehicle',
-    'obsolete_unobsolete_vehicle_class', 'obsolete_unobsolete_vehicle', 'define_dorn_code',
-    'define_greeting_message', 'define_alternate_unit', 'define_master_card_alternate_unit',
-    'define_dorder_group', 'define_users_dorder_group', 'view_print_analysis_code',
-    'view_print_vehicle_class', 'view_print_vehicle',
-    
-    // DO Processing
-    'prepare_delivery_order_single', 'prepare_delivery_order_multiple', 'print_delivery_order',
-    'print_do_proforma_invoice', 'print_coa_result_by_wo', 'print_coa_result_by_so',
-    'amend_delivery_order', 'cancel_delivery_order', 'reconcile_do_unapplied_fg',
-    'view_print_do_log', 'view_print_do_unapplied_fg', 'customer_so_delivery_obsolete',
-    'sales_order_delivery_schedule',
-    
-    // DORN Processing
-    'issue_dorn', 'print_dorn', 'amend_dorn', 'cancel_dorn', 'view_print_dorn_log',
-    
-    // Manual DO Processing
-    'activate_manual_configuration', 'register_manual_numbers', 'view_print_registered_manual_numbers_log',
-    
-    // Invoice Setup
-    'define_tax_type', 'obsolete_unobsolete_tax_type', 'define_tax_group',
-    'obsolete_unobsolete_tax_group', 'obsolete_unobsolete_customer_sales_tax_index',
-    'define_customer_sales_tax_index', 'view_print_tax_type', 'view_print_tax_group',
-    'view_print_customer_sales_tax_index',
-    
-    // IV Processing
-    'prepare_invoice_by_do_current_period', 'prepare_invoice_by_do_open_period',
-    'print_invoice', 'amend_invoice', 'cancel_active_invoice', 'view_print_invoice_log',
-    
-    // Tax DJP
-    'input_no_faktur', 'export_to_coretax'
-  ];
-  
-  return warehouseManagementPermissions.some(permission => hasPermission(permission));
-};
-
 // Filter menu items based on permissions (recursive for nested children)
 const filterItemsByPermission = (items) => {
-  return items.map((item) => {
-    if (item.children) {
-      // For items with children, filter the children recursively
-      const filteredChildren = item.children
-        .map((child) => {
-          if (child.children) {
-            // Handle nested children (sub-sub menu)
-            const nestedFilteredChildren = child.children.filter((nestedChild) => {
-              const permissionKey = getPermissionKeyFromTitle(nestedChild.title);
-              return hasPermission(permissionKey);
-            });
+  return items
+    .map((item) => {
+      if (item.children) {
+        // For items with children, filter the children recursively
+        const filteredChildren = filterItemsByPermission(item.children);
+        return filteredChildren.length > 0
+          ? {
+              ...item,
+              children: filteredChildren,
+            }
+          : null;
+      }
 
-            return {
-              ...child,
-              children: nestedFilteredChildren,
-            };
-          } else {
-            // Handle direct children
-            const permissionKey = getPermissionKeyFromTitle(child.title);
-            return hasPermission(permissionKey) ? child : null;
-          }
-        })
-        .filter((child) => {
-          // Keep item if it has children or if it passed permission check
-          return child !== null && (child.children?.length > 0 || !child.children);
-        });
+      if (item.route) {
+        const permissionKey = getPermissionKeyFromTitle(item.title);
+        return hasPermission(permissionKey) ? item : null;
+      }
 
-      return {
-        ...item,
-        children: filteredChildren,
-      };
-    }
-    return item;
-  });
+      return null;
+    })
+    .filter((item) => item !== null);
 };
 
 // Map menu titles to permission keys
@@ -658,10 +528,24 @@ const getPermissionKeyFromTitle = (title) => {
     titleMap[title] ||
     title
       .toLowerCase()
-      .replace(/\s+/g, "_")
+      .replace(/[\s\/&\-]+/g, "_")
       .replace(/[^a-z0-9_]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "")
   );
 };
+
+const filteredSystemManagerItems = computed(() =>
+  filterItemsByPermission(systemManagerItems)
+);
+
+const filteredSalesManagementItems = computed(() =>
+  filterItemsByPermission(salesManagementItems)
+);
+
+const filteredWarehouseManagementItems = computed(() =>
+  filterItemsByPermission(warehouseManagementItems)
+);
 
 const logout = () => {
   // Simple Inertia logout menggunakan GET; backend akan redirect ke /login
