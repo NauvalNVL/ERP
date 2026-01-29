@@ -2579,15 +2579,18 @@ class SalesOrderController extends Controller
             // }
 
             if ($request->has('remark')) {
-                $updateData['SO_REMARK'] = $request->remark;
+                // SO_REMARK is defined as NOT NULL in the SO table, so ensure we never send a NULL value
+                $updateData['SO_REMARK'] = $request->input('remark') ?? '';
             }
 
             if ($request->has('instruction1')) {
-                $updateData['SO_INSTRUCTION_1'] = $request->instruction1;
+                // SO_INSTRUCTION_1 is NOT NULL in legacy schema, coerce null to empty string
+                $updateData['SO_INSTRUCTION_1'] = $request->input('instruction1') ?? '';
             }
 
             if ($request->has('instruction2')) {
-                $updateData['SO_INSTRUCTION_2'] = $request->instruction2;
+                // SO_INSTRUCTION_2 is NOT NULL in legacy schema, coerce null to empty string
+                $updateData['SO_INSTRUCTION_2'] = $request->input('instruction2') ?? '';
             }
 
             // Note: ANALYSIS_CODE column does not exist in SO table
