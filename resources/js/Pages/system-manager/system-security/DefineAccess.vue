@@ -264,6 +264,7 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   <button
+                    type="button"
                     @click="toggleCategory('system_manager')"
                     class="system-manager-header w-full bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 md:px-6 py-4 border-b border-indigo-800 text-left hover:from-indigo-700 hover:to-indigo-800 transition-colors"
                   >
@@ -375,6 +376,7 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   <button
+                    type="button"
                     @click="toggleCategory('sales_management')"
                     class="sales-management-header w-full bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 border-b border-green-800 text-left hover:from-green-700 hover:to-green-800 transition-colors"
                   >
@@ -1241,6 +1243,7 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   <button
+                    type="button"
                     @click="toggleCategory('warehouse_management')"
                     class="warehouse-management-header w-full bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 md:px-6 py-4 border-b border-yellow-800 text-left hover:from-yellow-700 hover:to-yellow-800 transition-colors"
                   >
