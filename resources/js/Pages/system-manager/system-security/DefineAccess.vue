@@ -1313,11 +1313,31 @@
                               <label class="flex items-center">
                                 <input
                                   type="checkbox"
+                                  v-model="form.permissions.obsolete_unobsolete_vehicle_class"
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Vehicle Class</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
                                   v-model="form.permissions.define_vehicle"
                                   class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
                                 />
                                 <span class="ml-3 text-xs text-gray-700"
                                   >Define Vehicle</span
+                                >
+                              </label>
+                              <label class="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  v-model="form.permissions.obsolete_unobsolete_vehicle"
+                                  class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+                                />
+                                <span class="ml-3 text-xs text-gray-700"
+                                  >Obsolete/Unobsolete Vehicle</span
                                 >
                               </label>
                               <label class="flex items-center">
@@ -1864,7 +1884,9 @@ export default {
           define_analysis_code: false,
           define_transport_contractor: false,
           define_vehicle_class: false,
+          obsolete_unobsolete_vehicle_class: false,
           define_vehicle: false,
+          obsolete_unobsolete_vehicle: false,
           define_dorn_code: false,
           define_greeting_message: false,
           define_alternate_unit: false,

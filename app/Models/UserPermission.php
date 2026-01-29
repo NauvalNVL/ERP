@@ -948,6 +948,20 @@ class UserPermission extends Model
                 'parent' => 'warehouse_management'
             ],
             [
+                'key' => 'obsolete_unobsolete_vehicle_class',
+                'name' => 'Obsolete/Unobsolete Vehicle Class',
+                'route' => '/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle-class',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
+                'key' => 'obsolete_unobsolete_vehicle',
+                'name' => 'Obsolete/Unobsolete Vehicle',
+                'route' => '/warehouse-management/delivery-order/setup/obsolete-unobsolete-vehicle',
+                'category' => 'warehouse_management',
+                'parent' => 'warehouse_management'
+            ],
+            [
                 'key' => 'define_dorn_code',
                 'name' => 'Define DORN Code',
                 'route' => '/warehouse-management/delivery-order/setup/define-dorn-code',
