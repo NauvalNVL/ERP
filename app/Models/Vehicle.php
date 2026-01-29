@@ -62,7 +62,8 @@ class Vehicle extends Model
         $companies = [
             'KIM' => 'KIM',
             'CUSTOMER' => 'CUSTOMER',
-            'MBI' => 'MBI'
+            'MBI' => 'MBI',
+            'MMI' => 'MMI'
         ];
         
         return $companies[$this->VEHICLE_COMPANY] ?? $this->VEHICLE_COMPANY;

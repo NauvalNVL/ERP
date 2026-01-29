@@ -33,6 +33,8 @@ class VehicleController extends Controller
     {
         $query = Vehicle::with('vehicleClass');
 
+        $baseCompanies = ['KIM', 'CUSTOMER', 'MBI', 'MMI'];
+
         // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
@@ -64,6 +66,18 @@ class VehicleController extends Controller
         // Support both plain and paginated responses; always include a consistent shape
         if ($request->boolean('plain')) {
             $rows = $query->orderBy('VEHICLE_NO')->get();
+
+            $dbCompanies = Vehicle::select('VEHICLE_COMPANY')
+                ->whereNotNull('VEHICLE_COMPANY')
+                ->distinct()
+                ->orderBy('VEHICLE_COMPANY')
+                ->pluck('VEHICLE_COMPANY')
+                ->filter(fn ($v) => trim((string) $v) !== '')
+                ->values()
+                ->toArray();
+
+            $companies = array_values(array_unique(array_merge($baseCompanies, $dbCompanies)));
+
             return response()->json([
                 'success' => true,
                 'rows' => $rows,
@@ -75,12 +89,23 @@ class VehicleController extends Controller
                     'total' => $rows->count(),
                 ],
                 'vehicle_classes' => VehicleClass::orderBy('VEHICLE_CLASS_CODE')->get(),
-                'companies' => Vehicle::select('VEHICLE_COMPANY')->distinct()->orderBy('VEHICLE_COMPANY')->pluck('VEHICLE_COMPANY')->values(),
+                'companies' => $companies,
             ]);
         }
 
         $paginator = $query->orderBy('VEHICLE_NO')->paginate(20);
         $rows = $paginator->items();
+
+        $dbCompanies = Vehicle::select('VEHICLE_COMPANY')
+            ->whereNotNull('VEHICLE_COMPANY')
+            ->distinct()
+            ->orderBy('VEHICLE_COMPANY')
+            ->pluck('VEHICLE_COMPANY')
+            ->filter(fn ($v) => trim((string) $v) !== '')
+            ->values()
+            ->toArray();
+
+        $companies = array_values(array_unique(array_merge($baseCompanies, $dbCompanies)));
 
         return response()->json([
             'success' => true,
@@ -94,7 +119,7 @@ class VehicleController extends Controller
             ],
             'rows' => $rows,
             'vehicle_classes' => VehicleClass::orderBy('VEHICLE_CLASS_CODE')->get(),
-            'companies' => Vehicle::select('VEHICLE_COMPANY')->distinct()->orderBy('VEHICLE_COMPANY')->pluck('VEHICLE_COMPANY')->values(),
+            'companies' => $companies,
         ]);
     }
 
@@ -291,7 +316,7 @@ class VehicleController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => ['KIM', 'CUSTOMER', 'MBI']
+            'data' => ['KIM', 'CUSTOMER', 'MBI', 'MMI']
         ]);
     }
 

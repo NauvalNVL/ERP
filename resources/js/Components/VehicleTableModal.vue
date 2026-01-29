@@ -262,7 +262,12 @@ const searchVehicles = async () => {
       const rows = filterActiveVehicles(response.data.rows || [])
       vehicles.value = rows
       pagination.value = response.data.data?.pagination || null
-      companies.value = response.data.companies || []
+      const defaultCompanies = ['KIM', 'CUSTOMER', 'MBI', 'MMI']
+      const apiCompanies = Array.isArray(response.data.companies) ? response.data.companies : []
+      companies.value = Array.from(new Set([
+        ...defaultCompanies,
+        ...apiCompanies
+      ])).filter(Boolean)
     } else {
       errorMessage.value = 'Failed to load vehicles'
       vehicles.value = []
@@ -315,6 +320,12 @@ const changePage = async (page) => {
       const rows = filterActiveVehicles(response.data.rows || [])
       vehicles.value = rows
       pagination.value = response.data.data?.pagination || null
+      const defaultCompanies = ['KIM', 'CUSTOMER', 'MBI', 'MMI']
+      const apiCompanies = Array.isArray(response.data.companies) ? response.data.companies : []
+      companies.value = Array.from(new Set([
+        ...defaultCompanies,
+        ...apiCompanies
+      ])).filter(Boolean)
     }
   } catch (error) {
     console.error('Error fetching vehicles:', error)

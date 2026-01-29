@@ -349,6 +349,19 @@
                   </div>
                 </div>
 
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <input
+                    v-model="form.VEHICLE_DESCRIPTION"
+                    type="text"
+                    readonly
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Auto-filled from selected vehicle class"
+                  />
+                </div>
+
                 <!-- Vehicle Company -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -361,6 +374,7 @@
                     <option value="KIM">KIM</option>
                     <option value="CUSTOMER">CUSTOMER</option>
                     <option value="MBI">MBI</option>
+                    <option value="MMI">MMI</option>
                   </select>
                 </div>
 
@@ -550,6 +564,7 @@ const form = reactive({
   VEHICLE_NO: '',
   VEHICLE_STATUS: 'A',
   VEHICLE_CLASS: '',
+  VEHICLE_DESCRIPTION: '',
   VEHICLE_COMPANY: '',
   DRIVER_CODE: '',
   DRIVER_NAME: '',
@@ -694,6 +709,7 @@ const onVehicleSelected = (vehicle) => {
 const onVehicleClassSelected = (cls) => {
   if (!cls) return
   form.VEHICLE_CLASS = cls.VEHICLE_CLASS_CODE || ''
+  form.VEHICLE_DESCRIPTION = cls.DESCRIPTION || cls.description || ''
 }
 
 const openEditModal = (vehicle) => {
@@ -703,6 +719,7 @@ const openEditModal = (vehicle) => {
     VEHICLE_NO: vehicle.VEHICLE_NO,
     VEHICLE_STATUS: vehicle.VEHICLE_STATUS,
     VEHICLE_CLASS: vehicle.VEHICLE_CLASS,
+    VEHICLE_DESCRIPTION: vehicle.VEHICLE_DESCRIPTION || '',
     VEHICLE_COMPANY: vehicle.VEHICLE_COMPANY,
     DRIVER_CODE: vehicle.DRIVER_CODE,
     DRIVER_NAME: vehicle.DRIVER_NAME,
@@ -723,6 +740,7 @@ const resetForm = () => {
     VEHICLE_NO: '',
     VEHICLE_STATUS: 'A',
     VEHICLE_CLASS: '',
+    VEHICLE_DESCRIPTION: '',
     VEHICLE_COMPANY: '',
     DRIVER_CODE: '',
     DRIVER_NAME: '',

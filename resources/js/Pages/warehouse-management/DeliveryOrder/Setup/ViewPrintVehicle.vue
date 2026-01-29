@@ -72,6 +72,7 @@
                 <option value="KIM">KIM</option>
                 <option value="CUSTOMER">CUSTOMER</option>
                 <option value="MBI">MBI</option>
+                <option value="MMI">MMI</option>
               </select>
             </div>
 
