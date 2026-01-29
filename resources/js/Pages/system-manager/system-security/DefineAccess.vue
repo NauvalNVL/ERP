@@ -2183,6 +2183,9 @@ export default {
           this.searchMessage = "Permissions updated successfully!";
           this.searchMessageClass = "bg-green-100 text-green-700 border border-green-200";
           this.searchMessageIcon = CheckCircleIcon;
+
+          // Refresh permissions if this is the current logged-in user
+          this.refreshCurrentUserPermissions();
         } else {
           const errorData = await response.json();
           
@@ -2233,6 +2236,39 @@ export default {
         this.searchMessageIcon = ExclamationCircleIcon;
       } finally {
         this.isSaving = false;
+      }
+    },
+
+    async refreshCurrentUserPermissions() {
+      try {
+        // Check if the updated user is the current logged-in user
+        const currentUser = this.$page.props.auth?.user;
+        if (currentUser && currentUser.user_id === this.foundUser.userID) {
+          // Refresh permissions by calling the refresh endpoint
+          const response = await fetch(`/api/users/${this.foundUser.userID}/permissions/refresh`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Requested-With": "XMLHttpRequest",
+              "X-CSRF-TOKEN":
+                this.$page.props.csrf ||
+                document.querySelector('meta[name="csrf-token"]')?.getAttribute("content"),
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            // Update the page props with new permissions
+            if (this.$page.props.auth) {
+              this.$page.props.auth.permissions = data.permissions;
+            }
+            
+            // Optionally show a notification that permissions have been refreshed
+            console.log('Permissions refreshed for current user');
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing permissions:', error);
       }
     },
 

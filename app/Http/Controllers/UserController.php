@@ -7,6 +7,7 @@ use App\Models\UserPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -486,9 +487,9 @@ class UserController extends Controller
             // Delete existing permissions
             UserPermission::where('user_id', $userId)->delete();
 
-            // Create new permissions
+            // Create new permissions only for checked items
             $menuItems = UserPermission::getAllMenuItems();
-
+            
             // Remove duplicates based on menu_key
             $uniqueMenuItems = [];
             $seenKeys = [];
@@ -503,18 +504,24 @@ class UserController extends Controller
             foreach ($uniqueMenuItems as $item) {
                 $hasPermission = isset($validated['permissions'][$item['key']]) && $validated['permissions'][$item['key']];
 
-                UserPermission::create([
-                    'user_id' => $userId,
-                    'menu_key' => $item['key'],
-                    'menu_name' => $item['name'],
-                    'menu_route' => $item['route'],
-                    'menu_category' => $item['category'],
-                    'menu_parent' => $item['parent'],
-                    'can_access' => $hasPermission
-                ]);
+                // Only create permission if it's checked
+                if ($hasPermission) {
+                    UserPermission::create([
+                        'user_id' => $userId,
+                        'menu_key' => $item['key'],
+                        'menu_name' => $item['name'],
+                        'menu_route' => $item['route'],
+                        'menu_category' => $item['category'],
+                        'menu_parent' => $item['parent'],
+                        'can_access' => true
+                    ]);
+                }
             }
 
             DB::commit();
+
+            // Clear any cached permissions for this user
+            $this->clearUserPermissionCache($userId);
 
             return response()->json([
                 'success' => true,
@@ -527,6 +534,57 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update permissions: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Clear user permission cache
+     */
+    private function clearUserPermissionCache($userId)
+    {
+        // Clear Laravel cache if any
+        Cache::forget("user_permissions_{$userId}");
+        
+        // For session-based permissions, we might need to update session
+        // This is a fallback mechanism
+        if (session()->has("user_permissions_{$userId}")) {
+            session()->forget("user_permissions_{$userId}");
+        }
+    }
+
+    /**
+     * Refresh user permissions (for current logged-in user)
+     */
+    public function refreshPermissions(Request $request, $userId)
+    {
+        try {
+            $user = UserCps::where('userID', $userId)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            // Clear cache for this user
+            $this->clearUserPermissionCache($userId);
+
+            // Get fresh permissions
+            $permissions = UserPermission::getUserPermissions($userId);
+
+            return response()->json([
+                'success' => true,
+                'permissions' => $permissions,
+                'message' => 'Permissions refreshed successfully for user: ' . $userId
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error refreshing permissions: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to refresh permissions: ' . $e->getMessage()
             ], 500);
         }
     }

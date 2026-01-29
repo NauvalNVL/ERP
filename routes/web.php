@@ -886,10 +886,10 @@ return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view
 Route::prefix('api')->group(function () {
 // User API routes
 Route::get('/users', [UserController::class, 'searchUsers']);
-Route::post('/users', [UserController::class, 'store']);
-Route::put('/users/{user}', [UserController::class, 'update']);
+Route::get('/users/search/{userId}', [UserController::class, 'searchUser']);
 Route::get('/users/{user}/permissions', [UserController::class, 'getUserPermissions']);
 Route::post('/users/{user}/permissions', [UserController::class, 'updateAccess']);
+Route::post('/users/{user}/permissions/refresh', [UserController::class, 'refreshPermissions']);
 Route::post('/users/copy-permissions', [UserController::class, 'copyPermissions']);
 Route::post('/users/update-password', [UserController::class, 'updatePassword']);
 
