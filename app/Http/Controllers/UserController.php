@@ -7,6 +7,7 @@ use App\Models\UserPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -36,9 +37,9 @@ class UserController extends Controller
             'user_id' => 'required|unique:usercps,userID|max:20',
             'username' => 'required|unique:usercps,userName|max:30',
             'official_name' => 'required|max:100',
-            'official_title' => 'required|max:50',
-            'mobile_number' => 'required|digits_between:10,15',
-            'official_tel' => 'required|digits_between:8,15',
+            'official_title' => 'nullable|max:50',
+            'mobile_number' => 'nullable|digits_between:10,15',
+            'official_tel' => 'nullable|digits_between:8,15',
             'password_expiry_date' => 'required|integer|min:0',
             'status' => 'required|in:A,O',
             'amend_expired_password' => 'required|in:Yes,No',
@@ -60,13 +61,13 @@ class UserController extends Controller
 
             $user = UserCps::createUser($validated);
 
-            // User created without any permissions
-            // Permissions will be set separately via Define User Access Permission menu
+            // Automatically give dashboard access to new user
+            $this->createDefaultUserPermissions($user->userID);
 
             DB::commit();
 
             return redirect()->route('vue.system-security.index')
-                ->with('success', 'User '.$user->userID.' created successfully.');
+                ->with('success', 'User '.$user->userID.' created successfully with dashboard access.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -198,8 +199,11 @@ class UserController extends Controller
             // Update password menggunakan method dari model
             $user->updatePassword($request->new_password, 90);
 
+            // Ensure user has dashboard access
+            $this->ensureDashboardAccess($user->userID);
+
             return redirect()->route('vue.system-security.amend-password')
-                ->with('success', 'Password successfully updated for user: '.$user->userID);
+                ->with('success', 'Password successfully updated for user: '.$user->userID.' (dashboard access ensured)');
         } catch (\Exception $e) {
             Log::error('Password update error: '.$e->getMessage());
             return back()
@@ -483,9 +487,9 @@ class UserController extends Controller
             // Delete existing permissions
             UserPermission::where('user_id', $userId)->delete();
 
-            // Create new permissions
+            // Create new permissions only for checked items
             $menuItems = UserPermission::getAllMenuItems();
-
+            
             // Remove duplicates based on menu_key
             $uniqueMenuItems = [];
             $seenKeys = [];
@@ -500,18 +504,24 @@ class UserController extends Controller
             foreach ($uniqueMenuItems as $item) {
                 $hasPermission = isset($validated['permissions'][$item['key']]) && $validated['permissions'][$item['key']];
 
-                UserPermission::create([
-                    'user_id' => $userId,
-                    'menu_key' => $item['key'],
-                    'menu_name' => $item['name'],
-                    'menu_route' => $item['route'],
-                    'menu_category' => $item['category'],
-                    'menu_parent' => $item['parent'],
-                    'can_access' => $hasPermission
-                ]);
+                // Only create permission if it's checked
+                if ($hasPermission) {
+                    UserPermission::create([
+                        'user_id' => $userId,
+                        'menu_key' => $item['key'],
+                        'menu_name' => $item['name'],
+                        'menu_route' => $item['route'],
+                        'menu_category' => $item['category'],
+                        'menu_parent' => $item['parent'],
+                        'can_access' => true
+                    ]);
+                }
             }
 
             DB::commit();
+
+            // Clear any cached permissions for this user
+            $this->clearUserPermissionCache($userId);
 
             return response()->json([
                 'success' => true,
@@ -524,6 +534,57 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update permissions: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Clear user permission cache
+     */
+    private function clearUserPermissionCache($userId)
+    {
+        // Clear Laravel cache if any
+        Cache::forget("user_permissions_{$userId}");
+        
+        // For session-based permissions, we might need to update session
+        // This is a fallback mechanism
+        if (session()->has("user_permissions_{$userId}")) {
+            session()->forget("user_permissions_{$userId}");
+        }
+    }
+
+    /**
+     * Refresh user permissions (for current logged-in user)
+     */
+    public function refreshPermissions(Request $request, $userId)
+    {
+        try {
+            $user = UserCps::where('userID', $userId)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            // Clear cache for this user
+            $this->clearUserPermissionCache($userId);
+
+            // Get fresh permissions
+            $permissions = UserPermission::getUserPermissions($userId);
+
+            return response()->json([
+                'success' => true,
+                'permissions' => $permissions,
+                'message' => 'Permissions refreshed successfully for user: ' . $userId
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error refreshing permissions: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to refresh permissions: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -571,6 +632,61 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Error updating user status: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Create default permissions for a new user (dashboard access only)
+     */
+    private function createDefaultUserPermissions($userId)
+    {
+        try {
+            // Get dashboard menu item from the menu items list
+            $menuItems = UserPermission::getAllMenuItems();
+            
+            // Find the dashboard menu item
+            $dashboardItem = collect($menuItems)->firstWhere('key', 'dashboard');
+            
+            if ($dashboardItem) {
+                UserPermission::create([
+                    'user_id' => $userId,
+                    'menu_key' => $dashboardItem['key'],
+                    'menu_name' => $dashboardItem['name'],
+                    'menu_route' => $dashboardItem['route'],
+                    'menu_category' => $dashboardItem['category'],
+                    'menu_parent' => $dashboardItem['parent'],
+                    'can_access' => true // Give access to dashboard
+                ]);
+            }
+            
+            Log::info("Default dashboard access created for user: {$userId}");
+            
+        } catch (\Exception $e) {
+            Log::error("Error creating default permissions for user {$userId}: " . $e->getMessage());
+            // Don't throw exception here, as user creation should still succeed
+        }
+    }
+
+    /**
+     * Ensure user has dashboard access (for password updates)
+     */
+    private function ensureDashboardAccess($userId)
+    {
+        try {
+            // Check if user already has dashboard access
+            $existingPermission = UserPermission::where('user_id', $userId)
+                ->where('menu_key', 'dashboard')
+                ->first();
+
+            if (!$existingPermission) {
+                // Create dashboard access if it doesn't exist
+                $this->createDefaultUserPermissions($userId);
+                Log::info("Dashboard access ensured for user: {$userId}");
+            }
+            
+        } catch (\Exception $e) {
+            Log::error("Error ensuring dashboard access for user {$userId}: " . $e->getMessage());
+            // Don't throw exception here, as password update should still succeed
         }
     }
 }

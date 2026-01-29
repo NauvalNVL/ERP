@@ -264,6 +264,7 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   <button
+                    type="button"
                     @click="toggleCategory('system_manager')"
                     class="system-manager-header w-full bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 md:px-6 py-4 border-b border-indigo-800 text-left hover:from-indigo-700 hover:to-indigo-800 transition-colors"
                   >
@@ -375,6 +376,7 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   <button
+                    type="button"
                     @click="toggleCategory('sales_management')"
                     class="sales-management-header w-full bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 border-b border-green-800 text-left hover:from-green-700 hover:to-green-800 transition-colors"
                   >
@@ -1241,6 +1243,7 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   <button
+                    type="button"
                     @click="toggleCategory('warehouse_management')"
                     class="warehouse-management-header w-full bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 md:px-6 py-4 border-b border-yellow-800 text-left hover:from-yellow-700 hover:to-yellow-800 transition-colors"
                   >
@@ -1686,6 +1689,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import UserModal from "@/Components/user-modal.vue";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import Swal from "sweetalert2";
 import {
   UserIcon,
   ShieldCheckIcon,
@@ -2158,11 +2162,50 @@ export default {
         });
 
         if (response.ok) {
+          // Show SweetAlert success notification
+          await Swal.fire({
+            icon: 'success',
+            title: 'Permissions Updated!',
+            text: `Permissions for ${this.foundUser.official_name} have been successfully updated.`,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#10b981',
+            background: '#ffffff',
+            color: '#0f172a',
+            backdrop: 'rgba(16, 185, 129, 0.2)',
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-100',
+              title: 'text-xl font-semibold',
+              confirmButton: 'px-6 py-2 rounded-lg'
+            },
+          });
+          
+          // Also set the success message for consistency
           this.searchMessage = "Permissions updated successfully!";
           this.searchMessageClass = "bg-green-100 text-green-700 border border-green-200";
           this.searchMessageIcon = CheckCircleIcon;
+
+          // Refresh permissions if this is the current logged-in user
+          this.refreshCurrentUserPermissions();
         } else {
           const errorData = await response.json();
+          
+          // Show SweetAlert error notification
+          await Swal.fire({
+            icon: 'error',
+            title: 'Update Failed!',
+            text: errorData.message || "An error occurred while saving permissions.",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#ef4444',
+            background: '#ffffff',
+            color: '#0f172a',
+            backdrop: 'rgba(239, 68, 68, 0.2)',
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-100',
+              title: 'text-xl font-semibold',
+              confirmButton: 'px-6 py-2 rounded-lg'
+            },
+          });
+          
           this.searchMessage =
             errorData.message || "An error occurred while saving permissions.";
           this.searchMessageClass = "bg-red-100 text-red-700 border border-red-200";
@@ -2170,11 +2213,62 @@ export default {
         }
       } catch (error) {
         console.error("Save error:", error);
+        
+        // Show SweetAlert error notification for unexpected errors
+        await Swal.fire({
+          icon: 'error',
+          title: 'Unexpected Error!',
+          text: "An unexpected error occurred while saving permissions. Please try again.",
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#ef4444',
+          background: '#ffffff',
+          color: '#0f172a',
+          backdrop: 'rgba(239, 68, 68, 0.2)',
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-red-100',
+            title: 'text-xl font-semibold',
+            confirmButton: 'px-6 py-2 rounded-lg'
+          },
+        });
+        
         this.searchMessage = "An error occurred while saving permissions.";
         this.searchMessageClass = "bg-red-100 text-red-700 border border-red-200";
         this.searchMessageIcon = ExclamationCircleIcon;
       } finally {
         this.isSaving = false;
+      }
+    },
+
+    async refreshCurrentUserPermissions() {
+      try {
+        // Check if the updated user is the current logged-in user
+        const currentUser = this.$page.props.auth?.user;
+        if (currentUser && currentUser.user_id === this.foundUser.userID) {
+          // Refresh permissions by calling the refresh endpoint
+          const response = await fetch(`/api/users/${this.foundUser.userID}/permissions/refresh`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Requested-With": "XMLHttpRequest",
+              "X-CSRF-TOKEN":
+                this.$page.props.csrf ||
+                document.querySelector('meta[name="csrf-token"]')?.getAttribute("content"),
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            // Update the page props with new permissions
+            if (this.$page.props.auth) {
+              this.$page.props.auth.permissions = data.permissions;
+            }
+            
+            // Optionally show a notification that permissions have been refreshed
+            console.log('Permissions refreshed for current user');
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing permissions:', error);
       }
     },
 

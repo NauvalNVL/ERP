@@ -651,11 +651,12 @@ export default {
             const mobileDigits = mobile.replace(/\D/g, '');
             const officialTelDigits = officialTel.replace(/\D/g, '');
 
-            if (!mobile) {
+            // Mobile Number validation (optional)
+            if (mobile && mobileDigits.length < 8) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Validation Error',
-                    text: 'Mobile Number is required.',
+                    text: 'Mobile Number must be at least 8 digits if provided.',
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#2563eb',
                     background: '#ffffff',
@@ -670,62 +671,7 @@ export default {
                 return;
             }
 
-            if (mobileDigits.length < 8) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Validation Error',
-                    text: 'Mobile Number must be at least 8 digits.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#2563eb',
-                    background: '#ffffff',
-                    color: '#0f172a',
-                    backdrop: 'rgba(15,23,42,0.4)',
-                    customClass: {
-                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
-                        title: 'text-xl font-semibold',
-                        confirmButton: 'px-6 py-2 rounded-lg'
-                    },
-                });
-                return;
-            }
-
-            if (!officialTel) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Validation Error',
-                    text: 'Official Telephone is required.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#2563eb',
-                    background: '#ffffff',
-                    color: '#0f172a',
-                    backdrop: 'rgba(15,23,42,0.4)',
-                    customClass: {
-                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
-                        title: 'text-xl font-semibold',
-                        confirmButton: 'px-6 py-2 rounded-lg'
-                    },
-                });
-                return;
-            }
-
-            if (officialTelDigits.length < 8) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Validation Error',
-                    text: 'Official Telephone must be at least 8 digits.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#2563eb',
-                    background: '#ffffff',
-                    color: '#0f172a',
-                    backdrop: 'rgba(15,23,42,0.4)',
-                    customClass: {
-                        popup: 'rounded-2xl shadow-2xl border border-blue-100',
-                        title: 'text-xl font-semibold',
-                        confirmButton: 'px-6 py-2 rounded-lg'
-                    },
-                });
-                return;
-            }
+            // Official Telephone validation (optional - removed requirement)
 
             const passwordExpiry = Math.max(0, Number(this.form.password_expiry_date) || 0);
             const formData = {

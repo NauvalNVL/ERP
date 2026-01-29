@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Customer;
 use App\Models\Salesperson;
 
@@ -255,14 +256,31 @@ class SalesOrderController extends Controller
         $month = date('m');
         $year = date('Y');
 
-        // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
-        // Use TRY_CAST to safely handle non-numeric suffixes like "-Fit1" in SO_Num
-        $lastSO = DB::table('so')
-            ->where('MM', $month)
-            ->where('YYYY', $year)
-            ->whereRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) IS NOT NULL')
-            ->orderByRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) DESC')
-            ->first();
+        // Get the actual last sequence number by checking the max sequence in SO_Num column.
+        // Some legacy databases may not have MM/YYYY columns or may not support TRY_CAST.
+        $lastSoBaseQuery = DB::table('so');
+
+        if (Schema::hasColumn('so', 'MM')) {
+            $lastSoBaseQuery->where('MM', $month);
+        }
+
+        if (Schema::hasColumn('so', 'YYYY')) {
+            $lastSoBaseQuery->where('YYYY', $year);
+        } else {
+            $lastSoBaseQuery->where('SO_Num', 'like', $month . '-' . $year . '-%');
+        }
+
+        try {
+            $lastSO = (clone $lastSoBaseQuery)
+                ->whereRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) IS NOT NULL')
+                ->orderByRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) DESC')
+                ->first();
+        } catch (\Throwable $e) {
+            $lastSO = (clone $lastSoBaseQuery)
+                ->whereRaw('ISNUMERIC(RIGHT(SO_Num, 5)) = 1')
+                ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
+                ->first();
+        }
 
         $sequence = 1;
         if ($lastSO && $lastSO->SO_Num) {
@@ -291,7 +309,16 @@ class SalesOrderController extends Controller
         $masterCardData = DB::table('MC')
             ->where('MCS_Num', $validated['master_card_seq'])
             ->where('AC_NUM', $validated['customer_code'])
+            ->where('COMP', 'Main')
             ->first();
+
+        if (!$masterCardData) {
+            $masterCardData = DB::table('MC')
+                ->where('MCS_Num', $validated['master_card_seq'])
+                ->where('AC_NUM', $validated['customer_code'])
+                ->orderBy('COMP')
+                ->first();
+        }
 
         if (!$masterCardData) {
             return response()->json([
@@ -353,8 +380,6 @@ class SalesOrderController extends Controller
         // Prepare minimal legacy SO row so schedule updates can find it
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
-        $mainQty = $productDesignQuantities['Main'] ?? $qty;
-        $amount = $mainQty * $price;
         $exRate = isset($validated['exchange_rate']) ? (float) $validated['exchange_rate'] : 1.0;
         if ($exRate <= 0) {
             $exRate = 1.0;
@@ -398,6 +423,9 @@ class SalesOrderController extends Controller
         }
 
         $productDesignQuantities = $normalizedProductDesignQuantities;
+
+        $mainQty = $productDesignQuantities['Main'] ?? $qty;
+        $amount = $mainQty * $price;
 
         Log::info('Product Design Quantities processed:', [
             'original' => $validated['product_design_quantities'] ?? 'not_set',
@@ -606,7 +634,7 @@ class SalesOrderController extends Controller
             // MODEL / PRODUCT / COMPONENT and MC-related fields will be customized per component row below
             'MODEL' => $mcModel,
             'PRODUCT' => (string) ($validated['details'][0]['item_code'] ?? ''),
-            'COMP_Num' => $masterCardData ? (string) ($masterCardData->COMP ?? '') : '',
+            'COMP_Num' => 'Main',
             'P_DESIGN' => $mcPDesign,
             'PER_SET' => 1,
             'UNIT' => $productDesignUnits['Main'] ?? $headerUom,
@@ -714,8 +742,8 @@ class SalesOrderController extends Controller
         // Build SO rows for Main + Fit components for this master card
         $rowsToInsert = [];
 
-        // Only include the base row (Main component) if it has quantity in product design
-        if (isset($productDesignQuantities['Main']) && $productDesignQuantities['Main'] > 0) {
+        // Only include the base row (Main component) if it has a usable quantity
+        if ($mainQty > 0) {
             $rowsToInsert[] = $base;
         } else {
             Log::info('Skipping Main component - no quantity in product design', [
@@ -732,7 +760,10 @@ class SalesOrderController extends Controller
 
         foreach ($mcComponents as $componentRow) {
             // Skip if this is the same component as used for the base row to avoid duplicate Main
-            if ($masterCardData && $componentRow->COMP === ($masterCardData->COMP ?? null)) {
+            if (
+                $masterCardData &&
+                strtolower((string) ($componentRow->COMP ?? '')) === strtolower((string) ($masterCardData->COMP ?? ''))
+            ) {
                 continue;
             }
 
@@ -916,7 +947,60 @@ class SalesOrderController extends Controller
             'sample_sanitized_row' => !empty($sanitizedRows) ? $sanitizedRows[0] : null
         ]);
 
-        DB::table('so')->insert($sanitizedRows);
+        // Filter insert payload to existing columns (legacy SO schemas can differ across databases)
+        $filteredRows = $sanitizedRows;
+        try {
+            $soColumns = Schema::getColumnListing('so');
+            $columnMap = [];
+            foreach ($soColumns as $col) {
+                $columnMap[strtolower((string) $col)] = (string) $col;
+            }
+
+            $filteredRows = [];
+            foreach ($sanitizedRows as $row) {
+                $filtered = [];
+                foreach ($row as $key => $value) {
+                    $lookup = strtolower((string) $key);
+                    if (isset($columnMap[$lookup])) {
+                        $filtered[$columnMap[$lookup]] = $value;
+                    }
+                }
+                $filteredRows[] = $filtered;
+            }
+        } catch (\Throwable $e) {
+            // If schema inspection fails for any reason, fall back to the sanitized rows
+            $filteredRows = $sanitizedRows;
+        }
+
+        try {
+            DB::table('so')->insert($filteredRows);
+        } catch (\Throwable $e) {
+            $reference = uniqid('so_', true);
+            Log::error('Error inserting SO records', [
+                'reference' => $reference,
+                'so_number' => $soNumber,
+                'customer_code' => $validated['customer_code'] ?? null,
+                'master_card_seq' => $validated['master_card_seq'] ?? null,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            $payload = [
+                'success' => false,
+                'message' => 'Failed to create Sales Order',
+                'reference' => $reference,
+            ];
+
+            if (config('app.debug')) {
+                $payload['debug'] = [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                ];
+            }
+
+            return response()->json($payload, 500);
+        }
 
         Log::info('New sales order created', [
             'so_number' => $soNumber,
@@ -944,7 +1028,7 @@ class SalesOrderController extends Controller
         // Find the latest SO record for this customer, Main component only
         $lastSo = DB::table('so')
             ->where('AC_Num', $customerCode)
-            ->where('COMP_Num', 'Main')
+            ->whereRaw('LOWER(COMP_Num) = ?', ['main'])
             ->orderBy('SO_Num', 'desc')
             ->first();
 
@@ -952,7 +1036,7 @@ class SalesOrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'No sales order found for this customer',
-            ], 404);
+            ], 200);
         }
 
         $soNumber = (string) $lastSo->SO_Num;

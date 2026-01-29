@@ -1,7 +1,7 @@
 <template>
     <AppLayout header="Amend User Password">
         <Head title="Amend User Password" />
-        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden no-overscroll gutter-stable">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative gutter-stable">
             <div class="max-w-4xl mx-auto relative z-0">
                 <!-- Floating background bubbles -->
                 <div class="hidden md:block absolute inset-0 -z-10 overflow-hidden pointer-events-none">

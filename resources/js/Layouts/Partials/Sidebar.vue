@@ -52,30 +52,30 @@
 
       <!-- System Manager -->
       <SidebarDropdown
-        v-if="hasPermission('system_manager')"
+        v-if="filteredSystemManagerItems.length > 0"
         title="System Manager"
         icon="fas fa-cogs"
-        :items="filterItemsByPermission(systemManagerItems)"
+        :items="filteredSystemManagerItems"
         :current-path="currentPath"
         :has-permission="hasPermission"
       />
 
       <!-- Sales Management -->
       <SidebarDropdown
-        v-if="hasPermission('sales_management')"
+        v-if="filteredSalesManagementItems.length > 0"
         title="Sales Management"
         icon="fas fa-chart-line"
-        :items="filterItemsByPermission(salesManagementItems)"
+        :items="filteredSalesManagementItems"
         :current-path="currentPath"
         :has-permission="hasPermission"
       />
 
       <!-- Warehouse Management -->
       <SidebarDropdown
-        v-if="hasPermission('warehouse_management')"
+        v-if="filteredWarehouseManagementItems.length > 0"
         title="Warehouse Management"
         icon="fas fa-warehouse"
-        :items="filterItemsByPermission(warehouseManagementItems)"
+        :items="filteredWarehouseManagementItems"
         :current-path="currentPath"
         :has-permission="hasPermission"
       />
@@ -261,40 +261,27 @@ const hasPermission = (menuKey) => {
 
 // Filter menu items based on permissions (recursive for nested children)
 const filterItemsByPermission = (items) => {
-  return items.map((item) => {
-    if (item.children) {
-      // For items with children, filter the children recursively
-      const filteredChildren = item.children
-        .map((child) => {
-          if (child.children) {
-            // Handle nested children (sub-sub menu)
-            const nestedFilteredChildren = child.children.filter((nestedChild) => {
-              const permissionKey = getPermissionKeyFromTitle(nestedChild.title);
-              return hasPermission(permissionKey);
-            });
+  return items
+    .map((item) => {
+      if (item.children) {
+        // For items with children, filter the children recursively
+        const filteredChildren = filterItemsByPermission(item.children);
+        return filteredChildren.length > 0
+          ? {
+              ...item,
+              children: filteredChildren,
+            }
+          : null;
+      }
 
-            return {
-              ...child,
-              children: nestedFilteredChildren,
-            };
-          } else {
-            // Handle direct children
-            const permissionKey = getPermissionKeyFromTitle(child.title);
-            return hasPermission(permissionKey) ? child : null;
-          }
-        })
-        .filter((child) => {
-          // Keep item if it has children or if it passed permission check
-          return child !== null && (child.children?.length > 0 || !child.children);
-        });
+      if (item.route) {
+        const permissionKey = getPermissionKeyFromTitle(item.title);
+        return hasPermission(permissionKey) ? item : null;
+      }
 
-      return {
-        ...item,
-        children: filteredChildren,
-      };
-    }
-    return item;
-  });
+      return null;
+    })
+    .filter((item) => item !== null);
 };
 
 // Map menu titles to permission keys
@@ -541,10 +528,24 @@ const getPermissionKeyFromTitle = (title) => {
     titleMap[title] ||
     title
       .toLowerCase()
-      .replace(/\s+/g, "_")
+      .replace(/[\s\/&\-]+/g, "_")
       .replace(/[^a-z0-9_]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "")
   );
 };
+
+const filteredSystemManagerItems = computed(() =>
+  filterItemsByPermission(systemManagerItems)
+);
+
+const filteredSalesManagementItems = computed(() =>
+  filterItemsByPermission(salesManagementItems)
+);
+
+const filteredWarehouseManagementItems = computed(() =>
+  filterItemsByPermission(warehouseManagementItems)
+);
 
 const logout = () => {
   // Simple Inertia logout menggunakan GET; backend akan redirect ke /login
