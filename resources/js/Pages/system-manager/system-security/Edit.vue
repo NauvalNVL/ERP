@@ -128,7 +128,7 @@
                                     </div>
 
                                     <!-- Password Expiry Date -->
-                                    <div>
+                                    <div v-if="false">
                                         <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-full p-2 mr-3">
                                                 <ClockIcon class="h-5 w-5 text-white" />
@@ -143,7 +143,7 @@
                                     </div>
 
                                     <!-- Amend Expired Password -->
-                                    <div>
+                                    <div v-if="false">
                                         <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-pink-500 to-rose-500 rounded-full p-2 mr-3">
                                                 <KeyIcon class="h-5 w-5 text-white" />
@@ -163,7 +163,7 @@
                                     </div>
 
                                     <!-- User Printer -->
-                                    <div>
+                                    <div v-if="false">
                                         <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-rose-500 to-red-500 rounded-full p-2 mr-3">
                                                 <PrinterIcon class="h-5 w-5 text-white" />
@@ -177,7 +177,7 @@
                                     </div>
 
                                     <!-- Print Route -->
-                                    <div>
+                                    <div v-if="false">
                                         <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-2 mr-3">
                                                 <SwitchHorizontalIcon class="h-5 w-5 text-white" />
@@ -197,7 +197,7 @@
                                     </div>
 
                                     <!-- Menu Type -->
-                                    <div>
+                                    <div v-if="false">
                                         <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
                                                 <MenuAlt2Icon class="h-5 w-5 text-white" />
@@ -265,7 +265,7 @@
                     </div>
 
                     <!-- User Special Access -->
-                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
+                    <div v-if="false" class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
                         <div class="bg-purple-600 md:bg-gradient-to-r md:from-purple-700 md:to-indigo-700 p-4 md:p-6">
                             <h3 class="text-xl font-semibold text-white flex items-center">
                                 <div class="bg-white/30 rounded-full p-2 mr-3">
@@ -464,7 +464,7 @@
                 </form>
 
                 <!-- Salesperson Selection Modal -->
-                <SalespersonModal
+                <SalespersonModal v-if="false"
                     :show="showSalespersonModal"
                     :salespersons="salespersons"
                     :loading="salespersonLoading"

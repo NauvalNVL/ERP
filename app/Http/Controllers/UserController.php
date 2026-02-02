@@ -122,27 +122,27 @@ class UserController extends Controller
                 'userID' => $validated['user_id'],
                 'userName' => $validated['username'],
                 'OFFICIAL_NAME' => $validated['official_name'],
-                'OFFICIAL_TITLE' => $validated['official_title'],
-                'MOBILE' => $validated['mobile_number'],
-                'TEL_' => $validated['official_tel'],
+                'OFFICIAL_TITLE' => $validated['official_title'] ?? '',
+                'MOBILE' => $validated['mobile_number'] ?? '',
+                'TEL_' => $validated['official_tel'] ?? '',
                 // Convert A/O status back to original STS values
                 'STS' => $validated['status'] === 'A' ? 'Active' : 'Inactive',
                 // Recalculate absolute expiry date based on number of days
                 'EXPIRY_DATE' => now()->addDays($validated['password_expiry_date'])->format('Y-m-d'),
                 'EXPIRED' => $validated['amend_expired_password'],
                 // Optional printer & menu settings
-                'PRINTER' => $request->input('user_printer', $user->PRINTER),
-                'ROUTE' => $request->input('print_route', $user->ROUTE),
-                'TYPE' => $request->input('menu_type', $user->TYPE),
+                'PRINTER' => $request->input('user_printer') ?? ($user->PRINTER ?? ''),
+                'ROUTE' => $request->input('print_route') ?? ($user->ROUTE ?? ''),
+                'TYPE' => $request->input('menu_type') ?? ($user->TYPE ?? ''),
                 // Special access flags & salesperson lock
-                'U_PRICE' => $request->input('access_unit_price', $user->U_PRICE),
-                'AC' => $request->input('access_customer_acct', $user->AC),
-                'MC' => $request->input('amend_mc', $user->MC),
-                'MC_PRICE' => $request->input('amend_mc_price', $user->MC_PRICE),
-                'SM' => $request->input('salesperson_code', $user->SM),
+                'U_PRICE' => $request->input('access_unit_price') ?? ($user->U_PRICE ?? 'N'),
+                'AC' => $request->input('access_customer_acct') ?? ($user->AC ?? 'N'),
+                'MC' => $request->input('amend_mc') ?? ($user->MC ?? 'N'),
+                'MC_PRICE' => $request->input('amend_mc_price') ?? ($user->MC_PRICE ?? 'N'),
+                'SM' => $request->input('salesperson_code') ?? ($user->SM ?? null),
                 // Price & cost visibility flags
-                'PRICE' => $request->input('rc_rt_price', $user->PRICE),
-                'COST' => $request->input('board_rc_cost', $user->COST),
+                'PRICE' => $request->input('rc_rt_price') ?? ($user->PRICE ?? 'N'),
+                'COST' => $request->input('board_rc_cost') ?? ($user->COST ?? 'N'),
                 'updated_at' => now(),
             ];
 
