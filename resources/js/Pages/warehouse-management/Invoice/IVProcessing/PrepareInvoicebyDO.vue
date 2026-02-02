@@ -875,6 +875,19 @@ async function openFlow(){
     return
   }
 
+  if (!selectedIndexData.value || !selectedIndexData.value.tax_group_code) {
+    await fetchTaxIndexByNumber()
+  }
+
+  if (!selectedIndexData.value || !selectedIndexData.value.tax_group_code) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'Tax Index Required',
+      html: asPreHtml('Please select Tax Index No. from Customer\'s Sales Tax Index Table (use the search icon).'),
+    })
+    return
+  }
+
   // Show Check Sales Tax Screen (CPS workflow)
   // Tax options are loaded inside CheckSalesTaxModal based on selected tax group
   checkTaxModalOpen.value = true

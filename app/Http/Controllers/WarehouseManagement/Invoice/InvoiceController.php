@@ -79,6 +79,57 @@ class InvoiceController extends Controller
         return $tranAmount + $taxAmount;
     }
 
+    private function isTaxIncludedForCode(?string $taxCode, ?string $customerCode = null, ?string $taxIndexNo = null): bool
+    {
+        $taxCode = trim((string) $taxCode);
+        if ($taxCode === '') {
+            return false;
+        }
+
+        $taxGroupCode = null;
+
+        if (!empty($customerCode) && !empty($taxIndexNo)) {
+            try {
+                $indexNumber = (int) ltrim((string) $taxIndexNo, '0');
+                if ($indexNumber === 0 && trim((string) $taxIndexNo) !== '0') {
+                    $indexNumber = (int) $taxIndexNo;
+                }
+
+                $row = DB::table('customer_sales_tax_indices')
+                    ->where('customer_code', $customerCode)
+                    ->where('index_number', $indexNumber)
+                    ->first();
+
+                if ($row && !empty($row->tax_group_code)) {
+                    $taxGroupCode = (string) $row->tax_group_code;
+                }
+            } catch (\Throwable $e) {
+                $taxGroupCode = null;
+            }
+        }
+
+        try {
+            $query = DB::table('tax_group_items')
+                ->where('tax_type_code', $taxCode)
+                ->where(function ($q) {
+                    $q->whereNull('status')->orWhere('status', 'A');
+                });
+
+            if (!empty($taxGroupCode)) {
+                $query->where('tax_group_code', $taxGroupCode);
+            }
+
+            $item = $query->orderBy('sequence')->first();
+            if ($item && isset($item->include)) {
+                return strtoupper((string) $item->include) === 'Y';
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return false;
+    }
+
     /**
      * Resolve DO number for printing (CPS-like behaviour)
      *
@@ -1129,6 +1180,23 @@ class InvoiceController extends Controller
                     ]);
                 }
 
+                $taxIsIncluded = false;
+                $taxDivisor = null;
+                if (!empty($taxCode) && !empty($taxPercent)) {
+                    $taxIsIncluded = $this->isTaxIncludedForCode(
+                        (string) $taxCode,
+                        (string) ($customerCode ?? ''),
+                        (string) ($taxIndexNo ?? '')
+                    );
+                    if ($taxIsIncluded) {
+                        $taxDivisor = 1 + ((float) $taxPercent / 100);
+                        if ($taxDivisor <= 0) {
+                            $taxDivisor = null;
+                            $taxIsIncluded = false;
+                        }
+                    }
+                }
+
                 // Generate or use manual invoice number
                 if ($invoiceNumberMode === 'manual' && $manualInvoiceNumber) {
                     $ivNum = $manualInvoiceNumber;
@@ -1190,6 +1258,11 @@ class InvoiceController extends Controller
                 }
 
                 // Calculate tax amount if applicable
+                if ($taxIsIncluded && $taxDivisor && $tranAmount > 0) {
+                    $tranAmount = round($tranAmount / $taxDivisor, 2);
+                    $baseAmount = round($tranAmount * $exRate, 2);
+                }
+
                 $taxAmount = 0;
                 if ($taxPercent && $tranAmount > 0) {
                     $taxAmount = round($tranAmount * ($taxPercent / 100), 2);
@@ -1443,15 +1516,19 @@ class InvoiceController extends Controller
 
                     // ✅ FIX: Calculate amounts based on to_bill quantity
                     $unitPrice = $this->toDecimalOrNull($this->getProperty($line, 'SO_Unit_Price'), 0);
+                    $unitPriceToStore = $unitPrice;
+                    if ($taxIsIncluded && $taxDivisor && $unitPriceToStore > 0) {
+                        $unitPriceToStore = round($unitPriceToStore / $taxDivisor, 4);
+                    }
                     
                     // Always recalculate amounts based on to_bill quantity
-                    if ($unitPrice > 0 && $lineQty > 0) {
-                        $lineTranAmt = round($lineQty * $unitPrice, 2);
+                    if ($unitPriceToStore > 0 && $lineQty > 0) {
+                        $lineTranAmt = round($lineQty * $unitPriceToStore, 2);
                         $lineBaseAmt = round($lineTranAmt * $exRate, 2);
                         
                         Log::info("💰 Calculated amounts for to_bill", [
                             'to_bill_qty' => $lineQty,
-                            'unit_price' => $unitPrice,
+                            'unit_price' => $unitPriceToStore,
                             'tran_amt' => $lineTranAmt,
                             'base_amt' => $lineBaseAmt
                         ]);
@@ -1467,6 +1544,11 @@ class InvoiceController extends Controller
                         } else {
                             $lineTranAmt = 0;
                             $lineBaseAmt = 0;
+                        }
+
+                        if ($taxIsIncluded && $taxDivisor && $lineTranAmt > 0) {
+                            $lineTranAmt = round($lineTranAmt / $taxDivisor, 2);
+                            $lineBaseAmt = round($lineTranAmt * $exRate, 2);
                         }
                     }
                     
@@ -1556,7 +1638,7 @@ class InvoiceController extends Controller
                         'SO_PQ4' => $this->getProperty($line, 'PQ4'),
                         'SO_PQ5' => $this->getProperty($line, 'PQ5'),
                         'IV_QTY' => $ivQty,
-                        'IV_UNIT_PRICE' => $this->toDecimalOrNull($this->getProperty($line, 'SO_Unit_Price')),
+                        'IV_UNIT_PRICE' => $this->toDecimalOrNull($unitPriceToStore),
 
                         // Currency and amounts
                         'CURR' => $this->getProperty($line, 'Curr', 'IDR'),
@@ -2614,6 +2696,23 @@ class InvoiceController extends Controller
             // Resolve DO number for printing (independent from second_ref text)
             $doNumberForPrint = $this->resolveDoNumberForPrint($invoice);
 
+            $totalAmount = (float) DB::table('INV')
+                ->where('IV_NUM', $invoiceNo)
+                ->sum('IV_TRAN_AMT');
+            if ($totalAmount == 0) {
+                $totalAmount = (float)($invoice->IV_TRAN_AMT ?? 0);
+            }
+
+            $displayInvoice = (object) [
+                'IV_TRAN_AMT' => $totalAmount,
+                'IV_TAX_PERCENT' => $invoice->IV_TAX_PERCENT ?? 0,
+                'IV_TAX_CODE' => $invoice->IV_TAX_CODE ?? '',
+                'AC_NUM' => $invoice->AC_NUM ?? '',
+            ];
+
+            $taxAmount = $this->calculateTaxAmount($displayInvoice);
+            $netAmount = $this->calculateNetAmount($displayInvoice);
+
             return response()->json([
                 'invoice_no' => $invoice->IV_NUM ?? '',
                 'customer_code' => $invoice->AC_NUM ?? '',
@@ -2639,10 +2738,9 @@ class InvoiceController extends Controller
                 'second_ref' => $invoice->IV_SECOND_REF ?? '',
                 'remark' => $invoice->IV_REMARK ?? '',
                 'status' => $this->normalizeInvoiceStatus($invoice->IV_STS ?? null, $invoice->AM_UID ?? null),
-                'total_amount' => (float)($invoice->IV_TRAN_AMT ?? 0),
-                // ✅ Calculate tax_amount and net_amount on-the-fly (not stored in table)
-                'tax_amount' => $this->calculateTaxAmount($invoice),
-                'net_amount' => $this->calculateNetAmount($invoice),
+                'total_amount' => $totalAmount,
+                'tax_amount' => $taxAmount,
+                'net_amount' => $netAmount,
                 'quantity' => (float)($invoice->IV_QTY ?? 0),
                 'unit_price' => (float)($invoice->IV_UNIT_PRICE ?? 0),
                 'po_number' => $invoice->PO_NUM ?? '',
@@ -2759,14 +2857,24 @@ class InvoiceController extends Controller
                 $totalAmount = (float)($invoice->IV_NET_AMT ?? 0);
             }
 
+            $displayInvoice = (object) [
+                'IV_TRAN_AMT' => $totalAmount,
+                'IV_TAX_PERCENT' => $invoice->IV_TAX_PERCENT ?? 0,
+                'IV_TAX_CODE' => $invoice->IV_TAX_CODE ?? '',
+                'AC_NUM' => $invoice->AC_NUM ?? '',
+            ];
+
+            $taxAmount = $this->calculateTaxAmount($displayInvoice);
+            $netAmount = $this->calculateNetAmount($displayInvoice);
+
             // Return invoice header + items (empty if table doesn't exist)
             return response()->json([
                 'invoice_no' => $invoice->IV_NUM ?? '',
                 'customer_code' => $invoice->AC_NUM ?? '',
                 'customer_name' => $invoice->AC_NAME ?? '',
                 'total_amount' => $totalAmount,
-                'tax_amount' => (float)($invoice->IV_TAX_AMT ?? 0),
-                'net_amount' => (float)($invoice->IV_NET_AMT ?? 0),
+                'tax_amount' => $taxAmount,
+                'net_amount' => $netAmount,
                 'tax_code' => $invoice->IV_TAX_CODE ?? '',
                 'items' => $items->map(function ($item) {
                     return [

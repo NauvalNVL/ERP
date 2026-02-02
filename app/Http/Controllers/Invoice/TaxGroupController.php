@@ -236,14 +236,24 @@ class TaxGroupController extends Controller
             $taxItems = $items->map(function (TaxGroupItem $item) {
                 $taxType = $item->taxType;
 
+                $includeRaw = $item->include;
+                $include = ($includeRaw === true)
+                    || ((string) $includeRaw === '1')
+                    || in_array(strtoupper(trim((string) $includeRaw)), ['Y', 'YES', 'TRUE', 'T'], true);
+
+                $applyRaw = $item->apply;
+                $apply = ($applyRaw === true)
+                    || ((string) $applyRaw === '1')
+                    || in_array(strtoupper(trim((string) $applyRaw)), ['Y', 'YES', 'TRUE', 'T'], true);
+
                 return [
                     'tax_group_code' => $item->tax_group_code,
                     'tax_code'       => $item->tax_type_code,
                     'tax_name'       => $taxType->name ?? '',
                     'rate'           => floatval($taxType->rate ?? 0),
-                    'include'        => $item->include === 'Y',
+                    'include'        => $include,
                     'status'         => $item->status ?? 'A',
-                    'apply'          => $item->apply === 'Y',
+                    'apply'          => $apply,
                     'sequence'       => $item->sequence,
                 ];
             });

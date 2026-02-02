@@ -37,7 +37,7 @@
                   <div class="flex-1">
                     <input
                       type="text"
-                      :value="formatCurrency(totalAmount)"
+                      :value="formatCurrency(displayTotalAmount)"
                       readonly
                       class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded text-right font-bold text-gray-900"
                     />
@@ -145,9 +145,35 @@ const normalizedTaxOptions = computed(() => {
       const name = (t?.name ?? t?.tax_name ?? t?.TAXNAME ?? code).toString()
       const rateRaw = t?.rate ?? t?.tax_rate ?? t?.RATEPPN ?? 0
       const rate = Number(rateRaw) || 0
-      return { code, name, rate }
+      const includeRaw = t?.include ?? t?.Include ?? t?.is_include ?? t?.isInclude ?? false
+      const include = includeRaw === true || includeRaw === 1 || String(includeRaw).toUpperCase() === 'Y' || String(includeRaw).toUpperCase() === 'YES'
+      return { code, name, rate, include }
     })
     .filter((t) => t.code && t.code.trim() !== '')
+})
+
+const round2 = (value) => {
+  return Math.round((Number(value) || 0) * 100) / 100
+}
+
+const selectedTaxOption = computed(() => {
+  if (!selectedTaxGroup.value) return null
+  return normalizedTaxOptions.value.find(t => t.code === selectedTaxGroup.value) || null
+})
+
+const isIncludedTax = computed(() => {
+  return !!selectedTaxOption.value?.include
+})
+
+const displayTotalAmount = computed(() => {
+  const total = Number(props.totalAmount) || 0
+  const tax = selectedTaxOption.value
+  if (tax && tax.include && tax.rate > 0) {
+    const divisor = 1 + (tax.rate / 100)
+    if (!divisor) return round2(total)
+    return round2(total / divisor)
+  }
+  return round2(total)
 })
 
 // Define calculateTax FIRST before any watchers that use it
@@ -170,11 +196,18 @@ const calculateTax = () => {
     return
   }
 
-  const tax = normalizedTaxOptions.value.find(t => t.code === selectedTaxGroup.value)
+  const tax = selectedTaxOption.value
   console.log('📊 Found tax option:', tax)
 
   if (tax) {
-    taxAmount.value = props.totalAmount * (tax.rate / 100)
+    const total = Number(props.totalAmount) || 0
+    if (tax.include) {
+      const divisor = 1 + (tax.rate / 100)
+      const base = divisor ? (total / divisor) : total
+      taxAmount.value = round2(total - base)
+    } else {
+      taxAmount.value = round2(total * (tax.rate / 100))
+    }
     console.log('✅ Tax calculated:', {
       taxCode: tax.code,
       taxRate: tax.rate,
@@ -341,7 +374,11 @@ watch(() => props.taxOptions, (newOptions, oldOptions) => {
 }, { deep: true, immediate: true })
 
 const netAmount = computed(() => {
-  return props.totalAmount + taxAmount.value
+  const total = Number(props.totalAmount) || 0
+  if (isIncludedTax.value) {
+    return round2(total)
+  }
+  return round2(total + taxAmount.value)
 })
 
 const selectedTaxRate = computed(() => {
@@ -393,7 +430,7 @@ const handleOK = () => {
     taxCode: selectedTaxGroup.value,
     taxPercent: selectedTaxRate.value,
     taxAmount: taxAmount.value,
-    totalAmount: props.totalAmount,
+    totalAmount: displayTotalAmount.value,
     netAmount: netAmount.value
   })
 }
