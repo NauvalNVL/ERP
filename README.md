@@ -66,7 +66,6 @@ Multibox Contingency System adalah solusi manajemen enterprise yang dirancang un
 - SQL Server 2022 atau MySQL 8.1
 - RAM: 8GB atau lebih
 - Storage: 50GB SSD
-- 
 
 ## Instalasi
 
