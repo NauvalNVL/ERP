@@ -805,11 +805,10 @@ Please check browser console for details.`)
 }
 
 function renderSalesOrderPdf(doc, so, details, schedules) {
-  const leftMargin = 25
-  const rightMargin = 570
-  const rightColX = 275
+  const leftMargin = 5 // Minimal margin
+  const rightMargin = 590 // Minimal margin
   const pageWidth = 595
-  let yPos = 60
+  let yPos = 50
 
   // Debug: Log current user data at PDF render time
   console.log('➡️ renderSalesOrderPdf called')
@@ -818,10 +817,21 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   console.log('  official_name:', currentUser.value.official_name)
   console.log('  username:', currentUser.value.username)
 
-  // Header
-  doc.setFont('courier', 'bold')
-  doc.setFontSize(12)
-  doc.text('PT. MULTIBOX INDAH', leftMargin, yPos)
+  // Header - Centered with Times New Roman font
+  doc.setFont('times', 'normal')
+  doc.setFontSize(20)
+  doc.text('PT. MULTIBOX INDAH', doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' })
+  yPos += 15
+  doc.setFontSize(20)
+  doc.text('SALES ORDER', doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' })
+
+  // Right-aligned info positioned at the same level as header
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(11)
+  doc.text(`S/ORDER# : ${so.so_number || ''}`, pageWidth - 15, 65, { align: 'right' })
+  doc.text(`S/O DATE : ${formatDate(so.po_date) || ''}`, pageWidth - 15, 80, { align: 'right' })
+
+  yPos = Math.max(yPos, 80) + 20 // Ensure content starts below both header and right info
 
   // Detect cancelled status from possible status fields (status/STS/so_status)
   const rawStatus = String(so.status || so.sts || so.STS || so.so_status || '').trim().toUpperCase()
@@ -831,20 +841,13 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   if (isCancelled) {
     doc.setTextColor(255, 0, 0)
     doc.setFontSize(16)
-    doc.text('CANCEL', rightMargin, yPos - 12, { align: 'right' })
+    doc.text('CANCEL', pageWidth - 15, 50, { align: 'right' })
     doc.setTextColor(0, 0, 0)
-    doc.setFontSize(12)
   }
-
-  doc.text(`S/ORDER# : ${so.so_number || ''}`, rightMargin, yPos, { align: 'right' })
-  yPos += 13
-
-  doc.text('SALES ORDER', leftMargin, yPos)
-  doc.text(`S/O DATE : ${formatDate(so.po_date) || ''}`, rightMargin, yPos, { align: 'right' })
-  yPos += 13
 
   // Credit control line
   doc.setFont('courier', 'normal')
+  doc.setFontSize(11)
   doc.setFontSize(11)
   const creditControl = 'Credit Control: System Approved'
   const creditDate = new Date().toLocaleString('en-GB', {
@@ -860,7 +863,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   console.log('  From currentUser.value:', currentUser.value)
   console.log('  currentUser.value.user_id:', currentUser.value.user_id)
   doc.text(`${creditControl}    , ${creditDate}, ${userId}`, leftMargin, yPos)
-  doc.text(`PAGE NO : 1`, rightMargin, yPos, { align: 'right' })
+  doc.text(`PAGE NO : 1`, pageWidth - 15, yPos, { align: 'right' })
   yPos += 3
 
   // Separator line
@@ -871,6 +874,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   // Customer section (left side)
   const customerStartY = yPos // Store the starting Y position for alignment
   doc.setFont('courier', 'bold')
+  doc.setFontSize(11)
   doc.setFontSize(11)
   doc.text('CUSTOMER:', leftMargin, yPos)
   yPos += 12
@@ -902,18 +906,18 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
       // If this is the last part, write the remaining line
       if (index === addressParts.length - 1 && currentLine) {
         doc.text(currentLine, leftMargin, yPos)
-        yPos += 11
+        yPos += 12
       }
     })
   }
 
   // Deliver To section (right side) - Align with CUSTOMER line
   doc.setFont('courier', 'bold')
-  doc.text('DELIVER TO:', rightColX, customerStartY)
+  doc.text('DELIVER TO:', 320, customerStartY)
   doc.setFont('courier', 'normal')
 
   const deliverTo = so.delivery_location || so.customer_name || ''
-  doc.text(deliverTo, rightColX, customerStartY + 10)
+  doc.text(deliverTo, 320, customerStartY + 10)
 
   // Delivery address (right side) - Format properly
   const deliveryAddress = so.delivery_address || ''
@@ -930,15 +934,15 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
         currentDeliveryLine += ', ' + part
       } else {
         // Current line is full, write it and start new line
-        doc.text(currentDeliveryLine, rightColX, deliveryYPos)
-        deliveryYPos += 11
+        doc.text(currentDeliveryLine, 320, deliveryYPos)
+        deliveryYPos += 9
         currentDeliveryLine = part
       }
 
       // If this is the last part, write the remaining line
       if (index === deliveryParts.length - 1 && currentDeliveryLine) {
-        doc.text(currentDeliveryLine, rightColX, deliveryYPos)
-        deliveryYPos += 11
+        doc.text(currentDeliveryLine, 320, deliveryYPos)
+        deliveryYPos += 12
       }
     })
 
@@ -950,14 +954,14 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
 
   // Contact info
   doc.text(`TEL : ${so.customer_tel || ''}`, leftMargin, yPos)
-  doc.text(`TEL : ${so.customer_tel || ''}`, rightColX, yPos)
-  yPos += 11
+  doc.text(`TEL : ${so.customer_tel || ''}`, 320, yPos)
+  yPos += 9
   doc.text(`FAX : ${so.customer_fax || ''}`, leftMargin, yPos)
-  doc.text(`FAX : ${so.customer_fax || ''}`, rightColX, yPos)
-  yPos += 11
+  doc.text(`FAX : ${so.customer_fax || ''}`, 320, yPos)
+  yPos += 9
   doc.text(`EMAIL :`, leftMargin, yPos)
-  doc.text(`EMAIL :`, rightColX, yPos)
-  yPos += 12
+  doc.text(`EMAIL :`, 320, yPos)
+  yPos += 10
 
   // Line separator
   doc.setLineWidth(0.5)
@@ -966,17 +970,17 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
 
   // Order details
   doc.text(`P/ORDER      : ${so.customer_po_number || ''}`, leftMargin, yPos)
-  doc.text(`P/ORDER DATE : ${formatDate(so.po_date) || ''}`, rightColX, yPos)
-  yPos += 11
+  doc.text(`P/ORDER DATE : ${formatDate(so.po_date) || ''}`, 320, yPos)
+  yPos += 9
   doc.text(`ACCOUNT NO   : ${so.customer_code || ''}`, leftMargin, yPos)
-  doc.text(`CURRENCY     : ${so.currency || 'IDR'}`, rightColX, yPos)
-  yPos += 11
+  doc.text(`CURRENCY     : ${so.currency || 'IDR'}`, 320, yPos)
+  yPos += 9
   doc.text(`M/CARD SEQ# : ${so.master_card_seq || ''}`, leftMargin, yPos)
-  doc.text(`PAYMENT TERM : ${so.credit_terms || '30 DAYS'}`, rightColX, yPos)
-  yPos += 11
+  doc.text(`PAYMENT TERM : ${so.credit_terms || '30 DAYS'}`, 320, yPos)
+  yPos += 9
   doc.text(`MODEL        : ${so.master_card_model || ''}`, leftMargin, yPos)
-  doc.text(`PRINT. BLOCK#: 62`, rightColX, yPos)
-  yPos += 12
+  doc.text(`PRINT. BLOCK#: 62`, 320, yPos)
+  yPos += 10
 
   // Line separator
   doc.setLineWidth(0.5)
@@ -985,12 +989,12 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
 
   // Table header - Adjusted to match data positions exactly
   doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   doc.text('TYPE', leftMargin, yPos)
   doc.text('DESCRIPTION', leftMargin + 35, yPos)
   doc.text('QTY', leftMargin + 315, yPos)         // Align above QTY data
   doc.text('UOM', leftMargin + 360, yPos)         // Align above UOM data
-  doc.text('PRICE', leftMargin + 385, yPos)       // Shortened label, align above price data
+  doc.text('PRICE', leftMargin + 420, yPos)       // Align above price data
   doc.text('AMOUNT', rightMargin - 50, yPos)      // Align above amount data
   yPos += 3
 
@@ -1000,7 +1004,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
 
   // Detail rows
   doc.setFont('courier', 'normal')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   details.forEach((detail, index) => {
     if (index > 0) yPos += 5 // Add spacing between components
 
@@ -1018,70 +1022,55 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
     const partNo = so.part_number || ''
     const pDesign = detail.item_code || ''
     const perSet = detail.per_set || 1
+
+    // Quantity, UOM, Price, Amount - right aligned with PART NO line
+    const qtyText = qty.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    const priceText = price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    const amountText = amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+
     doc.text(`PART NO      : ${partNo}`, leftMargin + 35, yPos)
-    yPos += 10
+    doc.text(qtyText, leftMargin + 340, yPos, { align: 'right' })
+    doc.text(detail.uom || 'PCS', leftMargin + 360, yPos)
+    doc.text(priceText, leftMargin + 450, yPos, { align: 'right' })
+    doc.text(amountText, rightMargin - 5, yPos, { align: 'right' })
+    yPos += 12
+
     doc.text(`P/DESIGN     : ${pDesign} ( ${perSet} PCS/SET )`, leftMargin + 35, yPos)
-    yPos += 10
+    yPos += 12
 
     // Flute and paper quality
     const flute = detail.flute || ''
     const pq1 = detail.paper_quality_1 || ''
     const pq2 = detail.paper_quality_2 || ''
     const pq3 = detail.paper_quality_3 || ''
-    const formatPq = (v) => {
-      const s = String(v || '').trim()
-      if (!s) return ''
-      if (/\d/.test(s)) return s
-      return `${s}125`
-    }
-    const pq1Text = formatPq(pq1)
-    const pq2Text = formatPq(pq2)
-    const pq3Text = formatPq(pq3)
-    const bQualityText = `B/QUALITY    : ${pq1Text}/${pq2Text}/${pq3Text}/`
-    const prevFontSize = doc.getFontSize()
-    doc.setFontSize(9)
-    doc.text(bQualityText, leftMargin + 35, yPos)
-    doc.setFontSize(prevFontSize)
-    yPos += 10
+    doc.text(`B/QUALITY    : ${pq1}125  /${pq2}125  /${pq3}125  /`, leftMargin + 35, yPos)
+    yPos += 12
 
     // Measurement
     const dims = detail.dimensions || {}
     const measurement = `${dims.int_l || 460} L x  ${dims.int_w || 270} W x  ${dims.int_h || 260} H    (Int)`
     doc.text(`MEASUREMENT  : ${measurement}`, leftMargin + 35, yPos)
-    yPos += 10
+    yPos += 12
 
     // Roll size
     const rollSize = detail.roll_size || '220 cm'
     doc.text(`ROLL SIZE    : ${rollSize}`, leftMargin + 35, yPos)
-
-    // Quantity, UOM, Price, Amount - MAXIMUM spacing to avoid overlap completely
-    const qtyText = qty.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-    // Use 0 decimals for price to make it shorter and prevent overlap
-    const priceText = price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-    const amountText = amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-
-    // Positions: QTY(340→390), UOM(360), PRICE(410→max415), AMOUNT(480→540) = 65px gap!
-    doc.text(qtyText, leftMargin + 340, qtyRowY, { align: 'right' })      // QTY right-aligned
-    doc.text(detail.uom || 'PCS', leftMargin + 360, qtyRowY)              // UOM left-aligned
-    doc.text(priceText, leftMargin + 410, qtyRowY, { align: 'right' })    // PRICE: max width ~50px
-    doc.text(amountText, rightMargin - 5, qtyRowY, { align: 'right' })    // AMOUNT: 65px+ gap!
-
-    yPos += 14
+    yPos += 12
 
     // Additional details
     const grossKg = detail.gross_kg || 0
     const pricePerM2 = detail.price_per_m2 || 0
     doc.text(`Sales Order KG       :  ${grossKg.toFixed(3)}`, leftMargin + 35, yPos)
-    yPos += 10
+    yPos += 12
     doc.text(`Price Per M2         :  ${pricePerM2.toFixed(3)}`, leftMargin + 35, yPos)
-    yPos += 10
+    yPos += 12
     doc.text(`Exclusive PPn 10%`, leftMargin + 35, yPos)
     yPos += 14
   })
 
   // Delivery schedule
   doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   doc.text('DELIVERY SCHEDULE :', leftMargin, yPos)
   yPos += 11
 
@@ -1100,7 +1089,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   yPos += 11
 
   doc.setFont('courier', 'normal')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
 
   // Process schedules - keep each schedule separate (don't group by date)
   const scheduleList = []
@@ -1163,27 +1152,27 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
     }
 
     doc.text(scheduleData.remark, leftMargin + 345, yPos)
-    yPos += 10
+    yPos += 12
   })
 
-  yPos += 11
+  yPos += 12
 
   // SO Remark
   doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   doc.text('SO Remark :', leftMargin, yPos)
   doc.setFont('courier', 'normal')
   doc.text(so.remark || '', leftMargin + 65, yPos)
-  yPos += 14
+  yPos += 25
 
   // Order instructions
   doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   doc.text('ORDER INSTRUCTION :', leftMargin, yPos)
-  yPos += 11
+  yPos += 13
   doc.setFont('courier', 'normal')
   doc.text(`1. ${so.instruction1 || 'TOL +10%'}`, leftMargin, yPos)
-  yPos += 10
+  yPos += 12
   doc.text(`2. ${so.instruction2 || 'OO'}`, leftMargin, yPos)
   yPos += 17
 
@@ -1193,19 +1182,19 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   yPos += 14
 
   doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   doc.text('CHECKED BY : .', leftMargin, yPos)
-  doc.text('APPROVED BY : .', rightColX, yPos)
-  yPos += 27
+  doc.text('APPROVED BY : .', 320, yPos)
+  yPos += 25
 
   doc.setLineWidth(0.5)
   doc.line(leftMargin, yPos, leftMargin + 150, yPos)
-  doc.line(rightColX, yPos, rightColX + 150, yPos)
-  yPos += 14
+  doc.line(320, yPos, 470, yPos)
+  yPos += 12
 
   // Print info
   doc.setFont('courier', 'normal')
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   const issuedBy = currentUser.value.official_name || 'Unknown User'
   const issuedDate = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   const printedBy = currentUser.value.user_id || 'guest'
