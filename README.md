@@ -2,7 +2,7 @@
 
 Sistem Enterprise Resource Planning (ERP) yang modern dan scalable, dibangun dengan teknologi terkini untuk mengintegrasikan semua proses bisnis perusahaan.
 
-## 📋 Daftar Isi
+## Daftar Isi
 
 - [Tentang Proyek](#tentang-proyek)
 - [Fitur Utama](#fitur-utama)
@@ -17,11 +17,11 @@ Sistem Enterprise Resource Planning (ERP) yang modern dan scalable, dibangun den
 - [Lisensi](#lisensi)
 - [Dukungan](#dukungan)
 
-## 🎯 Tentang Proyek
+## Tentang Proyek
 
 Multibox Contingency System adalah solusi manajemen enterprise yang dirancang untuk membantu organisasi mengintegrasikan dan mengelola proses bisnis bisnis mereka secara efisien. Sistem ini menyediakan modul-modul yang komprehensif untuk mengelola operasi harian perusahaan dari berbagai departemen.
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 - **Dashboard Terintegrasi** - Dapatkan pandangan menyeluruh tentang operasi bisnis Anda
 - **Manajemen Inventory** - Kelola stok barang dengan real-time tracking
@@ -33,7 +33,7 @@ Multibox Contingency System adalah solusi manajemen enterprise yang dirancang un
 - **Kontrol Akses Multi-User** - Keamanan tingkat enterprise dengan role-based access control
 - **Integrasi Sistem** - API yang powerful untuk integrasi dengan sistem pihak ketiga
 
-## 🛠️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 | Teknologi | Persentase | Deskripsi |
 |-----------|-----------|-----------|
@@ -51,7 +51,7 @@ Multibox Contingency System adalah solusi manajemen enterprise yang dirancang un
 - **Server**: Apache/Nginx
 - **Version Control**: Git
 
-## 📦 Persyaratan Sistem
+## Persyaratan Sistem
 
 ### Minimum:
 - PHP 8.0 atau lebih tinggi
@@ -67,14 +67,9 @@ Multibox Contingency System adalah solusi manajemen enterprise yang dirancang un
 - RAM: 8GB atau lebih
 - Storage: 50GB SSD
 
-## 🚀 Instalasi
+## Instalasi
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/NauvalNVL/ERP.git
-cd ERP
-test
-bahlil etanol
-
-php artisan bahlil etanol
-npm run rabowo
+git clone https://github.com/wazzz23/ERP.git
+```
