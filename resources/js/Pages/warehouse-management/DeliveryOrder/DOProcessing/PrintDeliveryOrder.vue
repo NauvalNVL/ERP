@@ -779,8 +779,8 @@ async function downloadPdf() {
 }
 
 async function renderSuratJalan(doc, groupRows) {
-  const left = 50
-  const right = 545
+  const left = 5
+  const right = 590
   const center = (left + right) / 2
   let y = 50
 
@@ -844,8 +844,8 @@ async function renderSuratJalan(doc, groupRows) {
   }
 
   // Header Section
-  doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFont('times', 'normal')
+  doc.setFontSize(20)
   doc.text('PT. MULTIBOX INDAH', left, y)
 
   // Detect cancelled status from possible status fields on header row
@@ -866,14 +866,12 @@ async function renderSuratJalan(doc, groupRows) {
     doc.setFontSize(14)
     doc.text('CANCEL', right, y - 12, { align: 'right' })
     doc.setTextColor(0, 0, 0)
-    doc.setFontSize(10)
   }
 
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(11)
   doc.text(`No. SJ    : ${doNum}`, right, y, { align: 'right' })
   y += 12
-
-  doc.setFont('courier', 'normal')
-  doc.setFontSize(9)
   doc.text('Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo', left, y)
   doc.text(`Tanggal   : ${doDate}`, right, y, { align: 'right' })
   y += 12
@@ -888,15 +886,14 @@ async function renderSuratJalan(doc, groupRows) {
   doc.text('Fax   : (021)8252690', left, y)
   y += 25
 
-  // Title
-  doc.setFont('courier', 'bold')
+  doc.setFont('times', 'bold')
   doc.setFontSize(16)
   doc.text('SURAT JALAN', center, y, { align: 'center' })
   y += 25
 
   // Customer and delivery info section
   doc.setFont('courier', 'normal')
-  doc.setFontSize(9)
+  doc.setFontSize(11)
   doc.text('Kirim ke :', left, y)
   doc.text(`Nomor Truk : ${truck || '-'}`, right, y, { align: 'right' })
   y += 12

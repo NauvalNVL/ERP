@@ -516,30 +516,30 @@ const generateInvoicePDF = (invoice) => {
     });
 
     // ==== COMPANY HEADER (Top Left) ====
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('PT. MULTIBOX INDAH', 15, 15);
+    doc.setFont('times', 'normal')
+    doc.setFontSize(20)
+    doc.text('PT. MULTIBOX INDAH', 5, 15);
 
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('NPWP  : 01.495.224.6-415.000', 15, 20);
-    doc.text('', 15, 25); // Empty line
-    doc.text('Jl. Raya Cikande - Rangkas Bitung KM. 6', 15, 30);
-    doc.text('Desa Kareo Kec. Javilan', 15, 34);
-    doc.text('Serang - Banten 42180', 15, 38);
-    doc.text('Phone  : 0254-404060', 15, 42);
-    doc.text('Fax    : 021-8252690', 15, 46);
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
+    doc.text('NPWP  : 01.495.224.6-415.000', 5, 20);
+    doc.text('', 5, 25); // Empty line
+    doc.text('Jl. Raya Cikande - Rangkas Bitung KM. 6', 5, 30);
+    doc.text('Desa Kareo Kec. Javilan', 5, 34);
+    doc.text('Serang - Banten 42180', 5, 38);
+    doc.text('Phone  : 0254-404060', 5, 42);
+    doc.text('Fax    : 021-8252690', 5, 46);
 
     // ==== INVOICE TITLE (Center) ====
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold')
+    doc.setFontSize(16)
     doc.text('INVOICE', 105, 60, { align: 'center' });
 
     // ==== INVOICE INFO (Top Right) ====
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
     // Shift header info block slightly to the right
-    const rightX = 155;
+    const rightX = 145;
 
     let rawStatus = String(invoice.inv_sts || invoice.status || '').trim().toUpperCase();
     if (!rawStatus || rawStatus === '0') {
@@ -555,12 +555,12 @@ const generateInvoicePDF = (invoice) => {
     if (isCancelled) {
         doc.setTextColor(255, 0, 0);
         doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
+        doc.setFont('courier', 'bold');
         // Keep CANCEL aligned near the right margin while header block shifts right
         doc.text('CANCEL', rightX + 40, 11, { align: 'right' });
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setFont('courier', 'normal');
     }
 
     const paymentTermText =
@@ -582,35 +582,35 @@ const generateInvoicePDF = (invoice) => {
     doc.text(`Nomor FP      : ${invoice.tax_invoice_no || ''}`, rightX, 50);
 
     // ==== CUSTOMER NAME (Below Title) ====
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`NAMA CUSTOMER  : ${invoice.customer_name || ''}`, 15, 70);
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
+    doc.text(`NAMA CUSTOMER  : ${invoice.customer_name || ''}`, 5, 70);
 
     // ==== ITEM TABLE HEADER ====
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('courier', 'bold')
+    doc.setFontSize(10)
 
     // Separator line
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.3);
-    doc.line(15, 75, 195, 75);
+    doc.line(5, 75, 200, 75);
 
     // Headers
     const headerY = 80;
-    doc.text('Untuk Pembayaran  :', 15, headerY);
-    doc.text('Qty', 110, headerY, { align: 'right' });
-    doc.text('Harga', 140, headerY, { align: 'right' });
-    doc.text('Jumlah', 180, headerY, { align: 'right' });
+    doc.text('Untuk Pembayaran  :', 5, headerY);
+    doc.text('Qty', 120, headerY, { align: 'right' });
+    doc.text('Harga', 150, headerY, { align: 'right' });
+    doc.text('Jumlah', 195, headerY, { align: 'right' });
 
-    doc.text('No.  Deskripsi', 15, headerY + 5);
+    doc.text('No.  Deskripsi', 5, headerY + 5);
 
-    doc.line(15, headerY + 7, 195, headerY + 7);
+    doc.line(5, headerY + 7, 200, headerY + 7);
 
     // ==== ITEM DETAILS (If includeDetails enabled) ====
     let currentY = headerY + 12;
 
     if (printOptions.value.includeDetails) {
-        doc.setFont('helvetica', 'normal');
+        doc.setFont('courier', 'normal');
 
         // Y untuk baris Qty/Harga/Jumlah akan diselaraskan dengan baris 'Main :'
         let mainLineY = currentY;
@@ -648,18 +648,18 @@ const generateInvoicePDF = (invoice) => {
         // Baris 1: nomor + SO# dan PO# pada baris yang sama
         const soText = invoice.so_number || '';
         const poText = invoice.po_number || '';
-        doc.text(`1  SO#  : ${soText};  PO# : ${poText}`, 15, currentY);
+        doc.text(`1  SO#  : ${soText};  PO# : ${poText}`, 5, currentY);
 
         // Baris berikutnya: Model (jika ada)
         const modelText = invoice.model || '';
         if (modelText) {
             currentY += 4;
-            doc.text('   Model: ' + modelText, 15, currentY);
+            doc.text('   Model: ' + modelText, 5, currentY);
         }
 
         // Baris selanjutnya: Main
         currentY += 4;
-        doc.text('   Main : ' + mainDesc, 15, currentY);
+        doc.text('   Main : ' + mainDesc, 5, currentY);
         // Set posisi kolom Qty/Harga/Jumlah sejajar dengan baris Main
         mainLineY = currentY;
 
@@ -682,12 +682,12 @@ const generateInvoicePDF = (invoice) => {
                 desc = item.item_desc || '';
             }
 
-            doc.text(`   ${compLabel}: ` + desc, 15, currentY);
+            doc.text(`   ${compLabel}: ` + desc, 5, currentY);
         });
 
         // Baris terakhir: DO# (hanya dari nomor DO yang sudah di-resolve, tanpa fallback second_ref)
         currentY += 4;
-        doc.text('   DO#  : ' + (invoice.do_number || ''), 15, currentY);
+        doc.text('   DO#  : ' + (invoice.do_number || ''), 5, currentY);
 
         // Qty/Harga/Jumlah hanya di baris nomor 1 (Main)
         const qtyNumber =
@@ -698,9 +698,9 @@ const generateInvoicePDF = (invoice) => {
         const unitPrice = formatCurrency(invoice.unit_price ?? 0);
         const amount = formatCurrency(invoice.total_amount ?? 0);
 
-        doc.text(qty + 'Pcs', 110, mainLineY, { align: 'right' });
-        doc.text(unitPrice, 140, mainLineY, { align: 'right' });
-        doc.text(amount, 180, mainLineY, { align: 'right' });
+        doc.text(qty + 'Pcs', 126, mainLineY, { align: 'right' });
+        doc.text(unitPrice, 154, mainLineY, { align: 'right' });
+        doc.text(amount, 203, mainLineY, { align: 'right' });
     }
 
     // ==== TOTALS SECTION ====
@@ -708,11 +708,11 @@ const generateInvoicePDF = (invoice) => {
 
     // Separator line before totals
     doc.setLineWidth(0.3);
-    doc.line(110, totalsY - 5, 195, totalsY - 5);
+    doc.line(110, totalsY - 5, 200, totalsY - 5);
 
     // Subtotal row
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
     doc.text('Subtotal', 130, totalsY);
     doc.text(':', 155, totalsY);
     doc.text(formatCurrency(invoice.total_amount || 0), 190, totalsY, { align: 'right' });
@@ -723,7 +723,7 @@ const generateInvoicePDF = (invoice) => {
     doc.text(formatCurrency(invoice.tax_amount || 0), 190, totalsY + 5, { align: 'right' });
 
     // Total row (bold)
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('courier', 'bold')
     doc.text('Total', 130, totalsY + 10);
     doc.text(':', 155, totalsY + 10);
     doc.text(formatCurrency(invoice.net_amount || 0), 190, totalsY + 10, { align: 'right' });
@@ -731,12 +731,12 @@ const generateInvoicePDF = (invoice) => {
     // ==== PAYMENT INFO (Amount in words, neatly below totals) ====
     const paymentY = totalsY + 18; // Push below totals block like CPS layout
 
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('JUMLAH:', 15, paymentY);
+    doc.setFont('courier', 'bold')
+    doc.setFontSize(10)
+    doc.text('JUMLAH:', 5, paymentY);
 
     // Convert net amount to words (Terbilang) and render on lines under the label
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('courier', 'normal')
     const amountInWords = numberToWords(invoice.net_amount || 0);
 
     // Wrap text within the lower area width
@@ -745,45 +745,47 @@ const generateInvoicePDF = (invoice) => {
 
     let lineY = paymentY + 4; // Start a bit under the JUMLAH label
     lines.forEach((line) => {
-        doc.text(line, 15, lineY);
+        doc.text(line, 5, lineY);
         lineY += 4;
     });
 
     // Payment instructions
     const paymentInfoY = lineY + 6; // Start after terbilang text
-    doc.setFontSize(7);
-    doc.text('Pembayaran dengan CHEQUE/BILYET GIRO', 15, paymentInfoY);
-    doc.text('harap dicantumkan atas nama PT. MULTIBOX INDAH', 15, paymentInfoY + 4);
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
+    doc.text('Pembayaran dengan CHEQUE/BILYET GIRO', 5, paymentInfoY);
+    doc.text('harap dicantumkan atas nama PT. MULTIBOX INDAH', 5, paymentInfoY + 5);
 
     // Bank accounts
-    doc.setFontSize(7);
-    doc.text('Bank BCA No. Rekening      : 0068584488', 15, paymentInfoY + 10);
-    doc.text('Bank MANDIRI No. Rekening  : 118.00.0489970.3', 15, paymentInfoY + 14);
-    doc.text('Bank HSBC No. Rekening     : 900.025487075', 15, paymentInfoY + 18);
+    doc.setFontSize(10)
+    doc.text('Bank BCA No. Rekening      : 0068584488', 5, paymentInfoY + 12);
+    doc.text('Bank MANDIRI No. Rekening  : 118.00.0489970.3', 5, paymentInfoY + 17);
+    doc.text('Bank HSBC No. Rekening     : 900.025487075', 5, paymentInfoY + 22);
 
     // ==== SIGNATURE SECTION (Right side) ====
-    const sigY = paymentInfoY;
-    doc.setFontSize(8);
+    const sigY = 260;
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
     const signDate = invoice.invoice_date
         ? formatDateForPrint(invoice.invoice_date)
         : new Date().toLocaleDateString('id-ID');
     doc.text('Banten, ' + signDate, 140, sigY);
-    doc.text('PT. MULTIBOX INDAH', 140, sigY + 4);
+    doc.text('PT. MULTIBOX INDAH', 140, sigY + 5);
 
     // Signature name (fixed as EVA KENPI to match CPS layout) – sejajar dengan PT. MULTIBOX INDAH
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('courier', 'bold')
     const signerName = 'EVA KENPI';
     // Gunakan X yang sama (140) tanpa align center agar kiri teks sejajar
-    doc.text(signerName.toUpperCase(), 140, sigY + 33);
+    doc.text(signerName.toUpperCase(), 150, sigY + 34);
 
     // ==== FOOTER ====
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Akhir dari halaman', 15, 285);
-    doc.text('Tanggal Print  : ' + new Date().toLocaleDateString('id-ID'), 15, 289);
+    doc.setFont('courier', 'normal')
+    doc.setFontSize(10)
+    doc.text('Akhir dari halaman', 5, 288);
+    doc.text('Tanggal Print  : ' + new Date().toLocaleDateString('id-ID'), 5, 293);
 
     // Page number
-    doc.text('1 of 1', 190, 289, { align: 'right' });
+    doc.text('1 of 1', 200, 290, { align: 'right' });
 
     return doc;
 };
