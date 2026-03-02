@@ -299,6 +299,134 @@
       @save="handleSalesOrderDetailSave"
       @save-delivery-order="handleSalesOrderDeliveryOrderSave"
     />
+
+    <!-- DO Number Selection Modal -->
+    <div v-if="showDoNumberModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closeDoNumberModal"></div>
+
+      <!-- Modal -->
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative w-full max-w-md bg-white rounded-xl shadow-2xl">
+          <!-- Header -->
+          <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-xl">
+            <div class="flex items-center space-x-3">
+              <div class="p-2 bg-white/20 rounded-lg">
+                <i class="fas fa-hashtag text-white text-lg"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-white">Delivery Order Number</h3>
+            </div>
+            <button @click="closeDoNumberModal" class="p-2 rounded-full hover:bg-white/20 text-white transition-colors">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Modal Content -->
+          <div class="p-6">
+            <div class="space-y-4">
+              <!-- DO Number Mode Selection -->
+              <div>
+                <div class="flex items-center space-x-4">
+                  <label class="flex items-center">
+                    <input
+                      v-model="doNumberMode"
+                      type="radio"
+                      value="auto"
+                      class="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
+                    >
+                    <span class="text-sm text-gray-700">Auto Generate</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      v-model="doNumberMode"
+                      type="radio"
+                      value="manual"
+                      class="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
+                    >
+                    <span class="text-sm text-gray-700">Manual</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Manual DO Number Input -->
+              <div v-if="doNumberMode === 'manual'" class="space-y-3">
+                <div class="flex items-center space-x-1">
+                  <input
+                    v-model="lastDoNumber.prefix"
+                    type="text"
+                    class="w-12 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="MM"
+                    maxlength="2"
+                    @input="checkDoNumberExists"
+                  >
+                  <span class="text-gray-500">-</span>
+                  <input
+                    v-model="lastDoNumber.year"
+                    type="number"
+                    class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="YYYY"
+                    min="2000"
+                    max="2100"
+                    @input="checkDoNumberExists"
+                  >
+                  <span class="text-gray-500">-</span>
+                  <input
+                    v-model="manualDoNumber"
+                    type="text"
+                    class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="XXXXX"
+                    maxlength="5"
+                    @input="checkDoNumberExists"
+                  >
+                  <button
+                    v-if="manualDoNumber"
+                    @click="checkDoNumberExists"
+                    class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                    :disabled="isCheckingDoNumber"
+                  >
+                    <span v-if="isCheckingDoNumber">Checking...</span>
+                    <span v-else>Check</span>
+                  </button>
+                </div>
+                <div v-if="doNumberError" class="text-sm text-red-600">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  {{ doNumberError }}
+                </div>
+                <div v-else-if="doNumberMode === 'manual' && manualDoNumber && !doNumberExists && !isCheckingDoNumber" class="text-sm text-green-600">
+                  <i class="fas fa-check-circle mr-1"></i>
+                  DO number is available
+                </div>
+              </div>
+
+              <!-- Preview -->
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="text-xs text-gray-600 mb-1">Preview:</div>
+                <div class="text-sm font-medium text-gray-800">
+                  {{ doNumberMode === 'manual' && manualDoNumber ? `${lastDoNumber.prefix}-${lastDoNumber.year}-${manualDoNumber}` : 'Will be auto-generated' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-end space-x-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <button
+              @click="closeDoNumberModal"
+              class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              @click="confirmCreateDeliveryOrder"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              :disabled="doNumberMode === 'manual' && (!manualDoNumber || doNumberExists)"
+            >
+              Create DO
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -331,6 +459,13 @@ const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 const selectedEntryIndex = ref(0)
 const showSalesOrderTableModal = ref(false)
 const showSalesOrderDetailModal = ref(false)
+const showDoNumberModal = ref(false)
+const doNumberMode = ref('auto') // 'auto' or 'manual'
+const manualDoNumber = ref('')
+const lastDoNumber = ref({ prefix: '', year: '', number: '' })
+const isCheckingDoNumber = ref(false)
+const doNumberExists = ref(false)
+const doNumberError = ref('')
 
 const orderInfo = reactive({
   orderGroup: '',
@@ -455,6 +590,7 @@ const handleSalesOrderSelect = async (selectedOrder) => {
 
 // Store current sales order data for detail modal
 const currentSalesOrderData = ref({})
+const currentDeliveryOrderData = ref({})
 
 const handleSave = () => {
   // Check if any sales order entry is filled
@@ -498,15 +634,95 @@ const handleSalesOrderDetailSave = (detailData) => {
 }
 
 const handleSalesOrderDeliveryOrderSave = (detailData) => {
-  // Transform payload to match parent expectations
+  // Instead of directly emitting, show the DO number modal first
+  showDoNumberModal.value = true
+  // Store the detail data to use when confirming
+  currentDeliveryOrderData.value = detailData
+}
+
+// Check if DO number already exists
+const checkDoNumberExists = async () => {
+  if (!manualDoNumber.value) {
+    doNumberExists.value = false
+    doNumberError.value = ''
+    return
+  }
+
+  isCheckingDoNumber.value = true
+  doNumberError.value = ''
+
+  try {
+    const fullDoNumber = `${lastDoNumber.value.prefix}-${lastDoNumber.value.year}-${manualDoNumber.value}`
+    const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+
+    const response = await fetch('/api/delivery-orders/check-do-number', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({ do_number: fullDoNumber })
+    })
+
+    const data = await response.json()
+
+    if (data.exists) {
+      doNumberExists.value = true
+      doNumberError.value = `Delivery Order number "${fullDoNumber}" is already used`
+    } else {
+      doNumberExists.value = false
+      doNumberError.value = ''
+    }
+  } catch (err) {
+    console.error('Error checking DO number:', err)
+    doNumberError.value = 'Failed to check DO number availability'
+  } finally {
+    isCheckingDoNumber.value = false
+  }
+}
+
+const closeDoNumberModal = () => {
+  showDoNumberModal.value = false
+  // Reset modal state
+  doNumberMode.value = 'auto'
+  manualDoNumber.value = ''
+  lastDoNumber.value = { prefix: '', year: '', number: '' }
+  doNumberExists.value = false
+  doNumberError.value = ''
+}
+
+const confirmCreateDeliveryOrder = () => {
+  // Validate manual DO number if selected
+  if (doNumberMode.value === 'manual') {
+    if (!manualDoNumber.value) {
+      error('Please enter a Delivery Order number')
+      return
+    }
+    if (doNumberExists.value) {
+      error(`Delivery Order number "${lastDoNumber.value.prefix}-${lastDoNumber.value.year}-${manualDoNumber.value}" is already used`)
+      return
+    }
+  }
+
+  // Transform payload to match parent expectations with DO number data
   const payload = {
-    salesOrderDetail: detailData?.salesOrderDetail || {},
-    packingDetails: detailData?.packingDetails || {},
-    finishedGoodsOffsets: undefined
+    salesOrderDetail: currentDeliveryOrderData.value?.salesOrderDetail || {},
+    packingDetails: currentDeliveryOrderData.value?.packingDetails || {},
+    finishedGoodsOffsets: undefined,
+    doNumberData: {
+      mode: doNumberMode.value,
+      do_number: doNumberMode.value === 'manual' && manualDoNumber.value
+        ? `${lastDoNumber.value.prefix}-${lastDoNumber.value.year}-${manualDoNumber.value}`
+        : null
+    }
   }
 
   emit('save-delivery-order', payload)
   showSalesOrderDetailModal.value = false
+  closeDoNumberModal()
   success('Delivery order will be saved')
 }
 
@@ -514,6 +730,15 @@ const handleSalesOrderDeliveryOrderSave = (detailData) => {
 onMounted(() => {
   if (props.customerData && props.customerData.code) {
     orderInfo.orderGroup = props.customerData.code
+  }
+
+  // Initialize DO number with current period
+  const currentMonth = new Date().getMonth() + 1
+  const currentYear = new Date().getFullYear()
+  lastDoNumber.value = {
+    prefix: String(currentMonth).padStart(2, '0'),
+    year: String(currentYear),
+    number: ''
   }
 })
 </script>

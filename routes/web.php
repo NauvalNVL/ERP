@@ -286,11 +286,13 @@ Route::get('/api/sales-order/master-card/{mcSeq}', [SalesOrderController::class,
 Route::get('/api/sales-order/salesperson/{salespersonCode}', [SalesOrderController::class, 'getSalesperson']);
         Route::post('/api/sales-order/product-design', [SalesOrderController::class, 'saveProductDesign']);
         Route::post('/api/sales-order/delivery-schedule', [SalesOrderController::class, 'saveDeliverySchedule']);
+Route::post('/api/sales-order/check-so-number', [SalesOrderController::class, 'checkSoNumberExists']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedule-summary', [SalesOrderController::class, 'getDeliveryScheduleSummary']);
 Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
 
 // Delivery Order API routes (use web.php to keep session/CSRF context)
 Route::post('/api/delivery-orders', [DeliveryOrderController::class, 'store']);
+Route::post('/api/delivery-orders/check-do-number', [DeliveryOrderController::class, 'checkDoNumberExists']);
 // Print Delivery Order (preview range / single DO)
 Route::get('/api/delivery-orders/print-range', [DeliveryOrderController::class, 'getPrintRange']);
 

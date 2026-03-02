@@ -828,8 +828,8 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   // Right-aligned info positioned at the same level as header
   doc.setFont('courier', 'normal')
   doc.setFontSize(11)
-  doc.text(`S/ORDER# : ${so.so_number || ''}`, pageWidth - 15, 65, { align: 'right' })
-  doc.text(`S/O DATE : ${formatDate(so.po_date) || ''}`, pageWidth - 15, 80, { align: 'right' })
+  doc.text(`S/ORDER# : ${so.so_number || ''}`, pageWidth - 9, 50, { align: 'right' })
+  doc.text(`S/O DATE : ${formatDate(so.po_date) || ''}`, pageWidth - 28, 65, { align: 'right' })
 
   yPos = Math.max(yPos, 80) + 20 // Ensure content starts below both header and right info
 
@@ -863,7 +863,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   console.log('  From currentUser.value:', currentUser.value)
   console.log('  currentUser.value.user_id:', currentUser.value.user_id)
   doc.text(`${creditControl}    , ${creditDate}, ${userId}`, leftMargin, yPos)
-  doc.text(`PAGE NO : 1`, pageWidth - 15, yPos, { align: 'right' })
+  doc.text(`PAGE NO : 1`, pageWidth - 95, 80, { align: 'right' })
   yPos += 3
 
   // Separator line

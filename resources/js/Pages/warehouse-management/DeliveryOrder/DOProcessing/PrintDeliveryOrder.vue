@@ -508,7 +508,7 @@ function formatPreviewText(rows) {
       lines.push(' '.repeat(Math.max(0, RIGHT - 6)) + 'CANCEL')
     }
 
-    lines.push(`PT. MULTIBOX INDAH${' '.repeat(RIGHT - 18)}No. SJ    : ${doNum}`)
+    lines.push(`PT. MULTIBOX INDAH${' '.repeat(RIGHT - 15)}No. SJ    : ${doNum}`)
     lines.push(`Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo${' '.repeat(RIGHT - 47)}Tanggal   : ${doDate}`)
     lines.push(`Kec. Jawilan, Serang - Banten 42180${' '.repeat(RIGHT - 38)}Halaman   : 1`)
     lines.push('Phone : (0254)404060 (Hunting)')
@@ -779,8 +779,8 @@ async function downloadPdf() {
 }
 
 async function renderSuratJalan(doc, groupRows) {
-  const left = 50
-  const right = 545
+  const left = 5
+  const right = 590
   const center = (left + right) / 2
   let y = 50
 
@@ -844,8 +844,8 @@ async function renderSuratJalan(doc, groupRows) {
   }
 
   // Header Section
-  doc.setFont('courier', 'bold')
-  doc.setFontSize(10)
+  doc.setFont('times', 'normal')
+  doc.setFontSize(20)
   doc.text('PT. MULTIBOX INDAH', left, y)
 
   // Detect cancelled status from possible status fields on header row
@@ -866,20 +866,32 @@ async function renderSuratJalan(doc, groupRows) {
     doc.setFontSize(14)
     doc.text('CANCEL', right, y - 12, { align: 'right' })
     doc.setTextColor(0, 0, 0)
-    doc.setFontSize(10)
   }
 
-  doc.text(`No. SJ    : ${doNum}`, right, y, { align: 'right' })
-  y += 12
-
   doc.setFont('courier', 'normal')
-  doc.setFontSize(9)
+  doc.setFontSize(11)
+  const noSjPrefix = `No. SJ    : `
+  const tanggalPrefix = `Tanggal   : `
+  const halamanPrefix = `Halaman   : `
+  const maxPrefixWidth = Math.max(
+    doc.getTextWidth(noSjPrefix),
+    doc.getTextWidth(tanggalPrefix),
+    doc.getTextWidth(halamanPrefix)
+  )
+  const contentWidth = Math.max(
+    doc.getTextWidth(doNum),
+    doc.getTextWidth(doDate),
+    doc.getTextWidth('1')
+  )
+  const xRight = right - maxPrefixWidth - contentWidth
+  doc.text(noSjPrefix + doNum, xRight, y, { align: 'left' })
+  y += 12
   doc.text('Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo', left, y)
-  doc.text(`Tanggal   : ${doDate}`, right, y, { align: 'right' })
+  doc.text(tanggalPrefix + doDate, xRight, y, { align: 'left' })
   y += 12
 
   doc.text('Kec. Jawilan, Serang - Banten 42180', left, y)
-  doc.text('Halaman   : 1', right, y, { align: 'right' })
+  doc.text(halamanPrefix + '1', xRight, y, { align: 'left' })
   y += 12
 
   doc.text('Phone : (0254)404060 (Hunting)', left, y)
@@ -888,21 +900,37 @@ async function renderSuratJalan(doc, groupRows) {
   doc.text('Fax   : (021)8252690', left, y)
   y += 25
 
-  // Title
-  doc.setFont('courier', 'bold')
+  doc.setFont('times', 'bold')
   doc.setFontSize(16)
   doc.text('SURAT JALAN', center, y, { align: 'center' })
   y += 25
 
   // Customer and delivery info section
   doc.setFont('courier', 'normal')
-  doc.setFontSize(9)
+  doc.setFontSize(11)
+  const nomorTruckPrefix = `Nomor Truk : `
+  const waktuPrintPrefix = `Waktu Print : `
+  const dibuatOlehPrefix = `Dibuat Oleh : `
+  const maxPrefixWidth2 = Math.max(
+    doc.getTextWidth(nomorTruckPrefix),
+    doc.getTextWidth(waktuPrintPrefix),
+    doc.getTextWidth(dibuatOlehPrefix)
+  )
+  const truckContent = truck || '-'
+  const waktuPrintContent = `${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`
+  const dibuatOlehContent = currentUser.value.username || currentUser.value.user_id || 'whs12'
+  const contentWidth2 = Math.max(
+    doc.getTextWidth(truckContent),
+    doc.getTextWidth(waktuPrintContent),
+    doc.getTextWidth(dibuatOlehContent)
+  )
+  const xRight2 = right - maxPrefixWidth2 - contentWidth2
   doc.text('Kirim ke :', left, y)
-  doc.text(`Nomor Truk : ${truck || '-'}`, right, y, { align: 'right' })
+  doc.text(nomorTruckPrefix + truckContent, xRight2, y, { align: 'left' })
   y += 12
 
   doc.text(`${custName || '-'}`, left, y)
-  doc.text(`Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`, right, y, { align: 'right' })
+  doc.text(waktuPrintPrefix + waktuPrintContent, xRight2, y, { align: 'left' })
   y += 12
 
   // Customer address from database with word-wrap
@@ -914,7 +942,7 @@ async function renderSuratJalan(doc, groupRows) {
       y += 12
     })
     // Position "Dibuat Oleh" at the first address line
-    doc.text(`Dibuat Oleh : ${currentUser.value.username || currentUser.value.user_id || 'whs12'}`, right, y - (addressLines.length * 12), { align: 'right' })
+    doc.text(dibuatOlehPrefix + dibuatOlehContent, xRight2, y - (addressLines.length * 12), { align: 'left' })
   }
 
   if (custAddress2) {
@@ -941,11 +969,10 @@ async function renderSuratJalan(doc, groupRows) {
   y += 13
 
   // Table header with separate columns
-  const qtyColX = right - 160 // column for quantity (Jumlah)
+  const qtyColX = right - 200 // column for quantity (Jumlah)
   const unitColX = right      // column for unit breakdown (Satuan)
   doc.text('No. Nama Barang', left, y)
-  doc.text('Jumlah', qtyColX, y, { align: 'right' })
-  doc.text('Satuan', unitColX, y, { align: 'right' })
+  doc.text('Jumlah  Satuan', qtyColX, y, { align: 'left' })
   y += 8
 
   // Draw line under header
@@ -1005,8 +1032,7 @@ async function renderSuratJalan(doc, groupRows) {
     // Position text elements: component on left, dimensions shifted left, quantity/unit on right
     doc.text(compText, left, y)
     doc.text(dimText, left + 100, y) // Shifted left from 180 to 100
-    doc.text(compQtyStr, qtyColX, y, { align: 'right' })
-    doc.text(compUnitStr, unitColX, y, { align: 'right' })
+    doc.text(compQtyStr + '  ' + compUnitStr, qtyColX, y, { align: 'left' })
     y += 12
   })
 

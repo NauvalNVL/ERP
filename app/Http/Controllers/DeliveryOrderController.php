@@ -37,6 +37,8 @@ class DeliveryOrderController extends Controller
             'unit' => 'nullable|string|max:50',
             'do_qty' => 'nullable|numeric',
             'pcs_per_bdl' => 'nullable|string|max:50',
+            // Manual DO number (optional)
+            'do_number' => 'nullable|string|max:50',
             // Optional multi-line DO items (Main + Fit1-9)
             'items' => 'sometimes|array',
             'items.*.name' => 'nullable|string|max:50',
@@ -62,20 +64,44 @@ class DeliveryOrderController extends Controller
             $doYear = $orderDate->format('Y');
             $doMonth = $orderDate->format('m');
 
-            // Get the last DO number for this month/year
-            $lastDO = DB::table('DO')
-                ->where('DOYYYY', $doYear)
-                ->where('DOMM', $doMonth)
-                ->orderBy('DO_Num', 'desc')
-                ->value('DO_Num');
+            // Check if manual DO number is provided
+            $manualDoNumber = $request->input('do_number');
+            
+            if ($manualDoNumber) {
+                // Use the provided manual DO number
+                $doNumber = $manualDoNumber;
+                
+                // Check if this DO number already exists
+                if (DB::table('DO')->where('DO_Num', $doNumber)->exists()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Delivery Order number "' . $doNumber . '" is already used. Please use a different number or use auto-generate.'
+                    ], 422);
+                }
+            } else {
+                // Auto-generate DO number
+                // Get the last DO number for this month/year
+                $lastDO = DB::table('DO')
+                    ->where('DOYYYY', $doYear)
+                    ->where('DOMM', $doMonth)
+                    ->orderBy('DO_Num', 'desc')
+                    ->value('DO_Num');
 
-            $seq = 1;
-            if ($lastDO) {
-                $parts = explode('-', $lastDO);
-                $seq = isset($parts[2]) ? ((int) $parts[2]) + 1 : 1;
+                $seq = 1;
+                if ($lastDO) {
+                    $parts = explode('-', $lastDO);
+                    $seq = isset($parts[2]) ? ((int) $parts[2]) + 1 : 1;
+                }
+
+                // Ensure uniqueness by checking if DO_Num already exists
+                do {
+                    $doNumber = $doMonth . '-' . $doYear . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+                    $exists = DB::table('DO')->where('DO_Num', $doNumber)->exists();
+                    if ($exists) {
+                        $seq++;
+                    }
+                } while ($exists);
             }
-
-            $doNumber = $doMonth . '-' . $doYear . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
 
             // Get customer information
             $customer = DB::table('CUSTOMER')
@@ -928,12 +954,8 @@ class DeliveryOrderController extends Controller
                 ->leftJoin('MC', function($join) {
                     $join->on('DO.MCS_Num', '=', 'MC.MCS_Num')
                          ->on('DO.AC_Num', '=', 'MC.AC_NUM')
-                         // Important: also match component so each DO line joins only to its own MC row
                          ->on('DO.COMP', '=', 'MC.COMP');
                 })
-                // Join products to fetch its product group
-                // Important: join ONLY on DO.Product to avoid duplicate rows when
-                // DO.Product and DO.PD are different valid product codes.
                 ->leftJoin('products as p', function($join) {
                     $join->on('p.product_code', '=', 'DO.Product');
                 })
@@ -1121,5 +1143,27 @@ class DeliveryOrderController extends Controller
                 'message' => 'Error fetching delivery orders for print: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Check if a delivery order number already exists in the database.
+     */
+    public function checkDoNumberExists(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'do_number' => 'required|string|max:50',
+        ]);
+
+        $doNumber = $request->input('do_number');
+
+        // Check in the DO table
+        $exists = DB::table('DO')
+            ->where('DO_Num', $doNumber)
+            ->exists();
+
+        return response()->json([
+            'exists' => $exists,
+            'do_number' => $doNumber,
+        ]);
     }
 }

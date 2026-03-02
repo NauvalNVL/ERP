@@ -644,12 +644,22 @@ const handleSalesOrderDeliveryOrderSave = async (salesOrderData) => {
     deliveryOrder.salesOrderData = offsetsData.salesOrderData
   }
 
+  // Process DO number data if available
+  let manualDoNumber = null
+  if (salesOrderData.doNumberData) {
+    console.log('DO Number Data:', salesOrderData.doNumberData)
+    if (salesOrderData.doNumberData.mode === 'manual' && salesOrderData.doNumberData.do_number) {
+      manualDoNumber = salesOrderData.doNumberData.do_number
+      console.log('Using manual DO number:', manualDoNumber)
+    }
+  }
+
   // Now save the delivery order
-  await saveDeliveryOrder()
+  await saveDeliveryOrder(manualDoNumber)
   showSalesOrderModal.value = false
 }
 
-const saveDeliveryOrder = async () => {
+const saveDeliveryOrder = async (manualDoNumber = null) => {
   if (!selectedCustomer.code) {
     error('Please select a customer first')
     return
@@ -747,6 +757,8 @@ const saveDeliveryOrder = async () => {
       remark2: deliveryOrder.remark2,
       unapply_fg: deliveryOrder.unapplyFG,
       status: 'Active',
+      // Manual DO number (if user selected manual mode)
+      do_number: manualDoNumber || null,
       // SO / MC mapping for DO
       so_number: deliveryOrder.soNumber,
       mcard_seq: deliveryOrder.mcardSeq,

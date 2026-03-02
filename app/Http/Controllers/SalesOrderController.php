@@ -252,52 +252,70 @@ class SalesOrderController extends Controller
             }
         }
         $productDesignUnits = $normalizedProductDesignUnits;
+        
+        // Check if manual SO number is provided
+        $manualSoNumber = $validated['so_number'] ?? null;
+        
         // Generate SO number in format: MM-YYYY-XXXXX (matching the filter format)
         $month = date('m');
         $year = date('Y');
 
-        // Get the actual last sequence number by checking the max sequence in SO_Num column.
-        // Some legacy databases may not have MM/YYYY columns or may not support TRY_CAST.
-        $lastSoBaseQuery = DB::table('so');
-
-        if (Schema::hasColumn('so', 'MM')) {
-            $lastSoBaseQuery->where('MM', $month);
-        }
-
-        if (Schema::hasColumn('so', 'YYYY')) {
-            $lastSoBaseQuery->where('YYYY', $year);
-        } else {
-            $lastSoBaseQuery->where('SO_Num', 'like', $month . '-' . $year . '-%');
-        }
-
-        try {
-            $lastSO = (clone $lastSoBaseQuery)
-                ->whereRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) IS NOT NULL')
-                ->orderByRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) DESC')
-                ->first();
-        } catch (\Throwable $e) {
-            $lastSO = (clone $lastSoBaseQuery)
-                ->whereRaw('ISNUMERIC(RIGHT(SO_Num, 5)) = 1')
-                ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
-                ->first();
-        }
-
-        $sequence = 1;
-        if ($lastSO && $lastSO->SO_Num) {
-            // Extract last 5 characters (sequence) from format MM-YYYY-XXXXX
-            $lastSequence = substr($lastSO->SO_Num, -5);
-            $sequence = intval($lastSequence) + 1;
-        }
-
-        // Ensure uniqueness by checking if SO_Num already exists
-        do {
-            $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
-            $soNumber = $month . '-' . $year . '-' . $seqPart;
-            $exists = DB::table('so')->where('SO_Num', $soNumber)->exists();
-            if ($exists) {
-                $sequence++;
+        if ($manualSoNumber) {
+            // Use the provided manual SO number
+            $soNumber = $manualSoNumber;
+            
+            // Check if this SO number already exists
+            if (DB::table('so')->where('SO_Num', $soNumber)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales Order number "' . $soNumber . '" is already used. Please use a different number or use auto-generate.'
+                ], 422);
             }
-        } while ($exists);
+        } else {
+            // Auto-generate SO number
+            // Get the actual last sequence number by checking the max sequence in SO_Num column.
+            // Some legacy databases may not have MM/YYYY columns or may not support TRY_CAST.
+            $lastSoBaseQuery = DB::table('so');
+
+            if (Schema::hasColumn('so', 'MM')) {
+                $lastSoBaseQuery->where('MM', $month);
+            }
+
+            if (Schema::hasColumn('so', 'YYYY')) {
+                $lastSoBaseQuery->where('YYYY', $year);
+            } else {
+                $lastSoBaseQuery->where('SO_Num', 'like', $month . '-' . $year . '-%');
+            }
+
+            try {
+                $lastSO = (clone $lastSoBaseQuery)
+                    ->whereRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) IS NOT NULL')
+                    ->orderByRaw('TRY_CAST(RIGHT(SO_Num, 5) AS INT) DESC')
+                    ->first();
+            } catch (\Throwable $e) {
+                $lastSO = (clone $lastSoBaseQuery)
+                    ->whereRaw('ISNUMERIC(RIGHT(SO_Num, 5)) = 1')
+                    ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
+                    ->first();
+            }
+
+            $sequence = 1;
+            if ($lastSO && $lastSO->SO_Num) {
+                // Extract last 5 characters (sequence) from format MM-YYYY-XXXXX
+                $lastSequence = substr($lastSO->SO_Num, -5);
+                $sequence = intval($lastSequence) + 1;
+            }
+
+            // Ensure uniqueness by checking if SO_Num already exists
+            do {
+                $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
+                $soNumber = $month . '-' . $year . '-' . $seqPart;
+                $exists = DB::table('so')->where('SO_Num', $soNumber)->exists();
+                if ($exists) {
+                    $sequence++;
+                }
+            } while ($exists);
+        }
 
         // Fetch customer data from database
         $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
@@ -1061,6 +1079,28 @@ class SalesOrderController extends Controller
     public function getMasterCard(string $mcSeq): JsonResponse
     {
         return response()->json(['message' => 'getMasterCard not yet implemented', 'mcSeq' => $mcSeq], 200);
+    }
+
+    /**
+     * Check if a sales order number already exists in the database.
+     */
+    public function checkSoNumberExists(Request $request): JsonResponse
+    {
+        $request->validate([
+            'so_number' => 'required|string|max:50',
+        ]);
+
+        $soNumber = $request->input('so_number');
+
+        // Check in the SO table
+        $exists = DB::table('so')
+            ->where('SO_Num', $soNumber)
+            ->exists();
+
+        return response()->json([
+            'exists' => $exists,
+            'so_number' => $soNumber,
+        ]);
     }
 
     public function getProductDesignData(string $masterCardSeq): JsonResponse

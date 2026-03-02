@@ -77,6 +77,84 @@
               </div>
             </div>
           </div>
+
+          <!-- SO Number Mode Selection -->
+          <div class="mb-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <h4 class="text-sm font-semibold text-gray-800 mb-3">Sales Order Number</h4>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <label class="flex items-center">
+                <input
+                  v-model="soNumberMode"
+                  type="radio"
+                  value="auto"
+                  class="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
+                >
+                <span class="text-sm text-gray-700">Auto Generate</span>
+              </label>
+              <label class="flex items-center">
+                <input
+                  v-model="soNumberMode"
+                  type="radio"
+                  value="manual"
+                  class="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
+                >
+                <span class="text-sm text-gray-700">Manual</span>
+              </label>
+            </div>
+            <div v-if="soNumberMode === 'manual'" class="mt-3">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="flex items-center space-x-1">
+                  <input
+                    v-model="lastSoNumber.prefix"
+                    type="text"
+                    class="w-12 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="MM"
+                    maxlength="2"
+                    @input="checkSoNumberExists"
+                  >
+                  <span class="text-gray-500">-</span>
+                  <input
+                    v-model="lastSoNumber.year"
+                    type="number"
+                    class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="YYYY"
+                    min="2000"
+                    max="2100"
+                    @input="checkSoNumberExists"
+                  >
+                  <span class="text-gray-500">-</span>
+                  <input
+                    v-model="manualSoNumber"
+                    type="text"
+                    class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="XXXXX"
+                    maxlength="5"
+                    @input="checkSoNumberExists"
+                  >
+                </div>
+                <button
+                  v-if="manualSoNumber"
+                  @click="checkSoNumberExists"
+                  class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                  :disabled="isCheckingSoNumber"
+                >
+                  <span v-if="isCheckingSoNumber">Checking...</span>
+                  <span v-else>Check Availability</span>
+                </button>
+              </div>
+              <div v-if="soNumberError" class="mt-2 text-sm text-red-600">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ soNumberError }}
+              </div>
+              <div v-else-if="soNumberMode === 'manual' && manualSoNumber && !soNumberExists && !isCheckingSoNumber" class="mt-2 text-sm text-green-600">
+                <i class="fas fa-check-circle mr-1"></i>
+                SO number is available
+              </div>
+              <div v-if="lastSoNumber.prefix || lastSoNumber.year || lastSoNumber.number" class="mt-2 text-xs text-gray-500">
+                Last SO: {{ lastSoNumber.prefix }}-{{ lastSoNumber.year }}-{{ lastSoNumber.number }}
+              </div>
+            </div>
+          </div>
           <!-- Schedule Grid -->
           <div class="mb-6">
             <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white -mx-4 sm:mx-0">
@@ -409,6 +487,14 @@ const emit = defineEmits(['close', 'save'])
 
 const { success, error, info } = useToast()
 
+// SO Number Mode
+const soNumberMode = ref('auto') // 'auto' or 'manual'
+const manualSoNumber = ref('')
+const lastSoNumber = ref({ prefix: '', year: '', number: '' })
+const isCheckingSoNumber = ref(false)
+const soNumberExists = ref(false)
+const soNumberError = ref('')
+
 // Time input refs for 24-hour format
 const timeHours = ref('09')
 const timeMinutes = ref('00')
@@ -507,6 +593,19 @@ const orderTotal = computed(() => {
     })()
   }
 })
+
+// Watch for orderDetails changes to get last SO number
+watch(() => props.orderDetails, (newDetails) => {
+  if (newDetails) {
+    const currentMonth = new Date().getMonth() + 1
+    const currentYear = new Date().getFullYear()
+    lastSoNumber.value = {
+      prefix: newDetails.lastSoPrefix || String(currentMonth).padStart(2, '0'),
+      year: newDetails.lastSoYear || String(currentYear),
+      number: newDetails.lastSoNumber || ''
+    }
+  }
+}, { immediate: true, deep: true })
 
 const activeComponentLabels = computed(() => {
   const comps = Array.isArray(props.mcComponents) ? props.mcComponents : []
@@ -840,6 +939,50 @@ const calculateTotals = () => {
   // This method is called when quantities change
   // The computed properties will automatically update
 }
+
+// Check if SO number already exists
+const checkSoNumberExists = async () => {
+  if (!manualSoNumber.value) {
+    soNumberExists.value = false
+    soNumberError.value = ''
+    return
+  }
+
+  isCheckingSoNumber.value = true
+  soNumberError.value = ''
+
+  try {
+    const fullSoNumber = `${lastSoNumber.value.prefix}-${lastSoNumber.value.year}-${manualSoNumber.value}`
+    const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+
+    const response = await fetch('/api/sales-order/check-so-number', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({ so_number: fullSoNumber })
+    })
+
+    const data = await response.json()
+
+    if (data.exists) {
+      soNumberExists.value = true
+      soNumberError.value = `Sales Order number "${fullSoNumber}" is already used`
+    } else {
+      soNumberExists.value = false
+      soNumberError.value = ''
+    }
+  } catch (err) {
+    console.error('Error checking SO number:', err)
+    soNumberError.value = 'Failed to check SO number availability'
+  } finally {
+    isCheckingSoNumber.value = false
+  }
+}
 // Keep Main in sync with Set input (only when not using product-design-driven quantities)
 watch(() => scheduleEntry.set, (val) => {
   if (isProductDesignQuantity.value) {
@@ -1120,7 +1263,30 @@ const saveSchedule = async () => {
       })
     }
     // Hand over to parent for actual saving
-    await Promise.resolve(emit('save', { entries: validatedEntries }))
+    // Validate manual SO number if in manual mode
+    if (soNumberMode.value === 'manual') {
+      if (!manualSoNumber.value) {
+        error('Please enter a Sales Order number')
+        return
+      }
+      if (soNumberExists.value) {
+        error(`Sales Order number "${lastSoNumber.value.prefix}-${lastSoNumber.value.year}-${manualSoNumber.value}" is already used`)
+        return
+      }
+    }
+
+    // Build SO number data to pass to parent
+    const soNumberData = {
+      mode: soNumberMode.value,
+      so_number: soNumberMode.value === 'manual' 
+        ? `${lastSoNumber.value.prefix}-${lastSoNumber.value.year}-${manualSoNumber.value}`
+        : null
+    }
+
+    await Promise.resolve(emit('save', { 
+      entries: validatedEntries,
+      soNumberData: soNumberData
+    }))
 
   } catch (err) {
     console.error('Error in saveSchedule function:', err)

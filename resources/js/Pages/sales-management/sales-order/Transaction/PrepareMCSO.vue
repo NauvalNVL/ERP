@@ -563,7 +563,7 @@
       :show="showDeliveryScheduleModal"
       @close="showDeliveryScheduleModal = false"
       @save="saveDeliverySchedule"
-      :order-details="orderDetails"
+      :order-details="{ ...orderDetails, lastSoPrefix: lastSOOrder.prefix, lastSoYear: lastSOOrder.year, lastSoNumber: lastSOOrder.number }"
       :mc-components="mcComponentsForDesign"
       ref="deliveryScheduleModalRef"
     />
@@ -1882,14 +1882,17 @@ const saveDeliverySchedule = async (scheduleData) => {
       return
     }
 
+    // Get SO number data from modal
+    const soNumberData = scheduleData.soNumberData || { mode: 'auto', so_number: null }
+
     // First, we need to create the Sales Order if it doesn't exist
     let soNumber = orderDetails.so_number
     console.log('Current SO number:', soNumber)
 
     if (!soNumber) {
       console.log('No SO number found, creating new Sales Order...')
-      // Create the Sales Order first
-      const soResponse = await createSalesOrder()
+      // Create the Sales Order first (pass manual SO number if selected)
+      const soResponse = await createSalesOrder(soNumberData.so_number)
       console.log('SO creation response:', soResponse)
       if (!soResponse.success) {
         error('Failed to create Sales Order: ' + soResponse.message)
@@ -1951,7 +1954,7 @@ const saveDeliverySchedule = async (scheduleData) => {
 }
 
 // Create Sales Order function
-const createSalesOrder = async () => {
+const createSalesOrder = async (manualSoNumber = null) => {
   try {
     // Comprehensive validation
     if (!selectedCustomer.code) {
@@ -1992,6 +1995,8 @@ const createSalesOrder = async () => {
       // Include product design quantities for each component (Main, Fit1-9)
       product_design_quantities: orderDetails.productDesignQuantities || {},
       product_design_units: orderDetails.productDesignUnits || {},
+      // Manual SO number (if user selected manual mode)
+      so_number: manualSoNumber || null,
       // ===================================================================
       // DELIVERY LOCATION DATA - Dual Mode System
       // ===================================================================
